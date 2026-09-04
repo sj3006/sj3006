@@ -1,0 +1,212 @@
+{
+  "lime": [
+    {
+      "rank": 1,
+      "modal": "time",
+      "share": 1.0,
+      "distinct": 1,
+      "norm_entropy": -0.0,
+      "mean_abs_w": 43.00365544657543,
+      "dist": {
+        "time": 1.0
+      }
+    },
+    {
+      "rank": 2,
+      "modal": "sensor measurement 15",
+      "share": 1.0,
+      "distinct": 1,
+      "norm_entropy": -0.0,
+      "mean_abs_w": 16.358467372974932,
+      "dist": {
+        "sensor measurement 15": 1.0
+      }
+    },
+    {
+      "rank": 3,
+      "modal": "sensor measurement 11",
+      "share": 1.0,
+      "distinct": 1,
+      "norm_entropy": -0.0,
+      "mean_abs_w": 12.081436840386258,
+      "dist": {
+        "sensor measurement 11": 1.0
+      }
+    },
+    {
+      "rank": 4,
+      "modal": "sensor measurement 4",
+      "share": 1.0,
+      "distinct": 1,
+      "norm_entropy": -0.0,
+      "mean_abs_w": 7.459347614182116,
+      "dist": {
+        "sensor measurement 4": 1.0
+      }
+    },
+    {
+      "rank": 5,
+      "modal": "sensor measurement 13",
+      "share": 1.0,
+      "distinct": 1,
+      "norm_entropy": -0.0,
+      "mean_abs_w": 4.85353431453974,
+      "dist": {
+        "sensor measurement 13": 1.0
+      }
+    },
+    {
+      "rank": 6,
+      "modal": "sensor measurement 3",
+      "share": 0.87,
+      "distinct": 2,
+      "norm_entropy": 0.12003777943326678,
+      "mean_abs_w": 2.465443846840378,
+      "dist": {
+        "sensor measurement 3": 0.87,
+        "sensor measurement 7": 0.13
+      }
+    },
+    {
+      "rank": 7,
+      "modal": "sensor measurement 7",
+      "share": 0.485,
+      "distinct": 10,
+      "norm_entropy": 0.4731870049512918,
+      "mean_abs_w": 1.7584571669412663,
+      "dist": {
+        "sensor measurement 7": 0.485,
+        "sensor measurement 2": 0.18,
+        "sensor measurement 3": 0.13,
+        "sensor measurement 17": 0.095,
+        "sensor measurement 9": 0.07,
+        "sensor measurement 8": 0.015,
+        "sensor measurement 14": 0.01,
+        "sensor measurement 21": 0.005,
+        "sensor measurement 19": 0.005,
+        "sensor measurement 18": 0.005
+      }
+    },
+    {
+      "rank": 8,
+      "modal": "sensor measurement 17",
+      "share": 0.23,
+      "distinct": 9,
+      "norm_entropy": 0.5997729318329541,
+      "mean_abs_w": 0.9667540275328715,
+      "dist": {
+        "sensor measurement 17": 0.23,
+        "sensor measurement 2": 0.175,
+        "sensor measurement 8": 0.155,
+        "sensor measurement 14": 0.15,
+        "sensor measurement 9": 0.13,
+        "sensor measurement 19": 0.09,
+        "sensor measurement 18": 0.055,
+        "sensor measurement 12": 0.01,
+        "sensor measurement 16": 0.005
+      }
+    }
+  ],
+  "walime": [
+    {
+      "rank": 1,
+      "modal": "time",
+      "share": 1.0,
+      "distinct": 1,
+      "norm_entropy": -0.0,
+      "mean_abs_w": 42.97029953965647,
+      "dist": {
+        "time": 1.0
+      }
+    },
+    {
+      "rank": 2,
+      "modal": "sensor measurement 15",
+      "share": 1.0,
+      "distinct": 1,
+      "norm_entropy": -0.0,
+      "mean_abs_w": 16.35693420664909,
+      "dist": {
+        "sensor measurement 15": 1.0
+      }
+    },
+    {
+      "rank": 3,
+      "modal": "sensor measurement 11",
+      "share": 1.0,
+      "distinct": 1,
+      "norm_entropy": -0.0,
+      "mean_abs_w": 12.061138838502913,
+      "dist": {
+        "sensor measurement 11": 1.0
+      }
+    },
+    {
+      "rank": 4,
+      "modal": "sensor measurement 4",
+      "share": 1.0,
+      "distinct": 1,
+      "norm_entropy": -0.0,
+      "mean_abs_w": 7.459806851113318,
+      "dist": {
+        "sensor measurement 4": 1.0
+      }
+    },
+    {
+      "rank": 5,
+      "modal": "sensor measurement 13",
+      "share": 1.0,
+      "distinct": 1,
+      "norm_entropy": -0.0,
+      "mean_abs_w": 4.871980136321517,
+      "dist": {
+        "sensor measurement 13": 1.0
+      }
+    },
+    {
+      "rank": 6,
+      "modal": "sensor measurement 3",
+      "share": 1.0,
+      "distinct": 1,
+      "norm_entropy": -0.0,
+      "mean_abs_w": 2.3937547099112364,
+      "dist": {
+        "sensor measurement 3": 1.0
+      }
+    },
+    {
+      "rank": 7,
+      "modal": "sensor measurement 7",
+      "share": 0.88,
+      "distinct": 4,
+      "norm_entropy": 0.14470893647222693,
+      "mean_abs_w": 1.4246215081095732,
+      "dist": {
+        "sensor measurement 7": 0.88,
+        "sensor measurement 2": 0.08,
+        "sensor measurement 17": 0.03,
+        "sensor measurement 9": 0.01
+      }
+    },
+    {
+      "rank": 8,
+      "modal": "sensor measurement 2",
+      "share": 0.5,
+      "distinct": 8,
+      "norm_entropy": 0.427073740809746,
+      "mean_abs_w": 0.6076242456686505,
+      "dist": {
+        "sensor measurement 2": 0.5,
+        "sensor measurement 17": 0.27,
+        "sensor measurement 7": 0.1,
+        "sensor measurement 9": 0.06,
+        "sensor measurement 8": 0.03,
+        "sensor measurement 14": 0.02,
+        "sensor measurement 21": 0.01,
+        "sensor measurement 20": 0.01
+      }
+    }
+  ],
+  "R_lime": 200,
+  "R_walime": 100
+}

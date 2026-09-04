@@ -8,6 +8,7 @@ turbofan RUL prediction, for academic paper submission.
 | File | Purpose |
 |---|---|
 | `PAPER_NUMBER_AUDIT.md` | Every number in `Tolu_Revamped_V10.pdf` vs the re-run |
+| `RANKWISE_ANALYSIS.md` | Rank-position occupancy and per-feature SNR |
 | `audit.html` | Presentable version of the audit (published artifact) |
 | `VERIFICATION_REPORT.md` | Full findings: GBRM, LIME, WA-LIME, Jaccard, Spearman |
 | `stability_metrics.py` | Jaccard Index + Spearman correlation implementation (missing from the notebook) |
@@ -22,6 +23,9 @@ turbofan RUL prediction, for academic paper submission.
 | `scripts/walime_audit.py` | WA-LIME convergence protocol from §4.4 |
 | `scripts/seed_distribution.py` | Sampling distribution of the 5-run Jaccard |
 | `scripts/true_effect.py` | Well-powered LIME vs WA-LIME on instance #10 |
+| `scripts/rankwise.py` | Rank-position occupancy, LIME vs WA-LIME, 200 runs |
+| `scripts/snr.py` | Per-feature signal-to-noise and rank variance |
+| `results/*.csv` | Rank occupancy and per-feature SNR as data |
 | `results/` | Raw logs and JSON output from the runs above |
 
 ## Headline result

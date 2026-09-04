@@ -1,0 +1,229 @@
+{
+  "features": [
+    {
+      "feature": "time",
+      "mean_w": -42.924344068945054,
+      "sd": 0.38704175138854324,
+      "snr": 110.9036529391223,
+      "mean_rank": 1.0,
+      "rank_sd": 0.0,
+      "top8_rate": 1.0
+    },
+    {
+      "feature": "sensor measurement 15",
+      "mean_w": -16.36738018142501,
+      "sd": 0.3033791841128163,
+      "snr": 53.95024127739279,
+      "mean_rank": 2.0,
+      "rank_sd": 0.0,
+      "top8_rate": 1.0
+    },
+    {
+      "feature": "sensor measurement 11",
+      "mean_w": -12.072313164060297,
+      "sd": 0.31016595475935427,
+      "snr": 38.922109209009534,
+      "mean_rank": 3.0,
+      "rank_sd": 0.0,
+      "top8_rate": 1.0
+    },
+    {
+      "feature": "sensor measurement 4",
+      "mean_w": -7.4522382069879765,
+      "sd": 0.30294502030200776,
+      "snr": 24.599309140512673,
+      "mean_rank": 4.0,
+      "rank_sd": 0.0,
+      "top8_rate": 1.0
+    },
+    {
+      "feature": "sensor measurement 13",
+      "mean_w": -4.8686429956047395,
+      "sd": 0.3142175512854733,
+      "snr": 15.494497285994932,
+      "mean_rank": 5.0,
+      "rank_sd": 0.0,
+      "top8_rate": 1.0
+    },
+    {
+      "feature": "sensor measurement 3",
+      "mean_w": -2.384228166759795,
+      "sd": 0.33186474743839506,
+      "snr": 7.184336947998328,
+      "mean_rank": 6.185,
+      "rank_sd": 0.41324931941867693,
+      "top8_rate": 1.0
+    },
+    {
+      "feature": "sensor measurement 7",
+      "mean_w": 1.9872486391288684,
+      "sd": 0.32092900443749217,
+      "snr": 6.19217525262952,
+      "mean_rank": 6.96,
+      "rank_sd": 0.6069596362197412,
+      "top8_rate": 0.98
+    },
+    {
+      "feature": "sensor measurement 21",
+      "mean_w": 1.3729901801878324,
+      "sd": 0.2803368288458599,
+      "snr": 4.897644686359621,
+      "mean_rank": 9.01,
+      "rank_sd": 1.44218584100663,
+      "top8_rate": 0.455
+    },
+    {
+      "feature": "sensor measurement 2",
+      "mean_w": -1.1274512592895822,
+      "sd": 0.31019857034445925,
+      "snr": 3.634611397588347,
+      "mean_rank": 10.475,
+      "rank_sd": 2.1930287275820164,
+      "top8_rate": 0.17
+    },
+    {
+      "feature": "sensor measurement 12",
+      "mean_w": 1.0861593570663641,
+      "sd": 0.3308416171124372,
+      "snr": 3.2830191272376434,
+      "mean_rank": 10.8,
+      "rank_sd": 2.467792535850614,
+      "top8_rate": 0.145
+    },
+    {
+      "feature": "sensor measurement 16",
+      "mean_w": -1.0024538404794263,
+      "sd": 0.3229559882509974,
+      "snr": 3.1039952097136267,
+      "mean_rank": 11.34,
+      "rank_sd": 2.6008460162031892,
+      "top8_rate": 0.13
+    },
+    {
+      "feature": "sensor measurement 20",
+      "mean_w": 0.9202612066195774,
+      "sd": 0.32638283235582705,
+      "snr": 2.8195760174551583,
+      "mean_rank": 11.94,
+      "rank_sd": 2.761593742750731,
+      "top8_rate": 0.085
+    },
+    {
+      "feature": "sensor measurement 17",
+      "mean_w": -0.7492997200359138,
+      "sd": 0.3050722092745584,
+      "snr": 2.4561388984519406,
+      "mean_rank": 13.65,
+      "rank_sd": 3.0979832149319337,
+      "top8_rate": 0.025
+    },
+    {
+      "feature": "sensor measurement 6",
+      "mean_w": -0.5937357780276443,
+      "sd": 0.3155303089072274,
+      "snr": 1.8817075927948819,
+      "mean_rank": 15.445,
+      "rank_sd": 3.8635443571932746,
+      "top8_rate": 0.01
+    },
+    {
+      "feature": "sensor measurement 9",
+      "mean_w": -0.5838348883965966,
+      "sd": 0.29258294501670007,
+      "snr": 1.9954508570664378,
+      "mean_rank": 15.435,
+      "rank_sd": 3.4822083510324333,
+      "top8_rate": 0.0
+    },
+    {
+      "feature": "sensor measurement 8",
+      "mean_w": 0.34726728975369425,
+      "sd": 0.30157108719517944,
+      "snr": 1.1515271340615616,
+      "mean_rank": 18.3,
+      "rank_sd": 3.9572717874818752,
+      "top8_rate": 0.0
+    },
+    {
+      "feature": "sensor measurement 14",
+      "mean_w": 0.2794033870056439,
+      "sd": 0.3255328423286212,
+      "snr": 0.8582955409567855,
+      "mean_rank": 18.53,
+      "rank_sd": 3.8143282501641114,
+      "top8_rate": 0.0
+    },
+    {
+      "feature": "operational setting 2",
+      "mean_w": 0.13037824303538104,
+      "sd": 0.3256513168713681,
+      "snr": 0.40036147953573387,
+      "mean_rank": 19.76,
+      "rank_sd": 3.52596086194955,
+      "top8_rate": 0.0
+    },
+    {
+      "feature": "sensor measurement 19",
+      "mean_w": -0.11774634666051448,
+      "sd": 0.3392996633080605,
+      "snr": 0.347027596527878,
+      "mean_rank": 19.9,
+      "rank_sd": 3.623534186398686,
+      "top8_rate": 0.0
+    },
+    {
+      "feature": "sensor measurement 18",
+      "mean_w": -0.08606607514895537,
+      "sd": 0.3116730729764362,
+      "snr": 0.27614215859918806,
+      "mean_rank": 20.285,
+      "rank_sd": 3.5204793707675686,
+      "top8_rate": 0.0
+    },
+    {
+      "feature": "sensor measurement 10",
+      "mean_w": -0.05352338765786991,
+      "sd": 0.2944887192225041,
+      "snr": 0.18175021372356795,
+      "mean_rank": 20.405,
+      "rank_sd": 3.0333108973529246,
+      "top8_rate": 0.0
+    },
+    {
+      "feature": "sensor measurement 5",
+      "mean_w": -0.030200815597685008,
+      "sd": 0.30227349374239515,
+      "snr": 0.09991221930766739,
+      "mean_rank": 20.38,
+      "rank_sd": 3.321987356989787,
+      "top8_rate": 0.0
+    },
+    {
+      "feature": "operational setting 3",
+      "mean_w": -0.02308489964446413,
+      "sd": 0.31077467231061573,
+      "snr": 0.07428179224782848,
+      "mean_rank": 20.175,
+      "rank_sd": 3.2502884487380506,
+      "top8_rate": 0.0
+    },
+    {
+      "feature": "operational setting 1",
+      "mean_w": 0.022037715284733465,
+      "sd": 0.2878131365900882,
+      "snr": 0.07656952544219764,
+      "mean_rank": 20.64,
+      "rank_sd": 3.3317262792732545,
+      "top8_rate": 0.0
+    },
+    {
+      "feature": "sensor measurement 1",
+      "mean_w": -0.00875796870991085,
+      "sd": 0.3032274844334079,
+      "snr": 0.028882502937606226,
+      "mean_rank": 20.385,
+      "rank_sd": 3.2197476609200275,
+      "top8_rate": 0.0
+    }
+  ]
+}

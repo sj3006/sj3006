@@ -157,7 +157,7 @@ footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--rule);
 
   <div class="ledger">
     <div class="lcell"><span class="n ok">13</span><span class="k">Values reproduced exactly &mdash; all of Tables&nbsp;2(b) and&nbsp;5, plus the instance&#8209;#10 prediction</span></div>
-    <div class="lcell"><span class="n self">3</span><span class="k">Places where the paper contradicts itself &mdash; Table&nbsp;6 vs Table&nbsp;7, the prose, and &rho;&#772;&nbsp;=&nbsp;1.000</span></div>
+    <div class="lcell"><span class="n self">4</span><span class="k">Places where the paper contradicts itself &mdash; Table&nbsp;6 vs Table&nbsp;7, the feature list, &rho;&#772;&nbsp;=&nbsp;1.000, and the rank&#8209;7/8 counts</span></div>
     <div class="lcell"><span class="n bad">0.636</span><span class="k">Headline Jaccard for LIME. Sits at the <b>0.75th percentile</b> of what 5 runs produce; the true value is 0.741</span></div>
     <div class="lcell"><span class="n warn">1</span><span class="k">Unresolved author note still in the PDF, under Fig.&nbsp;18 on p.&nbsp;23</span></div>
   </div>
@@ -467,12 +467,151 @@ footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--rule);
 </section>
 
 <section>
+  <h2>Rank&#8209;position analysis <span class="src">&sect;4.3 bimodal claim</span></h2>
+  <div class="col">
+  <p class="lede">&sect;4.3 makes a rank&#8209;<em>position</em> claim, distinct from the set&#8209;membership claim Jaccard measures: ranks 1&ndash;5 are perfectly stable, rank 6 nearly so, ranks 7&ndash;8 arbitrary. This is the paper&rsquo;s most interesting finding, and it <strong>largely holds up</strong> &mdash; re&#8209;measured here with 200 runs instead of 5.</p>
+  </div>
+
+  <div class="scroll">
+  <table>
+    <caption>What Table 6 shows, read by rank position</caption>
+    <thead><tr><th class="num">Rank</th><th>Run 1</th><th>Run 2</th><th>Run 3</th><th>Run 4</th><th>Run 5</th><th class="num">Distinct</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td>Time</td><td>Time</td><td>Time</td><td>Time</td><td>Time</td><td class="num">1</td></tr>
+      <tr><td class="num">2</td><td>S15</td><td>S15</td><td>S15</td><td>S15</td><td>S15</td><td class="num">1</td></tr>
+      <tr><td class="num">3</td><td>S11</td><td>S11</td><td>S11</td><td>S11</td><td>S11</td><td class="num">1</td></tr>
+      <tr><td class="num">4</td><td>S4</td><td>S4</td><td>S4</td><td>S4</td><td>S4</td><td class="num">1</td></tr>
+      <tr><td class="num">5</td><td>S13</td><td>S13</td><td>S13</td><td>S13</td><td>S13</td><td class="num">1</td></tr>
+      <tr><td class="num">6</td><td>S3</td><td>S3</td><td><strong>S7</strong></td><td>S3</td><td>S3</td><td class="num">2</td></tr>
+      <tr class="hl"><td class="num">7</td><td>S14</td><td>S7</td><td>S3</td><td>S2</td><td>S2</td><td class="num"><strong>4</strong></td></tr>
+      <tr class="hl"><td class="num">8</td><td>S8</td><td>S12</td><td>S14</td><td>S7</td><td>S8</td><td class="num"><strong>4</strong></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="col">
+  <div class="call self">
+    <h4>Ranks 7 and 8 hold four features each, not five</h4>
+    <p>&sect;4.3 says &ldquo;five different features appearing at rank 7 across the five runs and five different features at rank 8&rdquo;. Table&nbsp;6 gives <strong>four</strong> at each &mdash; S2 repeats at rank 7 (runs 4, 5) and S8 repeats at rank 8 (runs 1, 5). Ranks 1&ndash;6 match the prose exactly.</p>
+  </div>
+  </div>
+
+  <h3 style="max-width:70ch">Rank occupancy over 200 runs</h3>
+  <div class="scroll">
+  <table>
+    <caption>Instance #10, top-k = 8, 200 independent seeds &mdash; share is how often the modal feature holds that rank</caption>
+    <thead><tr><th class="num">Rank</th><th>LIME modal</th><th class="num">Share</th><th class="num">Distinct</th><th>WA&#8209;LIME modal</th><th class="num">Share</th><th class="num">Distinct</th><th class="num">Mean |w|</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td>time</td><td class="num">100.0%</td><td class="num">1</td><td>time</td><td class="num">100.0%</td><td class="num">1</td><td class="num">43.00</td></tr>
+      <tr><td class="num">2</td><td>S15</td><td class="num">100.0%</td><td class="num">1</td><td>S15</td><td class="num">100.0%</td><td class="num">1</td><td class="num">16.36</td></tr>
+      <tr><td class="num">3</td><td>S11</td><td class="num">100.0%</td><td class="num">1</td><td>S11</td><td class="num">100.0%</td><td class="num">1</td><td class="num">12.08</td></tr>
+      <tr><td class="num">4</td><td>S4</td><td class="num">100.0%</td><td class="num">1</td><td>S4</td><td class="num">100.0%</td><td class="num">1</td><td class="num">7.46</td></tr>
+      <tr><td class="num">5</td><td>S13</td><td class="num">100.0%</td><td class="num">1</td><td>S13</td><td class="num">100.0%</td><td class="num">1</td><td class="num">4.85</td></tr>
+      <tr class="hl"><td class="num">6</td><td>S3</td><td class="num">87.0%</td><td class="num">2</td><td>S3</td><td class="num"><strong>100.0%</strong></td><td class="num"><strong>1</strong></td><td class="num">2.47</td></tr>
+      <tr class="hl"><td class="num">7</td><td>S7</td><td class="num">48.5%</td><td class="num">10</td><td>S7</td><td class="num"><strong>88.0%</strong></td><td class="num"><strong>4</strong></td><td class="num">1.76</td></tr>
+      <tr class="hl"><td class="num">8</td><td>S17</td><td class="num">23.0%</td><td class="num">9</td><td>S2</td><td class="num"><strong>50.0%</strong></td><td class="num">8</td><td class="num">0.97</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="scroll">
+  <table>
+    <caption>Full occupancy &mdash; every feature holding each rank in more than 2% of runs</caption>
+    <thead><tr><th class="num">Rank</th><th>LIME</th><th>WA&#8209;LIME (B = 5)</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1&ndash;5</td><td>time / S15 / S11 / S4 / S13, each 100%</td><td>identical, each 100%</td></tr>
+      <tr><td class="num">6</td><td>S3 87%, S7 13%</td><td>S3 100%</td></tr>
+      <tr><td class="num">7</td><td>S7 48%, S2 18%, S3 13%, S17 10%, S9 7%</td><td>S7 88%, S2 8%, S17 3%</td></tr>
+      <tr><td class="num">8</td><td>S17 23%, S2 18%, S8 16%, S14 15%, S9 13%, S19 9%, S18 6%</td><td>S2 50%, S17 27%, S7 10%, S9 6%, S8 3%</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="col">
+  <div class="call">
+    <h4>This is the strongest evidence for WA-LIME in the whole study</h4>
+    <p>The paper&rsquo;s claim is <strong>confirmed at 40&times; the sample size</strong>: ranks 1&ndash;5 never move in 200 runs, and rank 6 is 87% S3 / 13% S7 against the 5&#8209;run estimate of 80/20. And WA&#8209;LIME&rsquo;s entire gain lands exactly where Eq.&nbsp;(22) predicts &mdash; the low&#8209;rank tail. Rank 6 becomes deterministic, rank 7 nearly doubles its modal share, rank 8 doubles.</p>
+    <p>This table shows <em>where</em> the improvement happens rather than averaging it away. It is a better headline than the Jaccard number, and I would put it in the paper alongside or in place of Table&nbsp;8.</p>
+  </div>
+  <p class="note">One nuance to add: rank 7 is not <em>uniformly</em> random &mdash; S7 holds it in nearly half of runs, so &ldquo;completely unstable&rdquo; overstates it. Rank 8, with 9 distinct occupants and a 23% mode, genuinely is close to arbitrary.</p>
+  </div>
+</section>
+
+<section>
+  <h2>The SNR cliff <span class="src">&sect;3.7, unmeasured</span></h2>
+  <div class="col">
+  <p class="lede">&sect;3.7 models each run as &beta;&#770;&nbsp;=&nbsp;&beta;*&nbsp;+&nbsp;&epsilon; and argues rank stability follows the signal&#8209;to&#8209;noise ratio. The paper asserts this but never measures it. It is straightforward to check &mdash; and the model is <strong>confirmed cleanly</strong>.</p>
+  </div>
+  <div class="scroll">
+  <table>
+    <caption>200 untruncated runs (num_features = 25), instance #10</caption>
+    <thead><tr><th class="num">#</th><th>Feature</th><th class="num">Mean w</th><th class="num">sd |w|</th><th class="num">SNR</th><th class="num">Mean rank</th><th class="num">Rank sd</th><th class="num">In top&#8209;8</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td class="q">time</td><td class="num">&minus;42.924</td><td class="num">0.387</td><td class="num">110.9</td><td class="num">1.00</td><td class="num">0.00</td><td class="num">100.0%</td></tr>
+      <tr><td class="num">2</td><td class="q">S15</td><td class="num">&minus;16.367</td><td class="num">0.303</td><td class="num">54.0</td><td class="num">2.00</td><td class="num">0.00</td><td class="num">100.0%</td></tr>
+      <tr><td class="num">3</td><td class="q">S11</td><td class="num">&minus;12.072</td><td class="num">0.310</td><td class="num">38.9</td><td class="num">3.00</td><td class="num">0.00</td><td class="num">100.0%</td></tr>
+      <tr><td class="num">4</td><td class="q">S4</td><td class="num">&minus;7.452</td><td class="num">0.303</td><td class="num">24.6</td><td class="num">4.00</td><td class="num">0.00</td><td class="num">100.0%</td></tr>
+      <tr><td class="num">5</td><td class="q">S13</td><td class="num">&minus;4.869</td><td class="num">0.314</td><td class="num">15.5</td><td class="num">5.00</td><td class="num">0.00</td><td class="num">100.0%</td></tr>
+      <tr><td class="num">6</td><td class="q">S3</td><td class="num">&minus;2.384</td><td class="num">0.332</td><td class="num">7.2</td><td class="num">6.18</td><td class="num">0.41</td><td class="num">100.0%</td></tr>
+      <tr><td class="num">7</td><td class="q">S7</td><td class="num">+1.987</td><td class="num">0.321</td><td class="num">6.2</td><td class="num">6.96</td><td class="num">0.61</td><td class="num">98.0%</td></tr>
+      <tr class="hl"><td class="num">8</td><td class="q">S21</td><td class="num">+1.373</td><td class="num">0.280</td><td class="num">4.9</td><td class="num">9.01</td><td class="num">1.44</td><td class="num">45.5%</td></tr>
+      <tr><td class="num">9</td><td class="q">S2</td><td class="num">&minus;1.127</td><td class="num">0.310</td><td class="num">3.6</td><td class="num">10.47</td><td class="num">2.19</td><td class="num">17.0%</td></tr>
+      <tr><td class="num">10</td><td class="q">S12</td><td class="num">+1.086</td><td class="num">0.331</td><td class="num">3.3</td><td class="num">10.80</td><td class="num">2.47</td><td class="num">14.5%</td></tr>
+      <tr><td class="num">11</td><td class="q">S16</td><td class="num">&minus;1.002</td><td class="num">0.323</td><td class="num">3.1</td><td class="num">11.34</td><td class="num">2.60</td><td class="num">13.0%</td></tr>
+      <tr><td class="num">12</td><td class="q">S20</td><td class="num">+0.920</td><td class="num">0.326</td><td class="num">2.8</td><td class="num">11.94</td><td class="num">2.76</td><td class="num">8.5%</td></tr>
+      <tr><td class="num">13</td><td class="q">S17</td><td class="num">&minus;0.749</td><td class="num">0.305</td><td class="num">2.5</td><td class="num">13.65</td><td class="num">3.10</td><td class="num">2.5%</td></tr>
+      <tr><td class="num">14</td><td class="q">S6</td><td class="num">&minus;0.594</td><td class="num">0.316</td><td class="num">1.9</td><td class="num">15.45</td><td class="num">3.86</td><td class="num">1.0%</td></tr>
+      <tr><td class="num">15</td><td class="q">S9</td><td class="num">&minus;0.584</td><td class="num">0.293</td><td class="num">2.0</td><td class="num">15.44</td><td class="num">3.48</td><td class="num">0.0%</td></tr>
+      <tr><td class="num">16</td><td class="q">S8</td><td class="num">+0.347</td><td class="num">0.302</td><td class="num">1.2</td><td class="num">18.30</td><td class="num">3.96</td><td class="num">0.0%</td></tr>
+      <tr><td class="num">17</td><td class="q">S14</td><td class="num">+0.279</td><td class="num">0.326</td><td class="num">0.9</td><td class="num">18.53</td><td class="num">3.81</td><td class="num">0.0%</td></tr>
+      <tr><td class="num">18</td><td class="q">OS2</td><td class="num">+0.130</td><td class="num">0.326</td><td class="num">0.4</td><td class="num">19.76</td><td class="num">3.53</td><td class="num">0.0%</td></tr>
+      <tr><td class="num">19</td><td class="q">S19</td><td class="num">&minus;0.118</td><td class="num">0.339</td><td class="num">0.3</td><td class="num">19.90</td><td class="num">3.62</td><td class="num">0.0%</td></tr>
+      <tr><td class="num">20</td><td class="q">S18</td><td class="num">&minus;0.086</td><td class="num">0.312</td><td class="num">0.3</td><td class="num">20.29</td><td class="num">3.52</td><td class="num">0.0%</td></tr>
+      <tr><td class="num">21</td><td class="q">S10</td><td class="num">&minus;0.054</td><td class="num">0.294</td><td class="num">0.2</td><td class="num">20.41</td><td class="num">3.03</td><td class="num">0.0%</td></tr>
+      <tr><td class="num">22</td><td class="q">S5</td><td class="num">&minus;0.030</td><td class="num">0.302</td><td class="num">0.1</td><td class="num">20.38</td><td class="num">3.32</td><td class="num">0.0%</td></tr>
+      <tr><td class="num">23</td><td class="q">OS3</td><td class="num">&minus;0.023</td><td class="num">0.311</td><td class="num">0.1</td><td class="num">20.18</td><td class="num">3.25</td><td class="num">0.0%</td></tr>
+      <tr><td class="num">24</td><td class="q">OS1</td><td class="num">+0.022</td><td class="num">0.288</td><td class="num">0.1</td><td class="num">20.64</td><td class="num">3.33</td><td class="num">0.0%</td></tr>
+      <tr><td class="num">25</td><td class="q">S1</td><td class="num">&minus;0.009</td><td class="num">0.303</td><td class="num">0.0</td><td class="num">20.39</td><td class="num">3.22</td><td class="num">0.0%</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="col">
+  <div class="call">
+    <h4>The noise floor is constant &mdash; report this</h4>
+    <p><code>sd|w|</code> sits between <strong>0.280 and 0.387 for every one of the 25 features</strong>, independent of the coefficient&rsquo;s magnitude. That is precisely the homoscedastic &epsilon; Eq.&nbsp;(17) assumes &mdash; and here it is an empirical result, not an assumption. It validates the variance&#8209;reduction identity the whole framework rests on.</p>
+  </div>
+  </div>
+  <div class="scroll">
+  <table>
+    <caption>Rank variance tracks SNR, and the cliff is sharp</caption>
+    <thead><tr><th>Band</th><th class="num">Mean SNR</th><th class="num">Median rank sd</th></tr></thead>
+    <tbody>
+      <tr><td class="q">ranks 1&ndash;5 (stable core)</td><td class="num">48.8</td><td class="num">0.00</td></tr>
+      <tr><td class="q">rank 6 (S3)</td><td class="num">7.2</td><td class="num">0.41</td></tr>
+      <tr><td class="q">ranks 7&ndash;8 (boundary)</td><td class="num">5.5</td><td class="num">1.02</td></tr>
+      <tr><td class="q">outside top&#8209;8</td><td class="num">1.3</td><td class="num">3.32</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="col">
+  <p class="note">Rank variance is exactly zero above SNR &asymp; 15, small between 5 and 7, and grows sharply below &asymp; 5. That is the bimodal pattern of &sect;4.3, quantified.</p>
+
+  <div class="call bad">
+    <h4>The paper&rsquo;s rank-8 row names the wrong feature</h4>
+    <p><strong>S21 is the true rank&#8209;8/9 boundary feature</strong> &mdash; SNR 4.9, mean rank 9.01, in the top&#8209;8 in <strong>45.5%</strong> of untruncated runs. Under the paper&rsquo;s <code>num_features=8</code> protocol it essentially never surfaces (1.6% over 250 runs) and appears nowhere in Table&nbsp;6.</p>
+    <p>Cause: truncation makes LIME select features and then <em>refit the surrogate on that subset</em>, changing which features reach the boundary. Under the paper&rsquo;s protocol rank 8 reads S17 / S2 / S8 / S14; untruncated, the real contenders are S21, S2, S12, S16. Run each base explanation with <code>num_features=25</code> and truncate only for display.</p>
+  </div>
+  </div>
+</section>
+
+<section>
   <h2>Editorial <span class="src">Pre-submission</span></h2>
   <div class="col">
   <ul>
     <li><strong>An unresolved author note is still in the PDF</strong>, under Fig.&nbsp;18 on p.&nbsp;23: <em>&ldquo;(Can consider adding a statement on the increase of Spearman Rank Correlation/point to the results section for the same)&rdquo;</em>.</li>
     <li><strong>Broken cross-references.</strong> &sect;4.4 says &ldquo;In Figure&nbsp;12, each curve plots the Jaccard index between the top&#8209;8 sets at successive iterations&rdquo; &mdash; that is <strong>Figure&nbsp;18</strong>; Figure&nbsp;12 is the third LIME iteration. &sect;4.4 and &sect;5 both cite &ldquo;Section&nbsp;3.3&rdquo; for the five&#8209;run instability test and the bimodal finding; both live in <strong>Section&nbsp;4.3</strong>.</li>
     <li><strong>Garbled sentence in the abstract:</strong> &ldquo;&hellip;increases the number of features retained in every run from 6 to 7 of the top&#8209;8 set, and features that enter or leave the top&#8209;<em>k</em> set across runs.&rdquo; The final clause has lost its verb.</li>
+    <li><strong>&sect;4.3 rank-7/8 counts.</strong> The prose says &ldquo;five different features&rdquo; at rank 7 and five at rank 8; Table&nbsp;6 gives <strong>four</strong> at each (S2 repeats at rank 7, S8 at rank 8).</li>
     <li><strong>&sect;4.2 ranking claim.</strong> &ldquo;the least important as sensor measurement 19&rdquo; &mdash; S19 appears in none of Table&nbsp;6&rsquo;s five runs, so this refers to the Figure&nbsp;9 explanation only. Make that explicit.</li>
     <li><strong>Ranking rule mismatch.</strong> &sect;3.6 says the top&#8209;<em>k</em> is ranked by |&beta;<sub>r</sub>&nbsp;&middot;&nbsp;x&#771;<sub>r</sub>|; the notebook ranks by |&beta;<sub>r</sub>| alone, which is what LIME&rsquo;s <code>as_list()</code> returns. Same top&#8209;6 here, but different quantities &mdash; describe the one the code computes. (Jaccard is identical either way; &rho;&#772; is 0.9857 by |&beta;| vs 0.9976 by |&beta;&middot;x&#771;|.)</li>
     <li><strong>&ldquo;S-LIME&rdquo; in the notebook headings.</strong> S&#8209;LIME (Zhou et al., KDD 2021) is a different algorithm using hypothesis testing for perturbation sizing. The paper correctly says WA&#8209;LIME throughout; the released notebook should match.</li>
@@ -488,6 +627,8 @@ footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--rule);
     <li><strong>Replace the 5&#8209;run point estimate with a properly powered one.</strong> Report J&#772; over 50&ndash;100 runs with a confidence interval. Costs minutes.</li>
     <li><strong>Run the compute&#8209;matched baseline</strong> and either re&#8209;frame the contribution around it or find the regime where aggregation genuinely wins.</li>
     <li><strong>Fix &rho;&#772;.</strong> Either compute it over all 25 features, or keep the intersection version as a diagnostic and drop the &ldquo;membership, not order&rdquo; conclusion.</li>
+    <li><strong>Promote the rank&#8209;position table.</strong> It confirms the bimodal claim at 200 runs and shows WA&#8209;LIME&rsquo;s gain landing exactly where Eq.&nbsp;(22) predicts &mdash; a stronger headline than the Jaccard number.</li>
+    <li><strong>Add the SNR table.</strong> It turns &sect;3.7&rsquo;s asserted mechanism into a measured one, and shows the constant noise floor that Eq.&nbsp;(17) assumes.</li>
     <li><strong>Drop or re&#8209;verify the Sensor&#8209;7 narrative</strong> in &sect;4.4, &sect;5 and the Conclusion.</li>
     <li><strong>Sweep the editorial list</strong> above, starting with the author note on p.&nbsp;23.</li>
   </ul>
