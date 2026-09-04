@@ -284,6 +284,7 @@ R = 30 repetitions, 10 test instances (including the notebook's `X_test.iloc[10]
 | **WA-LIME, B = 5 (the notebook's setting)** | 1.000 ± 0.000 | **0.958 ± 0.077** | **0.870 ± 0.091** | **0.9229 ± 0.0266** |
 | WA-LIME, B = 10 | 1.000 ± 0.000 | 0.978 ± 0.050 | 0.900 ± 0.088 | 0.9410 ± 0.0211 |
 | WA-LIME, B = 20 | 1.000 ± 0.000 | 0.994 ± 0.015 | 0.912 ± 0.083 | 0.9505 ± 0.0181 |
+| WA-LIME, B = 5, *full* background | 1.000 ± 0.000 | 0.959 ± 0.074 | 0.870 ± 0.095 | 0.9233 ± 0.0262 |
 
 ### Reading these numbers
 
@@ -338,6 +339,39 @@ This does not mean WA-LIME is worthless. It means the paper needs to either:
 I would not submit without addressing this. Everything else in this report is a
 tidy-up; this one goes to the contribution.
 
+### 5.2 The background bootstrap contributes nothing
+
+WA-LIME at B = 5 scores 0.958 / 0.870 / 0.9229 with the notebook's bootstrap-100
+background and 0.959 / 0.870 / 0.9233 with the full training background —
+identical to three decimals. The bootstrap in cell 32 neither helps nor hurts;
+it only makes the experiment harder to describe. Drop it and aggregate over
+LIME's own sampling variance alone. That also removes the confound noted in
+§3.2.
+
+### 5.3 Do not compute these metrics on truncated explanations
+
+Running the same evaluation on the notebook's code as literally written
+(`num_features=8`, so 17 of 25 weights are exactly 0):
+
+| method (as coded, top-8) | Jaccard@5 | Jaccard@8 | Jaccard@10 | Spearman |
+|---|---|---|---|---|
+| LIME | 0.914 ± 0.092 | 0.763 ± 0.121 | 0.795 ± 0.109 | 0.8679 ± 0.0800 |
+| WA-LIME (B = 5) | 0.987 ± 0.024 | 0.890 ± 0.104 | 0.814 ± 0.100 | 0.9236 ± 0.0411 |
+
+Two distortions, both of which flatter the paper's conclusion and both of which
+a careful reviewer can catch:
+
+* **Jaccard@8 for LIME drops from 0.855 to 0.763** under truncation. Truncating
+  makes single-run LIME look *less* stable than it actually is, widening the
+  apparent gap to WA-LIME.
+* **Spearman on truncated vectors is not meaningful.** 17 of 25 features are tied
+  at exactly 0, so most of the correlation is being computed over an arbitrary
+  tie block. The value 0.8679 is an artifact of `scipy`'s tie handling, not a
+  measure of ranking agreement.
+
+Compute both metrics on untruncated weight vectors (`num_features=n_features`)
+and truncate only for display. `stability_metrics.py` defaults to this.
+
 ---
 
 ## 6. Recommended changes, in priority order
@@ -349,11 +383,14 @@ tidy-up; this one goes to the contribution.
    claim as currently stated and must be addressed, not omitted.
 3. **Seed everything** in the LIME path so the reported aggregated weights are
    reproducible.
-4. **Report the engine-grouped split** as the primary GBRM result (§2.2).
-5. **Stop truncating base explanations to 8 features** before aggregating (§4.2).
-6. **Keep the sign** in the aggregation, or report signed and magnitude side by
+4. **Drop the background bootstrap** from cell 32 — it changes nothing
+   measurable and confounds the instability demonstration (§3.2, §5.2).
+5. **Report the engine-grouped split** as the primary GBRM result (§2.2).
+6. **Stop truncating base explanations to 8 features** — before aggregating
+   (§4.2) and, separately, before computing Jaccard or Spearman (§5.3).
+7. **Keep the sign** in the aggregation, or report signed and magnitude side by
    side (§4.1).
-7. **Rename S-LIME → WA-LIME** in the notebook headings (§4.3).
-8. Discuss `time`'s structural relationship to RUL, and show the sensor-only
+8. **Rename S-LIME → WA-LIME** in the notebook headings (§4.3).
+9. Discuss `time`'s structural relationship to RUL, and show the sensor-only
    explanation ranking (§2.3).
-9. Note in the text that `local_exp[1]` is deliberate and correct (§3.1).
+10. Note in the text that `local_exp[1]` is deliberate and correct (§3.1).
