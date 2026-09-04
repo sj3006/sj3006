@@ -1,0 +1,6 @@
+COMPUTE-MATCHED COMPARISON  (R=20 reps, 5 instances)
+method                                 J@8      J@10    Spearman   perturbations
+--------------------------------------------------------------------------------
+LIME  num_samples=5000  (1x)         0.854     0.776      0.8514           5,000
+LIME  num_samples=25000 (5x)         0.984     0.844      0.9400          25,000
+WA-LIME B=5 x 5000      (5x)         0.927     0.857      0.9253          25,000

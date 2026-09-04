@@ -1,0 +1,34 @@
+A) Unseeded GBR, fixed split=42, 5 refits:
+     MSE=1248.524755  R2=0.73314714
+     MSE=1248.524755  R2=0.73314714
+     MSE=1248.524755  R2=0.73314714
+     MSE=1248.524755  R2=0.73314714
+     MSE=1248.524755  R2=0.73314714
+   spread: MSE range=0.0000, R2 range=0.00e+00
+
+B) Sensitivity to train_test_split random_state (GBR seeded=0):
+     seed=0     MSE=  1288.76  R2=0.7294
+     seed=1     MSE=  1285.27  R2=0.7268
+     seed=42    MSE=  1248.52  R2=0.7331
+     seed=2024  MSE=  1279.29  R2=0.7254
+     seed=7     MSE=  1267.29  R2=0.7274
+   R2 mean=0.7284 sd=0.0027
+
+C) Random-row split vs engine-grouped split (GBR seeded=0):
+     GROUPED (no engine in both sides): MSE=  1334.64  R2=0.7249
+     RANDOM  (notebook's protocol)    : MSE=  1248.52  R2=0.7331
+     engines appearing in BOTH train and test (notebook split): 218 / 218
+
+D) Role of the 'time' feature:
+time                     0.865755
+sensor measurement 15    0.044981
+sensor measurement 11    0.028807
+sensor measurement 13    0.023056
+sensor measurement 4     0.015568
+sensor measurement 14    0.004734
+sensor measurement 12    0.003384
+sensor measurement 2     0.002465
+     WITHOUT 'time': MSE=  1853.02  R2=0.6039
+     mean baseline : MSE=  4679.06  R2=-0.0001
+
+[exited with code 0]
