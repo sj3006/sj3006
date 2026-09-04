@@ -1,0 +1,502 @@
+<title>WA-LIME Reproduction Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#EEF1F3; --panel:#FFFFFF; --panel-2:#F6F8F9;
+  --ink:#131C24; --ink-2:#3E4C58; --ink-3:#6B7A87;
+  --rule:#D3DBE0; --rule-2:#E4EAEE;
+  --accent:#0E6E78; --accent-soft:#DCEEF0;
+  --ok:#1B7A4B; --ok-soft:#DDF0E5;
+  --warn:#9A5E00; --warn-soft:#F7EBD6;
+  --bad:#B3372B; --bad-soft:#F8E2DF;
+  --self:#5F4499; --self-soft:#EAE3F7;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;
+  --serif:"Spectral",Georgia,"Times New Roman",serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#0D1317; --panel:#151E24; --panel-2:#1B252C;
+  --ink:#E6EDF1; --ink-2:#AFBDC7; --ink-3:#7E8E9A;
+  --rule:#2A3941; --rule-2:#222E35;
+  --accent:#4FBECA; --accent-soft:#16333A;
+  --ok:#5FCB93; --ok-soft:#123326;
+  --warn:#E3A650; --warn-soft:#33260F;
+  --bad:#F0796B; --bad-soft:#3A1D19;
+  --self:#B69BEA; --self-soft:#261E3C;
+}}
+[data-theme="dark"]{
+  --ground:#0D1317; --panel:#151E24; --panel-2:#1B252C;
+  --ink:#E6EDF1; --ink-2:#AFBDC7; --ink-3:#7E8E9A;
+  --rule:#2A3941; --rule-2:#222E35;
+  --accent:#4FBECA; --accent-soft:#16333A;
+  --ok:#5FCB93; --ok-soft:#123326;
+  --warn:#E3A650; --warn-soft:#33260F;
+  --bad:#F0796B; --bad-soft:#3A1D19;
+  --self:#B69BEA; --self-soft:#261E3C;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);
+  font-size:15px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px 96px}
+.col{max-width:70ch}
+
+/* ---------- masthead ---------- */
+header{padding:56px 0 32px;border-bottom:1px solid var(--rule)}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--accent);margin:0 0 14px}
+h1{font-family:var(--serif);font-weight:700;font-size:clamp(30px,4.6vw,46px);
+  line-height:1.1;letter-spacing:-.015em;margin:0 0 14px;text-wrap:balance}
+.standfirst{font-family:var(--serif);font-size:19px;line-height:1.55;
+  color:var(--ink-2);margin:0;max-width:64ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px 28px;margin-top:26px;
+  font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+.meta b{color:var(--ink-2);font-weight:500}
+
+/* ---------- verdict ledger ---------- */
+.ledger{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));
+  gap:1px;background:var(--rule);border:1px solid var(--rule);margin:34px 0 0}
+.lcell{background:var(--panel);padding:18px 20px}
+.lcell .n{font-family:var(--mono);font-size:30px;font-weight:600;
+  font-variant-numeric:tabular-nums;line-height:1;display:block}
+.lcell .k{font-size:13px;color:var(--ink-2);margin-top:9px;display:block}
+.n.ok{color:var(--ok)} .n.warn{color:var(--warn)}
+.n.bad{color:var(--bad)} .n.self{color:var(--self)}
+
+/* ---------- sections ---------- */
+section{padding-top:52px}
+h2{font-family:var(--serif);font-size:27px;font-weight:600;letter-spacing:-.01em;
+  margin:0 0 6px;text-wrap:balance;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+h2 .src{font-family:var(--mono);font-size:11.5px;font-weight:500;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+  padding:4px 9px;white-space:nowrap}
+h3{font-family:var(--sans);font-size:15.5px;font-weight:600;margin:34px 0 8px;
+  letter-spacing:.005em}
+p{margin:0 0 14px;color:var(--ink-2)}
+p strong,li strong{color:var(--ink);font-weight:600}
+.lede{color:var(--ink-2);font-size:16px;margin-bottom:22px}
+ul{margin:0 0 14px;padding-left:20px;color:var(--ink-2)}
+li{margin-bottom:7px}
+code{font-family:var(--mono);font-size:.885em;background:var(--panel-2);
+  border:1px solid var(--rule-2);padding:1px 5px;color:var(--ink)}
+a{color:var(--accent)}
+
+/* ---------- tables ---------- */
+.scroll{overflow-x:auto;border:1px solid var(--rule);background:var(--panel);margin:18px 0 6px}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:560px}
+caption{caption-side:top;text-align:left;font-family:var(--mono);font-size:11px;
+  letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);
+  padding:13px 18px 0}
+th,td{padding:9px 18px;text-align:left;border-bottom:1px solid var(--rule-2);vertical-align:top}
+thead th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-3);font-weight:500;
+  border-bottom:1px solid var(--rule);padding-top:12px;padding-bottom:9px;white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+td.num,th.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+td.q{color:var(--ink);font-weight:500}
+tr.hl td{background:var(--panel-2)}
+.note{font-size:12.5px;color:var(--ink-3);margin:0 0 4px;max-width:74ch}
+
+/* ---------- chips ---------- */
+.chip{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;
+  letter-spacing:.09em;text-transform:uppercase;padding:3px 8px;white-space:nowrap}
+.c-ok{background:var(--ok-soft);color:var(--ok)}
+.c-warn{background:var(--warn-soft);color:var(--warn)}
+.c-bad{background:var(--bad-soft);color:var(--bad)}
+.c-self{background:var(--self-soft);color:var(--self)}
+
+/* ---------- callout ---------- */
+.call{border-left:3px solid var(--accent);background:var(--panel);
+  padding:18px 22px;margin:22px 0}
+.call.bad{border-left-color:var(--bad)}
+.call.self{border-left-color:var(--self)}
+.call h4{margin:0 0 8px;font-family:var(--sans);font-size:14px;font-weight:600;
+  letter-spacing:.005em;color:var(--ink)}
+.call p:last-child{margin-bottom:0}
+.call p{font-size:14px}
+
+/* ---------- three-way disagreement ---------- */
+.three{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1px;
+  background:var(--rule);border:1px solid var(--rule);margin:20px 0 10px}
+.tw{background:var(--panel);padding:17px 19px}
+.tw .src{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-3);display:block;margin-bottom:11px}
+.tw .v{font-family:var(--mono);font-size:27px;font-weight:600;line-height:1;
+  font-variant-numeric:tabular-nums;display:block}
+.tw .d{font-size:12.5px;color:var(--ink-3);margin-top:9px;display:block;line-height:1.45}
+
+/* ---------- distribution figure ---------- */
+figure{margin:22px 0 8px;background:var(--panel);border:1px solid var(--rule);padding:22px}
+figcaption{font-size:12.5px;color:var(--ink-3);margin-top:14px;line-height:1.5}
+svg{display:block;width:100%;height:auto}
+
+footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--rule);
+  font-size:12.5px;color:var(--ink-3);font-family:var(--mono);line-height:1.7}
+@media (max-width:640px){
+  header{padding-top:38px}
+  .wrap{padding:0 18px 64px}
+  th,td{padding:8px 13px}
+}
+@media (prefers-reduced-motion:no-preference){
+  .lcell,.tw{transition:background .15s ease}
+}
+</style>
+
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">Independent reproduction &middot; Gbemi et al. 2026 &middot; V10 draft</p>
+  <h1>Every number in the WA&#8209;LIME paper, re&#8209;run</h1>
+  <p class="standfirst">The model results reproduce to the last printed digit. The explanation&#8209;stability results &mdash; the paper&rsquo;s actual contribution &mdash; do not, and Tables&nbsp;6 and&nbsp;7 disagree with each other.</p>
+  <div class="meta">
+    <span><b>Dataset</b> C&#8209;MAPSS &middot; 218 engines &middot; 45,918 cycles</span>
+    <span><b>Model</b> GradientBoostingRegressor, defaults</span>
+    <span><b>Env</b> Python 3.11 &middot; scikit&#8209;learn 1.9.0 &middot; lime 0.2.0.1</span>
+  </div>
+
+  <div class="ledger">
+    <div class="lcell"><span class="n ok">13</span><span class="k">Values reproduced exactly &mdash; all of Tables&nbsp;2(b) and&nbsp;5, plus the instance&#8209;#10 prediction</span></div>
+    <div class="lcell"><span class="n self">3</span><span class="k">Places where the paper contradicts itself &mdash; Table&nbsp;6 vs Table&nbsp;7, the prose, and &rho;&#772;&nbsp;=&nbsp;1.000</span></div>
+    <div class="lcell"><span class="n bad">0.636</span><span class="k">Headline Jaccard for LIME. Sits at the <b>0.75th percentile</b> of what 5 runs produce; the true value is 0.741</span></div>
+    <div class="lcell"><span class="n warn">1</span><span class="k">Unresolved author note still in the PDF, under Fig.&nbsp;18 on p.&nbsp;23</span></div>
+  </div>
+</header>
+
+<section>
+  <div class="col">
+  <h2>The short version</h2>
+  <p class="lede">Split cleanly in two: everything about the predictive model is solid, and everything about explanation stability needs work before submission.</p>
+  <p><strong>What holds.</strong> MSE, RMSE, MAE, R&sup2;, the dataset descriptives, the hyperparameters, the predicted RUL for test instance&nbsp;#10 &mdash; all reproduce to the digit, across two scikit&#8209;learn minor versions. The six&#8209;feature stable core (time, S15, S11, S4, S13, S3) holds in <strong>250 of 250</strong> independent LIME runs, so the bimodal&#8209;stability interpretation in &sect;4.3 is well founded.</p>
+  <p><strong>What does not.</strong> The reported <code>J&#772; = 0.636</code> is the most pessimistic estimate of LIME&rsquo;s stability that five runs can produce. Table&nbsp;6 implies 0.707; the stated seeds give 0.800; the true value over 31,125 pairs is <strong>0.741</strong>. Against 0.741, WA&#8209;LIME&rsquo;s 0.778 is a <strong>+5% gain, not +22.3%</strong>. And at matched compute, plain LIME with more perturbations beats WA&#8209;LIME outright.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Dataset descriptives <span class="src">Table 2(b)</span></h2>
+  <div class="scroll">
+  <table>
+    <caption>All nine values reproduce</caption>
+    <thead><tr><th>Quantity</th><th class="num">Paper</th><th class="num">Re&#8209;run</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td class="q">Total aircraft engines</td><td class="num">218</td><td class="num">218</td><td><span class="chip c-ok">match</span></td></tr>
+      <tr><td class="q">Total operational cycles</td><td class="num">45,918</td><td class="num">45,918</td><td><span class="chip c-ok">match</span></td></tr>
+      <tr><td class="q">Min engine lifetime</td><td class="num">128 cyc (eng 76)</td><td class="num">128 (eng 76)</td><td><span class="chip c-ok">match</span></td></tr>
+      <tr><td class="q">Max engine lifetime</td><td class="num">357 cyc (eng 5)</td><td class="num">357 (eng 5)</td><td><span class="chip c-ok">match</span></td></tr>
+      <tr><td class="q">Mean engine lifetime</td><td class="num">210.63 cyc</td><td class="num">210.63</td><td><span class="chip c-ok">match</span></td></tr>
+      <tr><td class="q">&sigma; engine lifetime</td><td class="num">43.50 cyc</td><td class="num">43.50 <span style="color:var(--ink-3)">(ddof=0)</span></td><td><span class="chip c-ok">match</span></td></tr>
+      <tr><td class="q">RUL range</td><td class="num">0 &ndash; 356</td><td class="num">0 &ndash; 356</td><td><span class="chip c-ok">match</span></td></tr>
+      <tr><td class="q">Training set size</td><td class="num">36,734</td><td class="num">36,734</td><td><span class="chip c-ok">match</span></td></tr>
+      <tr><td class="q">Test set size</td><td class="num">9,184</td><td class="num">9,184</td><td><span class="chip c-ok">match</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="note">&sigma; is the population standard deviation. <code>pandas.std()</code> defaults to the sample s.d. and returns 43.60 &mdash; state which you used.</p>
+  <div class="col">
+  <div class="call self">
+    <h4>&sect;4.1.2 contradicts Table 2(b) on the RUL range</h4>
+    <p>&sect;4.1.2 says the test labels &ldquo;span from 0 to <strong>350</strong> cycles&rdquo;; Table&nbsp;2(b) says <strong>0&ndash;356</strong>. The correct range is 0&ndash;356. The derived claim &ldquo;35.33 cycles &asymp; 10.1% of the operational range&rdquo; uses 350; with 356 it is <strong>9.9%</strong>.</p>
+  </div>
+  </div>
+</section>
+
+<section>
+  <h2>Model performance <span class="src">Table 5</span></h2>
+  <div class="scroll">
+  <table>
+    <caption>Reproduced to the digit &mdash; nothing to fix</caption>
+    <thead><tr><th>Metric</th><th class="num">Paper</th><th class="num">Re&#8209;run</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td class="q">MSE</td><td class="num">1248.52 cyc&sup2;</td><td class="num">1248.5248</td><td><span class="chip c-ok">match</span></td></tr>
+      <tr><td class="q">RMSE</td><td class="num">35.33 cyc</td><td class="num">35.3345</td><td><span class="chip c-ok">match</span></td></tr>
+      <tr><td class="q">MAE</td><td class="num">26.96 cyc</td><td class="num">26.9557</td><td><span class="chip c-ok">match</span></td></tr>
+      <tr><td class="q">R&sup2;</td><td class="num">0.733</td><td class="num">0.7331</td><td><span class="chip c-ok">match</span></td></tr>
+      <tr><td class="q">RMSE / MAE ratio</td><td class="num">&asymp;1.31</td><td class="num">1.3108</td><td><span class="chip c-ok">match</span></td></tr>
+      <tr><td class="q">Predicted RUL, instance #10</td><td class="num">175.54 cyc</td><td class="num">175.5442</td><td><span class="chip c-ok">match</span></td></tr>
+      <tr><td class="q">Local fidelity R&sup2;<sub>local</sub></td><td class="num">0.848 / 0.843</td><td class="num">0.836 &ndash; 0.845</td><td><span class="chip c-warn">close</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="col">
+  <p class="note">Hyperparameters stated in &sect;4.1 are exactly scikit&#8209;learn&rsquo;s defaults and exactly what the notebook instantiates. Despite <code>random_state</code> being unset, default GBR makes no material use of the RNG, so the result is genuinely reproducible.</p>
+  <p style="margin-top:16px">One presentational point: instance&nbsp;#10&rsquo;s <em>actual</em> RUL is 226 cycles against a prediction of 175.54 &mdash; a 50&#8209;cycle residual, 1.4&times; the RMSE. &sect;4.2 calls it &ldquo;representative of typical operation&rdquo;. That is defensible, but say so plainly rather than be caught describing an above&#8209;average&#8209;error instance as typical.</p>
+  </div>
+</section>
+
+<section>
+  <h2>LIME stability &mdash; the three&#8209;way disagreement <span class="src">Tables 6 &amp; 7</span></h2>
+  <div class="col">
+  <p class="lede">Protocol per &sect;4.3: instance&nbsp;#10, top&#8209;<em>k</em>&nbsp;=&nbsp;8, five runs seeded <code>s&#7522; = 17i + 3</code> &mdash; seeds 20, 37, 54, 71, 88. Three sources give three different answers for the same experiment.</p>
+  </div>
+
+  <div class="three">
+    <div class="tw"><span class="src">Table 7 reports</span><span class="v" style="color:var(--bad)">0.636</span><span class="d">Union 14 features &middot; 6 stable &middot; 8 unstable &middot; &rho;&#772; = 1.000</span></div>
+    <div class="tw"><span class="src">Table 6 implies</span><span class="v" style="color:var(--self)">0.7067</span><span class="d">Union 11 features &middot; 6 stable &middot; 5 unstable &middot; &rho;&#772; = 0.9929</span></div>
+    <div class="tw"><span class="src">Re&#8209;run, stated seeds</span><span class="v" style="color:var(--accent)">0.8000</span><span class="d">Union 11 features &middot; 7 stable &middot; 4 unstable &middot; &rho;&#772; = 0.9857</span></div>
+  </div>
+
+  <div class="scroll">
+  <table>
+    <caption>Table 7, line by line</caption>
+    <thead><tr><th>Metric</th><th class="num">Paper</th><th class="num">Table 6 implies</th><th class="num">Re&#8209;run</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr class="hl"><td class="q">Mean pairwise Jaccard, J&#772;</td><td class="num">0.636</td><td class="num">0.7067</td><td class="num">0.8000</td><td><span class="chip c-bad">mismatch</span></td></tr>
+      <tr class="hl"><td class="q">Mean pairwise Spearman, &rho;&#772;</td><td class="num">1.000</td><td class="num">0.9929</td><td class="num">0.9857</td><td><span class="chip c-self">self&#8209;contradiction</span></td></tr>
+      <tr><td class="q">Mean local fidelity R&sup2;<sub>local</sub></td><td class="num">0.843</td><td class="num">&mdash;</td><td class="num">0.8408</td><td><span class="chip c-ok">match</span></td></tr>
+      <tr><td class="q">Unique features ever in top&#8209;8</td><td class="num">14</td><td class="num">11</td><td class="num">11</td><td><span class="chip c-bad">mismatch</span></td></tr>
+      <tr><td class="q">Features in top&#8209;8 in all 5 runs</td><td class="num">6</td><td class="num">6</td><td class="num">7</td><td><span class="chip c-warn">close</span></td></tr>
+      <tr><td class="q">Features appearing in &lt;5 runs</td><td class="num">8</td><td class="num">5</td><td class="num">4</td><td><span class="chip c-bad">mismatch</span></td></tr>
+      <tr><td class="q">Number of pairwise comparisons</td><td class="num">10</td><td class="num">10</td><td class="num">10</td><td><span class="chip c-ok">match</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="col">
+  <h3>Table 7 is internally consistent &mdash; with an experiment that is not Table 6</h3>
+  <p>Table&nbsp;7&rsquo;s numbers do hang together. Five runs &times; 8 slots = 40; six core features occupy 30; if the eight unstable features share the remaining 10 slots with two appearing twice and six once, then exactly 2 of the 10 pairs share a seventh feature:</p>
+  </div>
+  <div class="scroll" style="max-width:70ch">
+  <table style="min-width:420px">
+    <tbody>
+      <tr><td class="q">2 pairs with |A&#7522; &cap; A&#11049;| = 7</td><td class="num">J = 7/9 = 0.7778</td></tr>
+      <tr><td class="q">8 pairs with |A&#7522; &cap; A&#11049;| = 6</td><td class="num">J = 6/10 = 0.6000</td></tr>
+      <tr class="hl"><td class="q"><strong>mean</strong></td><td class="num"><strong>0.6356 &rarr; rounds to the reported 0.636</strong></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="col">
+  <p>So Table&nbsp;7 is arithmetically sound. The problem is that Table&nbsp;6 does not describe that experiment &mdash; its union is 11 features, not 14, and only 5 are unstable, not 8.</p>
+
+  <h3>What Table 6 actually contains</h3>
+  </div>
+  <div class="scroll">
+  <table>
+    <caption>Transcribed from the printed ranks &mdash; each run does have exactly 8 features</caption>
+    <thead><tr><th>Run</th><th>Top&#8209;8, in rank order</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td>Time, S15, S11, S4, S13, S3, <strong>S14</strong>, <strong>S8</strong></td></tr>
+      <tr><td class="num">2</td><td>Time, S15, S11, S4, S13, S3, <strong>S7</strong>, <strong>S12</strong></td></tr>
+      <tr><td class="num">3</td><td>Time, S15, S11, S4, S13, <strong>S7</strong>, S3, <strong>S14</strong></td></tr>
+      <tr><td class="num">4</td><td>Time, S15, S11, S4, S13, S3, <strong>S2</strong>, <strong>S7</strong></td></tr>
+      <tr><td class="num">5</td><td>Time, S15, S11, S4, S13, S3, <strong>S2</strong>, <strong>S8</strong></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="col">
+  <p class="note">Union = {Time, S15, S11, S4, S13, S3, S2, S7, S8, S12, S14} = <strong>11 features</strong>. Pairwise Jaccard values: 0.6, 0.778, 0.6, 0.778, 0.778, 0.778, 0.6, 0.778, 0.6, 0.778 &rarr; mean <strong>0.7067</strong>.</p>
+
+  <div class="call self">
+    <h4>The prose names features that are not in Table 6</h4>
+    <p>&sect;4.3 says the unstable features are &ldquo;Sensors 2, 7, 9, 12, 17, 18, 19, and Operational Setting&nbsp;3&rdquo; &mdash; eight, matching Table&nbsp;7&rsquo;s count. Table&nbsp;6 contains Sensors&nbsp;<strong>2, 7, 8, 12, 14</strong>.</p>
+    <p>Named in prose, absent from Table&nbsp;6: <strong>S9, S17, S18, S19, Operational Setting&nbsp;3</strong>. In Table&nbsp;6, missing from prose: <strong>S8, S14</strong>. Over 250 runs, Operational Setting&nbsp;3 <strong>never once</strong> enters the top&#8209;8.</p>
+  </div>
+
+  <div class="call self">
+    <h4>&ldquo;Mean Spearman is exactly 1.000&rdquo; is contradicted two paragraphs later</h4>
+    <p>&sect;4.3 argues &rho;&#772;&nbsp;=&nbsp;1.000 means &ldquo;whenever two runs agree a feature is in the top&#8209;8, they also agree on its precise rank&rdquo; &mdash; then says &ldquo;Rank 6 is occupied by sensor&nbsp;3 in 4 runs and by sensor&nbsp;7 in 1 run.&rdquo; Both cannot be true. In Table&nbsp;6, run&nbsp;3 swaps S3 and S7, and both are in the intersection for pairs 2&ndash;3 and 3&ndash;4, giving <strong>&rho; = 0.9643</strong> for those two pairs and a mean of <strong>0.9929</strong>.</p>
+    <p>Numerically small, but it falsifies the membership&#8209;versus&#8209;order dichotomy the section builds its interpretation on &mdash; and it is exactly what a referee checks with a pencil.</p>
+  </div>
+
+  <h3>A structural problem with Eq. (16)</h3>
+  <p>Spearman is computed <strong>on the intersection only</strong>, re&#8209;ranked 1&hellip;<em>q</em>. That is close to guaranteed to return &asymp;1 here, for a reason unrelated to LIME&rsquo;s stability: the features surviving into both top&#8209;8 sets are overwhelmingly the high&#8209;SNR ones, whose ordering is stable by construction. &sect;4.3 says as much &mdash; ranks 1&ndash;5 are 100% stable &mdash; so restricting to the intersection discards precisely the features whose order is in doubt.</p>
+  <p>Computing Spearman over all <em>p</em>&nbsp;=&nbsp;25 features on untruncated weight vectors gives <strong>&rho;&#772; = 0.849</strong> for single&#8209;run LIME &mdash; a number with actual resolution.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Where 0.636 sits <span class="src">&sect;4.3</span></h2>
+  <div class="col">
+  <p class="lede">The obvious rejoinder to &ldquo;I got 0.800, you got 0.636&rdquo; is that both are estimates from five runs. So I measured the sampling distribution directly: 250 independent seeded LIME runs on instance&nbsp;#10, then 2,000 resamples of five, recomputing J&#772; exactly as Eq.&nbsp;(15) prescribes.</p>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 900 220" role="img" aria-label="Distribution of the 5-run Jaccard estimate, from 0.60 to 0.95, showing the paper's 0.636 at the extreme low tail">
+      <!-- scale: J 0.60 -> x=70 ; J 0.95 -> x=850 -->
+      <g font-family="IBM Plex Mono, monospace" font-size="11" fill="var(--ink-3)">
+        <text x="70"  y="205" text-anchor="middle">0.60</text>
+        <text x="181" y="205" text-anchor="middle">0.65</text>
+        <text x="292" y="205" text-anchor="middle">0.70</text>
+        <text x="404" y="205" text-anchor="middle">0.75</text>
+        <text x="515" y="205" text-anchor="middle">0.80</text>
+        <text x="627" y="205" text-anchor="middle">0.85</text>
+        <text x="738" y="205" text-anchor="middle">0.90</text>
+        <text x="850" y="205" text-anchor="middle">0.95</text>
+      </g>
+      <line x1="70" y1="186" x2="850" y2="186" stroke="var(--rule)" stroke-width="1"/>
+      <g stroke="var(--rule-2)" stroke-width="1">
+        <line x1="181" y1="40" x2="181" y2="186"/><line x1="292" y1="40" x2="292" y2="186"/>
+        <line x1="404" y1="40" x2="404" y2="186"/><line x1="515" y1="40" x2="515" y2="186"/>
+        <line x1="627" y1="40" x2="627" y2="186"/><line x1="738" y1="40" x2="738" y2="186"/>
+      </g>
+
+      <!-- whiskers 1st pct 0.6533 -> x=188.4 ; 99th 0.8667 -> x=663.9 -->
+      <line x1="188" y1="120" x2="664" y2="120" stroke="var(--ink-3)" stroke-width="1.5"/>
+      <line x1="188" y1="108" x2="188" y2="132" stroke="var(--ink-3)" stroke-width="1.5"/>
+      <line x1="664" y1="108" x2="664" y2="132" stroke="var(--ink-3)" stroke-width="1.5"/>
+      <!-- IQR box 0.7067 -> x=306 ; 0.7778 -> x=464.5 -->
+      <rect x="308" y="102" width="158" height="36" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/>
+      <!-- median 0.7289 -> x=355.4 -->
+      <line x1="357" y1="102" x2="357" y2="138" stroke="var(--accent)" stroke-width="2.5"/>
+
+      <!-- markers -->
+      <!-- paper 0.636 -> x=150.7 -->
+      <line x1="151" y1="52" x2="151" y2="150" stroke="var(--bad)" stroke-width="2"/>
+      <circle cx="151" cy="52" r="4" fill="var(--bad)"/>
+      <text x="151" y="42" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600" fill="var(--bad)">0.636</text>
+      <text x="151" y="167" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="var(--bad)">Table 7</text>
+
+      <!-- true 0.7409 -> x=381.2 -->
+      <line x1="384" y1="70" x2="384" y2="150" stroke="var(--ink)" stroke-width="2" stroke-dasharray="4 3"/>
+      <circle cx="384" cy="70" r="4" fill="var(--ink)"/>
+      <text x="384" y="60" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600" fill="var(--ink)">0.741</text>
+      <text x="384" y="167" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="var(--ink-2)">true value</text>
+
+      <!-- rerun 0.800 -> x=515.7 -->
+      <line x1="516" y1="52" x2="516" y2="150" stroke="var(--accent)" stroke-width="2"/>
+      <circle cx="516" cy="52" r="4" fill="var(--accent)"/>
+      <text x="516" y="42" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600" fill="var(--accent)">0.800</text>
+      <text x="516" y="167" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="var(--accent)">re-run</text>
+
+      <text x="70" y="19" font-family="IBM Plex Mono, monospace" font-size="10.5" letter-spacing="1" fill="var(--ink-3)">MEAN PAIRWISE JACCARD FROM 5 RUNS &mdash; BOX = 25th&ndash;75th PCT, WHISKERS = 1st&ndash;99th</text>
+    </svg>
+    <figcaption>2,000 resamples of five runs drawn from a pool of 250 independent seeded LIME explanations of instance&nbsp;#10. Mean 0.7420, s.d. 0.0503, range 0.6356&ndash;0.9111. The paper&rsquo;s 0.636 is the <strong>minimum of all 2,000 resamples</strong>.</figcaption>
+  </figure>
+
+  <div class="scroll">
+  <table>
+    <caption>Where each candidate value falls</caption>
+    <thead><tr><th class="num">Value</th><th>Source</th><th class="num">Percentile</th></tr></thead>
+    <tbody>
+      <tr class="hl"><td class="num">0.636</td><td class="q">Table 7 &mdash; the paper&rsquo;s headline</td><td class="num">0.75th &mdash; the minimum of 2,000 resamples</td></tr>
+      <tr><td class="num">0.7067</td><td class="q">Table 6&rsquo;s implied value</td><td class="num">29th &mdash; unremarkable</td></tr>
+      <tr><td class="num">0.7409</td><td class="q">Best estimate, all 31,125 pairs</td><td class="num">&mdash;</td></tr>
+      <tr><td class="num">0.8000</td><td class="q">Re&#8209;run with the paper&rsquo;s stated seeds</td><td class="num">~80th</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="col">
+  <p><strong>In the paper&rsquo;s favour:</strong> 0.636 is <em>attainable</em>. It is not fabricated, and a five&#8209;run estimate genuinely can land there. My 0.800 is no more &ldquo;correct&rdquo; &mdash; both are single draws from a distribution with &sigma;&nbsp;&asymp;&nbsp;0.05.</p>
+  <p><strong>Against:</strong> it is the single most pessimistic estimate five runs can produce, below 99.25% of resamples. The headline therefore contrasts a tail&#8209;minimum estimate of LIME against a point estimate of WA&#8209;LIME. Since the true value is 0.741, the honest baseline is <strong>&asymp;0.74</strong>, and against it WA&#8209;LIME&rsquo;s 0.778 is a <strong>+5% gain, not +22.3%</strong>.</p>
+  <p>There is a clean fix: report J&#772; with a confidence interval over many more runs. LIME takes ~0.02&nbsp;s per explanation on this model, so it costs minutes of compute and converts the weakest claim in the paper into a defensible one.</p>
+
+  <h3>Feature-presence rates over 250 runs</h3>
+  <p>This settles which features are genuinely unstable, and confirms the stable core.</p>
+  </div>
+  <div class="scroll">
+  <table>
+    <caption>Frequency of appearance in the top-8, 250 independent runs</caption>
+    <thead><tr><th>Feature</th><th class="num">Appears in top&#8209;8</th><th class="num">Rate</th></tr></thead>
+    <tbody>
+      <tr class="hl"><td class="q">time, S3, S4, S11, S13, S15</td><td class="num">250 / 250</td><td class="num">100.0%</td></tr>
+      <tr><td class="q">sensor 7</td><td class="num">170 / 250</td><td class="num">68.0%</td></tr>
+      <tr><td class="q">sensor 2</td><td class="num">89 / 250</td><td class="num">35.6%</td></tr>
+      <tr><td class="q">sensor 17</td><td class="num">81 / 250</td><td class="num">32.4%</td></tr>
+      <tr><td class="q">sensor 9</td><td class="num">42 / 250</td><td class="num">16.8%</td></tr>
+      <tr><td class="q">sensor 8</td><td class="num">38 / 250</td><td class="num">15.2%</td></tr>
+      <tr><td class="q">sensor 14</td><td class="num">36 / 250</td><td class="num">14.4%</td></tr>
+      <tr><td class="q">sensor 19</td><td class="num">18 / 250</td><td class="num">7.2%</td></tr>
+      <tr><td class="q">sensor 18</td><td class="num">14 / 250</td><td class="num">5.6%</td></tr>
+      <tr><td class="q">sensor 12</td><td class="num">5 / 250</td><td class="num">2.0%</td></tr>
+      <tr><td class="q">sensor 21</td><td class="num">4 / 250</td><td class="num">1.6%</td></tr>
+      <tr><td class="q">sensor 16</td><td class="num">3 / 250</td><td class="num">1.2%</td></tr>
+      <tr class="hl"><td class="q">operational setting 3</td><td class="num">0 / 250</td><td class="num">0.0%</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="col">
+  <p class="note">The six&#8209;feature stable core is <strong>confirmed</strong> &mdash; that part of &sect;4.3 is solid and the bimodal&#8209;stability interpretation is well supported. But sensor&nbsp;7 appears in <strong>68%</strong> of runs, not one in five.</p>
+  </div>
+</section>
+
+<section>
+  <h2>WA&#8209;LIME <span class="src">Table 8</span></h2>
+  <div class="scroll">
+  <table>
+    <caption>Paper&rsquo;s protocol: 3 WA-LIME runs, Jaccard-based stopping rule</caption>
+    <thead><tr><th>Metric</th><th class="num">Paper</th><th class="num">Re&#8209;run</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td class="q">Mean pairwise Jaccard, J&#772;</td><td class="num">0.778</td><td class="num">0.7185</td><td><span class="chip c-warn">close</span></td></tr>
+      <tr><td class="q">Features in top&#8209;8 in all runs</td><td class="num">7 of 10</td><td class="num">6 of 10</td><td><span class="chip c-warn">close</span></td></tr>
+      <tr><td class="q">Unique features in any top&#8209;8</td><td class="num">10</td><td class="num">10</td><td><span class="chip c-ok">match</span></td></tr>
+      <tr><td class="q">Boundary&#8209;fluctuating features</td><td class="num">3</td><td class="num">4</td><td><span class="chip c-warn">close</span></td></tr>
+      <tr><td class="q">Convergence iterations, 3 runs</td><td class="num">4, 12, 6</td><td class="num">4, 3, 5</td><td><span class="chip c-warn">close</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="col">
+  <p class="note">Table&nbsp;8&rsquo;s WA&#8209;LIME column is internally consistent: three 8&#8209;feature runs sharing a common 7 gives union 10, three boundary features, and J&nbsp;=&nbsp;7/9&nbsp;=&nbsp;0.7778 for all three pairs. That checks out.</p>
+
+  <div class="call">
+    <h4>The relative gain is quoted three different ways</h4>
+    <p>0.778 / 0.636 = 1.2233, so <strong>+22.3%</strong>. The abstract and &sect;4.4 say 22.3%; Table&nbsp;8&rsquo;s Change column says <strong>+22.4%</strong>; &sect;5 opens with &ldquo;A <strong>22.4%</strong> stability gain&rdquo;. Pick one &mdash; 22.3% is the correct rounding.</p>
+  </div>
+
+  <div class="call bad">
+    <h4>The Sensor-7 narrative does not survive re-running</h4>
+    <p>&sect;4.4 and the Conclusion both lean on it: &ldquo;Sensor 7, which appears in only one of the five LIME runs (rank 6 in run 5 only), appears in all three WA&#8209;LIME runs.&rdquo;</p>
+    <p><strong>Table 6 already contradicts it</strong> &mdash; it shows S7 in runs <strong>2, 3 and 4</strong> at ranks 7, 6 and 8, and <em>not</em> in run 5. The parenthetical matches no row of the paper&rsquo;s own table. <strong>And in my re-run with the stated seeds, S7 appears in all five LIME runs</strong>, so there is no omission for WA&#8209;LIME to correct.</p>
+    <p>&sect;5 escalates this into an operational claim &mdash; that under standard LIME the HPC discharge stage &ldquo;would have appeared in roughly one in five reports&rdquo;. The measured rate is <strong>68%</strong>. I would drop this narrative unless it survives a clean re-run.</p>
+  </div>
+
+  <h3>A well-powered comparison on the paper&rsquo;s own instance</h3>
+  <p>Repeating the comparison on instance&nbsp;#10 with R&nbsp;=&nbsp;100 runs per method &mdash; 4,950 pairs rather than 3 or 10 &mdash; on untruncated weight vectors:</p>
+  </div>
+  <div class="scroll">
+  <table>
+    <caption>R = 100 runs per method, 4,950 pairs</caption>
+    <thead><tr><th>Method</th><th class="num">Jaccard@8</th><th class="num">Spearman (all 25)</th><th class="num">Perturbations</th></tr></thead>
+    <tbody>
+      <tr><td class="q">LIME, 1&times; budget (n = 5,000)</td><td class="num">0.8201</td><td class="num">0.8609</td><td class="num">5,000</td></tr>
+      <tr class="hl"><td class="q"><strong>WA&#8209;LIME, B = 5 (5&times; budget)</strong></td><td class="num"><strong>0.9367</strong></td><td class="num"><strong>0.9351</strong></td><td class="num">25,000</td></tr>
+      <tr class="hl"><td class="q">LIME, 5&times; budget (n = 25,000)</td><td class="num"><strong>0.9434</strong></td><td class="num"><strong>0.9507</strong></td><td class="num">25,000</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="col">
+  <p><strong>WA&#8209;LIME does work.</strong> Against a single LIME call it lifts Jaccard@8 from 0.820 to 0.937 and Spearman from 0.861 to 0.935. The paper&rsquo;s qualitative claim is real, and this is a far stronger way to demonstrate it than 5&#8209;versus&#8209;3 runs.</p>
+
+  <div class="call bad">
+    <h4>But it does not beat the compute-matched baseline</h4>
+    <p>Simply raising <code>num_samples</code> from 5,000 to 25,000 &mdash; one LIME call, no aggregation, no wrapper &mdash; reaches <strong>0.9434 / 0.9507</strong>, edging out WA&#8209;LIME on both metrics at identical cost. This holds on the paper&rsquo;s own instance, and the same pattern appears across a separate 10&#8209;instance study.</p>
+    <p>This is the objection most likely to sink the paper in review, because the baseline is obvious and cheap to run. The most promising response: aggregating over <em>resampled backgrounds</em> targets a variance component that extra perturbations cannot touch, which would give WA&#8209;LIME a defensible niche. That claim needs its own experiment.</p>
+  </div>
+
+  <p class="note"><strong>A note on <em>k</em>.</strong> LIME&rsquo;s <code>num_features</code> is not a display truncation &mdash; it selects features and then <em>refits the surrogate on that subset</em>, so top&#8209;8&#8209;of&#8209;8 and top&#8209;8&#8209;of&#8209;25 are different quantities. Under the paper&rsquo;s <em>k</em>&nbsp;=&nbsp;8 protocol the true J&#772; is 0.7409; untruncated it is 0.8201. Both are correct for their protocols; the paper should say which it used.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Editorial <span class="src">Pre-submission</span></h2>
+  <div class="col">
+  <ul>
+    <li><strong>An unresolved author note is still in the PDF</strong>, under Fig.&nbsp;18 on p.&nbsp;23: <em>&ldquo;(Can consider adding a statement on the increase of Spearman Rank Correlation/point to the results section for the same)&rdquo;</em>.</li>
+    <li><strong>Broken cross-references.</strong> &sect;4.4 says &ldquo;In Figure&nbsp;12, each curve plots the Jaccard index between the top&#8209;8 sets at successive iterations&rdquo; &mdash; that is <strong>Figure&nbsp;18</strong>; Figure&nbsp;12 is the third LIME iteration. &sect;4.4 and &sect;5 both cite &ldquo;Section&nbsp;3.3&rdquo; for the five&#8209;run instability test and the bimodal finding; both live in <strong>Section&nbsp;4.3</strong>.</li>
+    <li><strong>Garbled sentence in the abstract:</strong> &ldquo;&hellip;increases the number of features retained in every run from 6 to 7 of the top&#8209;8 set, and features that enter or leave the top&#8209;<em>k</em> set across runs.&rdquo; The final clause has lost its verb.</li>
+    <li><strong>&sect;4.2 ranking claim.</strong> &ldquo;the least important as sensor measurement 19&rdquo; &mdash; S19 appears in none of Table&nbsp;6&rsquo;s five runs, so this refers to the Figure&nbsp;9 explanation only. Make that explicit.</li>
+    <li><strong>Ranking rule mismatch.</strong> &sect;3.6 says the top&#8209;<em>k</em> is ranked by |&beta;<sub>r</sub>&nbsp;&middot;&nbsp;x&#771;<sub>r</sub>|; the notebook ranks by |&beta;<sub>r</sub>| alone, which is what LIME&rsquo;s <code>as_list()</code> returns. Same top&#8209;6 here, but different quantities &mdash; describe the one the code computes. (Jaccard is identical either way; &rho;&#772; is 0.9857 by |&beta;| vs 0.9976 by |&beta;&middot;x&#771;|.)</li>
+    <li><strong>&ldquo;S-LIME&rdquo; in the notebook headings.</strong> S&#8209;LIME (Zhou et al., KDD 2021) is a different algorithm using hypothesis testing for perturbation sizing. The paper correctly says WA&#8209;LIME throughout; the released notebook should match.</li>
+  </ul>
+  </div>
+</section>
+
+<section>
+  <h2>What to do before submitting</h2>
+  <div class="col">
+  <ul>
+    <li><strong>Reconcile Tables 6 and 7.</strong> They describe different experiments. Re&#8209;run the five stated seeds, regenerate both tables from that single run, and make the prose feature list match.</li>
+    <li><strong>Replace the 5&#8209;run point estimate with a properly powered one.</strong> Report J&#772; over 50&ndash;100 runs with a confidence interval. Costs minutes.</li>
+    <li><strong>Run the compute&#8209;matched baseline</strong> and either re&#8209;frame the contribution around it or find the regime where aggregation genuinely wins.</li>
+    <li><strong>Fix &rho;&#772;.</strong> Either compute it over all 25 features, or keep the intersection version as a diagnostic and drop the &ldquo;membership, not order&rdquo; conclusion.</li>
+    <li><strong>Drop or re&#8209;verify the Sensor&#8209;7 narrative</strong> in &sect;4.4, &sect;5 and the Conclusion.</li>
+    <li><strong>Sweep the editorial list</strong> above, starting with the author note on p.&nbsp;23.</li>
+  </ul>
+  </div>
+</section>
+
+<footer>
+  Independent reproduction &middot; Full_Dataset.xlsx (45,918 &times; 27) &middot; full_aircraft_XAI.ipynb<br>
+  Scripts and raw logs: <code>scripts/</code> and <code>results/</code> on branch <code>claude/verify-paper-code-3pvywe</code>
+</footer>
+
+</div>

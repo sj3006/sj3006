@@ -1,0 +1,37 @@
+================================================================================
+SAMPLING DISTRIBUTION OF THE PAPER'S J-bar (5 runs, 10 pairs, instance #10)
+================================================================================
+  based on 250 independent LIME runs, 2000 resamples of 5
+  mean            0.7420
+  std             0.0503
+  min .. max      0.6356 .. 0.9111
+    1th pct       0.6533
+    5th pct       0.6711
+   25th pct       0.7067
+   50th pct       0.7289
+   75th pct       0.7778
+   95th pct       0.8267
+   99th pct       0.8667
+  fraction of 5-run draws at or below the paper's 0.636: 0.75%
+  fraction at or below 0.707 (Table 6's implied value)  : 29.35%
+
+  best estimate of LIME's true J-bar (all 31,125 pairs): 0.7409 +- 0.1144
+
+  feature presence across the 250 runs:
+    time                       250/250  (100.0%)
+    sensor measurement 3       250/250  (100.0%)
+    sensor measurement 4       250/250  (100.0%)
+    sensor measurement 11      250/250  (100.0%)
+    sensor measurement 13      250/250  (100.0%)
+    sensor measurement 15      250/250  (100.0%)
+    sensor measurement 7       170/250  (68.0%)
+    sensor measurement 2        89/250  (35.6%)
+    sensor measurement 17       81/250  (32.4%)
+    sensor measurement 9        42/250  (16.8%)
+    sensor measurement 8        38/250  (15.2%)
+    sensor measurement 14       36/250  (14.4%)
+    sensor measurement 19       18/250  (7.2%)
+    sensor measurement 18       14/250  (5.6%)
+    sensor measurement 12        5/250  (2.0%)
+    sensor measurement 21        4/250  (1.6%)
+    sensor measurement 16        3/250  (1.2%)
