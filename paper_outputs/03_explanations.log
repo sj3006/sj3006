@@ -1,0 +1,90 @@
+
+==============================================================================
+STAGE 03  REFERENCE EXPLANATIONS
+==============================================================================
+  split=random  instances=[8453, 7520, 5946, 268, 1086, 2986, 701, 5139]
+
+  instance #8453  predicted RUL   10.45   actual   12.0   residual   -1.55   R2_local 0.8238
+     1. time       -41.021  (lowers predicted RUL)
+     2. S15        -16.933  (lowers predicted RUL)
+     3. S11        -12.803  (lowers predicted RUL)
+     4. S4          -6.872  (lowers predicted RUL)
+     5. S13         -6.412  (lowers predicted RUL)
+     6. S3          -2.470  (lowers predicted RUL)
+     7. S7          +2.112  (raises predicted RUL)
+     8. S21         +1.553  (raises predicted RUL)
+
+  instance #7520  predicted RUL   39.46   actual   31.0   residual   +8.46   R2_local 0.8122
+     1. time       -40.908  (lowers predicted RUL)
+     2. S15        -16.745  (lowers predicted RUL)
+     3. S11        -12.662  (lowers predicted RUL)
+     4. S4          -7.477  (lowers predicted RUL)
+     5. S13         -5.549  (lowers predicted RUL)
+     6. S7          +2.681  (raises predicted RUL)
+     7. S3          -2.455  (lowers predicted RUL)
+     8. S21         +1.613  (raises predicted RUL)
+
+  instance #5946  predicted RUL  114.85   actual   77.0   residual  +37.85   R2_local 0.8311
+     1. time       -42.398  (lowers predicted RUL)
+     2. S15        -17.243  (lowers predicted RUL)
+     3. S11        -12.973  (lowers predicted RUL)
+     4. S4          -7.792  (lowers predicted RUL)
+     5. S13         -6.495  (lowers predicted RUL)
+     6. S7          +2.938  (raises predicted RUL)
+     7. S3          -2.158  (lowers predicted RUL)
+     8. S21         +2.013  (raises predicted RUL)
+
+  instance #268  predicted RUL  124.76   actual   92.0   residual  +32.76   R2_local 0.8366
+     1. time       -42.666  (lowers predicted RUL)
+     2. S15        -16.273  (lowers predicted RUL)
+     3. S11        -12.402  (lowers predicted RUL)
+     4. S4          -7.435  (lowers predicted RUL)
+     5. S13         -6.007  (lowers predicted RUL)
+     6. S3          -2.250  (lowers predicted RUL)
+     7. S7          +1.991  (raises predicted RUL)
+     8. S21         +1.673  (raises predicted RUL)
+
+  instance #1086  predicted RUL  152.16   actual  131.0   residual  +21.16   R2_local 0.8421
+     1. time       -43.496  (lowers predicted RUL)
+     2. S15        -16.229  (lowers predicted RUL)
+     3. S11        -12.456  (lowers predicted RUL)
+     4. S4          -7.273  (lowers predicted RUL)
+     5. S13         -5.969  (lowers predicted RUL)
+     6. S7          +2.213  (raises predicted RUL)
+     7. S3          -2.186  (lowers predicted RUL)
+     8. S12         +1.248  (raises predicted RUL)
+
+  instance #2986  predicted RUL   97.76   actual  132.0   residual  -34.24   R2_local 0.8403
+     1. time       -42.667  (lowers predicted RUL)
+     2. S15        -16.947  (lowers predicted RUL)
+     3. S11        -12.271  (lowers predicted RUL)
+     4. S4          -7.422  (lowers predicted RUL)
+     5. S13         -5.498  (lowers predicted RUL)
+     6. S3          -1.996  (lowers predicted RUL)
+     7. S7          +1.821  (raises predicted RUL)
+     8. S12         +1.450  (raises predicted RUL)
+
+  instance #701  predicted RUL  192.11   actual  165.0   residual  +27.11   R2_local 0.8399
+     1. time       -43.444  (lowers predicted RUL)
+     2. S15        -16.617  (lowers predicted RUL)
+     3. S11        -11.998  (lowers predicted RUL)
+     4. S4          -6.858  (lowers predicted RUL)
+     5. S13         -6.096  (lowers predicted RUL)
+     6. S7          +2.468  (raises predicted RUL)
+     7. S3          -2.017  (lowers predicted RUL)
+     8. S21         +1.760  (raises predicted RUL)
+
+  instance #5139  predicted RUL  185.05   actual  221.0   residual  -35.95   R2_local 0.8381
+     1. time       -43.200  (lowers predicted RUL)
+     2. S15        -16.439  (lowers predicted RUL)
+     3. S11        -12.353  (lowers predicted RUL)
+     4. S4          -7.621  (lowers predicted RUL)
+     5. S13         -5.375  (lowers predicted RUL)
+     6. S3          -2.001  (lowers predicted RUL)
+     7. S7          +1.578  (raises predicted RUL)
+     8. S21         +1.031  (raises predicted RUL)
+  -> paper_outputs/t03_single_explanation.csv
+  -> paper_outputs/t03_walime_explanation.csv
+  -> paper_outputs/s03_instances.json
+
+  mean local fidelity across instances: 0.8330

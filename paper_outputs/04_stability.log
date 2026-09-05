@@ -1,0 +1,11 @@
+
+==============================================================================
+STAGE 04  EXPLANATION STABILITY
+==============================================================================
+  split=random  instances=8  R=50 reps  (1225 pairs per instance per method)
+  LIME                                         J@8=0.8635  rho=0.8465  perturb=5,000
+  WA-LIME B=2                                  J@8=0.9110  rho=0.8894  perturb=10,000
+  WA-LIME B=3                                  J@8=0.9351  rho=0.9076  perturb=15,000
+  WA-LIME B=5                                  J@8=0.9634  rho=0.9255  perturb=25,000
+  WA-LIME B=10                                 J@8=0.9882  rho=0.9393  perturb=50,000
+  WA-LIME B=20                                 J@8=0.9978  rho=0.9471  perturb=100,000

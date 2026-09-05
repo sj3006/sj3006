@@ -1,0 +1,50 @@
+{
+  "random": {
+    "split": "random",
+    "n_train": 36734,
+    "n_test": 9184,
+    "mse": 1248.5247554117477,
+    "rmse": 35.33446979100928,
+    "mae": 26.955736383387936,
+    "r2": 0.7331471442860311
+  },
+  "grouped": {
+    "split": "grouped",
+    "n_train": 36420,
+    "n_test": 9498,
+    "mse": 1334.6424928133604,
+    "rmse": 36.53275917328666,
+    "mae": 29.153759345035443,
+    "r2": 0.7248780644453297
+  },
+  "primary_split": "random",
+  "baseline_r2": -7.574841866953008e-05,
+  "r2_without_time": 0.6039462835681189,
+  "feature_importance": {
+    "time": 0.8657546240271974,
+    "sensor measurement 15": 0.044980743448548424,
+    "sensor measurement 11": 0.028806704476301993,
+    "sensor measurement 13": 0.023056233269762243,
+    "sensor measurement 4": 0.015567998370023919,
+    "sensor measurement 14": 0.00473398447692796,
+    "sensor measurement 12": 0.0033837265912162354,
+    "sensor measurement 2": 0.002465323357355903,
+    "sensor measurement 9": 0.0020608306571716422,
+    "sensor measurement 17": 0.0018483163627906057,
+    "sensor measurement 3": 0.0014749036162587995,
+    "sensor measurement 7": 0.0013972847141512012,
+    "sensor measurement 20": 0.0010891859889786929,
+    "sensor measurement 21": 0.0010175644374642418,
+    "sensor measurement 8": 0.0008386217414939343,
+    "sensor measurement 6": 0.0007815816593933756,
+    "sensor measurement 16": 0.0006091279603475759,
+    "operational setting 2": 9.060433155590926e-05,
+    "operational setting 3": 4.264051305996139e-05,
+    "operational setting 1": 0.0,
+    "sensor measurement 1": 0.0,
+    "sensor measurement 5": 0.0,
+    "sensor measurement 10": 0.0,
+    "sensor measurement 18": 0.0,
+    "sensor measurement 19": 0.0
+  }
+}

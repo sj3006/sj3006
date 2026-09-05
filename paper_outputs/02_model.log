@@ -1,0 +1,23 @@
+
+==============================================================================
+STAGE 02  MODEL PERFORMANCE
+==============================================================================
+  row-level 80/20      MSE=  1248.52  RMSE= 35.33  MAE= 26.96  R2=0.7331
+  engine-level 80/20   MSE=  1334.64  RMSE= 36.53  MAE= 29.15  R2=0.7249
+  -> paper_outputs/t02_model.csv
+
+  mean-baseline R2            -0.0001
+  RUL sd on the test set      68.40 cycles
+  engines in the random   test set: 218 of 218
+  engines in the grouped  test set: 44 of 218
+  top feature importances:
+     time                       0.8658
+     sensor measurement 15      0.0450
+     sensor measurement 11      0.0288
+     sensor measurement 13      0.0231
+     sensor measurement 4       0.0156
+     sensor measurement 14      0.0047
+
+  R2 with 'time'              0.7331
+  R2 without 'time'           0.6039
+  -> paper_outputs/s02_model.json

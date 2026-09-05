@@ -1,0 +1,9 @@
+statistic,value,remark
+Total aircraft engines,218,run-to-failure
+Total operational cycles,"45,918",across all engines
+Min engine lifetime,128 cycles,engine 76
+Max engine lifetime,357 cycles,engine 5
+Mean engine lifetime,210.63 cycles,sd = 43.60 (sample)
+RUL range,0 - 356 cycles,0 = failure point
+Features used,25,time + 3 op. settings + 21 sensors
+RUL label verified,yes,"RUL == max(time) - time, per engine"
