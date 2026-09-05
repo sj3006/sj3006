@@ -1,16 +1,15 @@
 """Per-feature signal-to-noise: quantifies the mechanism §3.7 asserts.
 The paper models each run as beta_hat = beta* + eps. If so, a feature's rank
 stability should track |mean w| / sd(w) across runs."""
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _common import RESULTS as P, DATA, load_frame, load_xy, get_model
 import numpy as np, pandas as pd, warnings, json
 warnings.filterwarnings('ignore')
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import GradientBoostingRegressor
 from lime.lime_tabular import LimeTabularExplainer
-import os
-P = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'results') + os.sep
-df=pd.read_excel(os.environ.get('AIRCRAFT_XLSX','Full_Dataset.xlsx'))
-df.columns=[c.replace('Unit Number','unit number').replace('Time (Cycles)','time') for c in df.columns]
-df.columns=[' '.join(c.split()).lower() if c not in ('unit number','time','RUL') else c for c in df.columns]
+df = load_frame()
 X=df.drop(columns=['unit number']).drop('RUL',axis=1); y=df['RUL']
 Xtr,Xte,ytr,yte=train_test_split(X,y,test_size=0.2,random_state=42)
 gb=GradientBoostingRegressor().fit(Xtr,ytr)

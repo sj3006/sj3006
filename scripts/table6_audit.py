@@ -1,4 +1,7 @@
 """Recompute Table 7 from the ranks the paper itself prints in Table 6."""
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _common import RESULTS as P, DATA, load_frame, load_xy, get_model
 import itertools, numpy as np
 
 # Table 6 as printed: feature -> {run: rank}

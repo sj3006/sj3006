@@ -1,10 +1,9 @@
-import os
-P = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'results') + os.sep
-os.makedirs(P, exist_ok=True)
-DATA = os.environ.get('AIRCRAFT_XLSX', os.path.join(os.path.dirname(P.rstrip(os.sep)), 'Full_Dataset.xlsx'))
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _common import RESULTS as P, DATA, load_frame, load_xy, get_model
 import numpy as np, joblib, warnings; warnings.filterwarnings('ignore')
 from lime.lime_tabular import LimeTabularExplainer
-gb,Xtr,Xte,ytr,yte=joblib.load(P+'model.joblib'); cols=list(Xtr.columns); NF=len(cols)
+gb,Xtr,Xte,ytr,yte=get_model(); cols=list(Xtr.columns); NF=len(cols)
 row=Xte.iloc[10].values
 
 print("="*80); print("ISSUE 1: np.abs() discards direction -> explanation loses its meaning"); print("="*80)

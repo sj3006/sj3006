@@ -7,6 +7,7 @@ turbofan RUL prediction, for academic paper submission.
 
 | File | Purpose |
 |---|---|
+| `RUNNING_LOCALLY.md` | **Start here** — setup and what each script checks |
 | `PAPER_NUMBER_AUDIT.md` | Every number in `Tolu_Revamped_V10.pdf` vs the re-run |
 | `RANKWISE_ANALYSIS.md` | Rank-position occupancy and per-feature SNR |
 | `audit.html` | Presentable version of the audit (published artifact) |
@@ -48,10 +49,10 @@ recommended changes.
 ## Reproducing
 
 ```bash
-pip install pandas numpy scipy scikit-learn openpyxl matplotlib lime
-python scripts/repro_gbrm.py       # writes results/model.joblib
-python scripts/stability_study.py
+pip install -r requirements.txt   # if lime fails to build, run ./install_lime.sh
+./run_all.sh quick                # 7 fast checks, ~10 min
+./run_all.sh                      # everything, ~2 h
 ```
 
-`lime==0.2.0.1` does not build under recent setuptools; install it by copying
-the `lime/` package directory out of the sdist if `pip install lime` fails.
+Put `Full_Dataset.xlsx` in the project root, or set `AIRCRAFT_XLSX` to its path.
+See `RUNNING_LOCALLY.md` for what each script checks and how long it takes.

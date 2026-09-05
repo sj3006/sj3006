@@ -1,16 +1,15 @@
 """Well-powered estimate of the LIME vs WA-LIME effect on the paper's own
 instance #10, plus the compute-matched baseline."""
-import os
-DATA = os.environ.get('AIRCRAFT_XLSX', 'Full_Dataset.xlsx')
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _common import RESULTS as P, DATA, load_frame, load_xy, get_model
 import numpy as np, itertools, warnings, pandas as pd
 warnings.filterwarnings('ignore')
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import GradientBoostingRegressor
 from lime.lime_tabular import LimeTabularExplainer
 
-df = pd.read_excel(DATA)
-df.columns=[c.replace('Unit Number','unit number').replace('Time (Cycles)','time') for c in df.columns]
-df.columns=[' '.join(c.split()).lower() if c not in ('unit number','time','RUL') else c for c in df.columns]
+df = load_frame()
 X=df.drop(columns=['unit number']).drop('RUL',axis=1); y=df['RUL']
 Xtr,Xte,ytr,yte=train_test_split(X,y,test_size=0.2,random_state=42)
 gb=GradientBoostingRegressor().fit(Xtr,ytr); cols=list(X.columns); NF=len(cols); row=Xte.iloc[10].values

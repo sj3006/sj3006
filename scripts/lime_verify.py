@@ -1,12 +1,11 @@
 """Verify notebook cells 30/32/35: LIME + WA-LIME weight aggregation."""
-import os
-P = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'results') + os.sep
-os.makedirs(P, exist_ok=True)
-DATA = os.environ.get('AIRCRAFT_XLSX', os.path.join(os.path.dirname(P.rstrip(os.sep)), 'Full_Dataset.xlsx'))
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _common import RESULTS as P, DATA, load_frame, load_xy, get_model
 import numpy as np, pandas as pd, joblib, warnings
 warnings.filterwarnings('ignore')
 from lime.lime_tabular import LimeTabularExplainer
-gb, X_train, X_test, y_train, y_test = joblib.load(P+'model.joblib')
+gb, X_train, X_test, y_train, y_test = get_model()
 cols = list(X_train.columns)
 
 print("="*78)

@@ -1,17 +1,12 @@
-import os
-P = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'results') + os.sep
-os.makedirs(P, exist_ok=True)
-DATA = os.environ.get('AIRCRAFT_XLSX', os.path.join(os.path.dirname(P.rstrip(os.sep)), 'Full_Dataset.xlsx'))
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _common import RESULTS as P, DATA, load_frame, load_xy, get_model
 import pandas as pd, numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 
-df = pd.read_excel(DATA)
-# normalise the exported column names back to the notebook's names
-df.columns = [c.replace('Unit Number', 'unit number').replace('Time (Cycles)', 'time')
-              for c in df.columns]
-df.columns = [' '.join(c.split()).lower() if c not in ('unit number','time','RUL') else c for c in df.columns]
+df = load_frame()
 print("cols:", list(df.columns))
 
 # --- 1. Verify RUL == last_time - time, per engine (notebook cell 15) ---

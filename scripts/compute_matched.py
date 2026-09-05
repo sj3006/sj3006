@@ -1,13 +1,12 @@
 """Is WA-LIME's stability gain due to aggregation, or just 5x the compute?
 Compare WA-LIME(B=5, num_samples=5000) against plain LIME with num_samples=25000."""
-import os
-P = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'results') + os.sep
-os.makedirs(P, exist_ok=True)
-DATA = os.environ.get('AIRCRAFT_XLSX', os.path.join(os.path.dirname(P.rstrip(os.sep)), 'Full_Dataset.xlsx'))
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _common import RESULTS as P, DATA, load_frame, load_xy, get_model
 import numpy as np, joblib, warnings, itertools; warnings.filterwarnings('ignore')
 from scipy.stats import spearmanr
 from lime.lime_tabular import LimeTabularExplainer
-gb,Xtr,Xte,ytr,yte=joblib.load(P+'model.joblib'); cols=list(Xtr.columns); NF=len(cols)
+gb,Xtr,Xte,ytr,yte=get_model(); cols=list(Xtr.columns); NF=len(cols)
 
 def lime_w(row, ns=5000, bg=None):
     b = Xtr.values if bg is None else bg

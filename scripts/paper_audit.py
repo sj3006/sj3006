@@ -1,6 +1,7 @@
 """Audit every number in Tolu_Revamped_V10.pdf against a re-run."""
-import os
-DATA = os.environ.get('AIRCRAFT_XLSX', 'Full_Dataset.xlsx')
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _common import RESULTS as P, DATA, load_frame, load_xy, get_model
 import numpy as np, pandas as pd, itertools, warnings, joblib
 warnings.filterwarnings('ignore')
 from sklearn.model_selection import train_test_split
@@ -9,9 +10,7 @@ from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 from lime.lime_tabular import LimeTabularExplainer
 
 
-df = pd.read_excel(DATA)
-df.columns=[c.replace('Unit Number','unit number').replace('Time (Cycles)','time') for c in df.columns]
-df.columns=[' '.join(c.split()).lower() if c not in ('unit number','time','RUL') else c for c in df.columns]
+df = load_frame()
 
 print("#"*90); print("TABLE 2(b)  DATASET DESCRIPTIVE STATISTICS"); print("#"*90)
 life = df.groupby('unit number')['time'].max()

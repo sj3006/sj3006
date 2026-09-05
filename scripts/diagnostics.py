@@ -1,17 +1,13 @@
-import os
-P = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'results') + os.sep
-os.makedirs(P, exist_ok=True)
-DATA = os.environ.get('AIRCRAFT_XLSX', os.path.join(os.path.dirname(P.rstrip(os.sep)), 'Full_Dataset.xlsx'))
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _common import RESULTS as P, DATA, load_frame, load_xy, get_model
 import pandas as pd, numpy as np, joblib
 from sklearn.model_selection import train_test_split, GroupShuffleSplit
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.dummy import DummyRegressor
-df = pd.read_pickle(P+'data.pkl')
-df.columns = [c.replace('Unit Number','unit number').replace('Time (Cycles)','time') for c in df.columns]
-df.columns = [' '.join(c.split()).lower() if c not in ('unit number','time','RUL') else c for c in df.columns]
+df, X, y = load_xy()
 groups = df['unit number'].values
-X = df.drop(columns=['unit number']).drop('RUL', axis=1); y = df['RUL'].copy()
 
 # A) run-to-run variance of the *unseeded* GBR on the fixed split
 Xtr,Xte,ytr,yte = train_test_split(X,y,test_size=0.2,random_state=42)

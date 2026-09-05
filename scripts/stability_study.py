@@ -6,16 +6,15 @@ Implements the two metrics missing from the notebook:
 Both are computed PAIRWISE over R independent repetitions of the same method
 on the same instance -- that is what "explanation stability" means.
 """
-import os
-P = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'results') + os.sep
-os.makedirs(P, exist_ok=True)
-DATA = os.environ.get('AIRCRAFT_XLSX', os.path.join(os.path.dirname(P.rstrip(os.sep)), 'Full_Dataset.xlsx'))
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _common import RESULTS as P, DATA, load_frame, load_xy, get_model
 import numpy as np, pandas as pd, joblib, warnings, itertools, json, sys
 warnings.filterwarnings('ignore')
 from scipy.stats import spearmanr
 from lime.lime_tabular import LimeTabularExplainer
 
-gb, X_train, X_test, y_train, y_test = joblib.load(P + 'model.joblib')
+gb, X_train, X_test, y_train, y_test = get_model()
 cols = list(X_train.columns); NF = len(cols)
 Xtr_np = X_train.values
 
