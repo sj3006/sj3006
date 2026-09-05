@@ -1,0 +1,31 @@
+====================================================================================
+AUDIT OF TABLE 6 (recomputing Table 7 from the paper's own printed ranks)
+====================================================================================
+  run 1: |A|=8  ['Time', 'Sensor 15', 'Sensor 11', 'Sensor 4', 'Sensor 13', 'Sensor 3', 'Sensor 14', 'Sensor 8']
+  run 2: |A|=8  ['Time', 'Sensor 15', 'Sensor 11', 'Sensor 4', 'Sensor 13', 'Sensor 3', 'Sensor 7', 'Sensor 12']
+  run 3: |A|=8  ['Time', 'Sensor 15', 'Sensor 11', 'Sensor 4', 'Sensor 13', 'Sensor 7', 'Sensor 3', 'Sensor 14']
+  run 4: |A|=8  ['Time', 'Sensor 15', 'Sensor 11', 'Sensor 4', 'Sensor 13', 'Sensor 3', 'Sensor 2', 'Sensor 7']
+  run 5: |A|=8  ['Time', 'Sensor 15', 'Sensor 11', 'Sensor 4', 'Sensor 13', 'Sensor 3', 'Sensor 2', 'Sensor 8']
+
+  pairwise Jaccard values: [0.6, 0.7778, 0.6, 0.7778, 0.7778, 0.7778, 0.6, 0.7778, 0.6, 0.7778]
+
+  metric                                       paper      Table 6 implies
+  ----------------------------------------------------------------------------
+  Mean pairwise Jaccard                        0.636      0.7067
+  Mean pairwise Spearman (intersection)        1.000      0.9929
+  Total unique features ever in top-8          14         11
+  Features in top-8 in all 5 runs              6          6
+  Features appearing in <5 runs                8          5
+
+  features in all 5 runs: ['Sensor 11', 'Sensor 13', 'Sensor 15', 'Sensor 3', 'Sensor 4', 'Time']
+  features in <5 runs   : ['Sensor 12', 'Sensor 14', 'Sensor 2', 'Sensor 7', 'Sensor 8']
+
+  paper's prose names these 8 as the unstable ones:
+    Sensors 2, 7, 9, 12, 17, 18, 19, and Operational Setting 3
+  Table 6 actually contains: ['Sensor 12', 'Sensor 14', 'Sensor 2', 'Sensor 7', 'Sensor 8']
+  named in prose but ABSENT from Table 6 : Sensors 9, 17, 18, 19, Operational Setting 3
+  in Table 6 but MISSING from the prose  : Sensors 8, 14
+
+  pairs whose Spearman < 1 (contradicting the 'exactly 1.000' claim):
+    runs 2 vs 3: rho = 0.9643   (Sensor 3 / Sensor 7 swap at ranks 6-7)
+    runs 3 vs 4: rho = 0.9643   (Sensor 3 / Sensor 7 swap at ranks 6-7)

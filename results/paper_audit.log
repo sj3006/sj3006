@@ -1,0 +1,67 @@
+##########################################################################################
+TABLE 2(b)  DATASET DESCRIPTIVE STATISTICS
+##########################################################################################
+  total engines            paper 218        got 218
+  total cycles             paper 45,918     got 45,918
+  min engine lifetime      paper 128 (#76)  got 128 (#76)
+  max engine lifetime      paper 357 (#5)   got 357 (#5)
+  mean engine lifetime     paper 210.63     got 210.63
+  sigma engine lifetime    paper 43.50      got 43.60  (ddof=1) / 43.50 (ddof=0)
+  RUL range                paper 0-356      got 0-356
+  training set size        paper 36,734     got 36,734
+  test set size            paper 9,184      got 9,184
+
+##########################################################################################
+TABLE 5  GBRM PERFORMANCE
+##########################################################################################
+  MSE   paper 1248.52   got 1248.5248
+  RMSE  paper 35.33     got 35.3345
+  MAE   paper 26.96     got 26.9557
+  R2    paper 0.733     got 0.7331
+  RMSE/MAE ratio  paper 1.31   got 1.3108
+  hyperparams: lr=0.1 n_estimators=100 max_depth=3 min_samples_split=2 min_samples_leaf=1 max_features=None
+
+##########################################################################################
+SECTION 4.2  TEST INSTANCE #10
+##########################################################################################
+  GBRM predicted RUL   paper 175.54   got 175.5442
+  actual RUL of that instance: 226
+  paper's seeds s_i = 17i+3, i=1..5  ->  [20, 37, 54, 71, 88]
+
+==========================================================================================
+TABLE 6 / 7  LIME ACROSS 5 SEEDED RUNS   (top-8 ranked by |beta|)
+==========================================================================================
+   seed 20  R2_local=0.8406 : ['time', 'S 15', 'S 11', 'S 4', 'S 13', 'S 3', 'S 7', 'S 2']
+   seed 37  R2_local=0.8450 : ['time', 'S 15', 'S 11', 'S 4', 'S 13', 'S 7', 'S 3', 'S 8']
+   seed 54  R2_local=0.8390 : ['time', 'S 15', 'S 11', 'S 4', 'S 13', 'S 3', 'S 7', 'S 2']
+   seed 71  R2_local=0.8363 : ['time', 'S 15', 'S 11', 'S 4', 'S 13', 'S 3', 'S 7', 'S 21']
+   seed 88  R2_local=0.8429 : ['time', 'S 15', 'S 11', 'S 4', 'S 13', 'S 3', 'S 7', 'S 17']
+
+   metric                                     paper          got
+   Mean pairwise Jaccard                      0.636          0.8000
+   Mean pairwise Spearman (intersection)      1.000          0.9857
+   Mean local fidelity R2_local               0.843          0.8408
+   Total unique features ever in top-8        14             11
+   Features in top-8 in all 5 runs            6              7
+   Features appearing in <5 runs              8              4
+   intersection sizes q per pair: [7, 8, 7, 7, 7, 7, 7, 7, 7, 7]
+   always-present: ['sensor measurement 11', 'sensor measurement 13', 'sensor measurement 15', 'sensor measurement 3', 'sensor measurement 4', 'sensor measurement 7', 'time']
+
+==========================================================================================
+TABLE 6 / 7  LIME ACROSS 5 SEEDED RUNS   (top-8 ranked by |beta * x_tilde|)
+==========================================================================================
+   seed 20  R2_local=0.8406 : ['time', 'S 15', 'S 11', 'S 13', 'S 4', 'S 3', 'S 2', 'S 7']
+   seed 37  R2_local=0.8450 : ['time', 'S 15', 'S 11', 'S 13', 'S 4', 'S 3', 'S 8', 'S 7']
+   seed 54  R2_local=0.8390 : ['time', 'S 15', 'S 11', 'S 13', 'S 4', 'S 3', 'S 7', 'S 2']
+   seed 71  R2_local=0.8363 : ['time', 'S 15', 'S 11', 'S 13', 'S 4', 'S 3', 'S 7', 'S 21']
+   seed 88  R2_local=0.8429 : ['time', 'S 15', 'S 11', 'S 13', 'S 4', 'S 3', 'S 7', 'S 17']
+
+   metric                                     paper          got
+   Mean pairwise Jaccard                      0.636          0.8000
+   Mean pairwise Spearman (intersection)      1.000          0.9976
+   Mean local fidelity R2_local               0.843          0.8408
+   Total unique features ever in top-8        14             11
+   Features in top-8 in all 5 runs            6              7
+   Features appearing in <5 runs              8              4
+   intersection sizes q per pair: [7, 8, 7, 7, 7, 7, 7, 7, 7, 7]
+   always-present: ['sensor measurement 11', 'sensor measurement 13', 'sensor measurement 15', 'sensor measurement 3', 'sensor measurement 4', 'sensor measurement 7', 'time']

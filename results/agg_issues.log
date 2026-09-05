@@ -1,0 +1,47 @@
+================================================================================
+ISSUE 1: np.abs() discards direction -> explanation loses its meaning
+================================================================================
+  A single LIME explanation for X_test.iloc[10] (signed):
+     time                      -43.1185  (decreases RUL)
+     sensor measurement 15     -17.0259  (decreases RUL)
+     sensor measurement 11     -11.9535  (decreases RUL)
+     sensor measurement 4       -7.5301  (decreases RUL)
+     sensor measurement 13      -5.2430  (decreases RUL)
+     sensor measurement 3       -2.7235  (decreases RUL)
+     sensor measurement 2       -1.2062  (decreases RUL)
+     sensor measurement 9       -1.0923  (decreases RUL)
+
+  After np.abs() the aggregated bar chart in cells 37/38 can no longer say
+  whether a sensor pushes predicted RUL UP or DOWN. For a prognostics paper
+  that is the whole actionable content of the explanation.
+
+================================================================================
+ISSUE 2: sign cancellation is NOT the reason to use abs -- check it
+================================================================================
+  fraction of 20 runs where the weight is POSITIVE (0 or 1 => stable sign):
+     time                     0.00
+     sensor measurement 2     0.00
+     sensor measurement 3     0.00
+     sensor measurement 4     0.00
+     sensor measurement 7     1.00
+     sensor measurement 9     0.00
+  features with UNSTABLE sign across runs: 10 / 25 -> ['operational setting 1', 'operational setting 2', 'operational setting 3', 'sensor measurement 1', 'sensor measurement 5', 'sensor measurement 8']
+  => signed averaging would be safe for the top features; abs() is not needed
+     for them, and it destroys interpretability. Report signed mean + the
+     magnitude separately.
+
+================================================================================
+ISSUE 3: truncation-to-8 shrinks the aggregate (cell 35 vs untruncated)
+================================================================================
+  feature                    agg(top-8)  agg(all 25)  shrinkage
+  time                          42.2198      42.1884      -0.1%
+  sensor measurement 15         16.6370      16.6311      -0.0%
+  sensor measurement 11         12.1431      12.1634       0.2%
+  sensor measurement 4           7.7366       7.7212      -0.2%
+  sensor measurement 13          5.2556       5.2741       0.4%
+  sensor measurement 3           2.3907       2.3755      -0.6%
+  sensor measurement 7           1.3004       2.1313      39.0%
+  sensor measurement 21          0.0000       1.4581     100.0%
+  sensor measurement 12          0.6826       1.3166      48.2%
+  sensor measurement 2           0.2771       0.9932      72.1%
+  nonzero: top-8 protocol=12, untruncated=25
