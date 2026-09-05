@@ -55,6 +55,30 @@ Output is printed and also written to `results/<name>.log`.
 
 ---
 
+## Do they depend on each other?
+
+**No. Every script is independent and can be run alone, in any order.**
+
+Each one reads only two things: the Excel file, and a trained GBRM it gets from
+`_common.get_model()`. No script reads any other script's output.
+
+`get_model()` caches the model to `results/model.joblib` purely to save refitting
+(~40 s) on every run. If the cache is absent, whichever script you run builds it.
+It is seeded (`random_state=0`) so it is byte-identical no matter which script
+builds it first — order genuinely does not matter. Delete the file any time to
+force a rebuild.
+
+The four files some scripts *write* (`rankwise.json`, `snr.json`,
+`agg_notebook.npy`, `ctx.joblib`) are outputs for you to inspect. Nothing reads
+them back.
+
+One deliberate exception: `repro_gbrm.py` fits the notebook's **unseeded**
+`GradientBoostingRegressor()` rather than using the shared cache, because
+demonstrating that the paper's exact figures fall out of the untouched default
+is the whole point of that script. It does not touch the cache.
+
+---
+
 ## What each file checks
 
 ### Fast — run these first (~10 min total)

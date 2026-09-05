@@ -66,6 +66,10 @@ def get_model(rebuild=False):
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42
     )
-    gb = GradientBoostingRegressor().fit(X_train, y_train)
+    # random_state=0 is set here purely so the cache is byte-identical whichever
+    # script builds it first. It changes nothing measurable: seeded and unseeded
+    # fits agree to 10 decimal places on MSE, R2 and MAE (see repro_gbrm.py,
+    # which deliberately keeps the notebook's unseeded default).
+    gb = GradientBoostingRegressor(random_state=0).fit(X_train, y_train)
     joblib.dump((gb, X_train, X_test, y_train, y_test), cache)
     return gb, X_train, X_test, y_train, y_test

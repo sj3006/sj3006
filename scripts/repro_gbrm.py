@@ -36,5 +36,7 @@ print("  y_test std = %.4f, var = %.4f" % (y_test.std(), y_test.var()))
 gb2 = GradientBoostingRegressor().fit(X_train, y_train)
 print("\n[determinism] identical preds across two unseeded fits:", np.array_equal(y_pred, gb2.predict(X_test)))
 
-import joblib, os
-joblib.dump((gb, X_train, X_test, y_train, y_test), P + 'model.joblib')
+
+# The shared cache is built by _common.get_model() (seeded, so it is identical
+# whichever script builds it). This script deliberately fits the notebook's
+# unseeded default instead, so it must not overwrite that cache.
