@@ -1,0 +1,24 @@
+
+==============================================================================
+STAGE 05  RANK OCCUPANCY AND SIGNAL-TO-NOISE
+==============================================================================
+  split=random  instances=8  R=100 reps
+  -> paper_outputs/t05_rank_occupancy.csv
+  -> paper_outputs/t05_rank_occupancy_full.csv
+  -> paper_outputs/t05_feature_snr.csv
+
+==============================================================================
+POOLED RANK STABILITY (mean modal share across instances)
+==============================================================================
+  rank     LIME share   LIME distinct   WA-LIME share  WA-LIME distinct
+  --------------------------------------------------------------------
+  1           100.0%             1.0          100.0%               1.0
+  2           100.0%             1.0          100.0%               1.0
+  3           100.0%             1.0          100.0%               1.0
+  4            99.6%             1.2          100.0%               1.0
+  5            99.6%             1.2          100.0%               1.0
+  6            64.0%             2.4           75.6%               2.0
+  7            56.1%             5.0           75.6%               2.0
+  8            57.2%             7.5           91.6%               3.5
+  -> paper_outputs/t05_rank_pooled.csv
+  -> paper_outputs/s05_meta.json
