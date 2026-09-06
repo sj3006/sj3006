@@ -1,5 +1,12 @@
 # Generating the paper's numbers from scratch
 
+> **Prefer a notebook?** `WA_LIME_study.ipynb` at the project root is the same
+> pipeline as one runnable notebook — same config, same logic, same outputs,
+> with the tables rendered inline. Set `QUICK = True` in its config cell for a
+> ~2 minute smoke run (which writes to `paper_outputs_quick/` so it cannot
+> clobber real results), then `QUICK = False` for the real one. Use the `paper/`
+> scripts below if you would rather run it headless or from CI.
+
 This is a **separate pipeline** from `scripts/`. The 13 scripts in `scripts/`
 audit the existing draft — they print "paper says X, we got Y". Useful for
 checking the old version, wrong for producing new numbers.
