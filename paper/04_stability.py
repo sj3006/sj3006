@@ -19,7 +19,7 @@ banner("STAGE 04  EXPLANATION STABILITY")
 gb, Xtr, Xte, ytr, yte, _ = build_model()
 cols = list(Xtr.columns)
 inst = pick_instances(Xte, yte)
-R, B = CFG.R_REPEATS, CFG.B_AGG
+R, B = CFG.R, CFG.B_AGG
 print(f"  split={CFG.SPLIT}  instances={len(inst)}  R={R} reps  "
       f"({R*(R-1)//2} pairs per instance per method)")
 

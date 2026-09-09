@@ -24,18 +24,17 @@ N_PERTURB      = 5000       # LIME num_samples for one explanation
 K_LIST         = (5, 8, 10) # report Jaccard at each k
 K_DISPLAY      = 8          # k used for rank-occupancy tables
 
-R_REPEATS      = 50         # independent repetitions per method per instance.
-                            # 50 gives 1225 pairs per instance; the paper's
-                            # 5 runs gave 10. Raise to 100 for the final run.
+R              = 100        # independent repetitions per method per instance,
+                            # used by BOTH the stability and the rank tables so
+                            # every result in the paper rests on one sample size.
+                            # 100 gives 4950 pairs per instance; the original
+                            # notebook's 5 runs gave 10.
 B_AGG          = 5          # WA-LIME aggregation depth
 B_SWEEP        = (2, 3, 5, 10, 20)   # for the B-vs-stability curve
 
 # Compute-matched control: plain LIME given B_AGG x N_PERTURB perturbations.
 # Without this the reviewer cannot tell aggregation from extra sampling.
 RUN_COMPUTE_MATCHED = True
-
-# --------------------------------------------------------------- rank / SNR
-R_RANK         = 100        # repetitions for rank-occupancy and SNR tables
 
 # ------------------------------------------------------------------- outputs
 OUT_DIR        = "paper_outputs"

@@ -16,7 +16,7 @@ banner("STAGE 05  RANK OCCUPANCY AND SIGNAL-TO-NOISE")
 gb, Xtr, Xte, ytr, yte, _ = build_model()
 cols = list(Xtr.columns)
 inst = pick_instances(Xte, yte)
-R, K = CFG.R_RANK, CFG.K_DISPLAY
+R, K = CFG.R, CFG.K_DISPLAY
 print(f"  split={CFG.SPLIT}  instances={len(inst)}  R={R} reps")
 
 occ_rows, full_rows, snr_rows = [], [], []
