@@ -2,24 +2,7 @@
 ==============================================================================
 STAGE 04  EXPLANATION STABILITY
 ==============================================================================
-  split=random  instances=8  R=50 reps  (1225 pairs per instance per method)
-  LIME                                         J@8=0.8635  rho=0.8465  perturb=5,000
-  WA-LIME B=2                                  J@8=0.9110  rho=0.8894  perturb=10,000
-  WA-LIME B=3                                  J@8=0.9351  rho=0.9076  perturb=15,000
-  WA-LIME B=5                                  J@8=0.9634  rho=0.9255  perturb=25,000
-  WA-LIME B=10                                 J@8=0.9882  rho=0.9393  perturb=50,000
-  WA-LIME B=20                                 J@8=0.9978  rho=0.9471  perturb=100,000
-  LIME n=25000 (compute-matched to B=5)        J@8=0.9628  rho=0.9361  perturb=25,000
-  -> paper_outputs/t04_stability.csv
-  -> paper_outputs/t04_stability_per_instance.csv
-  -> paper_outputs/s04_stability.json
-
-==============================================================================
-COMPUTE-MATCHED VERDICT
-==============================================================================
-  at 25,000 perturbations:
-    WA-LIME B=5          Jaccard@8 = 0.9634   Spearman = 0.9255
-    plain LIME, same cost  Jaccard@8 = 0.9628   Spearman = 0.9361
-    difference (WA - LIME) dJ = +0.0007   drho = -0.0106
-
-  Mixed: WA-LIME wins on one metric, loses on the other. Report both.
+  split=random  instances=8  R=100 reps  (4950 pairs per instance per method)
+  LIME                                         J@8=0.8662  rho=0.8472  perturb=5,000
+  WA-LIME B=2                                  J@8=0.9165  rho=0.8874  perturb=10,000
+  WA-LIME B=3                                  J@8=0.9410  rho=0.9065  perturb=15,000
