@@ -88,6 +88,20 @@ intersection of two top-k sets nearly guarantees ≈1: the surviving features ar
 the high-SNR ones whose order is stable by construction, so the statistic throws
 away exactly the features whose ordering is in doubt.
 
+**R_RANK is about precision, not coverage.** Rank-occupancy shares are
+proportions, so their standard error is √(p(1−p)/R) — a formula with no term for
+the number of features. Running R=100 rather than R=25 on a 25-feature problem is
+not redundant: at R=25 the modal share for rank 8 carries an SE near 10
+percentage points, at R=100 about 4. Verified empirically against a 400-run pool;
+predicted and observed spread agree to within 0.5 points.
+
+**Do not compare `n_distinct` across different R.** The count of distinct
+features ever occupying a rank grows with R (4.3 at R=10, 6.2 at 25, 7.6 at 50,
+8.5 at 100, 10.0 at 400 on one instance) because it is a species-richness count
+— more draws keep turning up rarer occupants. It never converges in the usable
+range. Report it only between methods run at the same R, and state R alongside
+it. Modal share is the statistic that converges.
+
 **A compute-matched control.** WA-LIME with B=5 spends five times the
 perturbation budget of one LIME call. Stage 04 therefore also runs plain LIME
 with `num_samples = B × 5000` and prints an explicit verdict comparing the two.
