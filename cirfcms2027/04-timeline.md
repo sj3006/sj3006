@@ -53,6 +53,15 @@ Sensitivity Jacobian, whitening, pairwise angles, SVD rank.
 Enlarge the observation vector with temporal and spatial statistics. Recompute.
 Identify which confusions dissolve without new hardware.
 
+## Week 8b — Known-practice validation
+
+Check that the analysis predicts what industry already does: the recoater fault
+should be poorly isolable from melt-pool sensors alone and well isolable once
+layer imaging is added to the configuration. This reproduces established practice
+from first principles and is the cheapest credibility you will get. If the
+prediction fails, something is wrong with the fault parameterisation — investigate
+before trusting the rest of the matrix.
+
 ## Week 9 — Sensor configurations and literature comparison
 
 Subset sweep over sensor configurations. In parallel, extract defect class sets
@@ -90,6 +99,7 @@ two sensors, five faults and one matrix is complete and defensible.
 | 4 | Diagnosability matrix (angle heatmap), main result |
 | 5 | Three-way classification per sensor configuration |
 | 6 | LDA confusion matrix on simulated data versus predicted angles |
+| 7 | Known-practice check: recoater fault isolability with and without layer imaging |
 
-Six figures is about right for a Procedia CIRP paper. If space is tight, merge 2
-into a table and drop 3.
+Seven is one too many for a Procedia CIRP paper. Merge 2 into a table and drop 3
+if space is tight; figure 7 earns its place over figure 3.

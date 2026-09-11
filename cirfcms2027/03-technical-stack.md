@@ -46,6 +46,45 @@ nominal, each mapped to a specific model input:
 | Degraded shielding gas flow | reduced surface convection + attenuation on delivered power |
 | Geometry-driven heat accumulation | elevated initial temperature T0 |
 
+### How well is each cause covered in the literature?
+
+Checked during planning. Coverage is very uneven, and the pattern matters for both
+validation and framing.
+
+| Cause | Labelled against melt-pool signals? | Notes |
+|---|---|---|
+| Laser power deviation | Yes | RAISE-LPBF labels per scan line with on-axis video |
+| Scan speed deviation | Yes | Same source; almost always studied jointly with power |
+| Thin powder layer | Via a *different* sensor | Detected by recoater line cameras / layer imaging, not melt pool signature |
+| Degraded gas flow | Essentially no | Reported as a fixed condition (e.g. 1.0 L/min Ar), not varied and detected |
+| Geometric heat accumulation | As a phenomenon, not a fault | Overhang pyrometry work exists; framed as geometry effect |
+
+Three consequences:
+
+**The pair everyone studies is the pair physics says is hardest.** Power and speed
+are the only causes routinely labelled together, and both act primarily through
+energy density, so they are the most likely to be confounded. The RAISE-LPBF
+benchmark exists specifically to test recovering both from video. Its *published
+results* are citable empirical evidence for the central claim without needing the
+dataset itself — which sidesteps the access problem recorded in
+`06-literature-landscape.md`.
+
+**The recoater fault is a free validation.** Industry solved it by adding a
+different sensor (powder-bed imaging) rather than extracting it from the melt pool
+signal. The analysis should therefore predict that this fault is poorly isolable
+from melt-pool sensors alone and well isolable once layer imaging is added. If it
+does, the method has reproduced established industrial practice from first
+principles. **Make this an explicit result** — predicting something the field
+already knows is how you earn trust for the predictions it has not checked.
+
+**Gas flow is the weakest fault.** No corroboration available and the hardest to
+model credibly. Keep it, because it is where a prediction has most value, but flag
+it as the most uncertain of the five and do not build a headline claim on it.
+
+None of this blocks the work: the model *generates* the signals, so the literature
+is corroboration rather than input. Sparse coverage is a limitation to state, not
+a dependency.
+
 **Objective.** Put all faults into a common dimensionless magnitude space so the
 signature directions computed later are comparable.
 

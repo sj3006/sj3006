@@ -56,6 +56,12 @@ included.
 deviation choice explicitly and show the main conclusions survive a different
 normalisation.
 
+**Gas flow fault is thinly supported.** No published work identifies gas flow
+faults from melt pool signals, so there is no corroboration available for this one
+and it is the hardest of the five to model credibly. Keep it but state the
+uncertainty, and do not put it in a headline claim. If a reviewer pushes hard, it
+is the fault to drop.
+
 ## Decisions already made
 
 | Decision | Rationale |
