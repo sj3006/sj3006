@@ -41,6 +41,17 @@ should appear in the introduction: those accuracies are per-study on
 self-selected class sets, and a 99% number on a chosen set says nothing about what
 a configuration resolves in general.
 
+**"Your fault modes are not what people monitor for."** Partly true and it is the
+motivation, not a weakness. The field classifies outcomes; operators need causes,
+because an outcome says something went wrong while a cause says what to change.
+Put this in the introduction rather than waiting for review.
+
+**"Classifiers already report 99%, so faults are clearly separable."** The most
+likely objection. Full answer in `01-vision.md` under "Causes, not outcomes" —
+different question, mostly outcome classes, often binary detection, usually large
+magnitude separations, and confusions do appear where confusable classes are
+included.
+
 **Fault normalisation is arbitrary.** It partly is. Justify the fractional-
 deviation choice explicitly and show the main conclusions survive a different
 normalisation.

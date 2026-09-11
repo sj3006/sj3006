@@ -166,12 +166,24 @@ you want to name which uncertainty drives the conclusion.
 
 ## 11. Literature comparison
 
-**Method.** Structured manual extraction of defect class sets and reported
-confusions from 15–20 monitoring papers. Then a rank-sum test comparing predicted
-angles for pairs the literature tests against pairs it does not.
+**Method.** Structured manual extraction from 15–20 monitoring papers. For each,
+record three things:
 
-**Objective.** Test whether the community's benchmarks disproportionately avoid
-the hard pairs.
+1. Whether the class set describes **outcomes** (keyhole, lack of fusion,
+   balling) or **causes** (power, speed, layer thickness, gas flow).
+2. Whether the task is binary detection or multi-class isolation.
+3. The magnitude separation between tested fault levels.
+
+Then a rank-sum test comparing predicted angles for cause-pairs the literature
+actually tests against cause-pairs it does not.
+
+**Objective.** Two findings. First, that the field overwhelmingly classifies
+outcomes rather than causes, which is why the confusions this paper predicts have
+gone unobserved — the question is not posed. Second, that where cause-pairs are
+tested, they are disproportionately the well-separated ones.
+
+This is the table that answers the "but classifiers already get 99%" objection,
+so it earns its space even if other sections get cut.
 
 **Watch out.** An LLM can help extract, but verify every row by hand. A
 fabricated citation here would be fatal.

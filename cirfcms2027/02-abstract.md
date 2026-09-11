@@ -62,6 +62,18 @@ changed to "published sensor characterisations" so that nothing in the abstract
 depends on obtaining any particular dataset. Benchmark data can still be used if
 it becomes available, but the promise does not rest on it.
 
+## Causes versus outcomes
+
+The abstract says "fault modes", which is correct but easy to misread as defect
+classes. Make sure the introduction states plainly that the analysis concerns
+process **causes** (power, speed, layer thickness, gas flow, geometric heat
+accumulation), not defect **outcomes** (keyhole, lack of fusion, balling).
+
+Reviewers who conflate the two will think the paper contradicts well-established
+classification results. It does not — see `01-vision.md` for the full argument. If
+the word count allows, add "process fault causes" rather than "fault modes" in the
+method sentence.
+
 ## Framing variant
 
 If the conference track is digital-twin flavoured, lead the method sentence with

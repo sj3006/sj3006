@@ -57,6 +57,53 @@ type" is a stronger and more useful statement than any accuracy figure. It is al
 the kind of claim that only a model-based analysis can make — no amount of
 empirical work establishes an impossibility.
 
+## Causes, not outcomes — read this before defending the paper
+
+The single most likely reviewer objection is: "classifiers already report 99%
+accuracy on defect detection, so how can you claim faults are indistinguishable?"
+
+The answer is that the literature and this paper are answering different
+questions.
+
+Most published monitoring work classifies **outcomes**: keyhole pore, lack of
+fusion, balling, conduction mode, nominal. Those describe what went wrong with the
+material. This paper's fault modes are **causes**: low power, high speed, thin
+powder layer, degraded gas flow, geometric heat accumulation. Those describe why
+it went wrong.
+
+Outcomes can be easy to separate while causes are hard. A keyhole melt pool and a
+lack-of-fusion melt pool genuinely look different. But two causes that produce the
+same melt pool state are, by construction, indistinguishable at that instant. A
+paper classifying keyhole against lack of fusion never asks whether a given
+lack-of-fusion event came from low power or from high scan speed, because both
+land in the same outcome class. The confusion is invisible because the question is
+never posed.
+
+Four further reasons high accuracies coexist with genuine confounding:
+
+- Many headline figures are binary detection (anomaly versus nominal), which is
+  far easier than multi-class isolation.
+- Tested fault magnitudes are usually large and widely spaced (nominal, -20%,
+  +20%). This paper asks about local distinguishability near nominal. Those are
+  our detectability threshold and our isolability angle respectively — both fall
+  out of the same framework.
+- Where confusable classes *are* included, published confusion matrices do show
+  the failures (cracks predicted as pinholes, spatter confused with holes). That
+  corroborates the prediction rather than contradicting it.
+- Sequence models on video or full scan-line traces already exploit temporal
+  structure, which is route A in `03-technical-stack.md`. The framework therefore
+  *explains* why sequence models outperform instantaneous-feature models.
+
+**Why causes matter even though the field monitors outcomes.** Outcomes tell an
+operator that something went wrong. Causes tell them what to change. Detecting a
+keyhole pore after the fact does not say whether to lower power or slow the scan,
+and if those two are confounded in the sensor signal, no monitoring system can
+say. Process control, parameter correction and root-cause analysis all need
+causes.
+
+State this distinction explicitly in the introduction. One sentence removes the
+objection.
+
 ## Scope boundaries
 
 In scope: one alloy, one process (LPBF), five fault modes, three to four sensor
