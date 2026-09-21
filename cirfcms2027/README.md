@@ -19,9 +19,9 @@ pairs are hopeless regardless of the algorithm.
 
 Planning complete. Nothing implemented yet.
 
-**Before submitting the abstract**, do the one outstanding check in
-`05-risks-and-decisions.md` (novelty search on "structural analysis fault
-isolation" terminology).
+Novelty check complete — see `05-risks-and-decisions.md`. The claim holds, with
+positive evidence on two of three legs. No blocking items remain before abstract
+submission.
 
 ## Constraints this plan was built under
 

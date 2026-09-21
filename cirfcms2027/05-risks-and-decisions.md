@@ -1,18 +1,57 @@
 # Risks, decisions and open questions
 
-## Outstanding before abstract submission
+## Novelty check — CLOSED
 
-**One novelty check remains.** Search these terms together and confirm nothing
-prior exists:
+Run and resolved. The claim survives, and on stronger footing than "searches
+returned nothing". The evidence has three legs, two of them positive.
 
-- "diagnosability" + "additive manufacturing"
-- "structural analysis" + "fault isolation" + manufacturing
-- "fault isolability" + laser powder bed fusion
+**Leg 1 — the method is mature elsewhere, with a named toolkit.** Structural
+analysis is the standard FDI route to determining observability, fault
+detectability and diagnosability from model structure alone. Established
+machinery: bipartite graph of the model equations, Dulmage-Mendelsohn
+decomposition, Minimal Structurally Overdetermined (MSO) sets for residual
+generation, Binary Diagnostic Matrix, and a formal weak/strong isolability
+distinction. Published algorithms compute which sensors to add to meet a stated
+isolability requirement.
 
-The novelty claim currently rests on searches that returned nothing, and empty
-searches are weaker evidence than positive ones. If something turns up, the fix is
-small: change "not previously used" to "extending", and position as the first
-application to LPBF specifically.
+Applied domains to cite:
+- Anti-lock braking systems — pmc.ncbi.nlm.nih.gov/articles/PMC6308433
+- Automatic transmission clutch faults — structural-analysis sensor placement
+- Hydraulic torque converters — pmc.ncbi.nlm.nih.gov/articles/PMC6308526
+- Permanent magnet traction drives — pmc.ncbi.nlm.nih.gov/articles/PMC11086266
+- Wind turbine hydraulic pitch systems — arxiv.org/pdf/2312.09018
+- Sensor placement for FDI — orbilu.uni.lu/bitstream/10993/4479/1/0161.pdf
+
+**Leg 2 — AM fault diagnosis is active but exclusively data-driven.** This is the
+strongest leg: the field is working the same problem with a different toolset, so
+the question is demonstrably live rather than uninteresting.
+- MAFN multi-view adaptive fusion network for AM fault diagnosis,
+  sciencedirect.com/science/article/pii/S0888327025013810
+- Multimodal sensor fusion for AI-based fault detection in 3D printing (Feb 2026),
+  arxiv.org/pdf/2602.16108
+- Online fault detection for metal AM with data-driven time series models,
+  link.springer.com/chapter/10.1007/978-3-031-94895-4_2
+- Survey of image-based fault monitoring in AM,
+  pmc.ncbi.nlm.nih.gov/articles/PMC10422627
+- Review of fault diagnosis: traditional ML to LLM fusion,
+  pmc.ncbi.nlm.nih.gov/articles/PMC12846000
+
+None is model-based. None asks what the sensors can resolve in principle.
+
+**Leg 3 — the intersection is empty.** Diagnosability, isolability and structural
+analysis searched together with additive manufacturing return LPBF defect-
+detection papers and unrelated mechanical-structure work. No formal diagnosability
+analysis for this process.
+
+**Claim this licenses:** a mature FDI method, with an established toolkit and a
+decade of automotive and aerospace application, has never been applied to a
+process where fault diagnosis is otherwise an active data-driven research area.
+Keep the wording "not previously used in additive manufacturing" in the abstract.
+
+**Framing note.** Leg 2 should appear in the introduction. It converts the
+contribution from "nobody did this" (weak, unprovable) into "the field works this
+problem with a toolset that cannot answer the in-principle question" (strong,
+citable).
 
 ## The three real risks
 
