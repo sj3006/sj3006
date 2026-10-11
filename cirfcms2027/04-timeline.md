@@ -55,7 +55,16 @@ Identify which confusions dissolve without new hardware.
 
 ## Week 8b — Known-practice validation
 
-Check that the analysis predicts what industry already does: the recoater fault
+Two checks now, not one.
+
+**Depth versus width (central claim).** Weaver et al. 2024 report that melt pool
+depth tracked volumetric energy density while width did not. The analysis should
+therefore show power and speed strongly confounded in a depth-sensitive observable
+and less so in a width-sensitive one. This tests the central claim against a
+published independent observation — run it first.
+
+**Recoater fault (method sanity).** Check that the analysis predicts what industry
+already does: the recoater fault
 should be poorly isolable from melt-pool sensors alone and well isolable once
 layer imaging is added to the configuration. This reproduces established practice
 from first principles and is the cheapest credibility you will get. If the

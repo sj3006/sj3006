@@ -112,10 +112,38 @@ is the fault to drop.
 | Angles, not distances, for isolability | Magnitude-independent. A distance threshold depends on how big you made each fault. |
 | LDA only for the ML step | Optimal under linear-Gaussian assumptions, so its errors are determined by the geometry. A neural net would let reviewers blame architecture instead of physics. |
 | Noise from published specs, not a dataset | Keeps the abstract true regardless of data access. |
+| Alloy: IN718 | Weaver et al. 2024 (DOI 10.1007/s40192-024-00355-5) gives AM-Bench 2022 single-track melt pool width and depth on bare IN718 with power, speed and spot size varied, plus uncertainty budgets stated for model validation. One authoritative benchmark with known uncertainties beats scattered 316L literature values with heterogeneous measurement methods, despite 316L having more papers overall. |
+
+### Gate 1 calibration source
+
+**Weaver et al. (2024)**, *Integrating Materials and Manufacturing Innovation*,
+DOI 10.1007/s40192-024-00355-5 — "Cross-Sectional Melt Pool Geometry of Laser
+Scanned Tracks and Pads on Nickel Alloy 718 for the 2022 Additive Manufacturing
+Benchmark Challenges". PMC copy at PMC11187816; NIST also hosts a download.
+Related AM-Bench material: AMB2022-03 challenge descriptions on nist.gov, and the
+data.gov catalogue entry for the cross-sectional microstructure dataset.
+
+Pull 4-6 single-track points (power, speed, spot size, width, depth) from this for
+the absorptivity fit. This replaces any dataset dependency — the project needs a
+handful of numbers from one paper, not a corpus.
+
+### Two findings in that paper that support the thesis
+
+**Melt pool depth tracked volumetric energy density; width did not.** Published,
+independent evidence that power and speed are confounded *in depth* while width
+carries information they do not share. The framework should reproduce this. If it
+does, it is a second known-practice validation (alongside the recoater check) and
+this one lands on the central claim rather than a side one. Add it to week 8b.
+
+**Pad melt pool depth was smaller when scan direction ran parallel to gas flow.**
+Gas flow was flagged as the fault mode with no corroboration anywhere. It now has
+some, from a NIST benchmark. Worth citing when defending that fault's inclusion.
+
+
 
 ## Open questions for the supervisor
 
-1. Which alloy — 316L has more published melt pool data, IN718 has AM-Bench.
+1. ~~Which alloy~~ — **DECIDED: IN718.** Rationale below.
 2. Target venue and word limit, which decides whether the abstract is trimmed.
 3. Whether active excitation (route C) should be in this paper or held back.
 4. Author list and affiliations.

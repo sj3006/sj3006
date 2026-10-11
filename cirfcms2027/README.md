@@ -26,8 +26,12 @@ submission.
 ## Constraints this plan was built under
 
 - No physical experiments of any kind. Everything is computational.
-- No dependency on any external dataset. This was a deliberate choice after
-  two candidate datasets failed on access or novelty grounds — see
-  `06-literature-landscape.md`.
+- **No dependency on any external dataset.** Deliberate, after two candidates
+  failed on access or novelty grounds (`06-literature-landscape.md`). The model
+  generates the sensor signals; published papers are corroboration, not input.
+  What the project needs instead is 4-6 published melt pool measurements for the
+  absorptivity fit — see the Gate 1 calibration source in
+  `05-risks-and-decisions.md`.
+- **Alloy: IN718.** Decided; rationale in `05-risks-and-decisions.md`.
 - Runs on a laptop. No GPU, no licensed solver, no cluster.
 - Target: roughly twelve weeks from start to submission.
