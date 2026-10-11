@@ -196,6 +196,99 @@ sensor signals.
 | Honarmandi, nickel-alloy envelope | 16.0 % | 12.8 % | FAIL on width |
 | **Honarmandi, physical kappa bound** | **11.7 %** | **13.0 %** | **adopted** |
 
+## GATE 3 REACHED: Tier 2 parametric results
+
+`src/diagnosability.py`, `src/parametric.py`. No in-process noise figures are
+used - see the decision below - so everything is swept.
+
+### Noise figures: deliberately not used
+
+NIST AMS 100-35 reports 10 uV resolution on a 35 mV scale for a commercial
+coaxial photodiode. That is a bench multimeter reading a static blackbody.
+Applying it to a sensor running at tens of kilohertz against a melt pool with
+plume and spatter in the field of view would flatter the hardware and bias every
+conclusion towards "separable". **Not used.** The paper also characterises only
+its broadband detector, never its two wavelength channels, and the system has no
+camera, so it would have covered one sensor of three in any case.
+
+Weaver et al. Table 4 gives U(k=2) = 6.2 um on a 136.3 um width, so 2.3 %. That
+is metrology uncertainty from cross-sectional microscopy, not in-process camera
+noise, so it appears only as a marked reference point on the sweep axis.
+
+### The structural point that shapes the study
+
+Whitening divides each sensor row by its own noise. If all three noise levels
+scale together that is a uniform rescaling, and the angles between fault
+signatures **do not move at all**. So isolability depends on noise *ratios*
+between sensors, while detectability depends on the *absolute* level. Two
+separate sweeps, answering different questions.
+
+### Result 1: power and gas are confounded at every noise ratio
+
+Angle 0.00 degrees at every pyrometer quality tested, from 1000x better than the
+other sensors to 10x worse. Tier 1 called this the one structurally irreducible
+pair under every modelling variant; Tier 2 confirms it exactly and shows that no
+sensor improvement touches it. Both faults change the product (absorptivity x
+power), and the melt pool cannot distinguish less emitted from less arrived.
+
+### Result 2: the pyrometer has an optimum, and better is not better
+
+| pyrometer / photodiode noise | power/speed | power/layer | speed/geom |
+|---|---|---|---|
+| 0.001 | 0.70 | 0.25 | 5.98 |
+| 0.01 | 5.74 | 1.94 | 54.62 |
+| **0.03** | **7.12** | **2.04** | **67.64** |
+| 0.1 | 3.62 | 0.95 | 26.38 |
+| 1.0 | 2.11 | 0.55 | 14.11 |
+| 10 | 2.09 | 0.54 | 13.93 |
+
+Angles peak around a ratio of 0.03 and fall off **in both directions**. An
+arbitrarily precise pyrometer makes isolability *worse*: whitening multiplies
+its row by 1/sigma, so as its noise goes to zero it dominates the whitened
+Jacobian, and since one scalar cannot separate five faults, every signature
+collapses onto that single axis.
+
+**There is an optimal balance between sensors, and over-specifying one degrades
+the suite.** Counter-intuitive, falsifiable, and directly useful to anyone
+specifying monitoring hardware.
+
+### Result 3: the rank limit bites before noise does
+
+Three sensors span at most three directions, so with five faults two are
+unresolvable by construction, independent of noise. Singular values at the
+optimum ratio are [2.885, 0.678, 0.055], condition number 52 - the third
+direction is 52x weaker than the first, so realistically two directions are
+usable.
+
+### Result 4: no pair is practically identifiable
+
+Worst finite collinearity index (excluding the exactly-degenerate power/gas
+pair) ranges 40 to 321 across the sweep, against a conventional cutoff of 10.
+Even at the optimum it is 40, four times the cutoff. Only geometry separates
+cleanly from anything, at 6 to 67 degrees.
+
+### Result 5: detection is fine, isolation is not
+
+Minimum detectable fault at 3 sigma, all sensors at equal relative noise:
+
+| noise | power | speed | layer | gas | geometry |
+|---|---|---|---|---|---|
+| 1.0 % | 1.5 % | 4.7 % | 2.4 % | 7.7 % | 4.4 % |
+| 2.3 % | 3.5 % | 10.8 % | 5.6 % | 17.7 % | 10.1 % |
+
+The suite notices faults at plausible magnitudes. It simply cannot say which
+one it noticed. That gap between detection and isolation is the paper.
+
+### Derivatives: complex-step abandoned
+
+The plan specified complex-step differentiation. It is invalid here - the model
+branches at the liquidus threshold and at the boiling-point cap, and
+complex-step through a branch returns nonsense silently. Central differences
+with a reported convergence check are used instead. The Jacobian moves 20.6 %
+between steps of 0.02 and 0.01, 0.25 % between 0.01 and 0.005, and under 0.03 %
+below that; the default is 0.002. **Earlier preview numbers used step 0.10 and
+carried substantial curvature error.**
+
 ## The three real risks
 
 **Thermal model does not match published melt pool dimensions.**
