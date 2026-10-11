@@ -8,6 +8,7 @@ pairs are hopeless regardless of the algorithm.
 
 | File | Contents |
 |---|---|
+| `00-explainer.md` | **Start here.** Plain-language reference for anyone unfamiliar with the work |
 | `01-vision.md` | Project vision, problem statement, what the paper claims |
 | `02-abstract.md` | Submission abstract, title options, keywords |
 | `03-technical-stack.md` | Chronological method stack: algorithms and their objectives |
@@ -17,7 +18,12 @@ pairs are hopeless regardless of the algorithm.
 
 ## Status
 
-Abstract **accepted**. Three-week build sprint. Nothing implemented yet.
+Abstract **accepted**. Three-week build sprint, in progress.
+
+Implemented: `src/eagar_tsai.py` (forward thermal model) and
+`src/sanity_checks.py` (day-1 verification). Directional sweeps pass, and the
+Weaver et al. depth-versus-width observation is reproduced — see day-1 findings in
+`05-risks-and-decisions.md`.
 
 Novelty check complete — see `05-risks-and-decisions.md`. The claim holds, with
 positive evidence on two of three legs. No blocking items remain before abstract

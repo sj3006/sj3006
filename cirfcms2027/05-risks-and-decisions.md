@@ -53,6 +53,33 @@ contribution from "nobody did this" (weak, unprovable) into "the field works thi
 problem with a toolset that cannot answer the in-principle question" (strong,
 citable).
 
+## Day-1 implementation findings
+
+Three things came out of getting the Eagar-Tsai module running. All verified by
+running the code, not predicted.
+
+**Weaver reproduction PASSES, on day 1.** Varying power, speed and spot size over
+27 melted conditions, log-log correlation with volumetric energy density came out
+depth r = +0.727, width r = +0.032. That is Weaver et al.'s reported finding
+(depth tracks VED, width does not) reproduced from an analytical model. The
+central claim's physics basis is confirmed against an independent published
+benchmark before any diagnosability machinery exists. Keep `src/sanity_checks.py`
+in the paper's reproducibility materials.
+
+**Peak temperature is unphysical and this has a consequence.** The model gives
+~12,000 K peak at 250 W / 0.8 m/s against a 3190 K vaporisation point. Expected
+for constant-property Eagar-Tsai (no latent heat, no vaporisation, no melt pool
+convection) and harmless for melt pool *geometry*, which came out realistic
+(123 um wide, 54 um deep). But a photodiode model integrating radiance ~ T^4
+would be dominated entirely by the artefact. **The Gate 2 fallback (melt pool area
+as photodiode proxy) should now be treated as the baseline, not the fallback.**
+Decide this before day 4, not during it.
+
+**IN718 properties are provisional.** The values in `src/eagar_tsai.py` are
+literature-typical effective near-melt figures, good enough for directional
+checks. Each needs a citable source before the Gate 1 fit. Flagged in the module
+docstring.
+
 ## The three real risks
 
 **Thermal model does not match published melt pool dimensions.**
