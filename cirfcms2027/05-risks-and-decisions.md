@@ -289,6 +289,97 @@ between steps of 0.02 and 0.01, 0.25 % between 0.01 and 0.005, and under 0.03 %
 below that; the default is 0.002. **Earlier preview numbers used step 0.10 and
 carried substantial curvature error.**
 
+## ROUTE A: richer observables change the headline
+
+`src/observables.py`. Enlarging the observation from three instantaneous sensor
+values to the regression of each sensor's residual onto known build context.
+
+### The idea
+
+A build already tells you things the instantaneous reading throws away: the
+toolpath, the layer schedule, the gas flow direction, the part geometry. Each
+fault leaves a different trace across those.
+
+| fault | how it varies across a build | known regressor |
+|---|---|---|
+| power | roughly uniform, slow drift | constant / build time |
+| speed | worst where the galvo must turn | 1 / vector length |
+| layer | constant within a layer, steps between | layer-synchronous indicator |
+| gas | gradient along the flow direction | position along gas flow |
+| geometry | follows the part's own shape | local solid support depth |
+
+Cheap to compute: to first order the residual at segment i is
+`sum_k J[:,k] * f_k * m_k(i)`, so the enlarged Jacobian is
+`Jbig[(s,j),k] = J[s,k] * B[j,k]` with `B = (G'G)^-1 G' M`. One small
+least-squares solve, no re-running the thermal model.
+
+### Result: everything becomes identifiable
+
+| pair | instantaneous | enlarged |
+|---|---|---|
+| power / gas | **0.00** | **44.99** |
+| layer / gas | 2.04 | 58.31 |
+| power / layer | 2.04 | 45.55 |
+| power / speed | 7.12 | 33.87 |
+| speed / gas | 7.12 | 54.83 |
+| speed / layer | 9.16 | 56.97 |
+
+Rank 3 -> 5. Condition number 52 -> 7. Worst finite collinearity index
+141,869 -> **2.4**, comfortably inside the conventional cutoff of 10.
+
+**The pair Tier 1 called structurally irreducible is well separated.** That is
+not a contradiction: Tier 1 analysed an instantaneous measurement model, and
+adding spatial and temporal regressors is a genuinely richer one with new
+equations relating each fault to its signature.
+
+### Stress tests, because the result looked too good
+
+**Control - all faults given the same profile.** Min angle 0.00 deg, rank 3,
+worst CI 141,869: *identical to instantaneous*. The gain is therefore not from
+having more dimensions. It comes entirely from faults varying differently. This
+is the test that validates the mechanism.
+
+**Graceful degradation.** Blending the profiles toward a common one:
+
+| blend toward common | min angle | worst CI |
+|---|---|---|
+| 0 % | 33.87 | 2.4 |
+| 25 % | 26.95 | 3.0 |
+| 50 % | 19.31 | 4.2 |
+| 75 % | 11.61 | 7.0 |
+| 100 % | 0.00 | 141,869 |
+
+Stays inside the cutoff until 75 % overlap. Not a knife-edge.
+
+**Imprecise knowledge does not hurt.** Corrupting the assumed profiles by up to
+100 % random error leaves min angle unchanged (33.9 -> 36.4 deg). You do not
+need to know *how* each fault varies, only that they vary *differently*. This
+matters a lot for the practical claim.
+
+**A simpler part still works.** Two layers, uniform vectors, little geometric
+variety: regressor conditioning worsens from 2.0 to 5.2, min angle 28.4 deg,
+rank still 5.
+
+### What this does to the paper
+
+The three-way classification changes, for the better. Nothing is irreducible
+once spatial and temporal context is used; everything is resolvable with no new
+hardware. The message shifts from "these sensors cannot tell your faults apart"
+to "they cannot instant-by-instant, but the process already hands you the
+context that fixes it for free". More surprising, more actionable, and Tier 1
+remains the baseline that makes the improvement legible.
+
+### Open
+
+Modulation profiles are physical claims, not measurements. The control test
+shows the whole result rests on them being distinct. Each direction is
+defensible - recoater faults are layer-synchronous, gas degradation has a flow
+gradient, heat accumulation follows the known part shape, galvo error peaks at
+turns - but that they dominate real build variation is unproven.
+
+**Tier 1 should be re-run on the enlarged observation set** so the two tiers
+describe the same system.
+
 ## The three real risks
 
 **Thermal model does not match published melt pool dimensions.**
