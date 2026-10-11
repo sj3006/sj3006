@@ -80,6 +80,49 @@ literature-typical effective near-melt figures, good enough for directional
 checks. Each needs a citable source before the Gate 1 fit. Flagged in the module
 docstring.
 
+## Tier 1 structural analysis - COMPLETE, with a result
+
+Built and run on day 2, in parallel with calibration and needing none of it.
+`src/structural.py`. 11 equations, 8 unknowns, 5 faults, overall structural
+redundancy 3. Exhaustive MSO enumeration (2^11 subsets, exact and instant)
+finds 32 MSO sets. All five faults are structurally detectable.
+
+**Baseline isolability.** Two directed pairs fail:
+`f_P` is not isolable from `f_layer`, and `f_P` is not isolable from `f_gas`.
+The asymmetry is real: `f_layer` and `f_gas` *are* isolable from `f_P`.
+
+**Why.** A fault can be isolated from another only if it reaches the
+measurements by a route the other does not share. `f_P` acts solely through
+absorbed power. `f_layer` additionally changes the conduction path beneath the
+track; `f_gas` additionally changes surface convection. Those second routes are
+their private fingerprints. A power deviation has none.
+
+**Sensitivity to the modelling choices (the most attackable part of Tier 1).**
+Four variants run, each weakening one arguable coupling:
+
+| Variant | Non-isolable directed pairs |
+|---|---|
+| Baseline | f_P -/-> f_layer, f_P -/-> f_gas |
+| V1: gas has no convection route | + f_gas -/-> f_P, f_gas -/-> f_layer |
+| V2: thin layer has no absorptivity route | only f_P -/-> f_gas |
+| V3: both second routes removed | f_P -/-> f_gas, f_gas -/-> f_P |
+
+**The robust result: `f_P` is never isolable from `f_gas`, under every variant.**
+Physically obvious in hindsight and all the better for it - a power deviation and
+a degraded gas flow both reduce the energy reaching the melt pool, one at the
+source and one in transit, and the melt pool cannot distinguish "less was
+emitted" from "less arrived". This is the structurally irreducible pair, and it
+is the one conclusion that rests on no debatable assumption.
+
+**Feeds the three-way classification directly:**
+- structurally irreducible: f_P vs f_gas
+- modelling-dependent: f_P vs f_layer (hinges on whether thin layers change absorptivity)
+- everything else: structure permits it, so Tier 2 and the noise floor decide
+
+Note a counter-intuitive detail worth keeping: in V2, *removing* a fault coupling
+*improves* isolability, because f_layer sharing e1 with f_P was what blocked
+f_P's isolation. The analysis is not monotone in model richness.
+
 ## The three real risks
 
 **Thermal model does not match published melt pool dimensions.**
