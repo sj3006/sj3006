@@ -17,7 +17,7 @@ pairs are hopeless regardless of the algorithm.
 
 ## Status
 
-Planning complete. Nothing implemented yet.
+Abstract **accepted**. Three-week build sprint. Nothing implemented yet.
 
 Novelty check complete — see `05-risks-and-decisions.md`. The claim holds, with
 positive evidence on two of three legs. No blocking items remain before abstract
@@ -34,4 +34,5 @@ submission.
   `05-risks-and-decisions.md`.
 - **Alloy: IN718.** Decided; rationale in `05-risks-and-decisions.md`.
 - Runs on a laptop. No GPU, no licensed solver, no cluster.
-- Target: roughly twelve weeks from start to submission.
+- **Three-week sprint** (revised from twelve weeks part-time). Nothing removed
+  from the methodology; ~9-10 h/day, six days a week. See `04-timeline.md`.
