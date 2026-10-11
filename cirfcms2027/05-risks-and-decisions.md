@@ -123,6 +123,56 @@ Note a counter-intuitive detail worth keeping: in V2, *removing* a fault couplin
 *improves* isolability, because f_layer sharing e1 with f_P was what blocked
 f_P's isolation. The analysis is not monotone in model richness.
 
+## Gate 1 result: conduction model fails on depth, and why that is useful
+
+Weaver et al. Table 4 loaded in full (7 single-track cases, bare IN718 plate,
+with U(k=2) uncertainties). The paper states D4sigma/4 = sigma, confirming the
+spot convention in `sigma_from_spot_diameter`.
+
+**Outcome: width PASSES at 8.4 % MAPE, depth FAILS at 27.8 %.** Fitted
+absorptivity pegged at its upper bound of 0.95, which is the tell.
+
+**Diagnosis.** Every one of the seven benchmark conditions is in transition or
+keyholing mode - aspect ratios (depth / half-width) run from 1.45 to 4.28, and
+the paper says so explicitly. Eagar-Tsai is a pure conduction model with no
+vapour depression and no multiple reflections. It physically cannot produce a
+227 um deep pool from a 49 um spot. Predicted depths cluster in a narrow
+92-110 um band while measurements span 102-227 um: the optimiser pushes
+absorptivity to the bound trying to drive penetration, and the extra energy goes
+sideways instead of down.
+
+**Tested fix.** Keyhole depth scaling against normalised enthalpy,
+dH/hs = A*P / (hs * sqrt(pi * alpha * v * sigma^3)):
+
+| Correlation (Weaver data) | r |
+|---|---|
+| depth vs dH/hs | +0.970 |
+| depth vs VEDsigma | +0.978 |
+| width vs dH/hs | -0.443 |
+| width vs VEDsigma | -0.391 |
+
+A one-parameter fit, depth = C * (dH/hs) * sigma with C = 0.177, gives
+**14.8 % MAPE on depth** against the conduction model's 27.8 %. Combined with
+conduction width at 8.4 %, a hybrid model passes Gate 1 on both observables with
+two fitted parameters total.
+
+**Why this strengthens the paper rather than patching it.** The two observables
+are governed by different mechanisms:
+
+- **Width** is set by lateral conduction. It does not collapse onto energy
+  density (r = -0.39), and it responds strongly to spot size.
+- **Depth** is set by keyhole penetration, which scales with normalised enthalpy
+  - a single scalar combination of power and speed (r = +0.97).
+
+That is the *mechanism* behind the central claim. Depth compresses (P, v) into
+one number, so power and speed are confounded in it; width does not, so they are
+separable in it. Weaver observed this; we can now explain it. The Gate 1 failure
+led somewhere better than a pass would have.
+
+**Still open:** IN718 property values remain unsourced. The Weaver paper gives
+plate chemistry in its appendix but not the thermophysical constants, so they
+need a separate citation.
+
 ## The three real risks
 
 **Thermal model does not match published melt pool dimensions.**

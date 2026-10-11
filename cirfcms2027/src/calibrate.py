@@ -63,7 +63,28 @@ class Point:
 #     Point(power=250.0, speed=0.8, spot_diameter=100e-6,
 #           width=130e-6, depth=55e-6, label="AMB2022-03 track 1"),
 # ---------------------------------------------------------------------------
-WEAVER_POINTS: list[Point] = []
+WEAVER_POINTS: list[Point] = [
+    # Weaver et al. (2024) Table 4, single-track melt pool measurements on bare
+    # IN718 plate. Mean of six measurements per case (three tracks, two cross
+    # sections each). Spot size column is D4sigma; the paper states D4sigma/4 =
+    # sigma, which matches `sigma_from_spot_diameter`.
+    #
+    # Expanded uncertainties U(k=2) from the same table, in um:
+    #   case 0    width 6.2   depth 14.1
+    #   case 1.1  width 5.5   depth 22.9
+    #   case 1.2  width 6.0   depth 10.4
+    #   case 2.1  width 4.9   depth 11.2
+    #   case 2.2  width 7.7   depth 17.9
+    #   case 3.1  width 6.0   depth 16.8
+    #   case 3.2  width 5.5   depth 11.8
+    Point(285.0, 0.960, 67e-6, 136.3e-6, 139.7e-6, "case 0 baseline"),
+    Point(285.0, 0.960, 49e-6, 106.2e-6, 227.2e-6, "case 1.1 small spot"),
+    Point(285.0, 0.960, 82e-6, 141.7e-6, 102.4e-6, "case 1.2 large spot"),
+    Point(285.0, 1.200, 67e-6, 112.9e-6, 109.7e-6, "case 2.1 fast"),
+    Point(285.0, 0.800, 67e-6, 156.1e-6, 176.5e-6, "case 2.2 slow"),
+    Point(325.0, 0.960, 67e-6, 134.3e-6, 166.1e-6, "case 3.1 high power"),
+    Point(245.0, 0.960, 67e-6, 129.4e-6, 116.9e-6, "case 3.2 low power"),
+]
 
 
 def predict(point: Point, absorptivity: float, material: Material) -> dict[str, float]:
@@ -76,15 +97,16 @@ def predict(point: Point, absorptivity: float, material: Material) -> dict[str, 
     return melt_pool_dimensions(beam, material)
 
 
-def residuals(absorptivity: float, points: list[Point], material: Material) -> np.ndarray:
+def residuals(absorptivity, points: list[Point], material: Material) -> np.ndarray:
     """Relative residuals on whichever dimensions were reported.
 
     Relative rather than absolute so width (~100 um) and depth (~50 um) carry
     comparable weight instead of width dominating the fit.
     """
+    a = float(np.asarray(absorptivity).ravel()[0])
     out: list[float] = []
     for p in points:
-        pred = predict(p, float(absorptivity), material)
+        pred = predict(p, a, material)
         if p.width is not None:
             out.append((pred["width"] - p.width) / p.width)
         if p.depth is not None:
