@@ -1,19 +1,30 @@
 """Gate 1: fit the single free parameter (effective absorptivity) to measured
 melt pool geometry, and report the error.
 
-The only unknown in the Eagar-Tsai setup is how much of the incident laser power
-is actually absorbed. Everything else is a material property or a machine
-setting. Fitting one parameter is defensible; fitting several would be curve
-fitting, and a reviewer would say so.
+Four parameters are fitted, following Honarmandi et al. (2021): absorption
+efficiency, effective thermal conductivity, effective heat capacity, and the
+keyhole depth correction factor C. Treating conductivity and heat capacity as
+calibration parameters rather than fixed constants is their explicit
+recommendation - a constant-property conduction model absorbs the physics it
+omits into the properties it has.
+
+Conductivity is bounded to a physically arguable range for IN718 near melting.
+Without that bound the fit drifts to ~90 W/mK, which fits marginally better and
+would be indefensible in review.
 
 Usage
 -----
 Fill in `WEAVER_POINTS` with single-track measurements from
 
-    Weaver et al. (2024), "Cross-Sectional Melt Pool Geometry of Laser Scanned
-    Tracks and Pads on Nickel Alloy 718 for the 2022 Additive Manufacturing
-    Benchmark Challenges", Integrating Materials and Manufacturing Innovation,
-    DOI 10.1007/s40192-024-00355-5
+    Weaver, J.S. et al. (2024), "Cross-Sectional Melt Pool Geometry of Laser
+    Scanned Tracks and Pads on Nickel Alloy 718 for the 2022 Additive
+    Manufacturing Benchmark Challenges", Integrating Materials and Manufacturing
+    Innovation 13, 363-379. DOI 10.1007/s40192-024-00355-5
+
+    Honarmandi, P. et al. (2021), "A rigorous test and improvement of the
+    Eagar-Tsai model for melt pool characteristics in laser powder bed fusion
+    additive manufacturing", Additive Manufacturing 47, 102300.
+    DOI 10.1016/j.addma.2021.102300
 
 then run:  python3 src/calibrate.py
 
@@ -33,7 +44,8 @@ from scipy.optimize import least_squares
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from eagar_tsai import IN718, Beam, Material, melt_pool_dimensions, sigma_from_spot_diameter
+from eagar_tsai import (Beam, Material, keyhole_depth, melt_pool_dimensions,
+                        sigma_from_spot_diameter)
 
 
 @dataclass(frozen=True)
@@ -87,84 +99,79 @@ WEAVER_POINTS: list[Point] = [
 ]
 
 
-def predict(point: Point, absorptivity: float, material: Material) -> dict[str, float]:
-    beam = Beam(
-        power=point.power,
-        speed=point.speed,
-        sigma=sigma_from_spot_diameter(point.spot_diameter),
-        absorptivity=absorptivity,
-    )
-    return melt_pool_dimensions(beam, material)
+def _material(kappa: float, cp: float) -> Material:
+    return Material("IN718 fitted", 8190.0, cp, kappa, 1533.0, 1609.0, 293.0, 3190.0)
 
 
-def residuals(absorptivity, points: list[Point], material: Material) -> np.ndarray:
-    """Relative residuals on whichever dimensions were reported.
+# (absorptivity, conductivity W/mK, heat capacity J/kgK, keyhole factor C)
+BOUNDS_LO = (0.30, 11.0, 450.0, 1.0)
+BOUNDS_HI = (0.80, 35.0, 1200.0, 5.0)
+START = (0.62, 30.0, 700.0, 1.5)
 
-    Relative rather than absolute so width (~100 um) and depth (~50 um) carry
-    comparable weight instead of width dominating the fit.
-    """
-    a = float(np.asarray(absorptivity).ravel()[0])
+
+def predict(point: Point, theta) -> dict[str, float]:
+    mu, kappa, cp, C = (float(v) for v in theta)
+    material = _material(kappa, cp)
+    beam = Beam(point.power, point.speed, sigma_from_spot_diameter(point.spot_diameter), mu)
+    geom = melt_pool_dimensions(beam, material)
+    geom["depth_corrected"] = geom["depth"] + C * keyhole_depth(beam, material)
+    return geom
+
+
+def residuals(theta, points: list[Point]) -> np.ndarray:
+    """Relative residuals so width (~130 um) and depth (~150 um) weigh equally."""
     out: list[float] = []
     for p in points:
-        pred = predict(p, a, material)
+        pred = predict(p, np.asarray(theta).ravel())
         if p.width is not None:
             out.append((pred["width"] - p.width) / p.width)
         if p.depth is not None:
-            out.append((pred["depth"] - p.depth) / p.depth)
+            out.append((pred["depth_corrected"] - p.depth) / p.depth)
     return np.asarray(out, dtype=float)
 
 
-def fit(points: list[Point], material: Material = IN718,
-        initial: float = 0.35) -> tuple[float, dict[str, float]]:
-    """Least-squares fit of absorptivity. Returns (absorptivity, error report)."""
-    result = least_squares(
-        residuals, x0=[initial], bounds=([0.05], [0.95]),
-        args=(points, material), xtol=1e-4, diff_step=0.02,
-    )
-    absorptivity = float(result.x[0])
-
+def fit(points: list[Point]) -> tuple[tuple[float, ...], dict[str, float]]:
+    result = least_squares(residuals, x0=list(START), bounds=(list(BOUNDS_LO), list(BOUNDS_HI)),
+                           args=(points,), xtol=1e-8, diff_step=0.03)
+    theta = tuple(float(v) for v in result.x)
     width_err, depth_err = [], []
     for p in points:
-        pred = predict(p, absorptivity, material)
+        pred = predict(p, theta)
         if p.width is not None:
             width_err.append(abs(pred["width"] - p.width) / p.width)
         if p.depth is not None:
-            depth_err.append(abs(pred["depth"] - p.depth) / p.depth)
-
-    report = {
-        "absorptivity": absorptivity,
+            depth_err.append(abs(pred["depth_corrected"] - p.depth) / p.depth)
+    return theta, {
         "width_mape_pct": 100.0 * float(np.mean(width_err)) if width_err else float("nan"),
         "depth_mape_pct": 100.0 * float(np.mean(depth_err)) if depth_err else float("nan"),
         "n_conditions": len(points),
     }
-    return absorptivity, report
 
 
 def main() -> int:
     if not WEAVER_POINTS:
-        print(__doc__)
-        print("No calibration points loaded.")
-        print("Fill in WEAVER_POINTS at the top of this file and re-run.")
+        print("No calibration points loaded. Fill in WEAVER_POINTS and re-run.")
         return 1
 
-    absorptivity, rep = fit(WEAVER_POINTS)
-    print(f"fitted absorptivity        A = {rep['absorptivity']:.4f}")
-    print(f"conditions used                {rep['n_conditions']}")
-    print(f"width  mean abs pct error      {rep['width_mape_pct']:.1f} %")
-    print(f"depth  mean abs pct error      {rep['depth_mape_pct']:.1f} %")
+    theta, rep = fit(WEAVER_POINTS)
+    mu, kappa, cp, C = theta
+    print("fitted parameters (effective, not physical constants)")
+    print(f"   absorption efficiency  mu    = {mu:.3f}")
+    print(f"   thermal conductivity   kappa = {kappa:.1f} W/mK")
+    print(f"   heat capacity          Cp    = {cp:.0f} J/kgK")
+    print(f"   keyhole factor         C     = {C:.2f}")
     print()
-    print("per-condition:")
     for p in WEAVER_POINTS:
-        pred = predict(p, absorptivity, IN718)
-        bits = [f"P={p.power:6.1f} W", f"v={p.speed:5.2f} m/s", f"d={p.spot_diameter*1e6:5.1f} um"]
-        if p.width is not None:
-            bits.append(f"width {pred['width']*1e6:6.1f} vs {p.width*1e6:6.1f} um")
-        if p.depth is not None:
-            bits.append(f"depth {pred['depth']*1e6:6.1f} vs {p.depth*1e6:6.1f} um")
-        print("   " + "   ".join(bits) + (f"   [{p.label}]" if p.label else ""))
+        pred = predict(p, theta)
+        print(f"   P={p.power:6.1f} W  v={p.speed:5.2f} m/s  d={p.spot_diameter*1e6:5.1f} um"
+              f"   width {pred['width']*1e6:6.1f} vs {p.width*1e6:6.1f}"
+              f"   depth {pred['depth_corrected']*1e6:6.1f} vs {p.depth*1e6:6.1f} um"
+              f"   [{p.label}]")
     print()
+    print(f"   width MAPE {rep['width_mape_pct']:.1f} %     depth MAPE {rep['depth_mape_pct']:.1f} %"
+          f"     over {rep['n_conditions']} conditions")
     worst = max(rep["width_mape_pct"], rep["depth_mape_pct"])
-    print(f"GATE 1: {'PASS' if worst <= 15.0 else 'FAIL'} (threshold 15 % MAPE)")
+    print(f"   GATE 1: {'PASS' if worst <= 15.0 else 'FAIL'} (threshold 15 % MAPE)")
     return 0
 
 

@@ -20,9 +20,13 @@ pairs are hopeless regardless of the algorithm.
 
 Abstract **accepted**. Three-week build sprint, in progress.
 
-Implemented: `src/eagar_tsai.py` (forward thermal model) and
-`src/sanity_checks.py` (day-1 verification). Directional sweeps pass, and the
-Weaver et al. depth-versus-width observation is reproduced — see day-1 findings in
+Implemented: `src/eagar_tsai.py` (thermal model with Gladush-Smurov keyhole
+correction), `src/calibrate.py`, `src/structural.py` (Tier 1), and
+`src/sanity_checks.py`.
+
+**Gate 1 PASSED** — width 11.7 %, depth 13.0 % MAPE against AM-Bench 2022
+single-track data. **Tier 1 complete** — a power deviation is never isolable from
+a degraded gas flow, under any modelling variant. Details in
 `05-risks-and-decisions.md`.
 
 Novelty check complete — see `05-risks-and-decisions.md`. The claim holds, with

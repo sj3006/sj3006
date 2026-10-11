@@ -41,6 +41,8 @@ __all__ = [
     "Material",
     "Beam",
     "IN718",
+    "IN718_KEYHOLE_C",
+    "IN718_ABSORPTIVITY",
     "sigma_from_spot_diameter",
     "temperature_field",
     "melt_pool_dimensions",
@@ -75,23 +77,42 @@ class Material:
 
 
 # ---------------------------------------------------------------------------
-# PROVISIONAL PROPERTY VALUES - verify against a citable source before Gate 1.
+# IN718 effective parameters, CALIBRATED against Weaver et al. (2024) Table 4.
 #
-# These are literature-typical effective values for IN718 in the near-melt
-# regime. They are good enough to get the model running and to check that
-# parameter sweeps behave correctly, but the calibration in Gate 1 must cite a
-# real source for each number. Flagged in 05-risks-and-decisions.md.
+# These are *effective* parameters, not physical constants, in the sense of
+# Honarmandi et al. (2021): a constant-property conduction model compensates for
+# the physics it omits (latent heat, melt pool convection, temperature-dependent
+# properties) by distorting the properties it does have. Honarmandi et al. treat
+# absorptivity, conductivity and heat capacity as calibration parameters for
+# exactly this reason, and report them as strongly collinear (pair correlation
+# 0.93 to 0.96). Several combinations fit the data comparably; the values below
+# are the best fit subject to keeping conductivity inside a physically arguable
+# range for IN718 near its melting point.
+#
+# Fit: width 11.7 % MAPE, depth 13.0 % MAPE over the seven AM-Bench single-track
+# conditions. See `src/calibrate.py` and 05-risks-and-decisions.md.
+#
+# Caveat: both conductivity and heat capacity sit at their bounds, which is the
+# collinearity pushing the fit along a near-degenerate direction until it hits a
+# wall. Heat capacity in particular is lower than IN718 would physically show
+# near melting. Report as a limitation.
 # ---------------------------------------------------------------------------
 IN718 = Material(
-    name="IN718 (provisional effective properties)",
+    name="IN718 (effective, calibrated to AM-Bench 2022 single tracks)",
     rho=8190.0,
-    cp=650.0,
-    k=30.0,
+    cp=450.0,
+    k=35.0,
     t_solidus=1533.0,
     t_liquidus=1609.0,
     t_ambient=293.0,
     t_vaporisation=3190.0,
 )
+
+# Fitted alongside the material parameters; used by `corrected_depth`.
+IN718_KEYHOLE_C = 1.00
+
+# Fitted absorption efficiency. Pass explicitly when constructing a Beam.
+IN718_ABSORPTIVITY = 0.384
 
 
 @dataclass(frozen=True)
@@ -286,3 +307,69 @@ def quadrature_convergence(
         )
         out.append((n, float(t.ravel()[0])))
     return out
+
+
+# ---------------------------------------------------------------------------
+# Keyhole depth correction
+#
+# Eagar-Tsai is a pure conduction model. Under keyholing, evaporation-induced
+# recoil pressure depresses the melt pool into a narrow cavity, giving far more
+# penetration than conduction alone predicts, with little effect on width.
+# Honarmandi et al. (2021) quantified this failure for E-T across four alloys
+# and fixed it by adding a physics-based depth term rather than by making the
+# model more complex.
+#
+# References
+# ----------
+# Honarmandi, P., Seede, R., Xue, L., Shoukr, D., Morcos, P., Zhang, B.,
+#   Zhang, C., Elwany, A., Karaman, I. and Arroyave, R. (2021), "A rigorous test
+#   and improvement of the Eagar-Tsai model for melt pool characteristics in
+#   laser powder bed fusion additive manufacturing", Additive Manufacturing 47,
+#   102300. doi:10.1016/j.addma.2021.102300
+# Gladush and Smurov, as cited therein, for the keyhole depth expression.
+# ---------------------------------------------------------------------------
+
+
+def keyhole_depth(beam: Beam, material: Material) -> float:
+    """Gladush-Smurov keyhole penetration depth (Honarmandi et al. Eq. 5).
+
+        d_k = mu*P / (2*pi*kappa*T_b) * ln[(sigma + alpha/v) / sigma]
+
+    Derived by solving conduction around a cylindrical keyhole of radius sigma
+    beneath the heat source, with the cavity wall held at the boiling point.
+    Returns metres.
+    """
+    ratio = (beam.sigma + material.alpha / beam.speed) / beam.sigma
+    return (
+        beam.absorptivity * beam.power
+        / (2.0 * np.pi * material.k * material.t_vaporisation)
+        * np.log(ratio)
+    )
+
+
+def is_keyholing(width: float, depth: float) -> bool:
+    """Honarmandi et al.'s empirical keyholing criterion: width / 1.5 <= depth.
+
+    Applied to the *measured* dimensions when deciding which conditions need the
+    correction, so that the criterion does not depend on the model being
+    corrected.
+    """
+    return depth >= width / 1.5
+
+
+def corrected_depth(
+    beam: Beam,
+    material: Material,
+    correction_factor: float,
+    conduction_depth: float,
+    conduction_width: float,
+) -> float:
+    """Conduction depth plus the keyhole discrepancy term.
+
+    Honarmandi et al. treat the depth shortfall under keyholing as proportional
+    to the Gladush-Smurov depth, with the constant C fitted alongside the other
+    model parameters. C came out between 1.3 and 3.1 across their four alloys.
+    """
+    if not is_keyholing(conduction_width, conduction_depth):
+        return conduction_depth
+    return conduction_depth + correction_factor * keyhole_depth(beam, material)

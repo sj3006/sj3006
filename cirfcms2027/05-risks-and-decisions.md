@@ -123,55 +123,78 @@ Note a counter-intuitive detail worth keeping: in V2, *removing* a fault couplin
 *improves* isolability, because f_layer sharing e1 with f_P was what blocked
 f_P's isolation. The analysis is not monotone in model richness.
 
-## Gate 1 result: conduction model fails on depth, and why that is useful
+## GATE 1: PASSED, using the Honarmandi keyhole correction
 
-Weaver et al. Table 4 loaded in full (7 single-track cases, bare IN718 plate,
-with U(k=2) uncertainties). The paper states D4sigma/4 = sigma, confirming the
-spot convention in `sigma_from_spot_diameter`.
+**Result: width 11.7 % MAPE, depth 13.0 % MAPE** over the seven AM-Bench
+single-track conditions. Both inside the 15 % threshold. `src/calibrate.py`.
 
-**Outcome: width PASSES at 8.4 % MAPE, depth FAILS at 27.8 %.** Fitted
-absorptivity pegged at its upper bound of 0.95, which is the tell.
+### How we got here
 
-**Diagnosis.** Every one of the seven benchmark conditions is in transition or
-keyholing mode - aspect ratios (depth / half-width) run from 1.45 to 4.28, and
-the paper says so explicitly. Eagar-Tsai is a pure conduction model with no
-vapour depression and no multiple reflections. It physically cannot produce a
-227 um deep pool from a 49 um spot. Predicted depths cluster in a narrow
-92-110 um band while measurements span 102-227 um: the optimiser pushes
-absorptivity to the bound trying to drive penetration, and the extra energy goes
-sideways instead of down.
+The plain conduction model failed: width 8.4 %, depth 27.8 %, with absorptivity
+pegged at its upper bound. Cause was not a bug. Every one of the seven benchmark
+conditions is keyholing - aspect ratios 1.45 to 4.28 - and Eagar-Tsai has no
+vapour depression and no multiple reflections, so it cannot produce a 227 um
+deep pool from a 49 um spot.
 
-**Tested fix.** Keyhole depth scaling against normalised enthalpy,
-dH/hs = A*P / (hs * sqrt(pi * alpha * v * sigma^3)):
+### The fix, from Honarmandi et al. (2021)
 
-| Correlation (Weaver data) | r |
-|---|---|
-| depth vs dH/hs | +0.970 |
-| depth vs VEDsigma | +0.978 |
-| width vs dH/hs | -0.443 |
-| width vs VEDsigma | -0.391 |
+**Honarmandi, P. et al., "A rigorous test and improvement of the Eagar-Tsai model
+for melt pool characteristics in laser powder bed fusion additive manufacturing",
+Additive Manufacturing 47 (2021) 102300. DOI 10.1016/j.addma.2021.102300**
 
-A one-parameter fit, depth = C * (dH/hs) * sigma with C = 0.177, gives
-**14.8 % MAPE on depth** against the conduction model's 27.8 %. Combined with
-conduction width at 8.4 %, a hybrid model passes Gate 1 on both observables with
-two fitted parameters total.
+They found exactly our failure across four alloys (depth R^2 of 0.12 to 0.42,
+RMSE 75 to 161 um) and fixed it with a physics-based depth term rather than a
+more complex model. Three things taken from them:
 
-**Why this strengthens the paper rather than patching it.** The two observables
-are governed by different mechanisms:
+1. **Gladush-Smurov keyhole depth** (their Eq. 5):
+   `d_k = mu*P / (2*pi*kappa*T_b) * ln[(sigma + alpha/v)/sigma]`,
+   derived from conduction around a cylindrical keyhole held at the boiling
+   point. Corrected depth = conduction depth + C * d_k, with C fitted. Their C
+   came out 1.32 to 3.10 across four alloys.
+2. **Keyholing criterion** `width / 1.5 <= depth`, applied to measured
+   dimensions. All seven AM-Bench cases qualify.
+3. **Conductivity and heat capacity are calibration parameters, not constants.**
+   This resolves the open item about unsourced IN718 properties: the published
+   approach is to fit them, because a constant-property model absorbs the
+   physics it omits into the properties it has.
 
-- **Width** is set by lateral conduction. It does not collapse onto energy
-  density (r = -0.39), and it responds strongly to spot size.
-- **Depth** is set by keyhole penetration, which scales with normalised enthalpy
-  - a single scalar combination of power and speed (r = +0.97).
+Their Eq. 1 is algebraically identical to our implementation, which independently
+verifies the module.
 
-That is the *mechanism* behind the central claim. Depth compresses (P, v) into
-one number, so power and speed are confounded in it; width does not, so they are
-separable in it. Weaver observed this; we can now explain it. The Gate 1 failure
-led somewhere better than a pass would have.
+### Calibrated values
 
-**Still open:** IN718 property values remain unsourced. The Weaver paper gives
-plate chemistry in its appendix but not the thermophysical constants, so they
-need a separate citation.
+| Parameter | Value | Honarmandi's range (4 alloys) |
+|---|---|---|
+| absorption efficiency mu | 0.384 | 0.60 - 0.64 |
+| conductivity kappa | 35.0 W/mK | 39 - 62 |
+| heat capacity Cp | 450 J/kgK | 849 - 1490 |
+| keyhole factor C | 1.00 | 1.32 - 3.10 |
+
+### Two honest caveats, both for the limitations section
+
+**Parameters sit at their bounds.** Conductivity and heat capacity both hit the
+edge of the allowed range, and all four values fall below Honarmandi's. The fit
+is sliding along a near-degenerate direction until it hits a wall. Unbounded, it
+drifts to kappa = 90 W/mK (width 6.2 %, depth 13.4 %) - a better fit and
+indefensible for IN718, so conductivity is bounded to 35 W/mK and the slightly
+worse error accepted.
+
+**The thermal model's own parameters are confounded.** Honarmandi report pair
+correlations of 0.93 to 0.96 between absorptivity, conductivity and heat
+capacity. Many combinations fit comparably. **This is the same identifiability
+pathology the paper is about, appearing in our own calibration** - worth a
+sentence in the discussion, because it shows the phenomenon is not peculiar to
+sensor signals.
+
+### Alternatives rejected
+
+| Approach | Width | Depth | Verdict |
+|---|---|---|---|
+| Conduction only | 8.4 % | 27.8 % | FAIL |
+| Ad-hoc one-parameter keyhole scaling | n/a | 14.8 % | borderline, unpublished |
+| Honarmandi, unbounded | 6.2 % | 13.4 % | kappa = 90 W/mK, indefensible |
+| Honarmandi, nickel-alloy envelope | 16.0 % | 12.8 % | FAIL on width |
+| **Honarmandi, physical kappa bound** | **11.7 %** | **13.0 %** | **adopted** |
 
 ## The three real risks
 
