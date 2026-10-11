@@ -241,6 +241,31 @@ def _crossing(coord: np.ndarray, values: np.ndarray, level: float) -> float:
     return float(coord[i] + frac * (coord[i + 1] - coord[i]))
 
 
+def _span(coord: np.ndarray, values: np.ndarray, level: float) -> float:
+    """Interpolated extent over which `values` stays above `level`.
+
+    Two-sided version of `_crossing`: interpolates the leading and trailing
+    crossings separately. Needed for melt pool length, which was previously
+    grid-snapped while width and depth were interpolated. The resulting ~1.6 %
+    quantisation would inject spurious angle into the Tier 2 Jacobian, where
+    the whole result is the geometry of small differences.
+    """
+    above = np.where(values >= level)[0]
+    if above.size == 0:
+        return 0.0
+    lo, hi = int(above.min()), int(above.max())
+
+    def interp(i: int, j: int) -> float:
+        if j < 0 or j >= len(values):
+            return float(coord[i])
+        v0, v1 = values[i], values[j]
+        if v0 == v1:
+            return float(coord[i])
+        return float(coord[i] + (v0 - level) / (v0 - v1) * (coord[j] - coord[i]))
+
+    return abs(interp(hi, hi + 1) - interp(lo, lo - 1))
+
+
 def melt_pool_dimensions(
     beam: Beam,
     material: Material,
@@ -273,8 +298,7 @@ def melt_pool_dimensions(
     ix = int(np.unravel_index(surf.argmax(), surf.shape)[0])
     width = 2.0 * _crossing(y, surf[ix, :], material.t_liquidus)
 
-    xi = np.where(molten_surf.any(axis=1))[0]
-    length = float(x[xi].max() - x[xi].min())
+    length = _span(x, surf[:, 0], material.t_liquidus)
 
     # Depth: maximum over x of the interpolated z-crossing on the y = 0 plane.
     # The deepest point sits slightly behind the hottest surface point, so taking
