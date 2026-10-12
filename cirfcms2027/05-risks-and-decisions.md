@@ -291,6 +291,12 @@ carried substantial curvature error.**
 
 ## ROUTE A: richer observables change the headline
 
+> **Numbers in this section are superseded.** They were computed with
+> unit-variance profile normalisation, which let a fault reverse sign across the
+> plate and, under the exponential form, reach 116% of nominal at one segment.
+> See "MODEL DOMAIN DEFECTS" below for the corrections and the current figures.
+> The section is kept because the *mechanism* it establishes is unchanged.
+
 `src/observables.py`. Enlarging the observation from three instantaneous sensor
 values to the regression of each sensor's residual onto known build context.
 
@@ -525,9 +531,10 @@ linear form's 33.3 / 46.3 / 47.9 deg at the same three magnitudes. The sign
 flips were helping slightly at finite magnitude and hurting slightly at the
 limit, so nothing of substance rested on them.
 
-**The headline numbers move** and these are now canonical: power/gas
-0.00 -> **41.44 deg**, worst pair **38.49 deg** (power/layer), rank 3 -> 5,
-worst finite collinearity index 141,869 -> **2.1**. The projection matrix is also
+**The headline numbers move.** They moved again afterwards, when the
+normalisation was corrected - see "MODEL DOMAIN DEFECTS" below for the figures
+that are actually canonical. What this section established and what survived is
+the *form*: strictly positive profiles, and a headline stated as a threshold. The projection matrix is also
 visibly less diagonal under this form - speed loads 1.385 on turn density but
 also 0.220 on the gas axis and 0.211 on support depth - which is honest, because
 the near-diagonal linear B was partly an artefact of writing profiles as exact
@@ -613,24 +620,27 @@ match exactly.** It is not used until that passes.
 At threshold 0 every channel admits every fault, so the enlarged model is five
 copies of the instantaneous one and reproduces Tier 1's blocked pairs exactly -
 `f_P` from `f_layer` and `f_P` from `f_gas`. A useful consistency check. Full
-isolability appears in a *window*, 0.10 to 0.20: below it the channels are not
-selective enough, above it they admit so little that equations are lost. The
+isolability appears in a *window* - **0.01 to 0.10** under the corrected
+profile normalisation, 0.10 to 0.20 as first computed: below it the channels are
+not selective enough, above it they admit so little that equations are lost. The
 paper must report the window, not a single threshold.
 
 ### The scan plan is a diagnosability lever, and this is the most actionable finding yet
 
 Power becomes isolable from gas because the support-depth channel admits power
-(B = -0.268) and not gas (0.082). But power only loads onto support depth because
+(B = -0.185) and not gas. But power only loads onto support depth because
 in a bottom-up raster, build time and solid support beneath the track both grow
 with height - correlation -0.642. **That is a consequence of the operator's chosen
 scan order, not a fact about LPBF.** Break it and the structural result changes:
 
 | plan | corr(time, support) | non-isolable pairs | worst angle | power/gas |
 |---|---|---|---|---|
-| raster, support grows | -0.642 | 0 | 38.49 | 41.44 |
-| raster, flat support | +0.000 | 2 | 32.34 | 39.19 |
-| random order | +0.078 | 2 | 39.85 | 40.59 |
-| interleaved order | -0.022 | 1 | 25.82 | 25.82 |
+| raster, support grows | -0.642 | 0 | 29.93 | 30.17 |
+| raster, flat support | -0.000 | 2 | 28.26 | 28.26 |
+| random order | +0.078 | 2 | 29.01 | 29.01 |
+
+(Corrected-normalisation figures. The conclusion is unchanged from the first
+run; only the angles moved.)
 
 So diagnosability is partly *designed*, not just measured. Scan-order and
 part-orientation choices change which faults a fixed sensor suite can resolve,
@@ -682,6 +692,118 @@ class now given a precise meaning rather than a hand-wave about noise.
 order is a first-class variable rather than an implicit raster. The default
 reproduces every previously recorded number exactly - checked.
 
+
+## MODEL DOMAIN DEFECTS, FOUND AND FIXED - and the canonical numbers
+
+Both were found by the sweeps rather than by inspection, which is the argument
+for running them.
+
+### 1. The coupling model left its own domain, silently
+
+The coupling sweep crashed. With `layer_to_conductivity = 1.0`, a -100% layer
+fault drives `k_eff = k * (1 + c*f)` to exactly zero, raising a
+ZeroDivisionError in the Eagar-Tsai integrand, and negative beyond that - which
+makes thermal diffusivity negative and the integrand imaginary. The worse part
+was past the zero: NaNs appeared and were then swallowed, so the model returned
+finite-looking numbers from a regime where it had no meaning.
+
+**Fix.** Absorptivity and conductivity are now multiplied by exponential factors,
+`mu = a*exp(c_layer*f_layer + c_gas*f_gas)` and `k = k0*exp(c_k*f_layer)`. They
+agree with the linear form to first order, so the Jacobian is unchanged to two
+decimal places - checked - but they are strictly positive everywhere by
+construction, which is also the right shape physically: conductivity interpolates
+between powder and solid and cannot pass through zero. `apply_faults` now raises
+if absorptivity leaves (0, 1], conductivity goes non-positive, or local preheat
+reaches the solidus. `form="linear"` is retained for comparison.
+
+### 2. The profile normalisation was the real cause of the sign reversals
+
+The earlier diagnosis blamed the linear profile form. That was wrong.
+Standardising the modulation drivers to unit *variance* leaves excursions out
+past +/-2, so `1 + c*z` went negative and `exp(c*z)` grew a 5.8x tail - which
+means **a +20% fault acted as 116% of nominal at one segment**, so that row of
+the locality table was itself outside any physical scope. The guard in
+`secant_directions` caught it; nothing else would have.
+
+**Fix.** Modulation drivers are normalised to exactly [-1, 1]. All three profile
+forms are then non-negative, the linear one included, which confirms the real
+diagnosis. It also gives contrast a physical meaning: with `exp(c*z)` and z in
+[-1, 1], a fault's severity spans a factor of `exp(2c)` between its mildest and
+most severe segment. At c = 0.3 that is 0.74x to 1.35x; at c = 1.0, 0.37x to
+2.72x. Those are numbers that can be defended in a paper. The regressors keep
+unit-variance standardisation - they are a basis and their scaling is absorbed
+into the regression coefficients.
+
+### The canonical numbers
+
+| | derivative limit | +5% fault | +20% fault |
+|---|---|---|---|
+| power/gas, enlarged | **30.17** | 38.07 | 48.19 |
+| worst pair, enlarged | **29.93** | 37.59 | 30.47 |
+| worst pair, instantaneous | 0.00 | - | - |
+| rank (of 5) | 5 | 5 | 5 |
+| condition number | 12 | 10 | 12 |
+
+No-interpolation cross-check agrees to 0.63 deg at +5% and 0.21 deg at +20%. The
+shared-profile control still returns the instantaneous result bit-identically.
+Contrast threshold at the derivative limit: 0.99 deg at contrast 0, then 3.57,
+8.55, 14.74, 22.04, 29.32, 40.16, 45.70 deg at 0.10 through 2.00 - monotone and
+smooth, so the threshold figure survives intact.
+
+The headline has now moved three times: 44.99 (unphysical profiles), 41.44
+(positive form, unbounded normalisation), 30.17 (bounded normalisation). Each
+move tightened the model rather than chasing a number, and this one is settled
+because contrast is now defined and nothing leaves the domain. 30 degrees of
+separation on a bounded, interpretable profile is a defensible claim where 45
+degrees on a profile that reversed the fault's sign was not.
+
+## COUPLING SWEEP: the conclusions do not depend on the couplings
+
+21 values across the four constants, each re-deriving the response curves, both
+tiers, at the derivative limit and at a +5% fault.
+
+| quantity | across all 21 values |
+|---|---|
+| power/gas angle, instantaneous | **0.00 deg, every value** |
+| rank, instantaneous | 3, every value |
+| rank, enlarged | 5, every value |
+| worst pair, enlarged, derivative limit | **29.93 deg, every value** |
+| worst pair, enlarged, +5% | 36.6 to 38.1 deg |
+| condition number, enlarged | 7 to 46 |
+
+### Read the invariance precisely
+
+29.93 deg at every single coupling value is not as sweeping as it looks, and the
+paper must not oversell it. The worst enlarged pair is **power/speed**, and
+neither of those two faults has a coupling constant - power enters through the
+power multiplier, speed through the speed multiplier. So that particular number
+is coupling-independent by construction. The pairs that *do* depend on the
+couplings move in conditioning, from 7 at `gas_to_attenuation = -0.50` to 46 at
+-0.05, because a weak coupling makes the gas signature small and the suite badly
+conditioned. What is genuinely robust is the structure: rank 3 instantaneous and
+rank 5 enlarged at every value, and no pair ever lost.
+
+### Two results that are now analytic rather than numerical
+
+**Power and gas are exactly collinear for any coupling value.** Both faults enter
+the model only through the product (absorptivity x power), and the Eagar-Tsai
+temperature rise is linear in that product. So the gas column of the Jacobian is
+a scalar multiple of the power column, with the scalar being `1/c_gas` -
+measured as -5.0001, -5.0001, -5.0028 in the three sensors at the default
+-0.20, the last being finite-difference error. Sweeping the coupling rescales
+the whole column by exactly 2.5000, 1.7500, 1.0000, 0.5000, 0.2500 with spread
+of order 1e-5. **No value of any coupling constant can break this confounding**,
+which is why Tier 1 found it from structure alone and why it needs spatial
+information rather than better calibration.
+
+**Power and layer collapse to exactly 0.00 deg when `layer_to_conductivity = 0`.**
+Predicted before it was run: with no conductivity effect, a layer fault acts
+purely through absorptivity, which is the same channel as power. The layer
+signature's direction is set by the ratio of its two couplings, so the pair's
+angle is a measure of how much of the layer fault is *not* an absorptivity
+change. 2.04 deg at the default is small, which is the honest reading: layer is
+nearly confounded with power instantaneously, for a reason the sweep makes
+explicit.
 
 ## The three real risks
 
