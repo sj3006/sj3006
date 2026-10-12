@@ -1011,6 +1011,83 @@ does not depend on noise: **threshold 0.01 to 0.10**, zero blocked pairs, agains
 two blocked pairs for the instantaneous model and at thresholds outside the
 window.
 
+## KNOWN-PRACTICE VALIDATION: partial pass, and it explained Route B
+
+`src/validation.py`. Gate 1 fitted four parameters to seven Weaver points, so
+agreement with those points is calibration. Validation means reproducing
+something the fit did not target.
+
+### The recoater check was dropped, because it was circular
+
+The plan listed a recoater validation: show that the framework recovers a
+recoater fault as layer-synchronous, which is how practitioners actually spot it.
+But layer-periodicity is *put in* through the modulation profile, so recovering
+it proves nothing about the model. Dropped and replaced, rather than reported as
+a pass it would not have earned.
+
+### Check 1, already passing
+
+Over 27 melted conditions spanning power, speed and spot size, depth correlates
+with volumetric energy density at r = +0.727 while width gives r = +0.032,
+reproducing Weaver et al. This lands on the central claim: width carries
+information depth does not.
+
+### Check 2: Guo et al.'s constant-energy-density result
+
+Guo et al., *Additive Manufacturing* 28:600-609 (2019), observed sub-surface melt
+pools by X-ray at constant input energy density and found dimension and volume
+varying by orders of magnitude, through different melting regimes, attributed to
+absorption changing with power and speed separately. It is the published
+statement of this paper's own thesis, and it was not fitted.
+
+Holding `P / (v * sigma^2)` at the Weaver case-0 value and sweeping power from
+150 to 500 W with speed compensating:
+
+| power, W | speed, m/s | width, um | depth, um | length, um | aspect | regime |
+|---|---|---|---|---|---|---|
+| 150 | 0.505 | 121.6 | 64.5 | 240.8 | 0.53 | conduction |
+| 285 | 0.960 | 115.1 | 69.7 | 415.5 | 0.61 | conduction |
+| 420 | 1.415 | 109.9 | 71.6 | 609.3 | 0.65 | conduction |
+| 500 | 1.684 | 107.9 | 152.9 | 645.3 | 1.42 | **keyhole** |
+
+**Partial pass, stated as such.** The model reproduces the existence of the
+variation, its direction, and a regime transition through the keyholing
+criterion. It does not reproduce "orders of magnitude": depth varies 2.37x and
+width 1.13x. That is expected and should be said plainly - the mechanism Guo et
+al. identify is absorption changing with the vapour-depression geometry, which a
+conduction model with an analytic keyhole patch does not contain. The shortfall
+is a limitation of the thermal model, not of the diagnosability method built on
+it, and the paper is better for saying so than for claiming a match.
+
+### The check produced a better result than the validation
+
+Restricting to conduction-regime rows, so the keyhole jump cannot flatter
+anything:
+
+| dimension | span | factor |
+|---|---|---|
+| width | 109.9 to 121.6 um | 1.11 |
+| depth | 64.5 to 71.6 um | 1.11 |
+| **length** | **240.8 to 609.3 um** | **2.53** |
+
+At constant energy density, width and depth barely move while **length moves by a
+factor of 2.5** - and width moves *downwards* while depth moves up, so the two
+are not even redundant with each other.
+
+**This independently explains the Route B result.** The camera reports
+`area = pi/4 * width * length`: it multiplies the least informative dimension by
+the most informative one and reports the product. That is why splitting the
+camera into its two axes was worth 13 deg on the power/speed pair while a SWIR
+photodiode and a wide-band pyrometer were worth nothing at all. The information
+was already in the image and was being averaged away.
+
+Two independent analyses - a thermal sweep against a published experiment, and a
+noise-whitened signature-geometry calculation - arriving at the same conclusion
+by different routes is the strongest internal consistency check in the study so
+far. It also turns the headline recommendation from an empirical observation into
+one with a stated mechanism, which is what makes it publishable rather than
+merely true.
+
 ## The three real risks
 
 **Thermal model does not match published melt pool dimensions.**
