@@ -1286,6 +1286,41 @@ with the convection-included baseline stated as the conservative case. Restoring
 the convection channel quantitatively needs a surface-loss term Eagar-Tsai does
 not have, so it is named as a limitation rather than patched.
 
+### Coupling sweep under the new definitions: invariance holds
+
+Both derived constants swept over their *own derivation sensitivity* ranges
+(d50 15-45 um and powder/solid ratio 1.5-2.5 for absorptivity; packing 0.45-0.65
+and latent heat 250-290 kJ/kg for the enthalpy term), plus the one remaining
+estimate over 0 to 1.5.
+
+| swept | power/gas | enlarged worst | enlarged rank | condition |
+|---|---|---|---|---|
+| layer_to_absorptivity, -0.30 to -0.12 | 0.00 | 25.83 | 5 | 30-31 |
+| layer_to_powder_enthalpy, 0.13 to 0.24 | 0.00 | 25.83 | 5 | 30-31 |
+| layer_to_conductivity, 0 to 1.5 | 0.00 | 25.83 | 5 | 30-47 |
+
+Every conclusion invariant. Power/gas stays exactly 0.00 deg - the column ratio
+is -0.99999, -1.00000, -0.99993, spread 7e-05, which is finite-difference noise
+on an exact algebraic identity.
+
+### One result the sweep exposed, and it needs saying plainly
+
+At `layer_to_conductivity = 0`, power/layer is **exactly 0.00 deg**. The reason is
+the same algebra as power/gas: with the conductivity channel removed, a layer
+fault acts only through absorptivity and through the powder-melting enthalpy, and
+*both* of those are pure multipliers on the energy reaching the pool - which is
+exactly what a power fault is.
+
+So **the entire instantaneous separation of layer from power lives in the
+conductivity channel** - the one coupling that is still an estimate rather than
+derived. It buys 3.46 deg at the default and at most 3.76 deg at the top of its
+range, all of it below the conventional 10 deg floor.
+
+The honest reading is therefore the conservative one: power and layer are
+effectively confounded instantaneously regardless of what that constant is, and
+the paper should say so rather than quoting 3.46 deg as a separation. The result
+does not depend on the estimate; it survives the estimate going to zero.
+
 ### The general lesson for the write-up
 
 Nine or so quantities in this study were hand-set. Three are now eliminated by
