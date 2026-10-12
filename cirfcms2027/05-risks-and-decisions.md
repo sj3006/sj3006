@@ -380,6 +380,47 @@ turns - but that they dominate real build variation is unproven.
 **Tier 1 should be re-run on the enlarged observation set** so the two tiers
 describe the same system.
 
+### Where the projection matrix B actually comes from
+
+Raised by Amit, and it is the right question. **No cross-perturbation was ever
+run.** Nothing in this project changed `gas_axis` and watched power respond, and
+Eagar-Tsai could not do it if asked: it takes power, speed, spot size and
+material properties for one straight track in steady state. It has no input for
+plate position, no layer index, no gas flow direction and no memory of
+previously deposited material.
+
+The thermal model contributes exactly one object to Route A: the 3x5
+instantaneous Jacobian `J`. Everything else is bookkeeping on two hand-authored
+arrays.
+
+- `G` (84x5), the known context, comes from `scan_plan()` - a synthetic plate of
+  6 layers x 14 vectors. In a real deployment every column would come out of the
+  sliced build file. Here the plate is invented.
+- `M` (84x5), the modulation profiles, are my physical claims about how each
+  fault's severity varies across a build, written as hard-coded coefficients
+  (0.3 drift, 0.8 turns, 1.0 recoater, 0.9 flow gradient, 1.0 support).
+- `B = (G'G)^-1 G' M` is a least-squares solve. No physics enters it.
+
+Three of B's columns are the coefficients typed into `modulations()` read
+straight back, because those profiles were written as exact multiples of
+regressor columns (gas 0.900, layer 1.000, geometry 1.000, speed 0.800). Only
+the power column does non-trivial work, because build time is not a regressor:
+regressing it onto G gives [0, -0.0067, 0.132, 0.518, -0.913], and 0.3x that is
+the printed power column. Its -0.913 loading on support depth against a plain
+correlation of only -0.642 is regressor-regressor collinearity - this paper's own
+subject matter appearing inside its construction.
+
+So the 44.99 degrees has two parents: `J` says power and gas are exactly
+parallel instantaneously, which is physics and is real; `B` says they have
+different spatial signatures, which is an assumption I wrote. The control test
+rules out a dimensionality artefact but cannot validate the profiles.
+
+**Consequence for the paper.** 44.99 degrees is not a prediction about any
+machine. The modulation coefficients must be swept alongside the fault couplings
+and the headline stated as a threshold - the confounded pair separates once
+profile contrast exceeds some value - rather than as a point number.
+
+
 ## LIMITATION FOUND: diagnosability is local, not global
 
 Prompted by the question of how fault magnitudes are chosen. The Jacobian is a
