@@ -98,30 +98,93 @@ class FaultState:
 
 @dataclass(frozen=True)
 class FaultCouplings:
-    """How strongly each fault acts on each model input.
+    """How each fault reaches the thermal model's inputs.
 
-    These set the *direction* and relative magnitude of each fault's signature,
-    which is what the isolability angles depend on. They are parameters of the
-    fault model, not of the thermal model, and they are not calibrated - there
-    is no AM-Bench data with deliberately induced faults to calibrate against.
+    Earlier versions of this class held four constants chosen as round numbers of
+    the right sign and order. That is not defensible in a paper, so each is now
+    either (a) derived from published measurements, with the derivation and its
+    sensitivity recorded, or (b) eliminated by defining the fault as a physical
+    quantity, or (c) explicitly marked as the one remaining estimate.
 
-    Values below are order-of-magnitude estimates with the sign fixed by physics.
-    Because the Tier 2 result depends on them, they must be swept - see
-    `couplings_sensitivity` - and the sweep reported, exactly as the Tier 1
-    equation structure was swept.
+    Fault definitions, all now physical
+    -----------------------------------
+    f_power     fractional power deviation. Direct.
+    f_speed     fractional speed deviation. Direct.
+    f_layer     fractional layer-THICKNESS deviation, positive = thinner.
+    f_gas       optical depth of the plume along the beam path. Beer-Lambert
+                gives transmission exp(-f_gas), so f_gas = 0.2 is 18%
+                attenuation. No conversion constant exists to be chosen.
+    f_geometry  local preheat rise in units of 100 K. f = 1 is +100 K, which is
+                the documented order for a thin wall or overhang.
+
+    (a) layer_to_absorptivity = -0.230, DERIVED
+    ------------------------------------------
+    A powder bed absorbs more than bare solid because light scatters between
+    particles. Trapp et al. (Applied Materials Today, 2017) measured, in situ at
+    1070 nm, powder absorptivity about **twice** that of the bare polished disc
+    for ~100 um layers. Radiative-transfer treatments of metal powder beds put
+    the radiation penetration depth at a few particle diameters.
+
+    Model that as saturation with thickness:
+
+        A(t) = A_s + (A_p - A_s) * (1 - exp(-t / delta)),   A_p = 2 * A_s
+
+    with delta = 2 * d50 = 60 um (d50 = 30 um, typical IN718 LPBF cut) and a
+    nominal layer t0 = 40 um. Then A(t0) = 1.487 * A_s, and since f_layer is
+    positive for a *thinner* layer,
+
+        layer_to_absorptivity = -d(lnA)/d(ln t) = -0.230
+
+    **Self-consistency check.** That implies a bare-solid absorptivity of
+    0.384 / 1.487 = 0.258, and bare nickel alloy at ~1 um is roughly 0.25-0.35.
+    So the Gate 1 fitted value and this derivation agree independently, which
+    neither was built to do.
+
+    Sensitivity: across d50 of 15-45 um and a powder/solid ratio of 1.5-2.5, the
+    coefficient runs -0.12 to -0.30. Swept over that range.
+
+    (a) layer_to_powder_enthalpy = +0.186, DERIVED - and it was MISSING
+    ------------------------------------------------------------------
+    The model had no term for the energy spent melting the powder itself, which
+    is not a small correction. Per unit track length, at the nominal condition:
+
+        absorbed energy          A*P/v = 0.384*285/0.960       = 114.0 J/m
+        powder cross-section     40um * 115um * 0.55 packing   = 2530 um^2
+        mass per unit length     8190 * that                   = 20.7 mg/m
+        enthalpy to melt         450*(1609-293) + 270e3        = 862 kJ/kg
+        energy to melt the layer                               = 17.9 J/m
+
+    So melting the powder consumes **15.7%** of the absorbed energy. A thinner
+    layer spends less of it there and leaves more to penetrate the substrate.
+    Normalising so that f = 0 is unchanged, the effective-power multiplier is
+    1 + f * phi/(1 - phi) with phi = 0.157, giving
+
+        layer_to_powder_enthalpy = +0.186
+
+    This matters more than its size suggests. It acts in the **opposite**
+    direction to the absorptivity term and is of the same order - 1.6% against
+    3.0% equivalent power change per 10% layer deviation - so omitting it left
+    the net sign of the layer fault unreliable. See the record for what that did
+    to the power/layer result.
+
+    (c) layer_to_conductivity = +0.50, THE ONE REMAINING ESTIMATE
+    ------------------------------------------------------------
+    Less insulating powder beneath the track raises the effective conductivity
+    the melt pool sees. Published values bracket the powder itself at roughly a
+    tenth to a hundredth of solid, and loose-powder conduction is dominated by
+    the gas in the pores. But the conductivity in this model is a *lumped fitted*
+    parameter, not the powder's own, so the published ratio does not transfer and
+    no measurement constrains its sensitivity to layer thickness.
+
+    It is kept, declared an estimate, and swept 0 to 1.5. It is also by far the
+    weakest of the three layer effects: isolating each at f = 0.2 moves the melt
+    depth by 3.4% (absorptivity), 1.6% (enthalpy) and 0.35% (conductivity).
     """
 
-    # A thinner powder layer means fewer multiple reflections trapping light, so
-    # absorptivity falls towards the bare-solid value.
-    layer_to_absorptivity: float = -0.30
-    # It also means less insulating powder between the track and the solid
-    # beneath, so effective conductivity rises.
+    layer_to_absorptivity: float = -0.230
+    layer_to_powder_enthalpy: float = +0.186
     layer_to_conductivity: float = +0.50
-    # Degraded gas flow leaves plume and spatter in the beam path, attenuating it.
-    gas_to_attenuation: float = -0.20
-    # Preheat rise per unit geometry fault, in kelvin. 0.1 -> +60 K, which is the
-    # right order for a thin feature or overhang.
-    geometry_preheat_kelvin: float = 600.0
+    geometry_preheat_kelvin: float = 100.0
 
 
 def apply_faults(
@@ -152,19 +215,20 @@ def apply_faults(
 
     `form="linear"` keeps the old behaviour for comparison.
     """
+    # Plume attenuation is Beer-Lambert with f_gas as the optical depth, so no
+    # conversion constant is involved in either form.
     if form == "exponential":
         mu = absorptivity * np.exp(
-            couplings.layer_to_absorptivity * fault.layer
-            + couplings.gas_to_attenuation * fault.gas
+            couplings.layer_to_absorptivity * fault.layer - fault.gas
         )
         k_eff = material.k * np.exp(couplings.layer_to_conductivity * fault.layer)
+        power_scale = np.exp(couplings.layer_to_powder_enthalpy * fault.layer)
     elif form == "linear":
         mu = absorptivity * (
-            1.0
-            + couplings.layer_to_absorptivity * fault.layer
-            + couplings.gas_to_attenuation * fault.gas
-        )
+            1.0 + couplings.layer_to_absorptivity * fault.layer
+        ) * np.exp(-fault.gas)
         k_eff = material.k * (1.0 + couplings.layer_to_conductivity * fault.layer)
+        power_scale = 1.0 + couplings.layer_to_powder_enthalpy * fault.layer
     else:
         raise ValueError(f"unknown coupling form {form!r}")
     t0 = material.t_ambient + couplings.geometry_preheat_kelvin * fault.geometry
@@ -180,7 +244,7 @@ def apply_faults(
 
     faulted_material = replace(material, k=k_eff, t_ambient=t0)
     faulted_beam = Beam(
-        power=power * (1.0 + fault.power),
+        power=power * (1.0 + fault.power) * power_scale,
         speed=speed * (1.0 + fault.speed),
         sigma=sigma,
         absorptivity=mu,

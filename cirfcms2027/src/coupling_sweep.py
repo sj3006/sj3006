@@ -38,7 +38,8 @@ import numpy as np
 
 from diagnosability import jacobian
 from faults import FAULT_NAMES, FaultCouplings
-from locality_routeA import SIGMAS, pair_angles, rank_cond, response_curves, secant_directions
+from locality_routeA import (SIGMAS, big_sigmas, pair_angles, rank_cond,
+                             response_curves, secant_directions)
 from observables import enlarged_jacobian, scan_plan
 
 __all__ = ["RANGES", "sweep_one", "summarise"]
@@ -50,24 +51,25 @@ RANGES = {
     # bed; bare solid is nearer 0.3. A full fractional layer change therefore
     # cannot swing absorptivity by more than about half, and the sign is fixed:
     # less powder means less trapping.
-    "layer_to_absorptivity": (-0.60, -0.45, -0.30, -0.15, -0.05),
+    # The derivation's own sensitivity: d50 15-45 um, powder/solid ratio 1.5-2.5.
+    "layer_to_absorptivity": (-0.30, -0.25, -0.230, -0.18, -0.12),
+    # phi = 0.157 +/- a packing fraction of 0.45-0.65 and latent heat 250-290 kJ/kg.
+    "layer_to_powder_enthalpy": (0.13, 0.16, 0.186, 0.21, 0.24),
     # Powder conductivity is ~0.2-1 W/mK against 35 for solid IN718, so removing
     # insulating powder can raise the effective value substantially. Sign fixed.
     "layer_to_conductivity": (0.0, 0.10, 0.25, 0.50, 1.00, 1.50),
-    # Plume and spatter attenuation. Sign fixed; magnitude poorly known.
-    "gas_to_attenuation": (-0.50, -0.35, -0.20, -0.10, -0.05),
-    # Kelvin of substrate preheat per unit geometry fault. 600 K/unit means a 10%
-    # fault preheats by 60 K, the right order for a thin wall or an overhang.
-    "geometry_preheat_kelvin": (200.0, 400.0, 600.0, 900.0, 1200.0),
+    # Kelvin per unit geometry fault. f = 1 now means +100 K, the documented
+    # order for a thin wall or overhang, so f is itself the physical quantity.
+    "geometry_preheat_kelvin": (100.0,),
 }
 
 DEFAULTS = FaultCouplings()
 PAIRS_OF_INTEREST = (("power", "gas"), ("power", "layer"), ("power", "speed"))
 
 
-def summarise(D):
-    a = pair_angles(D, SIGMAS)
-    r, c = rank_cond(D)
+def summarise(D, sigmas):
+    a = pair_angles(D, sigmas)
+    r, c = rank_cond(D, sigmas)
     return {"worst": min(a.values()), "angles": a, "rank": r, "cond": c}
 
 
@@ -75,10 +77,11 @@ def sweep_one(name, value, plan, f=0.05):
     """Instantaneous and enlarged diagnosability at one coupling value."""
     cpl = replace(DEFAULTS, **{name: value})
     J, _ = jacobian(couplings=cpl)
-    inst = summarise(J)
-    lim = summarise(enlarged_jacobian(J, plan))
+    bs = big_sigmas(plan)
+    inst = summarise(J, SIGMAS)
+    lim = summarise(enlarged_jacobian(J, plan), bs)
     curves, nominal = response_curves(cpl)
-    fin = summarise(secant_directions(f, plan, curves, nominal))
+    fin = summarise(secant_directions(f, plan, curves, nominal), bs)
     return inst, lim, fin
 
 
@@ -107,12 +110,10 @@ if __name__ == "__main__":
 
     print("THE STRUCTURAL CLAIM, CHECKED EXACTLY")
     J0, _ = jacobian()
-    for v in RANGES["gas_to_attenuation"]:
-        Jv, _ = jacobian(couplings=replace(DEFAULTS, gas_to_attenuation=v))
-        ratio = Jv[:, 3] / J0[:, 3]
-        spread = float(ratio.max() - ratio.min())
-        print(f"   gas coupling {v:+.2f}: gas column scales by "
-              f"{ratio.mean():.4f} in every sensor (spread {spread:.2e}), "
-              f"power/gas angle {pair_angles(Jv, SIGMAS)[('power', 'gas')]:.2f} deg")
-    print("   -> a pure rescale. The confounding is structural: no value of this "
-          "constant can break it.")
+    ratio = J0[:, 0] / J0[:, 3]
+    print(f"   power column / gas column = {np.round(ratio, 5)}")
+    print(f"   spread across sensors: {float(ratio.max() - ratio.min()):.2e}")
+    print("   -> exactly -1 in every sensor. Both faults act only on the product")
+    print("      (absorptivity x power), and the temperature rise is linear in it,")
+    print("      so the two columns are the same vector. No constant exists that")
+    print("      could break this: it is algebra, not calibration.")

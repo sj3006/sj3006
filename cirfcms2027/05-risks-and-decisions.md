@@ -1172,6 +1172,129 @@ does undermine is any sentence of the form "at a 5% fault, pair X is separable
 and pair Y is not" - comparisons *across pairs at fixed f* are not physically
 meaningful. The paper must not make one.
 
+## FAULTS REDEFINED AS PHYSICAL QUANTITIES - and a missing term found
+
+Amit rejected "I picked it" as a justification for the coupling constants and
+asked for literature. Going and getting it found something worse than a weak
+justification, and the fix is structural rather than a better number.
+
+### The root cause: dimensionless indices invent constants
+
+The constants existed only because each fault was defined as a dimensionless
+index. Define the fault as a physical quantity and most of them cease to exist.
+
+| fault | was | now | constants |
+|---|---|---|---|
+| power | fractional deviation | unchanged | none |
+| speed | fractional deviation | unchanged | none |
+| gas | index x -0.20 | **optical depth of the plume**, Beer-Lambert transmission exp(-f) | **none** |
+| geometry | index x 600 K | **preheat rise in units of 100 K** | **none** (a unit) |
+| layer | index x two constants | **fractional layer-thickness deviation** | three, derived |
+
+Gas is the clearest: there is no conversion factor to argue about, because
+Beer-Lambert *is* the law and f_gas is its optical depth. f_gas = 0.2 is 18.1%
+attenuation. Geometry: documented preheat in thin walls and overhangs is tens to
+a couple of hundred kelvin, so f = 1 meaning +100 K is realistic rather than the
+previous extreme.
+
+### layer_to_absorptivity = -0.230, derived
+
+Anchors: **Trapp et al., Applied Materials Today (2017)** measured in situ at
+1070 nm a powder absorptivity about **twice** the bare polished disc for ~100 um
+layers; radiative-transfer treatments of metal powder beds put the penetration
+depth at a few particle diameters.
+
+    A(t) = A_s + (A_p - A_s)(1 - exp(-t/delta)),  A_p = 2 A_s,
+    delta = 2 * d50 = 60 um,  t0 = 40 um
+
+    saturation at t0   1 - exp(-40/60)   = 0.487
+    A(t0)/A_s          1 + 1 x 0.487     = 1.487
+    d(lnA)/d(ln t)                       = 0.230
+    -> coupling = -0.230   (the guessed value was -0.300)
+
+**Self-consistency check, which neither side was built to pass.** That implies a
+bare-solid absorptivity of 0.384 / 1.487 = 0.258, and bare nickel alloy at ~1 um
+is roughly 0.25-0.35. The Gate 1 *fitted* absorptivity and this *derived*
+decomposition agree independently.
+
+Sensitivity across d50 15-45 um and powder/solid ratio 1.5-2.5: -0.12 to -0.30.
+That is now the sweep range.
+
+### The missing term, which is the real finding
+
+An IN718 single-track study reports melt pool depth **decreasing with thicker**
+powder layers. The model gave the opposite: depth fell from 69.70 to 65.37 um as
+f_layer went 0 to +0.3 (thinner).
+
+Not a wrong constant - a **missing physical term**. Eagar-Tsai is a semi-infinite
+solid with no powder layer in it, so the layer fault had been shoehorned into the
+only two knobs available. Energy spent melting the powder itself was absent.
+
+    absorbed energy        0.384 * 285 / 0.960           = 114.0 J/m
+    powder cross-section   40 um x 115 um x 0.55 packing = 2530 um^2
+    mass per unit length   8190 x that                   = 20.7 mg/m
+    enthalpy to melt       450*(1609-293) + 270e3        = 862 kJ/kg
+    energy to melt layer                                 = 17.9 J/m
+
+Melting the powder consumes **15.7%** of the absorbed energy, so a 10% layer
+change is worth 1.6% of total energy against 3.0% from the absorptivity term,
+**in the opposite direction**. Same order, opposite sign - which left the net
+sign of the layer fault unreliable.
+
+    layer_to_powder_enthalpy = phi/(1 - phi) = 0.157/0.843 = +0.186
+
+**And it mattered.** Flipping the relative sign of the layer couplings moves
+power/layer from 2.04 to 44.58 deg, a 20x change. The claim that layer is
+confounded with power rested entirely on those signs.
+
+### What the fix did
+
+Net layer effect drops from +/-4% to **+/-1.2%** over a +/-20% thickness change,
+which moves the model *towards* the review finding of no significant change in
+depth or width between 20 and 60 um. Better agreement with literature, not worse.
+
+| pair | instantaneous | enlarged | before |
+|---|---|---|---|
+| power / gas | **0.00** | 29.34 | 0.00 / 29.34 |
+| power / layer | 3.46 | 36.40 | 2.04 / 36.31 |
+| power / speed | 7.12 | 25.83 | 7.12 / 25.83 |
+
+Rank 3 -> 5 and enlarged worst 25.83 deg, both unchanged. The power/gas column
+ratio is now **exactly -1.0000** in all three sensors rather than -5.0001,
+because both faults are now defined as acting directly on the same product.
+
+Every constant became defensible and essentially nothing in the results moved.
+
+### Still not literature-backed, both flagged
+
+**layer_to_conductivity = +0.50 remains an estimate.** Published values bracket
+powder conductivity at a tenth to a hundredth of solid, but the conductivity here
+is a lumped *fitted* parameter, not the powder's own, so the ratio does not
+transfer and nothing constrains its sensitivity to layer thickness. Declared an
+estimate and swept. Mitigation: it is much the weakest of the three layer
+effects - isolating each at f = 0.2 moves melt depth by 3.4% (absorptivity),
+1.6% (enthalpy), 0.35% (conductivity).
+
+**A modelling choice that flatters the paper, recorded deliberately.** Defining
+f_gas as pure optical depth drops the convective-cooling channel a real gas-flow
+fault would also have. That is exactly Tier 1's variant V1, under which power/gas
+is non-isolable in *both* directions - **more** confounded than the baseline.
+Since the headline is "confounded before, separable after", adopting the
+more-confounded model makes the improvement look bigger. The quantitative
+0.00 deg must therefore be reported as an **upper bound** on the confounding,
+with the convection-included baseline stated as the conservative case. Restoring
+the convection channel quantitatively needs a surface-loss term Eagar-Tsai does
+not have, so it is named as a limitation rather than patched.
+
+### The general lesson for the write-up
+
+Nine or so quantities in this study were hand-set. Three are now eliminated by
+physical definition, two derived from published measurement, one remains an
+estimate. The ones that remain are defended by **sweeping**, never by a
+plausible-sounding physical argument constructed after the fact. If a sentence in
+the draft reads like a derivation of one of these constants, it is the same error
+Amit caught, and the correct replacement is a sentence about the sweep.
+
 ## The three real risks
 
 **Thermal model does not match published melt pool dimensions.**
