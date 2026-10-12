@@ -190,7 +190,7 @@ def plan_dependence(threshold: float = 0.10) -> None:
     is a diagnosability lever that costs nothing, which is a stronger and more
     actionable claim than any angle.
     """
-    from locality_routeA import SIGMAS, pair_angles, rank_cond
+    from locality_routeA import SIGMAS, big_sigmas, pair_angles, rank_cond
     from diagnosability import jacobian
     from observables import enlarged_jacobian
 
@@ -208,8 +208,9 @@ def plan_dependence(threshold: float = 0.10) -> None:
         corr = float(np.corrcoef(bt, G[:, 4])[0, 1])
         iso = isolability(enlarged_equations(B, threshold), FAULTS)
         blocked = _blocked(iso)
-        a = pair_angles(enlarged_jacobian(J, plan), SIGMAS)
-        _, c = rank_cond(enlarged_jacobian(J, plan))
+        Jb, bs = enlarged_jacobian(J, plan), big_sigmas(plan)
+        a = pair_angles(Jb, bs)
+        _, c = rank_cond(Jb, bs)
         print(f"   {label:26s}{corr:>+12.3f}{B[4, 0]:>+12.3f}{len(blocked):>9d}"
               f"{min(a.values()):>8.2f}{a[('power', 'gas')]:>9.2f}{c:>7,.0f}")
         if blocked:

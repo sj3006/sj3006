@@ -51,7 +51,8 @@ import numpy as np
 from diagnosability import FAULT_NAMES, SENSOR_NAMES, collinearity_index, jacobian, whiten
 
 __all__ = ["REGRESSOR_NAMES", "PROFILE_CONTRAST", "PROFILE_FORMS", "scan_plan",
-           "drivers", "modulations", "projection_matrix", "enlarged_jacobian"]
+           "drivers", "modulations", "projection_matrix", "enlarged_jacobian",
+           "coefficient_sigmas"]
 
 REGRESSOR_NAMES = ("constant", "gas_axis", "layer_sync", "turn_density", "support_depth")
 
@@ -204,6 +205,30 @@ def projection_matrix(plan: dict[str, np.ndarray], **kw) -> np.ndarray:
     G = regressors(plan)
     M = modulations(plan, **kw)
     return np.linalg.lstsq(G, M, rcond=None)[0]
+
+
+def coefficient_sigmas(sigmas, plan: dict[str, np.ndarray]) -> np.ndarray:
+    """Noise on each (sensor, regressor) coefficient, ordered to match the rows
+    of `enlarged_jacobian`.
+
+    This was wrong for most of the study and the correction matters. A richer
+    observable is not a raw sensor reading - it is a least-squares coefficient
+    estimated from every segment of the build, so its noise is
+
+        sigma[s, j] = sigma_s * sqrt( [(G'G)^-1]_jj )
+
+    not sigma_s. For this plan that factor runs 0.109 to 0.136, so averaging over
+    84 segments buys about a 9x noise reduction, and the *spread* across
+    regressors is 1.25x because turn density and support depth are correlated at
+    0.571 - a collinear regressor design is penalised, exactly as it should be.
+
+    A uniform factor would not matter: angles, rank and condition number are all
+    invariant to scaling every row equally. The 1.25x spread is what changes
+    them, and the 9x is what makes detectability honest.
+    """
+    G = regressors(plan)
+    se = np.sqrt(np.diag(np.linalg.inv(G.T @ G)))
+    return np.concatenate([float(s) * se for s in np.asarray(sigmas, float).ravel()])
 
 
 def enlarged_jacobian(J: np.ndarray, plan: dict[str, np.ndarray], **kw) -> np.ndarray:

@@ -805,6 +805,145 @@ change. 2.04 deg at the default is small, which is the honest reading: layer is
 nearly confounded with power instantaneously, for a reason the sweep makes
 explicit.
 
+## ROUTE A HAD THE WRONG NOISE MODEL - found by chasing an absurd Route B result
+
+Route B reported that a **single sensor** reaches enlarged rank 5 with a 29 deg
+worst angle. That looked impossible, since Tier 2's whole point was that three
+sensors cannot span five faults, so it got chased rather than reported. It turned
+out to be two separate things: one genuine error, and one correct-but-startling
+result.
+
+### The error
+
+A richer observable is not a raw sensor reading. It is a least-squares
+coefficient estimated from every segment of the build, so its noise is
+
+    sigma[s, j] = sigma_s * sqrt( [(G'G)^-1]_jj )
+
+Route A had been whitening every coefficient by `sigma_s` itself. For this plan
+the correct factors run 0.109 to 0.136, so averaging over 84 segments buys about
+a **9x noise reduction** that was being thrown away, and the *spread* across
+regressors is 1.25x because turn density and support depth are correlated at
+0.571 - a collinear regressor design should be penalised and now is.
+
+The uniform 9x changes nothing about angles, rank or condition number, all of
+which are invariant to scaling every row equally. The 1.25x spread does change
+them, and the 9x matters for detectability. `coefficient_sigmas` now computes it,
+`pair_angles` and `rank_cond` refuse a noise vector whose length does not match
+the number of rows, and every call site passes the right one.
+
+**Corrected canonical numbers:** worst pair **25.83 deg** (was 29.93), power/gas
+**29.34 deg** (was 30.17), rank 3 -> 5, condition 12.
+
+### The startling part, which is correct
+
+Rank 5 from one sensor is real, and it is the actual content of Route A. A single
+photodiode's residual across the build is
+
+    r(i) = sum_k  J[s,k] * f_k * m_k(i)
+
+one scalar time series - but regressing it onto five known regressors yields five
+numbers, and five numbers determine five faults whenever `J[s,k] * B[j,k]` is
+invertible, which it generically is. Route A does not add measurements. It
+converts a *static* identifiability problem, 3 equations in 5 unknowns, into a
+regression problem whose equation count is set by the number of **known
+regressors**, not the number of sensors. The rank limit Tier 2 found is therefore
+not a hardware limit at all.
+
+That has to be stated carefully rather than trumpeted, because it rests entirely
+on knowing the profiles. Which is what makes the next section the one that
+matters.
+
+## ROUTE B: what the sensors are actually for
+
+`src/route_b.py`. Four candidate additions, each costing something different: the
+camera's two axes reported separately instead of as one area (free - the image
+already exists), a short-wave infrared photodiode (new hardware), and a
+wide-band filter pair on the existing pyrometer (filter change).
+
+### Instantaneously, sensor count sets the rank. With spatial context it does not.
+
+| subset | inst rank | inst cond | enlarged rank | enlarged worst |
+|---|---|---|---|---|
+| photodiode only | 1 | 1 | 5 | 24.89 |
+| camera only | 1 | 1 | 5 | 24.89 |
+| pyrometer only | 1 | 1 | 5 | 24.89 |
+| photodiode + pyrometer | 2 | 5 | 5 | 26.12 |
+| all three (baseline) | 3 | 52 | 5 | 25.83 |
+| + split the camera (free) | 4 | 747,923 | 5 | **29.34** |
+| + SWIR photodiode | 3 | 59 | 5 | 25.75 |
+| + wide-band pyrometer | 4 | 944,000 | 5 | 25.70 |
+| everything | 4 | 676,482 | 5 | 29.34 |
+
+Every subset reaches rank 5 enlarged, with condition 12 to 14, and the angles sit
+within 1.3 deg of each other. **Sensor count barely affects the geometry at all**
+once spatial context is used. Checked at three different noise-ratio assumptions;
+the conclusion holds in all three.
+
+### The best intervention is free, and new hardware buys nothing
+
+Against the baseline worst pair, power/speed:
+
+| addition | power/speed | change | cost |
+|---|---|---|---|
+| split the camera into width and length | 39.23 deg | **+13.40** | none, image processing |
+| SWIR photodiode | 25.75 deg | -0.08 | new hardware |
+| wide-band pyrometer | 25.70 deg | -0.13 | filter change |
+
+Reporting the melt pool's two axes separately instead of collapsing them into an
+area is the single most valuable change available, and it costs nothing. Neither
+new sensor helps at all. For a paper whose promised deliverable includes the class
+of pairs "requiring an additional measurement", the honest answer is that the
+additional measurement already exists inside an instrument that is throwing it
+away.
+
+**And it only shows up in Tier 2.** Instantaneously the split camera has
+condition number 747,923 - width and length both scale with pool size, so the
+extra row is nearly degenerate and useless. Modulated across the build it is
+worth 13 deg. That is the clearest single illustration in the study that the two
+tiers answer different questions.
+
+### What extra sensors buy is robustness, and that is measurable
+
+If rank is not the constraint, "what does another sensor buy" has to be answered
+on something else. The weakest assumption in the whole study is the modulation
+profiles, so the metric is: diagnosis inverts the *assumed* enlarged Jacobian A
+while the data comes from the *true* one T, and the worst-case relative error
+over all fault directions is the operator norm of `pinv(A_w) T_w - I`.
+
+Contrast wrong by up to:
+
+| subset | n | 10% | 30% | 50% |
+|---|---|---|---|---|
+| photodiode only | 1 | 0.128 / 0.200 | 0.381 / 0.617 | 0.632 / 1.059 |
+| camera only | 1 | 0.107 / 0.168 | 0.320 / 0.519 | 0.530 / 0.887 |
+| photodiode + pyrometer | 2 | 0.093 / 0.153 | 0.278 / 0.466 | 0.461 / 0.785 |
+| all three (baseline) | 3 | 0.091 / 0.147 | 0.271 / 0.450 | 0.451 / 0.758 |
+| + split the camera (free) | 4 | **0.068 / 0.087** | **0.206 / 0.281** | **0.345 / 0.513** |
+| everything | 7 | 0.072 / 0.097 | 0.217 / 0.307 | 0.363 / 0.546 |
+
+(mean / worst over 40 random draws.)
+
+Redundancy roughly halves the worst-case error: one sensor at 30% profile error
+can get the fault vector 62% wrong, the split-camera suite only 28%. **So the
+suite exists to protect the answer against the thing we are least sure of, not
+to make the answer possible.** That is a genuinely useful sentence for a paper
+whose own weakest point is those profiles, because it turns the weakness into
+the reason the hardware matters.
+
+Note also that "everything" is slightly *worse* than the four-observable split
+camera set, which is the same over-specification effect Tier 2 found when the
+pyrometer was made too good: adding a weak, nearly-redundant row degrades a
+suite rather than improving it.
+
+### No sensor is redundant, and none is critical
+
+Dropping any one of the three changes the enlarged worst angle by at most 0.9 deg
+at any of the three noise-ratio assumptions, and never changes the rank. There is
+no basis for recommending that a builder remove any of them, and no basis for
+claiming any one is indispensable. That is a real answer and it should be stated
+as one rather than dressed up.
+
 ## The three real risks
 
 **Thermal model does not match published melt pool dimensions.**

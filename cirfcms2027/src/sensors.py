@@ -34,9 +34,29 @@ import numpy as np
 
 from eagar_tsai import IN718, Beam, Material, melt_pool_dimensions, temperature_field
 
-__all__ = ["SENSOR_NAMES", "SensorConfig", "sensor_readings"]
+__all__ = ["SENSOR_NAMES", "CANDIDATE_NAMES", "ALL_SENSOR_NAMES", "SensorConfig",
+           "sensor_readings"]
 
+# The suite actually fitted to a production machine: one coaxial photodiode, one
+# coaxial camera reporting melt pool area, one two-colour pyrometer.
 SENSOR_NAMES = ("photodiode", "camera", "pyrometer")
+
+# Candidate additions, for Route B. Each is deliberately something a real shop
+# could do, and each has a different cost:
+#
+#   camera_width, camera_length  FREE. The camera already forms an image; area
+#       collapses two independent axes into one number. Reporting both axes is
+#       image processing, not hardware. If this buys diagnosability it is the
+#       cheapest recommendation the paper can make.
+#   photodiode_swir  NEW HARDWARE. A second photodiode in a short-wave infrared
+#       band, which an InGaAs device covers. Longer wavelengths weight cooler
+#       parts of the pool more heavily, so it is not a copy of the visible one.
+#   pyrometer_wide  FILTER CHANGE. The same two-colour instrument with a widely
+#       separated band pair instead of 750/950 nm, which raises its temperature
+#       sensitivity.
+CANDIDATE_NAMES = ("camera_width", "camera_length", "photodiode_swir",
+                   "pyrometer_wide")
+ALL_SENSOR_NAMES = SENSOR_NAMES + CANDIDATE_NAMES
 
 # Planck constants, SI
 _H = 6.62607015e-34
@@ -63,13 +83,17 @@ class SensorConfig:
     def __init__(
         self,
         photodiode_band: tuple[float, float] = (700e-9, 1000e-9),
+        photodiode_swir_band: tuple[float, float] = (1500e-9, 1700e-9),
         pyrometer_bands: tuple[float, float] = (750e-9, 950e-9),
+        pyrometer_wide_bands: tuple[float, float] = (700e-9, 1600e-9),
         field_of_view: float = 1.5e-3,
         n_grid: int = 121,
         n_lambda: int = 12,
     ) -> None:
         self.photodiode_band = photodiode_band
+        self.photodiode_swir_band = photodiode_swir_band
         self.pyrometer_bands = pyrometer_bands
+        self.pyrometer_wide_bands = pyrometer_wide_bands
         self.field_of_view = field_of_view
         self.n_grid = n_grid
         self.n_lambda = n_lambda
@@ -119,17 +143,33 @@ def sensor_readings(
     # pyrometer measures two integrated band powers over its spot and ratios
     # them, which is both more faithful and responsive to how the temperature is
     # distributed rather than just how hot the hottest point is.
-    l1, l2 = cfg.pyrometer_bands
-    p1 = float(_spectral_radiance(np.array(l1), capped).sum())
-    p2 = float(_spectral_radiance(np.array(l2), capped).sum())
-    ratio = p1 / p2 if p2 > 0 else 0.0
-    if ratio > 0:
+    def two_colour(bands):
+        l1, l2 = bands
+        p1 = float(_spectral_radiance(np.array(l1), capped).sum())
+        p2 = float(_spectral_radiance(np.array(l2), capped).sum())
+        ratio = p1 / p2 if p2 > 0 else 0.0
+        if ratio <= 0:
+            return 0.0
         denom = np.log(ratio) + 5.0 * np.log(l1 / l2)
-        pyrometer = float(_H * _C / _KB * (1.0 / l2 - 1.0 / l1) / denom) if denom != 0 else 0.0
-    else:
-        pyrometer = 0.0
+        return float(_H * _C / _KB * (1.0 / l2 - 1.0 / l1) / denom) if denom != 0 else 0.0
 
-    return {"photodiode": photodiode, "camera": camera, "pyrometer": pyrometer}
+    def band_power(band):
+        lam = np.linspace(*band, cfg.n_lambda)
+        r = np.trapezoid(
+            _spectral_radiance(lam[None, None, :], capped[..., None]), lam, axis=-1
+        )
+        return float(r.sum() * cell)
+
+    return {
+        "photodiode": photodiode,
+        "camera": camera,
+        "pyrometer": two_colour(cfg.pyrometer_bands),
+        # candidates
+        "camera_width": float(geom["width"]),
+        "camera_length": float(geom["length"]),
+        "photodiode_swir": band_power(cfg.photodiode_swir_band),
+        "pyrometer_wide": two_colour(cfg.pyrometer_wide_bands),
+    }
 
 
 if __name__ == "__main__":

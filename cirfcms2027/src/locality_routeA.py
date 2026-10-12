@@ -45,11 +45,11 @@ from scipy.interpolate import PchipInterpolator
 
 from diagnosability import _readings, whiten
 from faults import FAULT_NAMES, FaultCouplings, FaultState
-from observables import (REGRESSOR_NAMES, enlarged_jacobian, modulations,
-                         regressors, scan_plan)
+from observables import (REGRESSOR_NAMES, coefficient_sigmas, enlarged_jacobian,
+                         modulations, regressors, scan_plan)
 from sensors import SENSOR_NAMES
 
-__all__ = ["NODES", "SIGMAS", "response_curves", "validate_curves",
+__all__ = ["NODES", "SIGMAS", "big_sigmas", "response_curves", "validate_curves",
            "enlarged_observation", "secant_directions", "exact_secant_directions",
            "instantaneous_secants", "pair_angles", "rank_cond"]
 
@@ -101,9 +101,9 @@ def validate_curves(curves, nominal, n: int = 10, seed: int = 1) -> dict[str, fl
             "per_sensor_typical": rms}
 
 
-def rank_cond(D, sigmas=None):
+def rank_cond(D, sigmas):
     """Effective rank and condition number of the whitened signature matrix."""
-    return _rank_cond(D, SIGMAS if sigmas is None else sigmas)
+    return _rank_cond(D, sigmas)
 
 
 def exact_secant_directions(f, plan, nominal):
@@ -159,8 +159,18 @@ def instantaneous_secants(f, curves, nominal):
     return np.column_stack(cols)
 
 
+def big_sigmas(plan, sigmas=None):
+    """Per-row noise for an enlarged observation matrix built from `sigmas`."""
+    return coefficient_sigmas(SIGMAS if sigmas is None else sigmas, plan)
+
+
 def pair_angles(D, sigmas):
-    Dw = whiten(D, np.repeat(sigmas, D.shape[0] // len(sigmas)))
+    """`sigmas` must have one entry per ROW of D - use `coefficient_sigmas` for
+    an enlarged matrix, not the raw per-sensor figures repeated."""
+    sigmas = np.asarray(sigmas, float).ravel()
+    if len(sigmas) != D.shape[0]:
+        raise ValueError(f"{D.shape[0]} rows but {len(sigmas)} noise figures")
+    Dw = whiten(D, sigmas)
     out = {}
     for i, a in enumerate(FAULT_NAMES):
         for j, b in enumerate(FAULT_NAMES):
@@ -182,7 +192,10 @@ RANK_TOL = 1e-6   # a direction 10^6 times weaker than the strongest is not a
 
 
 def _rank_cond(D, sigmas):
-    Dw = whiten(D, np.repeat(sigmas, D.shape[0] // len(sigmas)))
+    sigmas = np.asarray(sigmas, float).ravel()
+    if len(sigmas) != D.shape[0]:
+        raise ValueError(f"{D.shape[0]} rows but {len(sigmas)} noise figures")
+    Dw = whiten(D, sigmas)
     s = np.linalg.svd(Dw, compute_uv=False)
     s = s[s > s.max() * RANK_TOL]
     return len(s), s[0] / s[-1]
@@ -213,7 +226,8 @@ if __name__ == "__main__":
 
     J, _ = jacobian()
     Jbig = enlarged_jacobian(J, plan)
-    a_lim = pair_angles(Jbig, SIGMAS)
+    BIG = coefficient_sigmas(SIGMAS, plan)
+    a_lim = pair_angles(Jbig, BIG)
     i_lim = pair_angles(J, SIGMAS)
 
     mags = (0.002, 0.01, 0.02, 0.05, 0.10, 0.20, -0.02, -0.05, -0.20)
@@ -221,7 +235,7 @@ if __name__ == "__main__":
     print("\nCONVERGENCE TO THE DERIVATIVE LIMIT (enlarged, power/gas angle)")
     for f in (0.02, 0.01, 0.005, 0.002, 0.001):
         D = secant_directions(f, plan, curves, nominal)
-        print(f"   f = {f:+.3f}   {pair_angles(D, SIGMAS)[('power', 'gas')]:7.2f} deg")
+        print(f"   f = {f:+.3f}   {pair_angles(D, BIG)[('power', 'gas')]:7.2f} deg")
     print(f"   limit     {a_lim[('power', 'gas')]:7.2f} deg")
 
     print("\nENLARGED: PAIRWISE ANGLES VS FAULT MAGNITUDE (degrees)")
@@ -229,7 +243,7 @@ if __name__ == "__main__":
     print(f"   {'pair':22s}{'limit':>8s}{hdr}")
     rows = {}
     for f in mags:
-        rows[f] = pair_angles(secant_directions(f, plan, curves, nominal), SIGMAS)
+        rows[f] = pair_angles(secant_directions(f, plan, curves, nominal), BIG)
     for p in sorted(a_lim, key=lambda q: a_lim[q]):
         line = "".join(f"{rows[f][p]:>8.2f}" for f in mags)
         print(f"   {p[0] + ' / ' + p[1]:22s}{a_lim[p]:>8.2f}{line}")
@@ -247,7 +261,7 @@ if __name__ == "__main__":
           f"{'big rank':>10s}{'big cond':>11s}")
     for f in mags:
         ri, ci = _rank_cond(instantaneous_secants(f, curves, nominal), SIGMAS)
-        rb, cb = _rank_cond(secant_directions(f, plan, curves, nominal), SIGMAS)
+        rb, cb = _rank_cond(secant_directions(f, plan, curves, nominal), BIG)
         print(f"   {f:>+10.0%}{ri:>11d}{ci:>12,.0f}{rb:>10d}{cb:>11,.0f}")
 
     worst = min(min(r.values()) for r in rows.values())
@@ -257,9 +271,9 @@ if __name__ == "__main__":
     for f in (0.05, 0.20):
         t = time.time()
         De = exact_secant_directions(f, plan, nominal)
-        ae = pair_angles(De, SIGMAS)
+        ae = pair_angles(De, BIG)
         diff = max(abs(ae[p] - rows[f][p]) for p in ae)
-        re_, ce = _rank_cond(De, SIGMAS)
+        re_, ce = _rank_cond(De, BIG)
         print(f"   f = {f:+.0%}  worst angle {min(ae.values()):6.2f} deg   rank {re_}   "
               f"condition {ce:,.0f}   max angle disagreement with the interpolated "
               f"table {diff:.2f} deg   ({time.time() - t:.0f} s)")

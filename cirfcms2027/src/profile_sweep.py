@@ -26,8 +26,8 @@ import numpy as np
 
 from diagnosability import jacobian
 from faults import FAULT_NAMES
-from locality_routeA import (SIGMAS, pair_angles, rank_cond, response_curves,
-                             secant_directions)
+from locality_routeA import (SIGMAS, big_sigmas, pair_angles, rank_cond,
+                             response_curves, secant_directions)
 from observables import (PROFILE_CONTRAST, PROFILE_FORMS, enlarged_jacobian,
                          modulations, projection_matrix, regressors, scan_plan)
 
@@ -43,9 +43,9 @@ MAX_REACH = 0.70
 HEADLINE_PAIR = ("power", "gas")
 
 
-def _summary(D):
-    a = pair_angles(D, SIGMAS)
-    r, c = rank_cond(D)
+def _summary(D, sigmas):
+    a = pair_angles(D, sigmas)
+    r, c = rank_cond(D, sigmas)
     return min(a.values()), a[HEADLINE_PAIR], r, c
 
 
@@ -65,7 +65,8 @@ def contrast_threshold(curves, nominal, plan, f, form="positive"):
 
 
 def form_comparison(curves, nominal, plan, f):
-    return {form: _summary(secant_directions(f, plan, curves, nominal, form=form))
+    return {form: _summary(secant_directions(f, plan, curves, nominal, form=form),
+                           big_sigmas(plan))
             for form in PROFILE_FORMS}
 
 
@@ -86,8 +87,8 @@ if __name__ == "__main__":
 
     print("CONTROL: one shared profile for all five faults")
     Dc = shared_profile_control(J, plan)
-    w, h, r, c = _summary(Dc)
-    wi, hi, ri, ci = _summary(J)
+    w, h, r, c = _summary(Dc, big_sigmas(plan))
+    wi, hi, ri, ci = _summary(J, SIGMAS)
     print(f"   shared profile   worst {w:6.2f} deg   {HEADLINE_PAIR[0]}/{HEADLINE_PAIR[1]}"
           f" {h:6.2f} deg   rank {r}   condition {c:>10,.0f}")
     print(f"   instantaneous    worst {wi:6.2f} deg   {HEADLINE_PAIR[0]}/{HEADLINE_PAIR[1]}"
