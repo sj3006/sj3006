@@ -60,7 +60,8 @@ def contrast_threshold(curves, nominal, plan, f, form="positive"):
         reach = float(np.max(np.abs(f * modulations(plan, contrast=c, form=form))))
         out[s] = (None if reach > MAX_REACH else
                   _summary(secant_directions(f, plan, curves, nominal,
-                                             contrast=c, form=form)), reach)
+                                             contrast=c, form=form),
+                           big_sigmas(plan)), reach)
     return out
 
 

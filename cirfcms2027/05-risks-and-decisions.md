@@ -635,19 +635,37 @@ scan order, not a fact about LPBF.** Break it and the structural result changes:
 
 | plan | corr(time, support) | non-isolable pairs | worst angle | power/gas |
 |---|---|---|---|---|
-| raster, support grows | -0.642 | 0 | 29.93 | 30.17 |
-| raster, flat support | -0.000 | 2 | 28.26 | 28.26 |
-| random order | +0.078 | 2 | 29.01 | 29.01 |
+| raster, support grows | -0.642 | **0** | 25.83 | 29.34 |
+| raster, flat support | -0.000 | 2 | 26.21 | 28.01 |
+| random order | +0.078 | 2 | 28.83 | 28.83 |
 
-(Corrected-normalisation figures. The conclusion is unchanged from the first
-run; only the angles moved.)
+(Figures under the corrected profile normalisation and the corrected coefficient
+noise model.)
 
-So diagnosability is partly *designed*, not just measured. Scan-order and
-part-orientation choices change which faults a fixed sensor suite can resolve,
-at zero hardware cost. This is a stronger and more useful claim than any single
-angle, and it reaches the same place as active excitation (route C) without
-deliberately perturbing the process - which is the version a production engineer
-would actually accept.
+### The claim has to be narrowed, and the narrowing is itself the point
+
+The first version of this finding read "diagnosability is partly designed", and
+cited both the structural column and the angles, which then moved from 38.5 to
+32.3 as the plan changed. **Under the corrected noise model the angles no longer
+support that**: 25.83, 26.21, 28.83 deg, and the structurally *worse* plans have
+marginally *larger* worst angles. The honest claim is narrower:
+
+> Scan order changes the **structural** classification decisively - zero blocked
+> pairs against two - while barely moving the quantitative geometry.
+
+Which is exactly the structural-versus-quantitative distinction again. Scan-plan
+design operates on **decoupling**: whether a residual exists that is blind to the
+other fault, and therefore whether separability survives the magnitudes being
+wrong. It does not operate on signal geometry. A plan with a support-correlated
+build order moves power/gas from class 2 (separable only because the calibrated
+magnitudes differ) into class 1 (separable from the zero pattern alone), and that
+is a real and free upgrade in the *robustness* of the diagnosis, not in its
+sharpness.
+
+That is still a useful and publishable lever, and it still reaches the same place
+as active excitation without perturbing a production build. But it must be stated
+as a structural claim. Citing the angles for it would have been wrong, and nearly
+was.
 
 ### The apparent contradiction, resolved - and it improves the paper
 
@@ -943,6 +961,55 @@ at any of the three noise-ratio assumptions, and never changes the rank. There i
 no basis for recommending that a builder remove any of them, and no basis for
 claiming any one is indispensable. That is a real answer and it should be stated
 as one rather than dressed up.
+
+## CANONICAL NUMBERS, after both corrections
+
+Everything below is under exponential couplings, [-1, 1] profile normalisation,
+the positive profile form, and coefficient noise `sigma_s * sqrt([(G'G)^-1]_jj)`.
+These supersede every earlier figure in this file.
+
+### Route A, instantaneous versus enlarged
+
+| | derivative limit | +5% fault | +20% fault |
+|---|---|---|---|
+| power/gas, enlarged | **29.34** | 37.42 | 47.73 |
+| worst pair, enlarged | **25.83** | 36.61 | 29.40 |
+| worst pair, instantaneous | 0.00 | 4.26 | 6.61 |
+| rank (of 5) | 5 | 5 | 5 |
+| condition number | 12 | 10 | 13 |
+
+Worst enlarged angle over every magnitude and pair tested: **22.19 deg**, at a
+-2% fault. Rank 5 throughout; the instantaneous case is rank 3 throughout.
+
+### Contrast threshold, derivative limit
+
+| contrast | 0 | 0.10 | 0.25 | 0.50 | 0.75 | 1.00 | 1.50 | 2.00 |
+|---|---|---|---|---|---|---|---|---|
+| worst pair, deg | 0.99 | 3.49 | 7.88 | 12.60 | 18.71 | 25.20 | 36.53 | 43.64 |
+| condition | 52 | 111 | 45 | 23 | 16 | 12 | 9 | 7 |
+
+Monotone and smooth. The rank rises from 3 to 5 as soon as contrast is non-zero;
+the worst pair clears 8 deg at a quarter of the asserted profile strength and
+13 deg at half.
+
+### Profile form, worst pair at three magnitudes
+
+| form | limit | +5% | +20% | sign reversals |
+|---|---|---|---|---|
+| positive (default) | 25.20 | 36.61 | 29.40 | 0 / 420 |
+| linear | 30.75 | 38.43 | 40.99 | 0 / 420 |
+| clipped | 30.75 | 38.43 | 40.99 | 0 / 420 |
+
+All three forms are admissible now that drivers are range-normalised, and the
+positive form is the *conservative* one at every magnitude. Reporting it as the
+headline is therefore the cautious choice, not just the defensible one.
+
+### Structural, enlarged
+
+Isolability window unchanged by the noise correction, as it must be - structure
+does not depend on noise: **threshold 0.01 to 0.10**, zero blocked pairs, against
+two blocked pairs for the instantaneous model and at thresholds outside the
+window.
 
 ## The three real risks
 
