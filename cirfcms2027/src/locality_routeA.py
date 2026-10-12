@@ -59,7 +59,7 @@ __all__ = ["NODES", "SIGMAS", "response_curves", "validate_curves",
 # anywhere from -20% to +60% at an individual segment.
 _HALF = (1e-3, 2e-3, 3e-3, 5e-3, 7e-3, 0.01, 0.015, 0.02, 0.03, 0.04, 0.05,
          0.06, 0.08, 0.10, 0.12, 0.15, 0.18, 0.22, 0.26, 0.31, 0.37, 0.44,
-         0.52, 0.62, 0.75, 0.90, 1.05, 1.20)
+         0.52, 0.62, 0.75)   # top node covers profile_sweep.MAX_REACH
 NODES = np.array([-x for x in reversed(_HALF)] + [0.0] + list(_HALF))
 
 SIGMAS = np.array([1.0, 1.0, 0.03])   # same noise ratio as the Tier 2 headline

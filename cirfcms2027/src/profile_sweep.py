@@ -36,9 +36,10 @@ __all__ = ["contrast_threshold", "form_comparison", "shared_profile_control"]
 CONTRASTS = (0.0, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0)
 
 # A profile that turns a 20% fault into a 180% one at some segment is not a
-# modelling range problem, it is nonsense physics. Combinations that reach past
+# modelling range problem, it is nonsense physics. A 20% fault with a 3.1x spatial peak already reaches
+# 62%, so the bound sits just above that. Combinations that reach past
 # this are reported as out of scope rather than evaluated.
-MAX_REACH = 0.60
+MAX_REACH = 0.70
 HEADLINE_PAIR = ("power", "gas")
 
 

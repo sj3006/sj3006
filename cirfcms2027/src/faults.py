@@ -100,15 +100,50 @@ def apply_faults(
     sigma: float = 67e-6 / 4,
     material: Material = IN718,
     absorptivity: float = IN718_ABSORPTIVITY,
+    form: str = "exponential",
 ) -> tuple[Beam, Material]:
-    """Return the beam and material a given fault state produces."""
-    mu = absorptivity * (
-        1.0
-        + couplings.layer_to_absorptivity * fault.layer
-        + couplings.gas_to_attenuation * fault.gas
-    )
-    k_eff = material.k * (1.0 + couplings.layer_to_conductivity * fault.layer)
+    """Return the beam and material a given fault state produces.
+
+    Absorptivity and conductivity are multiplied by exponential factors rather
+    than linear ones. The linear form 1 + c*f agrees to first order - so the
+    Jacobian is unchanged to within the derivative step - but it goes to zero at
+    f = -1/c and negative beyond, which is not a large fault, it is a broken
+    model: a negative effective conductivity makes the thermal diffusivity
+    negative and the Eagar-Tsai integrand imaginary. At
+    layer_to_conductivity = 1.0 that happens at a 100% fault, and it did, during
+    the coupling sweep - raising a ZeroDivisionError at exactly -1.0 and
+    producing NaNs that were then swallowed into finite-looking nonsense beyond
+    it. The exponential form is strictly positive everywhere by construction,
+    which is also the physically right shape: conductivity interpolates between
+    powder and solid and cannot pass through zero.
+
+    `form="linear"` keeps the old behaviour for comparison.
+    """
+    if form == "exponential":
+        mu = absorptivity * np.exp(
+            couplings.layer_to_absorptivity * fault.layer
+            + couplings.gas_to_attenuation * fault.gas
+        )
+        k_eff = material.k * np.exp(couplings.layer_to_conductivity * fault.layer)
+    elif form == "linear":
+        mu = absorptivity * (
+            1.0
+            + couplings.layer_to_absorptivity * fault.layer
+            + couplings.gas_to_attenuation * fault.gas
+        )
+        k_eff = material.k * (1.0 + couplings.layer_to_conductivity * fault.layer)
+    else:
+        raise ValueError(f"unknown coupling form {form!r}")
     t0 = material.t_ambient + couplings.geometry_preheat_kelvin * fault.geometry
+
+    # Fail loudly rather than returning a finite-looking number from a model
+    # that has left its domain.
+    if not 0.0 < mu <= 1.0:
+        raise ValueError(f"absorptivity {mu:.4f} outside (0, 1] for {fault}")
+    if not k_eff > 0.0:
+        raise ValueError(f"effective conductivity {k_eff:.4f} not positive for {fault}")
+    if not t0 < material.t_solidus:
+        raise ValueError(f"local preheat {t0:.0f} K at or above the solidus for {fault}")
 
     faulted_material = replace(material, k=k_eff, t_ambient=t0)
     faulted_beam = Beam(

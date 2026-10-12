@@ -106,6 +106,28 @@ def scan_plan(n_layers: int = 6, n_vectors: int = 14, seed: int = 0,
     }
 
 
+def _range_normalise(a: np.ndarray) -> np.ndarray:
+    """Map to exactly [-1, 1], so a profile's span is bounded and interpretable.
+
+    Unit-variance standardisation was the wrong choice for the modulation
+    drivers: it leaves excursions out past +/-2, so `1 + c*z` went negative
+    (the fault reversing sign across the plate) and `exp(c*z)` grew a 5.8x tail
+    (a 20% fault acting as 116% at one segment). Normalising to the range
+    instead makes the contrast coefficient mean something physical - with
+    exp(c*z) and z in [-1, 1], the fault's severity spans a factor of exp(2c)
+    between its mildest and most severe segment, geometrically centred. At
+    c = 0.3 that is 0.74x to 1.35x; at c = 1.0 it is 0.37x to 2.72x.
+
+    The regressors keep unit-variance standardisation - they are a basis, and
+    their scaling is absorbed into the regression coefficients.
+    """
+    a = np.asarray(a, float)
+    lo, hi = a.min(), a.max()
+    if hi == lo:
+        return np.zeros_like(a)
+    return (2.0 * a - (hi + lo)) / (hi - lo)
+
+
 def _standardise(a: np.ndarray) -> np.ndarray:
     a = np.asarray(a, float)
     s = a.std()
@@ -129,18 +151,18 @@ PROFILE_FORMS = ("linear", "positive", "clipped")
 
 
 def drivers(plan: dict[str, np.ndarray]) -> np.ndarray:
-    """The standardised build variable each fault's severity is claimed to follow.
+    """The build variable each fault's severity is claimed to follow.
 
-    One column per fault, in FAULT_NAMES order. These are the physical claims;
-    PROFILE_CONTRAST sets how strongly each one varies.
+    One column per fault, in FAULT_NAMES order, each normalised to [-1, 1].
+    These are the physical claims; PROFILE_CONTRAST sets how strongly each one
+    varies.
     """
-    build_time = _standardise(plan["build_index"])
     return np.column_stack([
-        build_time,                                 # power: drift over the build
-        _standardise(1.0 / plan["length"]),         # speed: galvo error at turns
-        _standardise(plan["layer"] % 2),            # layer: recoater cycle
-        _standardise(plan["gas_axis"]),             # gas: gradient along the flow
-        _standardise(-plan["support"]),             # geometry: part shape
+        _range_normalise(plan["build_index"]),       # power: drift over the build
+        _range_normalise(1.0 / plan["length"]),      # speed: galvo error at turns
+        _range_normalise(plan["layer"] % 2),         # layer: recoater cycle
+        _range_normalise(plan["gas_axis"]),          # gas: gradient along the flow
+        _range_normalise(-plan["support"]),          # geometry: part shape
     ])
 
 
