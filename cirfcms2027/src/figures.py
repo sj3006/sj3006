@@ -124,7 +124,7 @@ def fig3(curves, nominal, plan):
     ax.semilogx(mags * 100, wb, "o-", color=C_BIG, ms=3.5, lw=1.2,
                 label="enlarged")
     ax.axhline(10, ls=":", lw=0.8, color="0.4")
-    ax.set_xlabel("fault magnitude (% of nominal)")
+    ax.set_xlabel("fault index $f$ (% — a common scale only for power and speed)")
     ax.set_ylabel("worst pair angle (degrees)")
     ax.set_ylim(0, 50)
     ax.set_xticks(mags * 100, [f"{m*100:g}" for m in mags])

@@ -1088,6 +1088,56 @@ far. It also turns the headline recommendation from an empirical observation int
 one with a stated mechanism, which is what makes it publishable rather than
 merely true.
 
+## WHAT A FAULT MAGNITUDE MEANS - a scale convention, and where it leaks
+
+Raised by Amit. `power` and `speed` are physical fractions: 0.05 is 5% more
+power. `layer`, `gas` and `geometry` are not - they are dimensionless severity
+indices whose meaning comes entirely from the coupling constant each multiplies.
+
+| f | layer | gas | geometry |
+|---|---|---|---|
+| 0.05 | absorptivity -1.5%, conductivity +2.5% | absorptivity -1.0% | preheat +30 K |
+| 0.20 | -5.8%, +10.5% | -3.9% | +120 K |
+| 1.00 | -25.9%, +64.9% | -18.1% | +600 K |
+
+The couplings were set so f = 1 is roughly the fault at its physical limit -
+powder absorptivity is near 0.4 against ~0.3 for bare solid, so -26% is about
+what losing the trapping would do; 18% beam attenuation is a severe plume;
++600 K is a thin wall running hot. So f reads as "fraction of the way to the
+worst case".
+
+**A fault index and its coupling are identifiable only as a product.** Double
+the coupling and halve f and the model is numerically identical. The scale is a
+convention, not a measurement.
+
+### Where that is harmless
+
+Isolability. Scaling a Jacobian column does not change its direction, and angles
+see only direction. The coupling sweep demonstrates it exactly: scaling
+`gas_to_attenuation` by 2.5 scaled the gas column by 2.5000 in every sensor and
+left the angle at 0.00 deg. Every angle, rank and condition number in the study
+is immune.
+
+### Where it leaks, and must be said in the paper
+
+**Detectability.** An absolute question, so not well posed under an arbitrary
+scale. Already compromised anyway by the deliberately-unused noise figures, so
+nothing new is lost - but the two limitations should be stated together rather
+than separately, since they bite the same claim.
+
+**The finite-magnitude study.** Every fault is given the same f. At f = 0.05
+that is a real 5% for power but a 1.5% absorptivity change for layer and 1.0%
+for gas. So those rows do **not** compare equal physical severities, and fig3's
+axis is an index rather than a common scale. Relabelled accordingly.
+
+This does not undermine the finite-magnitude conclusion, which is that the
+enlarged result stays rank 5 and stays in the 22 to 49 deg band across the whole
+sweep while the instantaneous one swings between 0 and 7 deg. That holds
+whatever the per-fault scale, because it holds at every point tested. What it
+does undermine is any sentence of the form "at a 5% fault, pair X is separable
+and pair Y is not" - comparisons *across pairs at fixed f* are not physically
+meaningful. The paper must not make one.
+
 ## The three real risks
 
 **Thermal model does not match published melt pool dimensions.**

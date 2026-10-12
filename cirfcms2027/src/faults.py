@@ -47,7 +47,39 @@ FAULT_NAMES = ("power", "speed", "layer", "gas", "geometry")
 
 @dataclass(frozen=True)
 class FaultState:
-    """Fractional deviations from the healthy process. All zero = nominal."""
+    """Fractional deviations from the healthy process. All zero = nominal.
+
+    What a magnitude means differs between faults, and the difference matters.
+
+    `power` and `speed` are physical fractions: 0.05 is 5% more power, or 5%
+    faster. They multiply the quantity directly and need no convention.
+
+    `layer`, `gas` and `geometry` are dimensionless **severity indices**. They
+    have no unit of their own - their physical meaning comes entirely from the
+    coupling constant each one multiplies. The couplings are set so that f = 1
+    is roughly the fault at its physical limit:
+
+        f_layer = 1     absorptivity -25.9%, conductivity +64.9%
+                        (about what losing the powder's trapping would do)
+        f_gas = 1       beam attenuated 18.1% (a severe plume)
+        f_geometry = 1  local preheat +600 K (a thin wall running hot)
+
+    So f reads as "fraction of the way to the worst case".
+
+    **A fault index and its coupling are identifiable only as a product.**
+    Doubling the coupling and halving f gives a numerically identical model, so
+    the scale is a convention. That is harmless for isolability - scaling a
+    Jacobian column does not change its direction, and angles see only
+    direction, which the coupling sweep confirms exactly. It is not harmless
+    for two things, both of which must be stated in the paper:
+
+      - Detectability, which is an absolute question and so is not well posed
+        here. See also the deliberately-unused noise figures.
+      - The finite-magnitude study, where every fault is given the same f. At
+        f = 0.05 that is a real 5% for power but only a 1.5% absorptivity change
+        for layer and 1.0% for gas, so those rows do **not** compare equal
+        physical severities. The magnitude axis is an index, not a common scale.
+    """
 
     power: float = 0.0
     speed: float = 0.0
