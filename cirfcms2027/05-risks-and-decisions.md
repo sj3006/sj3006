@@ -380,6 +380,58 @@ turns - but that they dominate real build variation is unproven.
 **Tier 1 should be re-run on the enlarged observation set** so the two tiers
 describe the same system.
 
+## LIMITATION FOUND: diagnosability is local, not global
+
+Prompted by the question of how fault magnitudes are chosen. The Jacobian is a
+derivative, so its perturbation size is a numerical choice and provably
+irrelevant (converged below 0.005, default 0.002; angles use normalised
+directions so magnitude cancels). But that makes every Tier 2 conclusion a
+**linearisation about the healthy operating point**, and the physics here is not
+close to linear.
+
+Pairwise angles recomputed at finite fault magnitude rather than as a derivative:
+
+| magnitude | power/gas | power/speed | speed/gas | power/geom |
+|---|---|---|---|---|
+| +0.2 % (derivative) | 0.99 | 6.03 | 6.92 | 62.12 |
+| +1 % | 4.72 | 2.89 | 6.16 | 64.77 |
+| +5 % | 17.48 | 42.44 | 24.96 | 37.81 |
+| +10 % | 44.94 | 59.47 | 14.63 | 25.58 |
+| +20 % | 45.74 | 50.49 | 5.88 | 27.99 |
+| -10 % | 11.24 | 26.76 | 37.96 | 41.91 |
+| -20 % | 3.51 | 49.49 | 52.99 | 39.43 |
+
+Three things follow.
+
+**There is no single diagnosability matrix.** It depends on fault magnitude, and
+on the sign of the deviation. Power/gas is perfectly confounded in the limit,
+well separated at +10 %, and confounded again at -20 %.
+
+**Small faults are confounded; large faults mostly separate.** The suite can say
+what went badly wrong while being blind to what is starting to go wrong - the
+opposite of what monitoring is usually wanted for. That is a genuinely useful
+and quotable finding, not just a caveat.
+
+**It is not monotone and not sign-symmetric.** speed/gas runs 6.9 -> 25.0 ->
+14.6 -> 5.9 as the fault grows, and a power increase does not mirror a power
+decrease. The nonlinearity comes from the keyhole depth term, the T^4 radiance
+weighting and the isotherm geometry.
+
+### What this does to the paper
+
+The headline must become **diagnosability as a function of fault magnitude**,
+not a single matrix. More work, and the honest presentation. The derivative-limit
+matrix stays as the incipient-fault case, which is the hardest and arguably the
+most important one.
+
+### Open, and it matters
+
+Does the Route A improvement survive at finite magnitude? The enlarged
+observation was computed from the linearised Jacobian via
+`Jbig = J[s,k] * B[j,k]`, so it inherits the linearisation wholesale. If the
+improvement is a small-fault artefact, the main result weakens considerably.
+**Check this before anything else.**
+
 ## The three real risks
 
 **Thermal model does not match published melt pool dimensions.**
