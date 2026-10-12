@@ -473,6 +473,105 @@ observation was computed from the linearised Jacobian via
 improvement is a small-fault artefact, the main result weakens considerably.
 **Check this before anything else.**
 
+## ROUTE A SURVIVES AT FINITE MAGNITUDE - and the profiles are now swept
+
+`src/locality_routeA.py` and `src/profile_sweep.py`. This was the flagged
+check-before-anything-else, because Route A was built as
+`Jbig[(s,j),k] = J[s,k] * B[j,k]` and so inherited the linearisation wholesale.
+It no longer does: the finite-magnitude version puts each segment's effective
+fault `f * m_k(i)` through the full nonlinear chain and regresses the resulting
+residuals, with no derivative anywhere.
+
+### It holds
+
+| | derivative limit | +5% fault | +20% fault |
+|---|---|---|---|
+| worst pair angle, enlarged | 38.5 deg | 39.0 deg | 42.5 deg |
+| worst pair angle, instantaneous | 0.00 deg | 4.1 deg | 6.8 deg |
+| rank (of 5) | 5 | 5 | 5 |
+| condition number | 8 | 7 | 8 |
+
+Rank 5 and single-digit conditioning at every magnitude tested, positive and
+negative, from 0.2% to 20%. The instantaneous case stays at rank 3 throughout.
+So unlike the instantaneous angles, which swing wildly and non-monotonically
+with fault size, the enlarged result is *stable* in magnitude. That is a better
+result than hoped for and it is the one to put in the paper.
+
+### Verification, because an interpolant was used
+
+Each fault's response is a function of one scalar, so the study runs off a 57-node
+exact response curve per fault rather than re-running the thermal model 84 times
+per magnitude. The pointwise interpolation error reaches 7% of the typical
+whitened residual, entirely on the pyrometer in a flat region of its response.
+That looked alarming, so the end quantity was checked directly: a full
+no-interpolation run (84 segments x 5 faults of real model evaluations per
+magnitude) agrees with the interpolated angle table to **0.14 deg at +5% and
+0.64 deg at +20%**, with identical rank and condition number. The intermediate
+metric was the misleading one - it divides by a change that passes through zero.
+
+### Profile form: the linear form was unphysical and is no longer the default
+
+The sweep exposed something that had gone unnoticed. The original profiles
+`1 + c*z` go negative wherever `z < -1/c`, so 32 of 420 entries were negative and
+a 20% fault acted as **-31%** at some segments: the fault reversed sign across the
+plate. Gas starvation does not become gas enrichment at the far wall, and a sign
+reversal is an unusually distinctive signature, so it had to be ruled out as the
+source of the gain.
+
+`modulations()` now takes a `form`, and the default is **"positive"**
+(`exp(c*z)` rescaled to unit mean - strictly positive, same leading order for
+small c). The result survives: worst pair 38.6 / 39.0 / 42.5 deg against the
+linear form's 33.3 / 46.3 / 47.9 deg at the same three magnitudes. The sign
+flips were helping slightly at finite magnitude and hurting slightly at the
+limit, so nothing of substance rested on them.
+
+**The headline numbers move** and these are now canonical: power/gas
+0.00 -> **41.44 deg**, worst pair **38.49 deg** (power/layer), rank 3 -> 5,
+worst finite collinearity index 141,869 -> **2.1**. The projection matrix is also
+visibly less diagonal under this form - speed loads 1.385 on turn density but
+also 0.220 on the gas axis and 0.211 on support depth - which is honest, because
+the near-diagonal linear B was partly an artefact of writing profiles as exact
+multiples of regressor columns.
+
+### The control passes exactly
+
+Give all five faults one shared profile: worst angle 0.00 deg, power/gas 0.00 deg,
+rank 3, condition 52 - bit-identical to the instantaneous case. So the gain is
+the profiles *differing*, not the enlarged observation having 15 rows instead of 3.
+
+### The contrast threshold, which is the honest form of the headline
+
+Angle against profile contrast (1.0 = the coefficients written into the module),
+strictly positive profiles, at the derivative limit:
+
+| contrast | 0 | 0.10 | 0.25 | 0.50 | 0.75 | 1.00 | 1.50 | 2.00 |
+|---|---|---|---|---|---|---|---|---|
+| worst pair, deg | 0.99 | 5.54 | 13.19 | 25.04 | 33.23 | 38.57 | 44.70 | 47.97 |
+| condition | 5.7e10 | 68 | 28 | 14 | 10 | 8 | 7 | 7 |
+
+Monotone and smooth, so the paper can state a threshold rather than a point
+value: **rank rises from 3 to 5 as soon as contrast is non-zero, and the worst
+pair clears 13 deg at contrast 0.25 and 25 deg at 0.50** - a quarter to a half of
+the asserted profile strength. That is the defensible claim, and it is a figure.
+
+### A framing this produced for free
+
+At +20% the instantaneous power/gas angle is already 45.7 deg and barely moves
+with contrast, while at the derivative limit it is 0.00 deg and moves from 0.99
+to 55 deg across the contrast sweep. The two mechanisms cover different regimes:
+**nonlinearity separates large faults, spatial context separates incipient
+ones.** Complementary, not competing, and it gives the paper a clean reason to
+report both.
+
+### Still open
+
+- Fault coupling constants (`FaultCouplings`) are still unswept. Same class of
+  assumption as the profiles, and the next thing to do.
+- Tier 1 on the enlarged observation set, so both tiers describe one system.
+- Rank tolerance is now 1e-6 relative, not 1e-12. At 1e-12 a condition number of
+  6.8e9 was being reported as rank 5, which is not a measurement.
+
+
 ## The three real risks
 
 **Thermal model does not match published melt pool dimensions.**

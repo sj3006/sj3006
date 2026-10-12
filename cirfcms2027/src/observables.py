@@ -50,7 +50,8 @@ import numpy as np
 
 from diagnosability import FAULT_NAMES, SENSOR_NAMES, collinearity_index, jacobian, whiten
 
-__all__ = ["REGRESSOR_NAMES", "scan_plan", "projection_matrix", "enlarged_jacobian"]
+__all__ = ["REGRESSOR_NAMES", "PROFILE_CONTRAST", "PROFILE_FORMS", "scan_plan",
+           "drivers", "modulations", "projection_matrix", "enlarged_jacobian"]
 
 REGRESSOR_NAMES = ("constant", "gas_axis", "layer_sync", "turn_density", "support_depth")
 
@@ -101,34 +102,70 @@ def regressors(plan: dict[str, np.ndarray]) -> np.ndarray:
     ])
 
 
-def modulations(plan: dict[str, np.ndarray]) -> np.ndarray:
-    """How each fault's magnitude actually varies across the build.
+PROFILE_CONTRAST = (0.3, 0.8, 1.0, 0.9, 1.0)
+PROFILE_FORMS = ("linear", "positive", "clipped")
 
-    These are physical claims about fault behaviour, not fitted. They set which
-    regressor each fault loads onto, so they drive the result and must be swept
-    alongside the coupling constants.
+
+def drivers(plan: dict[str, np.ndarray]) -> np.ndarray:
+    """The standardised build variable each fault's severity is claimed to follow.
+
+    One column per fault, in FAULT_NAMES order. These are the physical claims;
+    PROFILE_CONTRAST sets how strongly each one varies.
     """
     n = len(plan["layer"])
     build_time = _standardise(plan["layer"] * 1000 + np.arange(n) % 1000)
     return np.column_stack([
-        1.0 + 0.3 * build_time,                                  # power: drift
-        1.0 + 0.8 * _standardise(1.0 / plan["length"]),          # speed: turns
-        1.0 + 1.0 * _standardise(plan["layer"] % 2),             # layer: recoater cycle
-        1.0 + 0.9 * _standardise(plan["gas_axis"]),              # gas: flow gradient
-        1.0 + 1.0 * _standardise(-plan["support"]),              # geometry: part shape
+        build_time,                                 # power: drift over the build
+        _standardise(1.0 / plan["length"]),         # speed: galvo error at turns
+        _standardise(plan["layer"] % 2),            # layer: recoater cycle
+        _standardise(plan["gas_axis"]),             # gas: gradient along the flow
+        _standardise(-plan["support"]),             # geometry: part shape
     ])
 
 
-def projection_matrix(plan: dict[str, np.ndarray]) -> np.ndarray:
+def modulations(plan: dict[str, np.ndarray], contrast: float = 1.0,
+                form: str = "positive") -> np.ndarray:
+    """How each fault's magnitude varies across the build. Not fitted - asserted.
+
+    These set which regressor each fault loads onto, so they drive the whole
+    Route A result and must be swept. `contrast` scales every profile's strength
+    together; `form` changes the functional shape:
+
+    The default is "positive". "linear" was the original default and its results
+    are kept for comparison, but it is not defensible as the headline.
+
+    - "linear"   1 + c*z. The original. Simple, but for c near 1 it goes negative
+                 wherever z < -1/c, which means the fault changes sign across the
+                 plate. That is not physical - gas starvation does not become gas
+                 enrichment at the far wall - and a sign reversal is an unusually
+                 distinctive signature, so results must be checked against a form
+                 that cannot do it.
+    - "positive" exp(c*z), rescaled to unit mean. Strictly positive, same leading
+                 order as the linear form for small c. This is the defensible one.
+    - "clipped"  max(1 + c*z, 0.05). Positive, but with a kink where it clips.
+    """
+    Z = drivers(plan)
+    C = contrast * np.asarray(PROFILE_CONTRAST, float)
+    if form == "linear":
+        return 1.0 + Z * C
+    if form == "positive":
+        M = np.exp(Z * C)
+        return M / M.mean(axis=0)
+    if form == "clipped":
+        return np.maximum(1.0 + Z * C, 0.05)
+    raise ValueError(f"unknown profile form {form!r}")
+
+
+def projection_matrix(plan: dict[str, np.ndarray], **kw) -> np.ndarray:
     """B[j, k]: how strongly fault k's modulation loads onto regressor j."""
     G = regressors(plan)
-    M = modulations(plan)
+    M = modulations(plan, **kw)
     return np.linalg.lstsq(G, M, rcond=None)[0]
 
 
-def enlarged_jacobian(J: np.ndarray, plan: dict[str, np.ndarray]) -> np.ndarray:
+def enlarged_jacobian(J: np.ndarray, plan: dict[str, np.ndarray], **kw) -> np.ndarray:
     """Jacobian of (sensor x regressor) coefficients against fault magnitudes."""
-    B = projection_matrix(plan)
+    B = projection_matrix(plan, **kw)
     rows = [J[s, :] * B[j, :] for s in range(J.shape[0]) for j in range(B.shape[0])]
     return np.vstack(rows)
 
