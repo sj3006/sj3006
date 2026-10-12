@@ -1100,11 +1100,45 @@ indices whose meaning comes entirely from the coupling constant each multiplies.
 | 0.20 | -5.8%, +10.5% | -3.9% | +120 K |
 | 1.00 | -25.9%, +64.9% | -18.1% | +600 K |
 
-The couplings were set so f = 1 is roughly the fault at its physical limit -
-powder absorptivity is near 0.4 against ~0.3 for bare solid, so -26% is about
-what losing the trapping would do; 18% beam attenuation is a severe plume;
-+600 K is a thin wall running hot. So f reads as "fraction of the way to the
-worst case".
+### How the couplings were actually chosen - corrected
+
+An earlier version of this section said the couplings were "set so f = 1 is the
+fault at its physical limit", and showed arithmetic deriving -0.30 from a
+bare-solid absorptivity of 0.3 against the fitted 0.384. **That was written
+backwards.** The constants were picked first, as round numbers of the right sign
+and order; the arithmetic was constructed afterwards to justify them. Amit caught
+it on the giveaway - the "derivation" produced 0.25 and the text then "rounded"
+it to 0.30, which is a 20% change, not rounding.
+
+What is actually defensible about each constant, and nothing more:
+
+- **The sign.** Fixed by physics and not negotiable. A thinner layer means less
+  multiple-reflection trapping, so absorptivity falls. Degraded gas puts plume in
+  the beam path, so absorptivity falls. Less insulating powder raises effective
+  conductivity. A thin feature raises local preheat.
+- **The order of magnitude.** A fractional layer change cannot move absorptivity
+  by a factor of ten and cannot leave it unchanged, so it lands somewhere in the
+  tens of percent at full severity. -0.30 sits in that band; so do -0.20 and
+  -0.45.
+- **Nothing else.** No measurement pins any of them, because no benchmark dataset
+  with deliberately induced faults exists.
+
+So f = 1 is a *convention* meaning "severe", loosely anchored to the top of the
+plausible range. It is not a calibrated physical limit and the paper must not
+call it one.
+
+**The defence is the sweep, not the derivation.** `layer_to_absorptivity` from
+-0.60 to -0.05 is a twelvefold range, and power/gas stays 0.00 deg, enlarged rank
+stays 5, enlarged worst stays 29.93 deg throughout. The honest sentence is: the
+constant is a guess, and the conclusions are invariant to the guess across its
+whole plausible range. That is a stronger argument than any derivation, and it
+does not require the number to be right.
+
+Two figures quoted in passing - bare-metal absorptivity near 0.3 at ~1 um, and
+plume attenuation reaching ~20% in severe conditions - are from general knowledge
+of the literature, not from sources opened during this work. They are used only
+to argue order of magnitude. Each needs a citation before submission, and if
+either moves, the sweep already shows nothing breaks.
 
 **A fault index and its coupling are identifiable only as a product.** Double
 the coupling and halve f and the model is numerically identical. The scale is a

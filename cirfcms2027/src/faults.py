@@ -56,8 +56,9 @@ class FaultState:
 
     `layer`, `gas` and `geometry` are dimensionless **severity indices**. They
     have no unit of their own - their physical meaning comes entirely from the
-    coupling constant each one multiplies. The couplings are set so that f = 1
-    is roughly the fault at its physical limit:
+    coupling constant each one multiplies. f = 1 is a *convention* meaning
+    "severe", loosely anchored to the top of the plausible range - not a
+    calibrated physical limit, and the paper must not call it one. At f = 1:
 
         f_layer = 1     absorptivity -25.9%, conductivity +64.9%
                         (about what losing the powder's trapping would do)
