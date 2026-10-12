@@ -572,6 +572,117 @@ report both.
   6.8e9 was being reported as rank 5, which is not a measurement.
 
 
+## TIER 1 ON THE ENLARGED SET - and a better three-way classification
+
+`src/structural_enlarged.py`. The two tiers were analysing two different
+systems, which is the first thing a reviewer would have caught.
+
+### The structural form of Route A
+
+A regression coefficient of sensor s onto regressor j is the component of that
+sensor's response along regressor j, and the whole causal chain has such a
+component. So each regressor is a *channel* carrying its own copy of the chain:
+5 channels x 11 equations = 55 equations, 40 unknowns, redundancy 15. The
+structural content is which faults enter which channel - fault k enters channel
+j only where `B[j, k]` is non-zero - so the projection matrix's zero pattern is
+the entire structural claim, and since B is numerical, a threshold decides it.
+The threshold is swept.
+
+### The MSO enumeration had to be replaced, and the replacement is validated
+
+2^11 subsets was exhaustive; 2^55 is not available. But MSO sets were only ever
+a means to the two tests, and those need just the structurally overdetermined
+part M+:
+
+    f detectable           iff some equation carrying f lies in M+(E)
+    f_i isolable from f_j  iff some equation carrying f_i lies in M+(E minus
+                               the equations carrying f_j)
+
+and `e in M+(E)` iff `phi(E minus e) = phi(E) - 1`, since phi = |E| - matching
+and the matching only shrinks when e was matched in every maximum matching. That
+is |E| matching computations instead of 2^|E| subsets. **Checked against Tier 1's
+exhaustive answer on the 11-equation model: detectability and isolability both
+match exactly.** It is not used until that passes.
+
+### Result, and a non-monotone threshold
+
+| threshold | 0.00 | 0.01 | 0.05 | 0.10 | 0.20 | 0.40 |
+|---|---|---|---|---|---|---|
+| non-isolable pairs | 2 | 1 | 1 | **0** | **0** | 2 |
+
+At threshold 0 every channel admits every fault, so the enlarged model is five
+copies of the instantaneous one and reproduces Tier 1's blocked pairs exactly -
+`f_P` from `f_layer` and `f_P` from `f_gas`. A useful consistency check. Full
+isolability appears in a *window*, 0.10 to 0.20: below it the channels are not
+selective enough, above it they admit so little that equations are lost. The
+paper must report the window, not a single threshold.
+
+### The scan plan is a diagnosability lever, and this is the most actionable finding yet
+
+Power becomes isolable from gas because the support-depth channel admits power
+(B = -0.268) and not gas (0.082). But power only loads onto support depth because
+in a bottom-up raster, build time and solid support beneath the track both grow
+with height - correlation -0.642. **That is a consequence of the operator's chosen
+scan order, not a fact about LPBF.** Break it and the structural result changes:
+
+| plan | corr(time, support) | non-isolable pairs | worst angle | power/gas |
+|---|---|---|---|---|
+| raster, support grows | -0.642 | 0 | 38.49 | 41.44 |
+| raster, flat support | +0.000 | 2 | 32.34 | 39.19 |
+| random order | +0.078 | 2 | 39.85 | 40.59 |
+| interleaved order | -0.022 | 1 | 25.82 | 25.82 |
+
+So diagnosability is partly *designed*, not just measured. Scan-order and
+part-orientation choices change which faults a fixed sensor suite can resolve,
+at zero hardware cost. This is a stronger and more useful claim than any single
+angle, and it reaches the same place as active excitation (route C) without
+deliberately perturbing the process - which is the version a production engineer
+would actually accept.
+
+### The apparent contradiction, resolved - and it improves the paper
+
+The flat-support plan reads "structurally non-isolable" while its angle is 39 deg.
+That is not a bug. Under that plan, above the threshold:
+
+    constant       power speed layer gas geometry
+    gas_axis                         gas
+    layer_sync           layer
+    turn_density         speed       gas geometry
+    support_depth        speed       gas geometry
+
+Power appears **only** in the constant channel, and gas appears there too, so no
+residual can be built that is blind to gas. But the power-to-gas ratio across the
+five channels is 1.000, 0.001, 34.2, -0.010, 0.005 - wildly different, so the two
+signature *directions* are 39 deg apart and a discriminator plainly exists.
+
+The distinction is exact: **structural isolability asks for a residual decoupled
+from the other fault; quantitative separability only asks that the signature
+directions differ.** Decoupling is the stronger requirement. So the two tiers are
+not competing answers to one question, they answer two questions, and the gap
+between them has a precise meaning: a structurally isolable pair stays separable
+however wrong the magnitudes are, while a merely quantitatively separable pair
+relies on the calibration being right.
+
+That sharpens the abstract's three classes into something defensible:
+
+1. **Structurally isolable** - separable from the zero pattern alone, robust to
+   calibration error.
+2. **Quantitatively separable only** - separable in this calibrated model because
+   the magnitudes differ, with no structural guarantee. Honest and useful, but
+   conditional.
+3. **Neither** - needs another measurement, or a different scan plan.
+
+This is the same three-way split the accepted abstract promised, with the middle
+class now given a precise meaning rather than a hand-wave about noise.
+
+### Also recorded
+
+`scan_plan` now takes `order` ("raster", "random", "layer_interleaved") and
+`support_with_layer`, and the plan carries an explicit `build_index` so scan
+order is a first-class variable rather than an implicit raster. The default
+reproduces every previously recorded number exactly - checked.
+
+
 ## The three real risks
 
 **Thermal model does not match published melt pool dimensions.**

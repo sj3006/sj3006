@@ -51,7 +51,7 @@ import itertools
 
 import numpy as np
 
-from faults import FAULT_NAMES, FaultState, apply_faults
+from faults import FAULT_NAMES, FaultCouplings, FaultState, apply_faults
 from sensors import SENSOR_NAMES, sensor_readings
 
 __all__ = ["jacobian", "step_convergence", "whiten", "angles",
@@ -61,24 +61,25 @@ __all__ = ["jacobian", "step_convergence", "whiten", "angles",
 WEAVER_CAMERA_SIGMA = 3.1 / 136.3
 
 
-def _readings(fault: FaultState) -> np.ndarray:
-    beam, material = apply_faults(fault)
+def _readings(fault: FaultState, couplings: FaultCouplings | None = None) -> np.ndarray:
+    beam, material = apply_faults(fault, couplings or FaultCouplings())
     r = sensor_readings(beam, material)
     return np.array([r[s] for s in SENSOR_NAMES], dtype=float)
 
 
-def jacobian(step: float = 0.002) -> tuple[np.ndarray, np.ndarray]:
+def jacobian(step: float = 0.002,
+             couplings: FaultCouplings | None = None) -> tuple[np.ndarray, np.ndarray]:
     """Central-difference Jacobian of relative sensor change per unit fault.
 
     Returns (J, nominal). J has shape (n_sensors, n_faults) and is expressed in
     *relative* sensor units, so that a noise covariance given as fractional
     noise per sensor is directly compatible.
     """
-    nominal = _readings(FaultState())
+    nominal = _readings(FaultState(), couplings)
     cols = []
     for name in FAULT_NAMES:
-        plus = _readings(FaultState(**{name: step}))
-        minus = _readings(FaultState(**{name: -step}))
+        plus = _readings(FaultState(**{name: step}), couplings)
+        minus = _readings(FaultState(**{name: -step}), couplings)
         cols.append((plus - minus) / (2.0 * step) / nominal)
     return np.column_stack(cols), nominal
 

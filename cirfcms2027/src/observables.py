@@ -56,7 +56,9 @@ __all__ = ["REGRESSOR_NAMES", "PROFILE_CONTRAST", "PROFILE_FORMS", "scan_plan",
 REGRESSOR_NAMES = ("constant", "gas_axis", "layer_sync", "turn_density", "support_depth")
 
 
-def scan_plan(n_layers: int = 6, n_vectors: int = 14, seed: int = 0) -> dict[str, np.ndarray]:
+def scan_plan(n_layers: int = 6, n_vectors: int = 14, seed: int = 0,
+              order: str = "raster", support_with_layer: bool = True
+              ) -> dict[str, np.ndarray]:
     """A synthetic but structured build: several layers of vectors across a plate.
 
     Everything here is knowable before the build from the sliced file and the
@@ -64,6 +66,11 @@ def scan_plan(n_layers: int = 6, n_vectors: int = 14, seed: int = 0) -> dict[str
     """
     rng = np.random.default_rng(seed)
     layers, ys, lengths, support = [], [], [], []
+    # `order` sets the sequence vectors are actually scanned in, which is the
+    # machine operator's free choice and, as it turns out, a diagnosability lever
+    # - see `plan_variants` below. `support_with_layer` controls whether solid
+    # support beneath a vector grows as the build progresses, which is what makes
+    # build time and part geometry correlated in the first place.
     for layer in range(n_layers):
         for v in range(n_vectors):
             layers.append(layer)
@@ -75,12 +82,27 @@ def scan_plan(n_layers: int = 6, n_vectors: int = 14, seed: int = 0) -> dict[str
             lengths.append(0.4e-3 + 12e-3 * (1.0 - edge**2) * rng.uniform(0.85, 1.15))
             # solid material depth beneath this vector. Thin near the edges and
             # in the lower layers, which is where heat accumulates.
-            support.append((0.2 + 0.8 * (1.0 - edge)) * (0.3 + 0.7 * layer / n_layers))
+            growth = (0.3 + 0.7 * layer / n_layers) if support_with_layer else 1.0
+            support.append((0.2 + 0.8 * (1.0 - edge)) * growth)
+    n = len(layers)
+    layer_arr = np.asarray(layers, float)
+    if order == "raster":
+        build_index = layer_arr * 1000 + np.arange(n)
+    elif order == "random":
+        build_index = np.asarray(rng.permutation(n), float)
+    elif order == "layer_interleaved":
+        # scan every layer's left half, then every layer's right half: build time
+        # no longer tracks height
+        half = np.asarray(ys, float) > 0.5
+        build_index = half * 1000.0 + layer_arr * 10 + np.arange(n) % 10
+    else:
+        raise ValueError(f"unknown scan order {order!r}")
     return {
-        "layer": np.asarray(layers, float),
+        "layer": layer_arr,
         "gas_axis": np.asarray(ys, float),
         "length": np.asarray(lengths, float),
         "support": np.asarray(support, float),
+        "build_index": build_index,
     }
 
 
@@ -112,8 +134,7 @@ def drivers(plan: dict[str, np.ndarray]) -> np.ndarray:
     One column per fault, in FAULT_NAMES order. These are the physical claims;
     PROFILE_CONTRAST sets how strongly each one varies.
     """
-    n = len(plan["layer"])
-    build_time = _standardise(plan["layer"] * 1000 + np.arange(n) % 1000)
+    build_time = _standardise(plan["build_index"])
     return np.column_stack([
         build_time,                                 # power: drift over the build
         _standardise(1.0 / plan["length"]),         # speed: galvo error at turns

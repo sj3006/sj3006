@@ -44,7 +44,7 @@ import numpy as np
 from scipy.interpolate import PchipInterpolator
 
 from diagnosability import _readings, whiten
-from faults import FAULT_NAMES, FaultState
+from faults import FAULT_NAMES, FaultCouplings, FaultState
 from observables import (REGRESSOR_NAMES, enlarged_jacobian, modulations,
                          regressors, scan_plan)
 from sensors import SENSOR_NAMES
@@ -65,12 +65,14 @@ NODES = np.array([-x for x in reversed(_HALF)] + [0.0] + list(_HALF))
 SIGMAS = np.array([1.0, 1.0, 0.03])   # same noise ratio as the Tier 2 headline
 
 
-def response_curves() -> tuple[dict[str, PchipInterpolator], np.ndarray]:
+def response_curves(couplings: FaultCouplings | None = None
+                    ) -> tuple[dict[str, PchipInterpolator], np.ndarray]:
     """One exact 1-D response curve per fault, plus the nominal reading."""
-    nominal = _readings(FaultState())
+    nominal = _readings(FaultState(), couplings)
     curves = {}
     for name in FAULT_NAMES:
-        ys = np.array([_readings(FaultState(**{name: float(m)})) for m in NODES])
+        ys = np.array([_readings(FaultState(**{name: float(m)}), couplings)
+                       for m in NODES])
         curves[name] = PchipInterpolator(NODES, ys, axis=0)
     return curves, nominal
 
