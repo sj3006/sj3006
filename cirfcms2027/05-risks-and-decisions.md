@@ -1516,6 +1516,84 @@ real one would be contaminated - plume intensity depends on vaporisation, which
 power and speed drive - so the idealised result is an upper bound on what such a
 sensor buys. Stated as such.
 
+## ABSTRACT AUDIT: what is promised, what is delivered, what is not
+
+Amit asked whether the work was complete at the baseline. It is not, and the
+audit turned up three commitments beyond the obvious one. Checked against the
+accepted text, clause by clause.
+
+| abstract clause | status |
+|---|---|
+| structural diagnosability analysis applied to LPBF | **done** - Tier 1, 11 equations, MSO enumeration, four sensitivity variants |
+| reduced-order model generating sensor response to injected faults | **done** - Eagar-Tsai + keyhole correction, Gate 1 at 11.7% / 13.0% |
+| five named fault modes | **done** - power, speed, layer, gas, geometry |
+| noise "taken from published sensor characterisations" | **NOT AS STATED** - see below |
+| class 1: resolvable from the temporal and spatial structure of existing signals | **Route A, pieces 7-11** - not optional, it is named in the abstract |
+| class 2: requiring an additional measurement | **done** - Route C |
+| class 3: structurally irreducible | **done** - the answer is *none*, once spatial context is used |
+| "matrices reported for configurations found on current commercial machines" | **NOT DONE** |
+| "predicted limits compared against defect classes and accuracies reported in the monitoring literature" | **NOT DONE** |
+
+### Stopping at the baseline would empty class 1
+
+"Temporal and spatial structure of existing signals" *is* Route A. Without it,
+class 1 is empty, the paper reports that nothing is resolvable from existing
+signals and everything needs new hardware - which Route C now shows is **false**
+(the free method beats two idealised cause sensors). So the baseline is what
+makes the three-way split measurable, not the deliverable.
+
+### Deviation 1: the noise promise
+
+The abstract says distinguishability is evaluated against noise levels **taken
+from published sensor characterisations**. It was not. Only the Weaver camera
+figure (U(k=2) = 6.2 um on 136.3 um, so sigma = 2.3% relative) was citable; the
+NIST report AMS 100-35 is a thermal calibration study, not in-process noise
+characterisation, and using its numbers would have looked rigorous and been
+wrong. Amit's instruction was not to compromise airtightness for a citable
+figure. So noise was treated as a *ratio* and swept across three assumptions.
+
+That is defensible methodology and it does not match the abstract. Three options:
+
+1. find citable in-process characterisations before submission,
+2. reword the clause at submission,
+3. state plainly in the paper that no suitable characterisations were found,
+   and justify the ratio sweep on the grounds that angles, rank and condition
+   number are invariant to a common scaling, so only relative noise matters.
+
+**Option 3 is the honest one and probably right**, but it must be a declared
+decision rather than a quiet omission. Note the cost: absolute detection
+thresholds cannot then be claimed, which is already recorded.
+
+### Deviation 2: named commercial configurations
+
+The abstract promises matrices for "configurations found on current commercial
+machines". Route B swept *generic* subsets - photodiode only, camera plus
+pyrometer. Real machines from EOS, SLM Solutions, Concept Laser and Renishaw
+ship different suites, and the promise is a matrix per real configuration.
+
+A literature task (establish what each vendor actually ships) plus a re-run of
+`route_b.py` with those subsets. Not difficult, not started.
+
+### Deviation 3: the comparison against reported accuracies
+
+The closing sentence promises the predicted limits are *compared* against defect
+classes and accuracies in the monitoring literature. The 18-row extraction table
+exists; the comparison does not.
+
+The interesting case to look for: a paper reporting high accuracy separating two
+things this analysis says are confounded. That is either a problem for us or -
+far more likely - evidence they are separating **outcomes** rather than causes,
+which is the paper's central distinction and would be strong supporting
+material. Either way it must be run, not assumed.
+
+### Remaining work, in order
+
+    1. Route A, class 1                    pieces 7-11, the largest item
+    2. named commercial configurations     literature + re-run
+    3. comparison against published accuracies
+    4. decide and declare the noise position
+    5. figures, writing
+
 ## The three real risks
 
 **Thermal model does not match published melt pool dimensions.**
