@@ -1411,6 +1411,111 @@ That is a weaker claim than a computed angle and a more useful one, because it
 generalises past these five faults and this suite. It should be stated as a
 design rule in the discussion, not as a result.
 
+## ROUTE C: WHICH FAULTS A NEW SENSOR WOULD SEPARATE - the abstract's third class
+
+`src/route_c_added_sensor.py`. Route B's negative result (four melt-pool
+observables add rows, not rank) did not discharge the abstract's promise of a
+class "requiring an additional measurement". This does.
+
+### The method, and why it needs no plume model
+
+The sensors that would help - plume or fume sensing for gas, powder-bed or
+recoater sensing for layer - cannot be simulated, because Eagar-Tsai has no plume
+and no powder layer. Any Jacobian row for them would be invented.
+
+So: **do not model the instrument, model what it measures.** Add a row `e_k` -
+unit sensitivity to fault k and nothing else - with relative noise sigma_new.
+That is the idealised best case for any instrument aimed at that cause, and it
+brackets every real one. Hardware independent, and it answers exactly the
+question the abstract asks.
+
+### Result 1: which single measurement unlocks what
+
+| measurement added | rank | worst | pairs >= 10 deg | newly cleared |
+|---|---|---|---|---|
+| gas | 4 | 3.46 | 8/10 | power/gas, speed/gas, layer/gas |
+| power | 4 | 3.46 | 8/10 | power/speed, power/layer, power/gas |
+| layer | 4 | 0.00 | 7/10 | power/layer, layer/gas |
+| speed | 4 | 0.00 | 7/10 | power/speed, speed/gas |
+| **geometry** | **3** | 0.00 | 5/10 | **none** |
+
+Geometry is not worth measuring - it is already separated at 58-68 degrees, so a
+direct reading adds nothing. That is a procurement recommendation.
+
+### Result 2: precision is almost irrelevant
+
+Sweeping a direct gas measurement from 50% down to 0.2% relative noise:
+
+    rel. noise   50%    20%    10%     5%     2%     1%   0.2%
+    worst pair  3.46   3.46   3.46   3.46   3.46   3.46   3.46
+    pairs >=10  8/10   8/10   8/10   8/10   8/10   8/10   8/10
+
+Nothing moves. The pairs a gas measurement unlocks are unlocked at any
+precision, and the pair it does not touch (power/layer) is unaffected by its
+quality.
+
+**A crude measurement of the right cause beats a perfect measurement of the wrong
+one.** That is a useful and slightly counter-intuitive sentence for a
+manufacturing audience, and it follows directly from the geometry: adding a row
+in a *new direction* changes the rank; making an existing row quieter does not.
+
+### Result 3: the free method beats two idealised cause sensors
+
+| pair | baseline | +2 ideal sensors (gas, layer) | Route A (free) |
+|---|---|---|---|
+| power / gas | 0.00 | 83.45 | 29.34 |
+| power / layer | 3.46 | 87.59 | 36.40 |
+| layer / gas | 3.46 | 89.73 | 44.58 |
+| speed / gas | 7.12 | 83.51 | 36.47 |
+| **power / speed** | 7.12 | **7.12** | **25.83** |
+| speed / layer | 10.58 | 87.63 | 47.08 |
+| | worst 0.00, rank 3, 5/10 | worst 7.12, rank 5, cond 546, 9/10 | **worst 25.83, rank 5, cond 30, 10/10** |
+
+Route A wins on worst pair, on conditioning and on pairs cleared, against two
+*perfect direct measurements of the causes themselves* - and costs nothing.
+
+The reason is specific: **neither a gas sensor nor a layer sensor says anything
+about power versus speed.** That pair is untouchable by added hardware of this
+kind, and it is precisely what spatial context fixes.
+
+The two approaches are complementary in character rather than competing. Added
+sensors give enormous margin (83-90 deg) on the pairs they target; Route A gives
+uniform moderate margin (26-47 deg) on all of them.
+
+### The three classes, finally stated properly
+
+The accepted abstract promised: resolvable from existing signals, requiring an
+additional measurement, or structurally irreducible. With Route A and Route C
+both computed, the honest version is:
+
+1. **Resolvable from the temporal and spatial structure of existing signals** -
+   all ten pairs, worst 25.83 deg, rank 5. No new hardware.
+2. **Would benefit from an additional measurement** - the gas and layer pairs,
+   which reach 83-90 deg with a direct cause measurement instead of 29-47 deg.
+   This matters only where spatial context is unavailable: instant-by-instant
+   isolation for real-time control, as opposed to diagnosis accumulated over a
+   build.
+3. **Structurally irreducible** - none, once spatial context is used.
+
+That is a better answer than the abstract promised, and it carries a clean
+engineering split: **post-build diagnosis needs no new hardware; real-time
+per-segment isolation does, and crude direct sensing of the right cause is
+enough.**
+
+### What this does and does not license
+
+**Does:** "a measurement of the gas fault, at any practical precision, separates
+power/gas, speed/gas and layer/gas" - conditional, quantified, independent of
+whether the instrument is a light barrier, a plume camera, or something not yet
+built. Plus the design rule from the previous section, and the two named sensor
+classes that satisfy it with citations.
+
+**Does not:** any claim about a specific instrument's achievable performance, or
+any assertion that a real plume sensor would attain the idealised row `e_gas`. A
+real one would be contaminated - plume intensity depends on vaporisation, which
+power and speed drive - so the idealised result is an upper bound on what such a
+sensor buys. Stated as such.
+
 ## The three real risks
 
 **Thermal model does not match published melt pool dimensions.**
