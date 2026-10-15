@@ -1330,6 +1330,87 @@ plausible-sounding physical argument constructed after the fact. If a sentence i
 the draft reads like a derivation of one of these constants, it is the same error
 Amit caught, and the correct replacement is a sentence about the sweep.
 
+## TWO FLAGS ON THE "BEFORE" PICTURE, BOTH POINTING THE SAME WAY
+
+The paper's contribution is measured as the gap between the instantaneous result
+and the enlarged one. Anything that makes the instantaneous case *more*
+confounded inflates that gap. Two modelling choices do exactly that, and both
+must be declared rather than left to a reviewer.
+
+### Flag 1: the dropped convective channel (recorded earlier)
+
+Defining f_gas as pure optical depth omits the convective cooling a real
+gas-flow fault would also cause. That is Tier 1's variant V1, under which
+power/gas is non-isolable in both directions - more confounded than the
+baseline.
+
+### Flag 2: plume attenuation is modelled as independent of power and speed
+
+Our gas fault is pure Beer-Lambert: `absorptivity x exp(-f_gas)`, a constant
+multiplier. That is what makes the power/gas degeneracy *exact*, since both then
+act only on the product A*P.
+
+But a coaxial photodiode study reports that **without a vapour plume, gas flow
+speed has no effect on the photodiode signal, and once vaporisation is present
+the effect depends on laser power, scan speed and focus position.** Physically
+that is expected: the plume is produced by vaporisation, which power and speed
+drive.
+
+If attenuation genuinely depends on P and v, then f_gas is not a pure multiplier
+on A*P, and **the exact 0.00 degree degeneracy would break** - power and gas
+would separate by some second-order amount.
+
+### What follows
+
+- The reported 0.00 degrees is an **upper bound** on the instantaneous
+  confounding, under both flags. It is not a neutral estimate.
+- The structural claim survives either way: power and gas remain *strongly*
+  confounded, and the rank limit is untouched, since it comes from counting
+  channels rather than from this coupling's form.
+- A plume-coupling term of the form `f_gas * g(P, v)` would make the model more
+  faithful and the result more conservative. Eagar-Tsai has no plume, so it
+  cannot be derived from the present model; it needs either the cited
+  measurements or a vaporisation sub-model, and is named as further work.
+
+## ROUTE B's CANDIDATE SENSORS WERE CHOSEN ON THE WRONG CRITERION
+
+Raised by Amit. The four candidates - split camera axes, SWIR photodiode,
+wide-band pyrometer - were selected on **cost tiering**: free, filter change,
+new hardware. A procurement ladder.
+
+None was selected on the criterion that Piece 6 shows is the only one that
+matters: **does it observe something the melt pool's four channels do not
+determine?** All four are functions of the same temperature field, so all four
+were bound to add rows without adding rank. That outcome was predictable in
+advance and was not predicted.
+
+### The criterion, and the sensor classes that meet it
+
+A sensor breaks a confound only by observing *upstream* of A*P - the cause
+itself rather than its thermal consequence.
+
+| fault | sensor class | literature |
+|---|---|---|
+| gas | plume / fume sensing | photodiode light barrier detecting fume crossing an optical path (*Prog. Addit. Manuf.* 2026); off-axis high-speed camera with optical filter separating plume from pool; statistical plume-signature monitoring |
+| layer | powder bed / recoater sensing | IR layer-thickness measurement from post-recoat heat-up (Liu et al., *Addit. Manuf.* 2022); recoater-mounted optical scanner (Bugatti & Colosimo, *Addit. Manuf. Letters* 2022) |
+
+The light barrier is the clearest case: it measures fume particles blocking a
+beam and does not look at the melt pool at all.
+
+### What can and cannot be claimed about them
+
+**Cannot:** a quantified benefit. Eagar-Tsai has no plume and no powder layer, so
+their Jacobian rows cannot be computed. Any number would be invented.
+
+**Can:** the design rule, which is derived rather than asserted - *a sensor added
+to break a confound must observe upstream of the shared channel; a sensor reading
+the melt pool adds a row, not a direction.* Plus the two named classes that
+satisfy it and the citations showing they exist.
+
+That is a weaker claim than a computed angle and a more useful one, because it
+generalises past these five faults and this suite. It should be stated as a
+design rule in the discussion, not as a result.
+
 ## The three real risks
 
 **Thermal model does not match published melt pool dimensions.**
