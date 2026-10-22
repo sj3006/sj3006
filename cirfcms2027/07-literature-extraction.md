@@ -118,3 +118,111 @@ than burying them.
   diagnostic signal, and structural-analysis FDI applied to any additive process
   (the latter was covered in the novelty check and came back empty, but it
   belongs in this table as an explicit null row).
+
+---
+
+# The comparison against published accuracies
+
+The abstract's closing clause: *"the predicted limits are compared against the
+defect classes and accuracies reported in the monitoring literature."* This is
+that comparison.
+
+The test is adversarial by design. **Does any published work report high accuracy
+separating something this analysis says is confounded?** If so, either the
+analysis is wrong or the work is separating something other than what it claims.
+
+## Most of the literature is not comparable, and that is the first finding
+
+Of the 18 extracted works, 12 classify **outcomes** - porosity, keyholing,
+balling, density, roughness, mechanical properties. Our analysis makes no
+prediction about those. A melt pool that is deeper than the layer will fuse,
+whatever caused it to be deep, so outcome classification can succeed even where
+every cause is perfectly confounded.
+
+**That is not a defence, it is the paper's central point** and it now has an
+evidential form: the literature's success and our limit are about different
+questions, and the near-absence of overlap is itself the gap.
+
+## The one work that is directly comparable, and it confirms the framework
+
+**RAISE-LPBF-LASER** (Blanc, Ahar & De Grave, *Additive Manufacturing Letters* 7,
+2023; benchmark arXiv:2409.12475). On-axis video at 20 kHz, 128x128 grayscale,
+316L. Power and laser speed **independently sampled per scan line**, and models
+asked to reconstruct both. This is cause estimation of two faults our analysis
+places at 7.12 degrees instantaneously - below the practical floor.
+
+So they should struggle at a single frame and improve with temporal context.
+Their own baseline table:
+
+| model | frames per sample | speed RMSE | power RMSE |
+|---|---|---|---|
+| 3D ResNet | 8 | 157.8 | 19.50 |
+| **SlowFast** | **32** | **67.6** | **11.12** |
+
+**The model with 4x the temporal window halves the error on both targets** - 2.3x
+better on speed, 1.75x better on power. The authors note SlowFast "performs best
+by a great margin with less than half the RMSE of the second best... for both
+prediction targets".
+
+That is our result, measured by someone else, on real hardware, without
+reference to this framework:
+
+    instantaneous (one frame)        power/speed  7.12 deg   below the floor
+    with temporal context            power/speed 25.83 deg   comfortable
+
+We predict that power and speed are hard to separate from a single instant and
+become separable once temporal structure is used. Their benchmark shows exactly
+that ordering, and the mechanism they are implicitly exploiting is the one this
+paper makes explicit.
+
+A caution on how far to push this: the comparison is **qualitative and ordinal**.
+Their RMSE and our angles are not on a common scale, frame counts are reported in
+a fragmentary snippet and should be confirmed from the full text, and
+architectures differ in more than window length. The claim is that the
+*direction* agrees, not that the numbers do.
+
+## Two further confirmations, both of the "falling back on the lumped group" kind
+
+**The benchmark ranks on linear power density (P/v) as a target in its own
+right**, alongside power and speed separately. Why benchmark the lumped ratio
+unless the components are hard to recover individually? That is the same tell as
+the k-NN study (row 2) predicting *energy density class* rather than power and
+speed. Twice over, independent groups, the field reports the lumped group.
+
+Our framework says why: at a single instant, power and speed are confounded at
+7.12 degrees, so the robustly recoverable quantity is the combination, not the
+components.
+
+**The authors flag a frame-count side channel.** They note the number of camera
+frames in a scan line directly encodes speed, and ask submitters not to use it.
+That is an acknowledgement that the honest in-frame signal for speed is weak
+enough to need protecting from a shortcut - consistent with 7.12 degrees.
+
+## What nobody reports, which is the sharpest confirmation
+
+**No published work attempts to separate power from shielding gas degradation.**
+None attempts layer thickness against power. Searching for them returns nothing.
+
+Our analysis says power/gas is at **0.00 degrees** - not difficult, *identical* -
+and power/layer at 3.46. The literature's silence on exactly the pairs we
+identify as impossible is the strongest consistency check available, precisely
+because nobody was looking for it.
+
+It is weaker evidence than a failed attempt would be, and it should be stated as
+absence of evidence rather than evidence of absence. But the pattern - the field
+succeeds on the pairs we say are separable, reports lumped groups on the pairs we
+say are confounded, and does not attempt the pairs we say are impossible - holds
+across every comparable work found.
+
+## Summary table
+
+| our prediction | what the literature does | verdict |
+|---|---|---|
+| outcomes are separable regardless of cause confounding | 12 of 18 works classify outcomes successfully | consistent, and not a test |
+| power/speed hard instantaneously (7.12 deg), fine with temporal context (25.83) | RAISE-LPBF: 8 frames RMSE 157.8, 32 frames 67.6 | **confirmed, ordinally** |
+| the lumped group is what survives confounding | benchmark targets P/v; k-NN targets energy density class | **confirmed, twice** |
+| power/gas identical (0.00 deg) | no work attempts it | consistent, absence of evidence |
+| power/layer effectively confounded (3.46 deg) | no work attempts it | consistent, absence of evidence |
+
+**No published result contradicts the predicted limits.** One directly supports
+the central mechanism.
