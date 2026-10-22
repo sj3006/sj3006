@@ -15,6 +15,10 @@ Figure list, in the order the argument runs:
   fig5  the constant-energy-density sweep, showing length carrying the
         information that width and depth do not - the mechanism behind fig4's
         recommendation.
+  fig6  the diagnosability matrix: every pair in both regimes, classified. The
+        abstract's headline deliverable.
+  fig7  Route C: what each idealised added measurement unlocks, against the
+        free alternative.
 """
 
 from __future__ import annotations
@@ -182,6 +186,67 @@ def fig5():
     return _save(fig, "fig5_constant_ved.png")
 
 
+def fig6(J, plan):
+    """The diagnosability matrix, both regimes."""
+    from matrix import FLOOR, classify
+    ri, _ = classify(("photodiode", "camera", "pyrometer"), regime="instantaneous")
+    ra, _ = classify(("photodiode", "camera", "pyrometer"), regime="accumulated")
+    order = sorted(PAIRS, key=lambda p: ri[p]["instant"])
+    y = np.arange(len(order))
+    fig, ax = plt.subplots(figsize=(4.8, 2.9))
+    ax.barh(y - 0.2, [ri[p]["instant"] for p in order], 0.38, color=C_INST,
+            label="instantaneous (per segment)")
+    ax.barh(y + 0.2, [ra[p]["enlarged"] for p in order], 0.38, color=C_BIG,
+            label="accumulated (build context)")
+    ax.axvline(FLOOR, ls=":", lw=0.9, color="0.35")
+    ax.text(FLOOR + 0.8, len(order) - 0.4, "separation floor", fontsize=6, color="0.3")
+    for k, p in enumerate(order):
+        if ri[p]["class"] == 2:
+            ax.text(max(ri[p]["instant"], ra[p]["enlarged"]) + 1.5, k, "class 2",
+                    fontsize=6, color=C_INST, ha="left", va="center", style="italic")
+        if ri[p]["instant"] < 0.05:
+            ax.text(0.8, k - 0.2, "0.00$\\degree$ - identical", fontsize=6,
+                    color=C_INST, va="center")
+    ax.set_yticks(y, [f"{a} / {b}" for a, b in order])
+    ax.set_xlabel("separation angle (degrees)")
+    ax.set_xlim(0, 80)
+    ax.legend(loc="lower right", frameon=False)
+    ax.set_title("Five pairs need a measurement per segment, none over a build",
+                 fontsize=8.5)
+    return _save(fig, "fig6_matrix.png")
+
+
+def fig7(J, plan):
+    """What an added measurement unlocks, versus the free alternative."""
+    from matrix import FLOOR
+    from route_c_added_sensor import add_direct_sensor
+    from locality_routeA import big_sigmas
+    from observables import enlarged_jacobian
+    base = pair_angles(J, SIGMAS)
+    Jn, sn = add_direct_sensor(J, SIGMAS, ["gas", "layer"], 0.05)
+    added = pair_angles(Jn, sn)
+    routeA = pair_angles(enlarged_jacobian(J, plan), big_sigmas(plan))
+    order = sorted(PAIRS, key=lambda p: base[p])[:6]
+    x = np.arange(len(order))
+    fig, ax = plt.subplots(figsize=(4.8, 2.7))
+    for i, (vals, lab, c) in enumerate((
+            ([base[p] for p in order], "existing suite, per segment", C_INST),
+            ([added[p] for p in order], "+ 2 idealised cause sensors", "#8C8C8C"),
+            ([routeA[p] for p in order], "build context (free)", C_BIG))):
+        ax.bar(x + (i - 1) * 0.27, vals, 0.25, color=c, label=lab)
+    ax.axhline(FLOOR, ls=":", lw=0.9, color="0.35")
+    ax.set_xticks(x, [f"{a}\n{b}" for a, b in order], fontsize=6.5)
+    ax.set_ylabel("separation angle (degrees)")
+    ax.legend(frameon=False, ncol=1, loc="upper left", fontsize=6.5)
+    ax.set_title("The free method beats two perfect added sensors")
+    ax.annotate("added sensors do nothing here - neither says\nanything about power versus speed",
+                xy=(4.0, 9), xytext=(3.4, 50), fontsize=6, color="0.3",
+                ha="center", va="bottom",
+                arrowprops=dict(arrowstyle="->", lw=0.7, color="0.5"))
+    ax.set_ylim(0, 98)
+    return _save(fig, "fig7_added_sensor.png")
+
+
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
     plan = scan_plan()
@@ -190,6 +255,8 @@ if __name__ == "__main__":
     fig1(J, plan)
     fig5()
     fig4(plan)
+    fig6(J, plan)
+    fig7(J, plan)
     curves, nominal = response_curves()
     fig2(curves, nominal, plan)
     fig3(curves, nominal, plan)
