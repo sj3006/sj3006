@@ -1594,6 +1594,85 @@ material. Either way it must be run, not assumed.
     4. decide and declare the noise position
     5. figures, writing
 
+## THE DIAGNOSABILITY MATRIX - the abstract's headline deliverable, assembled
+
+`src/matrix.py`. Every ingredient existed across the other modules; nothing had
+assembled them into the artefact the abstract actually names.
+
+### The first attempt was degenerate, and that was informative
+
+Classifying on the enlarged observation alone put **all ten pairs in class 1 for
+every configuration, including a single photodiode**. True, and useless: classes
+2 and 3 come out empty and the matrix discriminates nothing.
+
+The cause is Route A itself - regressing onto known build context converts a
+static problem into a regression whose equation count is set by the regressors,
+so one sensor already reaches rank 5.
+
+### The fix: report two regimes
+
+    INSTANTANEOUS   per-segment decisions in real time, no opportunity to
+                    accumulate context. Closed-loop control lives here.
+    ACCUMULATED     diagnosis over a completed build or a substantial part of
+                    one. Post-build qualification and drift monitoring.
+
+This is an engineering distinction a machine builder actually faces, and it is
+where the structure is.
+
+### The matrix, baseline coaxial suite
+
+| pair | instant | class | enlarged | class | what changes it |
+|---|---|---|---|---|---|
+| power / gas | 0.00 | **2** | 29.34 | 1 | measure power, or use build context |
+| power / layer | 3.46 | **2** | 36.40 | 1 | measure power, or use build context |
+| layer / gas | 3.46 | **2** | 44.58 | 1 | measure layer, or use build context |
+| speed / gas | 7.12 | **2** | 36.47 | 1 | measure speed, or use build context |
+| power / speed | 7.12 | **2** | 25.83 | 1 | measure power, or use build context |
+| speed / layer | 10.58 | 1 | 47.08 | 1 | - |
+| layer / geometry | 58.40 | 1 | 66.45 | 1 | - |
+| power / geometry | 61.39 | 1 | 64.30 | 1 | - |
+| gas / geometry | 61.40 | 1 | 65.80 | 1 | - |
+| speed / geometry | 67.64 | 1 | 71.13 | 1 | - |
+
+    instantaneous:  class 1  5/10   class 2  5/10   class 3  0/10
+    accumulated:    class 1 10/10   class 2  0/10   class 3  0/10
+
+**Class 3 is empty in both regimes.** Nothing is structurally irreducible for
+this suite. That is a stronger answer than the abstract promised and it should
+be stated as such rather than hidden by reporting only one regime.
+
+### Per-pair contrast requirement - the honest form of the accumulated result
+
+The accumulated column rests on the modulation profiles, which are asserted.
+Reporting one angle hides that. So the matrix also reports, per pair, the
+smallest profile contrast at which it clears the floor (1.0 = the asserted
+strength):
+
+| pair | contrast needed |
+|---|---|
+| the four geometry pairs, speed/layer | **0.05** |
+| layer / gas | 0.15 |
+| power / layer, speed / gas | 0.25 |
+| **power / speed, power / gas** | **0.40** |
+
+Even the two hardest pairs need only **40% of the asserted profile strength**.
+The accumulated-regime conclusion therefore survives the profiles being 2.5x
+weaker than claimed, which is a far stronger statement than quoting 29.34 deg.
+
+This is the number to put in the paper. It lets a reader judge the result
+against their own view of how strongly faults vary across a build, rather than
+having to accept ours.
+
+### A fourth label carried alongside
+
+Each pair is also flagged **structurally isolable** - separable from the zero
+pattern of the equations alone, with no reliance on calibrated magnitudes. A
+class 1 pair that is also structurally isolable survives any amount of
+calibration error. At the current structural threshold all ten are, so the flag
+does not discriminate here; it is retained because it discriminates under other
+scan plans (see the plan-dependence section) and because its meaning is what
+separates the two tiers.
+
 ## The three real risks
 
 **Thermal model does not match published melt pool dimensions.**
