@@ -1673,6 +1673,76 @@ does not discriminate here; it is retained because it discriminates under other
 scan plans (see the plan-dependence section) and because its meaning is what
 separates the two tiers.
 
+## COMMERCIAL CONFIGURATIONS - the abstract's "current commercial machines"
+
+`src/commercial.py`. Route B swept generic subsets; the abstract promises real
+vendor suites. Mapped from secondary literature onto this study's observables.
+
+### Verification status, which is weak and must improve before submission
+
+Vendor details come from reviews and comparative studies, not datasheets, and
+the sources disagree. Detection bands are commonly withheld - one study records
+them as "protected under the confidentiality clause by the supplier". SLM's MPM
+is described in one source as two photodiodes of different spectral range and in
+another as a coaxial pyrometer; modelled as two bands, the more conservative
+reading. Concept Laser's QM Meltpool 3D appears only as a table entry. **Every
+row needs checking against vendor documentation.** The method does not depend on
+these being exactly right; the per-vendor conclusions do.
+
+### The matrices
+
+| configuration | inst rank | inst class 1 | class 2 | class 3 | accum rank | accum class 1 | accum worst |
+|---|---|---|---|---|---|---|---|
+| EOS, MeltPool only | 1 | 0 | 10 | 0 | 5 | 10 | 24.89 |
+| EOS, MeltPool + Exposure OT | 2 | 4 | 6 | 0 | 5 | 10 | 24.97 |
+| SLM Solutions MPM | 2 | 0 | 10 | 0 | 5 | 10 | 24.89 |
+| Concept Laser QM Meltpool 3D | 2 | 4 | 6 | 0 | 5 | 10 | 24.97 |
+| **Renishaw InfiniAM Spectral** | **3** | **4** | 6 | 0 | 5 | 10 | **31.89** |
+| research-grade reference | 3 | 5 | 5 | 0 | 5 | 10 | 25.83 |
+
+**Class 3 is empty for every commercial configuration in both regimes.** And
+every one of them reaches 10/10 in the accumulated regime - including a single
+photodiode. The paper's positive result is not conditional on owning a
+well-instrumented machine.
+
+### The finding worth leading with
+
+**Renishaw's InfiniAM Spectral is the only commercial configuration that
+separates power from gas instantaneously, at 84.02 degrees.**
+
+| configuration | power/gas, instantaneous |
+|---|---|
+| EOS MeltPool only | 0.00 confounded |
+| EOS MeltPool + Exposure OT | 0.00 confounded |
+| SLM Solutions MPM | 0.00 confounded |
+| Concept Laser QM Meltpool 3D | 0.00 confounded |
+| **Renishaw InfiniAM Spectral** | **84.02 SEPARATED** |
+| research-grade reference | 0.00 confounded |
+
+The reason is specific and it is exactly Route C's mechanism. InfiniAM pairs
+MeltVIEW (melt pool emissions, NIR and IR) with **LaserVIEW, described as a
+photosensitive diode measuring the intensity of the laser energy**. If LaserVIEW
+reads laser output *upstream of the plume*, it is a direct measurement of
+delivered power that does not see gas attenuation - the sensor Route C predicts
+breaks the confound, already fitted to a production machine.
+
+**Conditional on that reading being correct**, and it rests on secondary
+literature. It is the single most important line to verify against vendor
+documentation, because it turns an abstract design rule into a statement about a
+machine people own. If LaserVIEW instead sits after the plume, it is another
+melt-pool observable and the row collapses to the others.
+
+### A second, quieter finding
+
+SLM's two-spectral-band suite (0.00 to 7.4 deg across all pairs) performs worse
+than EOS's photodiode-plus-camera (0.00 to 16.9 deg), despite both having two
+observables. Two spectral bands of the same emitted light are close to
+redundant; a *geometric* measurement adds a genuinely different direction.
+
+That is the same lesson as Route B's failed candidates and the split-camera
+success, now visible across real products: **adding a different wavelength buys
+little, adding a different physical quantity buys more.**
+
 ## The three real risks
 
 **Thermal model does not match published melt pool dimensions.**
