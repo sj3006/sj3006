@@ -92,14 +92,17 @@ Exit criterion: Theorems 1-2 written out in full, checked line by line.
 
 - [x] Frontier sampling rule v1: most new predicted-window area per
       expected coupon (`alloc="frontier"`).
-- [~] Scaling experiment (`experiments/exp03_scaling.py`).
+- [x] Scaling experiment (`experiments/exp03_scaling.py`): 8x8 -> 32x32,
+      cost to certify 70% of the window grows ~n^1.34 (ours, good sim) vs
+      ~n^2.25 (unstructured) and ~n^2.2 (grid DoE). No-simulator variant
+      still scales like area: needs a better no-sim chain start.
 - [x] Oracle comparison (`experiments/exp04_oracle.py`): on the area goal,
       learned frontier allocation matches the oracle.
 - [x] Edge allocation rule (the lower bound's binding constraints used as
       an algorithm) with optimistic re-check. Tracks the oracle upper bound
       when rates are known; learned overhead grows slowly (1.1x-2.2x of UB
       from 8x8 to 24x24). Shrinking it is the open learning term.
-- [~] Bounds next to practice (`experiments/exp05_bounds.py`).
+- [x] Bounds next to practice (`experiments/exp05_bounds.py`).
 - [~] Theorem 4a/4b lower bounds drafted (`notes/05_lower_bound.md`); need
       checking.
 - [ ] Theorem 3: upper bound in terms of the weighted cover C*(T)
@@ -152,3 +155,7 @@ These change the method, so they need your answer before Phase 2:
   optimistic re-check + confidence-based futility after three failure
   modes found by the bounds experiment (exp05). Physics model directions:
   balling worsens with both power and speed in the Rosenthal model.
+- 2026-10-24: Full exp03 and exp05 done. Learned overhead diagnosed as a
+  target-membership cost; Theorem 3 to be stated with slack (notes/04).
+  Next without Amit's input: slack version of Theorem 3, no-sim chain
+  starts, give the unstructured baseline the re-check step, budget passing.

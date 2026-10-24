@@ -1,0 +1,106 @@
+grid,method,fraction,median_coupons,true_area,reps
+8,"ours, good sim",0.25,5016.0,34,5
+8,"ours, good sim",0.5,6456.0,34,5
+8,"ours, good sim",0.7,8472.0,34,5
+8,"ours, optimistic sim",0.25,5568.0,34,5
+8,"ours, optimistic sim",0.5,6816.0,34,5
+8,"ours, optimistic sim",0.7,8280.0,34,5
+8,"ours, no sim",0.25,3408.0,34,5
+8,"ours, no sim",0.5,6360.0,34,5
+8,"ours, no sim",0.7,9648.0,34,5
+8,"chains only, good sim",0.25,4920.0,34,5
+8,"chains only, good sim",0.5,5328.0,34,5
+8,"chains only, good sim",0.7,6624.0,34,5
+8,"spread only, good sim",0.25,5184.0,34,5
+8,"spread only, good sim",0.5,6816.0,34,5
+8,"spread only, good sim",0.7,8184.0,34,5
+8,"unstructured, good sim",0.25,6072.0,34,5
+8,"unstructured, good sim",0.5,6552.0,34,5
+8,"unstructured, good sim",0.7,7848.0,34,5
+8,grid DoE + CP + Bonferroni,0.25,15104.0,34,5
+8,grid DoE + CP + Bonferroni,0.5,17408.0,34,5
+8,grid DoE + CP + Bonferroni,0.7,20032.0,34,5
+12,"ours, good sim",0.25,7608.0,76,5
+12,"ours, good sim",0.5,11400.0,76,5
+12,"ours, good sim",0.7,15768.0,76,5
+12,"ours, optimistic sim",0.25,9744.0,76,5
+12,"ours, optimistic sim",0.5,12960.0,76,5
+12,"ours, optimistic sim",0.7,15840.0,76,5
+12,"ours, no sim",0.25,8856.0,76,5
+12,"ours, no sim",0.5,16680.0,76,5
+12,"ours, no sim",0.7,22488.0,76,5
+12,"chains only, good sim",0.25,6576.0,76,5
+12,"chains only, good sim",0.5,9360.0,76,5
+12,"chains only, good sim",0.7,13128.0,76,5
+12,"spread only, good sim",0.25,11184.0,76,5
+12,"spread only, good sim",0.5,12168.0,76,5
+12,"spread only, good sim",0.7,16320.0,76,5
+12,"unstructured, good sim",0.25,7416.0,76,5
+12,"unstructured, good sim",0.5,15432.0,76,5
+12,"unstructured, good sim",0.7,20232.0,76,5
+12,grid DoE + CP + Bonferroni,0.25,33984.0,76,5
+12,grid DoE + CP + Bonferroni,0.5,39168.0,76,5
+12,grid DoE + CP + Bonferroni,0.7,45072.0,76,5
+16,"ours, good sim",0.25,15328.0,140,5
+16,"ours, good sim",0.5,17536.0,140,5
+16,"ours, good sim",0.7,24096.0,140,5
+16,"ours, optimistic sim",0.25,15872.0,140,5
+16,"ours, optimistic sim",0.5,18432.0,140,5
+16,"ours, optimistic sim",0.7,27232.0,140,5
+16,"ours, no sim",0.25,16288.0,140,5
+16,"ours, no sim",0.5,28832.0,140,5
+16,"ours, no sim",0.7,39456.0,140,5
+16,"chains only, good sim",0.25,7776.0,140,5
+16,"chains only, good sim",0.5,13344.0,140,5
+16,"chains only, good sim",0.7,18592.0,140,5
+16,"spread only, good sim",0.25,15808.0,140,5
+16,"spread only, good sim",0.5,18784.0,140,5
+16,"spread only, good sim",0.7,24320.0,140,5
+16,"unstructured, good sim",0.25,17504.0,140,5
+16,"unstructured, good sim",0.5,30656.0,140,5
+16,"unstructured, good sim",0.7,38432.0,140,5
+16,grid DoE + CP + Bonferroni,0.25,69632.0,140,5
+16,grid DoE + CP + Bonferroni,0.5,80128.0,140,5
+16,grid DoE + CP + Bonferroni,0.7,92160.0,140,5
+24,"ours, good sim",0.25,24720.0,319,5
+24,"ours, good sim",0.5,30144.0,319,5
+24,"ours, good sim",0.7,41520.0,319,5
+24,"ours, optimistic sim",0.25,25488.0,319,5
+24,"ours, optimistic sim",0.5,32352.0,319,5
+24,"ours, optimistic sim",0.7,43488.0,319,5
+24,"ours, no sim",0.25,37392.0,319,5
+24,"ours, no sim",0.5,70176.0,319,5
+24,"ours, no sim",0.7,94848.0,319,5
+24,"chains only, good sim",0.25,13344.0,319,5
+24,"chains only, good sim",0.5,18912.0,319,5
+24,"chains only, good sim",0.7,29088.0,319,5
+24,"spread only, good sim",0.25,25632.0,319,5
+24,"spread only, good sim",0.5,29472.0,319,5
+24,"spread only, good sim",0.7,42864.0,319,5
+24,"unstructured, good sim",0.25,37104.0,319,5
+24,"unstructured, good sim",0.5,74544.0,319,5
+24,"unstructured, good sim",0.7,94512.0,319,5
+24,grid DoE + CP + Bonferroni,0.25,156672.0,319,5
+24,grid DoE + CP + Bonferroni,0.5,180288.0,319,5
+24,grid DoE + CP + Bonferroni,0.7,239040.0,319,5
+32,"ours, good sim",0.25,35968.0,572,5
+32,"ours, good sim",0.5,40960.0,572,5
+32,"ours, good sim",0.7,54592.0,572,5
+32,"ours, optimistic sim",0.25,38016.0,572,5
+32,"ours, optimistic sim",0.5,44416.0,572,5
+32,"ours, optimistic sim",0.7,60736.0,572,5
+32,"ours, no sim",0.25,61120.0,572,5
+32,"ours, no sim",0.5,119616.0,572,5
+32,"ours, no sim",0.7,150464.0,572,5
+32,"chains only, good sim",0.25,19776.0,572,5
+32,"chains only, good sim",0.5,26816.0,572,5
+32,"chains only, good sim",0.7,43072.0,572,5
+32,"spread only, good sim",0.25,35968.0,572,5
+32,"spread only, good sim",0.5,42944.0,572,5
+32,"spread only, good sim",0.7,65920.0,572,5
+32,"unstructured, good sim",0.25,64192.0,572,5
+32,"unstructured, good sim",0.5,131456.0,572,5
+32,"unstructured, good sim",0.7,178752.0,572,5
+32,grid DoE + CP + Bonferroni,0.25,278528.0,572,5
+32,grid DoE + CP + Bonferroni,0.5,320512.0,572,5
+32,grid DoE + CP + Bonferroni,0.7,424960.0,572,5

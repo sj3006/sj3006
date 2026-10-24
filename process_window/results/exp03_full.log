@@ -31,3 +31,7 @@
 32x32 ours, no sim                 25%:    61120  50%:   119616  70%:   150464   (299s)
 32x32 chains only, good sim        25%:    19776  50%:    26816  70%:    43072   (179s)
 32x32 spread only, good sim        25%:    35968  50%:    42944  70%:    65920   (337s)
+32x32 unstructured, good sim       25%:    64192  50%:   131456  70%:   178752   (373s)
+32x32 grid DoE + CP + Bonferroni   25%:   278528  50%:   320512  70%:   424960   (5s)
+-> /home/user/sj3006/process_window/experiments/../results/exp03_scaling.csv
+-> /home/user/sj3006/process_window/experiments/../results/exp03_scaling.png
