@@ -1,0 +1,13 @@
+ 8x8  good    spread  50%: learned    6876 oracle    7236 (x0.95)  70%: learned    8280 oracle    8808 (x0.94)  (22s)
+ 8x8  good    hybrid  50%: learned    6636 oracle    6468 (x1.03)  70%: learned    8100 oracle    8088 (x1.00)  (22s)
+ 8x8  biased  spread  50%: learned    7032 oracle    7200 (x0.98)  70%: learned    7716 oracle    8904 (x0.87)  (21s)
+ 8x8  biased  hybrid  50%: learned    6828 oracle    6336 (x1.08)  70%: learned    8400 oracle    8472 (x0.99)  (24s)
+16x16 good    spread  50%: learned   19040 oracle   19008 (x1.00)  70%: learned   25648 oracle   26992 (x0.95)  (101s)
+16x16 good    hybrid  50%: learned   17376 oracle   21136 (x0.82)  70%: learned   24528 oracle   25872 (x0.95)  (106s)
+16x16 biased  spread  50%: learned   18576 oracle   19008 (x0.98)  70%: learned   25216 oracle   27200 (x0.93)  (99s)
+16x16 biased  hybrid  50%: learned   18928 oracle   20096 (x0.94)  70%: learned   27808 oracle   27792 (x1.00)  (106s)
+24x24 good    spread  50%: learned   30960 oracle   38448 (x0.81)  70%: learned   45672 oracle   57792 (x0.79)  (265s)
+24x24 good    hybrid  50%: learned   29712 oracle   34464 (x0.86)  70%: learned   42264 oracle   42576 (x0.99)  (262s)
+24x24 biased  spread  50%: learned   29448 oracle   38448 (x0.77)  70%: learned   42048 oracle   55344 (x0.76)  (258s)
+24x24 biased  hybrid  50%: learned   32472 oracle   35400 (x0.92)  70%: learned   44424 oracle   47664 (x0.93)  (270s)
+-> /home/user/sj3006/process_window/experiments/../results/exp04_oracle.csv

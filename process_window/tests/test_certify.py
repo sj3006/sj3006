@@ -83,3 +83,17 @@ def test_frontier_allocation_finds_window_without_errors(structure):
     win = wc.window()
     assert win.sum() > 0
     assert not (win & ~sc.true_window()).any()
+
+
+def test_edge_allocation_certifies_a_margin_target():
+    """With the edge rule and a margin target, the whole target gets certified
+    (re-check prevents abandoning unlucky safe points) and nothing unsafe does."""
+    sc = make_scenario(8, 8)
+    target = np.all([sc.truth[m] <= 0.5 * sc.eps[m] for m in MODES], axis=0)
+    wc = WindowCertifier(sc, structure="hybrid", alloc="edge", target_q=0.5, batch=16,
+                         rng=np.random.default_rng(0))
+    while wc.coupons < 30000 and wc.run_plate():
+        if (wc.window() >= target).all():
+            break
+    assert (wc.window() >= target).all()
+    assert not (wc.window() & ~sc.true_window()).any()

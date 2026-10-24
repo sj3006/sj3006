@@ -93,8 +93,15 @@ Exit criterion: Theorems 1-2 written out in full, checked line by line.
 - [x] Frontier sampling rule v1: most new predicted-window area per
       expected coupon (`alloc="frontier"`).
 - [~] Scaling experiment (`experiments/exp03_scaling.py`).
-- [ ] Oracle comparison: how far is the frontier rule from an allocation
-      that knows the true rates? (Decides the shape of Theorem 3.)
+- [x] Oracle comparison (`experiments/exp04_oracle.py`): on the area goal,
+      learned frontier allocation matches the oracle.
+- [x] Edge allocation rule (the lower bound's binding constraints used as
+      an algorithm) with optimistic re-check. Tracks the oracle upper bound
+      when rates are known; learned overhead grows slowly (1.1x-2.2x of UB
+      from 8x8 to 24x24). Shrinking it is the open learning term.
+- [~] Bounds next to practice (`experiments/exp05_bounds.py`).
+- [~] Theorem 4a/4b lower bounds drafted (`notes/05_lower_bound.md`); need
+      checking.
 - [ ] Theorem 3: upper bound in terms of the weighted cover C*(T)
       (note 4, section 4).
 - [ ] Theorem 4: matching lower bound by change of measure.
@@ -140,3 +147,8 @@ These change the method, so they need your answer before Phase 2:
   current-practice baseline (grid DoE + Clopper-Pearson + Bonferroni), the
   Rosenthal physics simulator, notes 3-4 with the revised theory target
   (weighted cover C*(T)). Scaling experiment exp03 running.
+- 2026-10-24: Drafted Theorem 4a/4b (lower bounds with and without the
+  ordering; notes/05). Oracle experiment (exp04). Edge allocation rule +
+  optimistic re-check + confidence-based futility after three failure
+  modes found by the bounds experiment (exp05). Physics model directions:
+  balling worsens with both power and speed in the Rosenthal model.

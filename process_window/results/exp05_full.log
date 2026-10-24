@@ -1,0 +1,2 @@
+ 8x8  |T|=  28 edge= 13  LB_A=     987  UB=    5142  ours=    6024  |  LB_U=     1787  unstructured=   16224  (15s)
+12x12 |T|=  69 edge= 18  LB_A=    2142  UB=   11793  ours=   20352  |  LB_U=     5050  unstructured=     inf  (45s)

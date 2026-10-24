@@ -45,7 +45,17 @@ Allocation (which settings go on the next plate):
   settings that a certificate would cover by spreading and that currently
   look safe for every mode, and cost is the remaining log-wealth needed
   divided by the estimated growth rate KL(p_hat || eps) (note 1, sec. 4).
-Neither rule affects validity; both are decided before the plate is built.
+- alloc="edge": estimate the target region T_hat (every estimated rate below
+  target_q * eps), and for each mode take the riskiest uncertified points
+  of T_hat (its minimal elements). These are exactly the binding constraints
+  of the lower bound (notes/05): any cover of T_hat must certify them or
+  something riskier, and certifying them covers the rest by spreading.
+  Plates are filled with each such point's expected remaining coupons,
+  cheapest first, instead of one coupon each. Once T_hat is covered, it
+  re-checks the uncertified settings most likely to still be in the target
+  (lowest lower confidence bound on the defect rate), so a safe setting that
+  had an unlucky streak is not abandoned forever (optimism, as in bandits).
+No allocation rule affects validity; all are decided before the plate is built.
 """
 
 import numpy as np
@@ -58,12 +68,23 @@ class WindowCertifier:
     def __init__(self, scenario, alpha=0.05, structure="monotone",
                  strategy="hedge", use_sim_prior=True, start="boundary",
                  boundary_q=(0.3,), hedge_center=True, pilot_per_point=4, prior_weight=10.0, cap=0.8, batch=24,
-                 max_per_point=800, futility_n=60, alloc="margin", rng=None):
+                 max_per_point=None, futility_n=60, alloc="margin", oracle=False,
+                 target_q=1.0, rng=None):
         if structure not in ("monotone", "spread", "hybrid", "none"):
             raise ValueError("structure must be 'monotone', 'spread', 'hybrid' or 'none'")
-        if alloc not in ("margin", "frontier"):
-            raise ValueError("alloc must be 'margin' or 'frontier'")
+        if alloc not in ("margin", "frontier", "edge"):
+            raise ValueError("alloc must be 'margin', 'frontier' or 'edge'")
         self.alloc = alloc
+        # oracle=True lets the allocation rule see the true rates (testing
+        # still uses only data). Used to measure the cost of learning where
+        # to test; validity is unaffected because allocation never is.
+        self.oracle = oracle
+        # The frontier rule only counts gain at settings that look safe with
+        # margin: every estimated rate below target_q * eps. target_q = 1
+        # aims at the whole window; smaller values aim at a target region
+        # with a safety margin (and avoid pouring coupons into settings whose
+        # rate is barely below eps). Allocation only, so validity is unaffected.
+        self.target_q = target_q
         self.sc = scenario
         self.alpha = alpha
         self.structure = structure
@@ -234,7 +255,12 @@ class WindowCertifier:
         if not cur:
             return []
         xs = np.unique([x for _, x, _ in cur])
-        p_hat = self._estimates()
+        p_hat = self.truth if self.oracle else self._estimates()
+        if self.alloc == "edge":
+            plate = self._edge_plate(cur, p_hat)
+            if plate:
+                return plate
+            return self._recheck_plate(cur, p_hat)
         if self.alloc == "frontier":
             return self._frontier_plate(cur, xs, p_hat)
         # Score each candidate by its most promising pending certification:
@@ -249,7 +275,7 @@ class WindowCertifier:
         return list(np.tile(order, reps)[: self.batch])
 
     def _frontier_plate(self, cur, xs, p_hat):
-        looks_safe = (p_hat < self.eps).all(axis=0)                     # (N,)
+        looks_safe = (p_hat < self.target_q * self.eps).all(axis=0)     # (N,)
         a = np.full((self.M, self.N), self.alpha_chain)
         is_cur = np.zeros((self.M, self.N), dtype=bool)
         for m, x, c in cur:
@@ -271,6 +297,49 @@ class WindowCertifier:
         order = cand[np.argsort(-score[cand], kind="stable")][: self.batch]
         reps = int(np.ceil(self.batch / len(order)))
         return list(np.tile(order, reps)[: self.batch])
+
+    def _edge_plate(self, cur, p_hat):
+        target = (p_hat < self.target_q * self.eps).all(axis=0)          # (N,)
+        a = np.full((self.M, self.N), self.alpha_chain)
+        is_cur = np.zeros((self.M, self.N), dtype=bool)
+        for m, x, c in cur:
+            a[m, x] = max(a[m, x], self.alpha_c[m][c])
+            is_cur[m, x] = True
+        need = np.maximum(-np.log(a) - self.ep.log_wealth(), 0.0)
+        rate = _kl_vec(p_hat, self.eps)
+        remaining = {}                      # point -> expected coupons still needed
+        for m in range(self.M):
+            u = np.flatnonzero(target & ~self.certified[m])
+            if len(u) == 0:
+                continue
+            sub = self.dominance[m][np.ix_(u, u)].copy()   # [a, b] = b safer than a
+            np.fill_diagonal(sub, False)
+            minimal = u[~sub.any(axis=0)]                  # nothing in u is riskier
+            for z in minimal:
+                if is_cur[m, z] and rate[m, z] > 0:
+                    r = need[m, z] / rate[m, z] + 1.0
+                    remaining[z] = max(remaining.get(z, 0.0), r)
+        if not remaining:
+            return []
+        plate = []
+        for z, r in sorted(remaining.items(), key=lambda kv: kv[1]):
+            plate += [z] * int(min(np.ceil(r), self.batch - len(plate)))
+            if len(plate) >= self.batch:
+                break
+        reps = int(np.ceil(self.batch / len(plate)))
+        return list(np.tile(plate, reps)[: self.batch])
+
+    def _recheck_plate(self, cur, p_hat, per_point=4):
+        w = self.ep.n + self.ep.prior_weight
+        lcb = p_hat - 2.0 * np.sqrt(p_hat * (1 - p_hat) / w)
+        risk = {}
+        for m, x, _ in cur:
+            risk[x] = max(risk.get(x, -np.inf), lcb[m, x] / self.eps[m, x])
+        if not risk:
+            return []
+        order = sorted(risk, key=risk.get)[: max(1, self.batch // per_point)]
+        reps = int(np.ceil(self.batch / len(order)))
+        return list(np.tile(np.repeat(order, per_point), reps)[: self.batch])
 
     # -- one build plate ------------------------------------------------------
 
@@ -301,13 +370,17 @@ class WindowCertifier:
         return True
 
     def _futility(self):
-        """Stop chains whose current point looks hopeless. Never certifies
-        anything, so it cannot hurt validity."""
-        p_data = np.divide(self.ep.s1, self.ep.n, out=np.zeros_like(self.ep.s1),
-                           where=self.ep.n > 0)
+        """Stop chains whose current point is confidently unsafe (estimated
+        rate minus two standard errors above eps). Repeated checks of a plain
+        "estimate above eps" rule abandon too many truly safe points near the
+        threshold. Stopping never certifies anything, so validity is unaffected."""
+        n = self.ep.n
+        p_data = np.divide(self.ep.s1, n, out=np.zeros_like(self.ep.s1), where=n > 0)
+        se = np.sqrt(np.maximum(p_data * (1 - p_data), 1.0 / np.maximum(n, 1)) / np.maximum(n, 1))
+        hopeless = (n >= self.futility_n) & (p_data - 2 * se > self.eps)
         for m, x, c in self.current_points():
-            n = self.ep.n[m, x]
-            if n >= self.max_per_point or (n >= self.futility_n and p_data[m, x] > self.eps[m, x]):
+            capped = self.max_per_point is not None and n[m, x] >= self.max_per_point
+            if capped or hopeless[m, x]:
                 self.done[m][c] = True
 
     # -- results --------------------------------------------------------------

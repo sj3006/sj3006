@@ -94,6 +94,64 @@ term. If it isn't lower order, Theorem 3 needs a different shape. Measuring
 how far the frontier rule is from an oracle that knows the true rates is a
 good week-2 experiment.
 
+## 4b. Allocation: the lower bound tells you where to test
+
+`experiments/exp05_bounds.py` computes Theorem 4a's lower bound (an LP),
+Theorem 4b's, and the oracle upper bound, next to measured costs, for the
+target T = {all rates <= eps/2}. Smoke-test numbers (3 runs):
+
+| grid | lower bound, ordering | lower bound, no ordering | oracle upper bound |
+|---|---|---|---|
+| 8x8 | 987 | 1,787 | 5,142 |
+| 12x12 | 2,142 | 5,050 | 11,793 |
+| 16x16 | 2,902 | 8,572 | 16,733 |
+
+The ordered bound grows about linearly, the unordered one about
+quadratically. The gap between the oracle upper bound and the ordered lower
+bound (5.2x at 8x8) is accounted for by the Bonferroni log factor
+(ln(M N 16 / alpha) / L, about 5.1) and the bet cap (about 1.24), partly
+offset because the LP lets one coupon count toward several edge
+constraints (about 1.2x).
+
+Getting the *algorithm* to track the oracle took three fixes, each forced
+by a failure:
+
+1. **Greedy "area per coupon" wastes coupons on the interior.** At 16x16 it
+   spent 16k coupons on target-interior points, which spreading from the
+   edge covers for free. Fix: the **edge rule** samples only the current
+   riskiest uncertified points of the estimated target, for each mode.
+   These are exactly the binding constraints of Theorem 4a, so the rule
+   is the lower bound's own structure used as an algorithm. It also fills
+   plates with several coupons per point instead of one each.
+2. **A hard cap of 800 coupons per setting** abandoned target points with
+   rates near 2%, which need 1,000-1,400. Removed.
+3. **Exploration trap.** A safe target point with an unlucky streak looks
+   unsafe, stops being sampled, and is never certified. Fixes: futility
+   only when *confidently* unsafe (estimate minus 2 standard errors above
+   eps), and once the estimated target is covered, **re-check** the
+   uncertified points with the lowest lower confidence bound (optimism).
+
+Result, coupons to certify all of T (median of 3):
+
+| grid | oracle allocation / UB | learned allocation / UB |
+|---|---|---|
+| 8x8 | 0.76 | 1.06 |
+| 16x16 | 0.74 | 1.50 |
+| 24x24 | 0.81 | 2.18 |
+
+With the oracle, the edge rule sits just under the upper bound at every
+size. The learned version's overhead still grows slowly with n. **That
+growth is the open "learning term" in Theorem 3**, and it now has a
+concrete shape: wasted coupons on points whose estimated membership in T
+flips. Candidate remedies for week 2: smaller prior weight, sharing
+information across neighbouring settings (monotone smoothing of the
+estimates), and confidence-based edge selection.
+
+On the easier goal of certifying a *fraction* of the window (exp04),
+learned allocation already matches the oracle (ratios 0.76-1.08 up to
+24x24), so the learning cost only bites when every point of a target must
+be certified.
+
 ## 5. Physics findings that change modelling choices
 
 - With a Rosenthal melt pool, **balling increases with both power and speed**
