@@ -147,6 +147,34 @@ flips. Candidate remedies for week 2: smaller prior weight, sharing
 information across neighbouring settings (monotone smoothing of the
 estimates), and confidence-based edge selection.
 
+**Where the learned overhead goes (24x24, one run):**
+
+| category | oracle | learned |
+|---|---|---|
+| target edge (necessary) | 30,672 | 31,102 |
+| target interior | 0 | 7,182 |
+| window outside target | 0 | 38,764 |
+| unsafe | 0 | 9,832 |
+
+The learned rule certifies the necessary edge points as efficiently as the
+oracle. Nearly all the overhead goes to settings just outside the target,
+mostly during the re-check phase. That's inherent in the goal, not a bug:
+the target's edge points have rates right at q * eps *by definition*, so
+deciding which settings are in T is itself a thresholding problem at
+q * eps, and finer grids put more settings near that line.
+
+Two negative results: isotonic smoothing of the estimates (`smooth=True`)
+did not reliably reduce the overhead; a 2-standard-error re-check rule is
+needed for completion but is what spends the extra coupons.
+
+**Consequence for Theorem 3: state it with slack**, as in (eps, delta)-PAC
+pure exploration. Guarantee that every setting with rate <= q * eps gets
+certified, while allowing spending on settings with rate up to q' * eps
+(q < q' < 1). The membership-learning cost then depends on the gap
+(q' - q) * eps and can be bounded explicitly. This is also the natural
+engineering goal ("certify everything comfortably safe; borderline
+settings may be certified too").
+
 On the easier goal of certifying a *fraction* of the window (exp04),
 learned allocation already matches the oracle (ratios 0.76-1.08 up to
 24x24), so the learning cost only bites when every point of a target must

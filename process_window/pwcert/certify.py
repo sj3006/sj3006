@@ -69,7 +69,7 @@ class WindowCertifier:
                  strategy="hedge", use_sim_prior=True, start="boundary",
                  boundary_q=(0.3,), hedge_center=True, pilot_per_point=4, prior_weight=10.0, cap=0.8, batch=24,
                  max_per_point=None, futility_n=60, alloc="margin", oracle=False,
-                 target_q=1.0, rng=None):
+                 target_q=1.0, smooth=False, rng=None):
         if structure not in ("monotone", "spread", "hybrid", "none"):
             raise ValueError("structure must be 'monotone', 'spread', 'hybrid' or 'none'")
         if alloc not in ("margin", "frontier", "edge"):
@@ -85,6 +85,11 @@ class WindowCertifier:
         # with a safety margin (and avoid pouring coupons into settings whose
         # rate is barely below eps). Allocation only, so validity is unaffected.
         self.target_q = target_q
+        # smooth=True projects the allocation's rate estimates onto the
+        # monotone set (2D isotonic regression, approximated by alternating
+        # weighted 1D projections along rows and columns), pooling evidence
+        # across neighbouring settings. Allocation only.
+        self.smooth = smooth
         self.sc = scenario
         self.alpha = alpha
         self.structure = structure
@@ -247,7 +252,16 @@ class WindowCertifier:
 
     def _estimates(self):
         w = self.ep.n + self.ep.prior_weight
-        return (self.ep.s1 + self.ep.prior_weight * self.prior) / w
+        p = (self.ep.s1 + self.ep.prior_weight * self.prior) / w
+        if not self.smooth:
+            return p
+        out = np.empty_like(p)
+        for m, mode in enumerate(MODES):
+            d_p, d_v = self.sc.directions[mode]
+            # Rates INCREASE in the risky direction, i.e. along -d.
+            out[m] = _isotonic_2d(p[m].reshape(self.nP, self.nV), w[m].reshape(self.nP, self.nV),
+                                  -d_p, -d_v).ravel()
+        return out
 
     def choose_plate(self):
         """Pick self.batch settings for the next build plate (may repeat)."""
@@ -411,3 +425,33 @@ def _kl(p, q):
     """KL(Bernoulli(p) || Bernoulli(q)) for p < q."""
     p = min(max(p, 1e-12), 1 - 1e-12)
     return p * np.log(p / q) + (1 - p) * np.log((1 - p) / (1 - q))
+
+
+def _pava(y, w):
+    """Weighted isotonic (non-decreasing) regression of a 1-D array."""
+    vals, wts, cnt = [], [], []
+    for yi, wi in zip(y, w):
+        vals.append(yi)
+        wts.append(wi)
+        cnt.append(1)
+        while len(vals) > 1 and vals[-2] > vals[-1]:
+            v2, w2, c2 = vals.pop(), wts.pop(), cnt.pop()
+            v1, w1, c1 = vals.pop(), wts.pop(), cnt.pop()
+            vals.append((v1 * w1 + v2 * w2) / (w1 + w2))
+            wts.append(w1 + w2)
+            cnt.append(c1 + c2)
+    return np.repeat(vals, cnt)
+
+
+def _isotonic_2d(z, w, s_p, s_v, iters=4):
+    """Approximate bimonotone regression: z increasing along s_p on axis 0
+    and along s_v on axis 1 (signs +1/-1). Alternating 1D projections."""
+    z = z.copy()
+    for _ in range(iters):
+        for j in range(z.shape[1]):
+            col, wc = z[::s_p, j], w[::s_p, j]
+            z[::s_p, j] = _pava(col, wc)
+        for i in range(z.shape[0]):
+            row, wr = z[i, ::s_v], w[i, ::s_v]
+            z[i, ::s_v] = _pava(row, wr)
+    return z
