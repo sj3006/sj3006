@@ -1,0 +1,2 @@
+Part A: worst-case validity (all settings at threshold), alpha=0.05
+  monotone + good sim          FWER=0.0200 over 200 runs
