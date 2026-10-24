@@ -66,6 +66,22 @@ building as few coupons as possible, choosing adaptively where to build.
    next plate) may be anything that is decided before that plate's coupons
    are inspected.
 
+**Update after the first experiments (note 4).** The code now supports
+several chain designs, all covered by the same theorem:
+
+- *monotone*: one or more chains per row and mode, starting near the
+  predicted edge ("boundary") and/or mid-window. Chains may overlap; a point
+  that is current in several chains can be certified by any of them.
+- *spread*: every (mode, setting) is its own chain of length one. Spreading
+  still applies.
+- *hybrid*: the union of both families, with budgets alpha/2 split within
+  each family.
+
+Theorem 1's proof never uses that chains are disjoint or long; it only needs
+each chain to be fixed in advance and ordered from safer to riskier, and
+the budgets to add up to at most alpha. A length-one chain satisfies both
+trivially.
+
 ## 3. Theorem 1 (validity)
 
 **Theorem 1.** Under Assumption A, with chains chosen independently of the

@@ -59,3 +59,27 @@ def test_finds_part_of_the_window():
     win = wc.window()
     assert win.sum() > 0
     assert not (win & ~sc.true_window()).any()
+
+
+@pytest.mark.parametrize("structure", ["spread", "hybrid"])
+def test_new_structures_respect_the_worst_case_null(structure):
+    base = make_scenario(6, 6, simulator="adversarial")
+    truth = {m: np.full((6, 6), 0.05) for m in MODES}
+    sc = Scenario(base.power, base.speed, base.eps, truth, base.sim)
+    errors = 0
+    for r in range(10):
+        wc = WindowCertifier(sc, structure=structure, alloc="frontier",
+                             rng=np.random.default_rng(r), batch=12)
+        wc.run(budget=3000)
+        errors += int(wc.certified.any())
+    assert errors <= 2
+
+
+@pytest.mark.parametrize("structure", ["monotone", "spread", "hybrid"])
+def test_frontier_allocation_finds_window_without_errors(structure):
+    sc = make_scenario(8, 8)
+    wc = WindowCertifier(sc, structure=structure, alloc="frontier", rng=np.random.default_rng(4))
+    wc.run(budget=8000)
+    win = wc.window()
+    assert win.sum() > 0
+    assert not (win & ~sc.true_window()).any()

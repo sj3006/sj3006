@@ -70,6 +70,9 @@ class Scenario:
     sim: dict            # mode -> (nP, nV) simulator-predicted rates
     name: str = ""
     meta: dict = field(default_factory=dict)
+    # mode -> (sign, sign): index step along (power, speed) that makes the
+    # mode SAFER. Must match the physics of the ground truth (Assumption A).
+    directions: dict = field(default_factory=lambda: dict(SAFER_DIRECTION))
 
     def true_window(self):
         ok = np.ones_like(self.truth[MODES[0]], dtype=bool)

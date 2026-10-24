@@ -1,0 +1,37 @@
+grid,method,fraction,median_coupons,true_area,reps
+8,monotone + good sim,0.25,3288.0,34,2
+8,monotone + good sim,0.5,4332.0,34,2
+8,monotone + good sim,0.7,6288.0,34,2
+8,monotone + pilot (no sim),0.25,3832.0,34,2
+8,monotone + pilot (no sim),0.5,5032.0,34,2
+8,monotone + pilot (no sim),0.7,6892.0,34,2
+8,unstructured + good sim,0.25,6072.0,34,2
+8,unstructured + good sim,0.5,7032.0,34,2
+8,unstructured + good sim,0.7,10212.0,34,2
+8,grid DoE + CP + Bonferroni,0.25,15104.0,34,2
+8,grid DoE + CP + Bonferroni,0.5,17408.0,34,2
+8,grid DoE + CP + Bonferroni,0.7,20032.0,34,2
+12,monotone + good sim,0.25,6240.0,76,2
+12,monotone + good sim,0.5,10248.0,76,2
+12,monotone + good sim,0.7,14136.0,76,2
+12,monotone + pilot (no sim),0.25,6912.0,76,2
+12,monotone + pilot (no sim),0.5,11616.0,76,2
+12,monotone + pilot (no sim),0.7,15900.0,76,2
+12,unstructured + good sim,0.25,8760.0,76,2
+12,unstructured + good sim,0.5,14568.0,76,2
+12,unstructured + good sim,0.7,22572.0,76,2
+12,grid DoE + CP + Bonferroni,0.25,33984.0,76,2
+12,grid DoE + CP + Bonferroni,0.5,39168.0,76,2
+12,grid DoE + CP + Bonferroni,0.7,45072.0,76,2
+16,monotone + good sim,0.25,9776.0,140,2
+16,monotone + good sim,0.5,16944.0,140,2
+16,monotone + good sim,0.7,25664.0,140,2
+16,monotone + pilot (no sim),0.25,10480.0,140,2
+16,monotone + pilot (no sim),0.5,19312.0,140,2
+16,monotone + pilot (no sim),0.7,29312.0,140,2
+16,unstructured + good sim,0.25,16432.0,140,2
+16,unstructured + good sim,0.5,27232.0,140,2
+16,unstructured + good sim,0.7,41872.0,140,2
+16,grid DoE + CP + Bonferroni,0.25,69632.0,140,2
+16,grid DoE + CP + Bonferroni,0.5,80128.0,140,2
+16,grid DoE + CP + Bonferroni,0.7,92160.0,140,2

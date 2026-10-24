@@ -46,20 +46,22 @@ Status key: [x] done, [~] in progress, [ ] not started.
 - [ ] Day 1: read Shafer 2021 (testing by betting). Companion note:
       `notes/01_betting_and_ville.md`.
 - [ ] Day 2: read Ramdas et al. 2023 (SAVI survey).
-- [~] Day 2: single-setting betting test in code, error rate checked by
+- [x] Day 2: single-setting betting test in code, error rate checked by
       simulation. Code: `pwcert/eprocess.py`, `experiments/exp01_single_setting.py`.
 - [ ] Day 3: read Waudby-Smith & Ramdas 2024.
-- [~] Day 3: simulator-seeded betting, checked against good and bad
-      simulators (same files).
+- [x] Day 3: simulator-seeded betting, checked against good and bad
+      simulators (same files). Finding: bet seeding helps little (note 4).
 - [ ] Day 4: read Bretz et al. 2009 (graphical multiple testing).
-- [~] Day 4: 2D grid with monotone spreading and chain-wise testing.
-      Code: `pwcert/certify.py`, `experiments/exp02_grid.py`.
+- [x] Day 4: 2D grid with monotone spreading and chain-wise testing.
+      Code: `pwcert/certify.py`, `experiments/exp02_grid.py`. Companion
+      note: `notes/03_multiple_testing.md`.
 - [ ] Day 5: read Garivier, Menard & Rossi 2017; proof walkthrough.
 - [ ] Day 6: skim positioning papers; rewrite the problem statement in your
       own words (`notes/02_problem_statement.md` is the v0 to edit).
 
 Exit criterion: code reproduces the guarantee empirically (error rate at or
 below alpha in every configuration, including adversarial simulators).
+**Met** (exp01, exp02 part A).
 
 ### Phase 1: validity theory and method v1 (weeks 2-3)
 
@@ -78,10 +80,9 @@ Exit criterion: Theorems 1-2 written out in full, checked line by line.
 
 - [ ] Replace the toy ground truth with one fitted to process-map data
       (MeltpoolNet-style, check licence) or to your own experiments.
-- [ ] Replace the toy simulator with an analytical melt-pool model
-      (Eagar-Tsai or Rosenthal) plus standard defect criteria
-      (Tang et al. 2017 lack of fusion, King et al. 2014 keyhole,
-      length/width ratio for balling).
+- [x] Analytical melt-pool simulator: Rosenthal pool + Tang lack of fusion,
+      King keyhole, length/width balling (`pwcert/physics.py`). Thresholds
+      are placeholder calibrations until we have data.
 - [ ] Second domain for generality: two-drug dose-combination scenarios.
 - [ ] Baselines: grid + Clopper-Pearson + Bonferroni; bandit e-BH without
       structure (Xu, Wang & Ramdas); GP level-set estimation; M-SafeUCB;
@@ -89,10 +90,14 @@ Exit criterion: Theorems 1-2 written out in full, checked line by line.
 
 ### Phase 3: adaptive sampling and sample-complexity theory (weeks 5-6)
 
-- [ ] Frontier sampling rule that maximizes expected certified area per plate.
-- [ ] Theorem 3: upper bound on coupons, scaling with frontier width and
-      gaps at frontier points, with a simulator-quality term.
-- [ ] Theorem 4: lower bound on 2D ordered grids (extends Garivier et al.).
+- [x] Frontier sampling rule v1: most new predicted-window area per
+      expected coupon (`alloc="frontier"`).
+- [~] Scaling experiment (`experiments/exp03_scaling.py`).
+- [ ] Oracle comparison: how far is the frontier rule from an allocation
+      that knows the true rates? (Decides the shape of Theorem 3.)
+- [ ] Theorem 3: upper bound in terms of the weighted cover C*(T)
+      (note 4, section 4).
+- [ ] Theorem 4: matching lower bound by change of measure.
 - [ ] **Week 6 go/no-go.** If the 2D bounds hold, stay on ICML. Otherwise
       retarget to an applied venue.
 
@@ -120,8 +125,18 @@ These change the method, so they need your answer before Phase 2:
 3. In-situ monitoring on every coupon?
 4. What "coupon" means in your setup (single track, cube, tensile bar) and
    roughly how many fit on one build plate.
+5. In your process, does balling get worse with *higher* power (melt-pool
+   elongation, which the Rosenthal model predicts) or with *lower* power
+   (poor wetting)? The monotone direction matters for validity.
+6. Are your windows thin bands along constant energy density, or wider?
 
 ## Log
 
 - 2026-10-24: Directory created. Roadmap, Day 1 note, problem statement v0,
   e-process and grid certifier code, first two experiments.
+- 2026-10-24: Full exp02 (validity holds: worst-case FWER 0-4%). Found that
+  mid-window chains scale with area; added boundary-start chains, the
+  spread and hybrid structures, and the frontier allocation rule. Added the
+  current-practice baseline (grid DoE + Clopper-Pearson + Bonferroni), the
+  Rosenthal physics simulator, notes 3-4 with the revised theory target
+  (weighted cover C*(T)). Scaling experiment exp03 running.
