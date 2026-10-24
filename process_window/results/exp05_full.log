@@ -2,3 +2,5 @@
 12x12 |T|=  69 edge= 18  LB_A=    2142  UB=   11793  ours=   20352  |  LB_U=     5050  unstructured=     inf  (45s)
 16x16 |T|= 122 edge= 24  LB_A=    2902  UB=   16733  ours=   25088  |  LB_U=     8572  unstructured=     inf  (76s)
 24x24 |T|= 287 edge= 34  LB_A=    6158  UB=   37827  ours=   82320  |  LB_U=    21901  unstructured=     inf  (214s)
+32x32 |T|= 513 edge= 45  LB_A=    8821  UB=   56537  ours=  209600  |  LB_U=    39026  unstructured=     inf  (496s)
+-> /home/user/sj3006/process_window/experiments/../results/exp05_bounds.csv
