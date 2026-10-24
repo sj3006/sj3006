@@ -1,6 +1,6 @@
 config,reps,fwer,se
-monotone + good sim,20,0.0,0.0
-monotone + biased sim,20,0.0,0.0
-monotone + adversarial sim,20,0.05,0.0487
-monotone + pilot (no sim),20,0.0,0.0
-unstructured + good sim,20,0.0,0.0
+monotone + good sim,200,0.02,0.0099
+monotone + biased sim,200,0.025,0.011
+monotone + adversarial sim,200,0.04,0.0139
+monotone + pilot (no sim),200,0.03,0.0121
+unstructured + good sim,200,0.0,0.0

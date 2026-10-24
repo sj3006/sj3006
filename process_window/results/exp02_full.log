@@ -1,2 +1,21 @@
 Part A: worst-case validity (all settings at threshold), alpha=0.05
   monotone + good sim          FWER=0.0200 over 200 runs
+  monotone + biased sim        FWER=0.0250 over 200 runs
+  monotone + adversarial sim   FWER=0.0400 over 200 runs
+  monotone + pilot (no sim)    FWER=0.0300 over 200 runs
+  unstructured + good sim      FWER=0.0000 over 200 runs
+  -> /home/user/sj3006/process_window/experiments/../results/exp02_validity.csv
+
+Part B: certified area vs coupons
+  12x12 monotone + good sim          area@15000=  55.5/76  runs with errors=0/20  (54s)
+  12x12 monotone + biased sim        area@15000=  55.8/76  runs with errors=0/20  (54s)
+  12x12 monotone + adversarial sim   area@15000=  33.5/76  runs with errors=0/20  (56s)
+  12x12 monotone + pilot (no sim)    area@15000=  50.8/76  runs with errors=0/20  (53s)
+  12x12 unstructured + good sim      area@15000=  36.7/76  runs with errors=0/20  (72s)
+  24x24 monotone + good sim          area@40000= 190.8/319  runs with errors=0/20  (163s)
+  24x24 monotone + biased sim        area@40000= 190.4/319  runs with errors=0/20  (159s)
+  24x24 monotone + adversarial sim   area@40000= 137.6/319  runs with errors=0/20  (172s)
+  24x24 monotone + pilot (no sim)    area@40000= 167.4/319  runs with errors=0/20  (156s)
+  24x24 unstructured + good sim      area@40000=  92.7/319  runs with errors=0/20  (371s)
+  -> /home/user/sj3006/process_window/experiments/../results/exp02_area.csv
+  -> /home/user/sj3006/process_window/experiments/../results/exp02_area.png
