@@ -1743,6 +1743,64 @@ That is the same lesson as Route B's failed candidates and the split-camera
 success, now visible across real products: **adding a different wavelength buys
 little, adding a different physical quantity buys more.**
 
+## HOW WRONG CAN THE PATTERNS BE? - permutation and collapse tests
+
+Raised by Amit asking what had actually been assumed. The profile *strengths*
+were already swept; the **assignment** - which fault follows which build
+variable - was not. That was the gap, and it is now closed.
+
+### Assignment does not matter
+
+All 120 possible reassignments of the five patterns to the five faults:
+
+    rank 5 in 120/120 cases
+    worst pair:  min 17.13   median 23.84   max 30.58   (asserted: 25.83)
+
+So it is irrelevant *which* fault follows *which* variable. Only that they
+differ. The result does not rest on having guessed the assignments correctly -
+a far better position than defending five individual claims.
+
+### What would break it: two faults sharing a pattern
+
+Collapsing one fault's pattern onto another's:
+
+| forced equal | worst pair |
+|---|---|
+| layer = gas | **3.84** breaks |
+| speed = gas | **8.12** breaks |
+| speed = layer | 13.02 |
+| power = speed | 15.47 |
+| power = gas | 15.98 |
+| power = layer | 18.34 |
+| anything = geometry | 25.83 unchanged |
+
+**The paper's real dependency is a single question:** do the recoater fault and
+gas degradation vary differently across a build? Physically they obviously do -
+one is layer-periodic, the other spatial along the flow - but that is now the
+one assumption carrying weight and it should be named as such rather than buried
+among five.
+
+### Consequence for the data hunt
+
+Anything sharing a pattern with geometry leaves the answer at 25.83 deg,
+unchanged. **The geometry pattern is the least load-bearing of the five**, so
+the NIST overhang dataset - which validates exactly that pattern - is
+nice-to-have rather than blocking. It was dropped on this basis.
+
+The pattern worth chasing is **layer periodicity from recoating**. Gas already
+has support (Raj et al.).
+
+### For the paper
+
+This belongs in the robustness subsection and strengthens it. The claim becomes:
+
+> The result does not depend on the assigned patterns being correct - all 120
+> reassignments give rank 5 and 17 to 31 degrees. It depends only on the faults
+> varying distinguishably, and specifically on the recoater and gas faults not
+> sharing a pattern.
+
+That is one named, physically obvious condition in place of five asserted ones.
+
 ## The three real risks
 
 **Thermal model does not match published melt pool dimensions.**
