@@ -305,14 +305,14 @@ Of 18 extracted works, 12 classify outcomes, about which this analysis makes no
 prediction: a melt pool deeper than the layer will fuse whatever made it deep.
 That non-comparability is the paper's central point in evidential form.
 
-The one directly comparable work supports the framework. RAISE-LPBF-LASER
-[Blanc2023] reconstructs power and speed independently from on-axis video, a
-pair placed here at 7.12° instantaneously and 25.83° with context. Its baselines
-report speed RMSE 157.8 and power RMSE 19.50 for a model using 8 frames, against
-67.6 and 11.12 for one using 32 — **four times the temporal window halves the
-error on both targets**, the predicted ordering, measured independently.
-**[PROVISIONAL — frame counts from a fragmentary snippet; confirm from the full
-text. Comparison is ordinal: RMSE and angles share no scale.]**
+The one directly comparable work is RAISE-LPBF-LASER [Blanc2023], which
+reconstructs power and speed independently from on-axis video — a pair placed
+here at 7.12° instantaneously and 25.83° with context. Its best baseline
+(SlowFast, 32 input frames) reaches speed RMSE 67.6 and power RMSE 11.12,
+against 157.8 and 19.50 for a model using 8 frames. **This is suggestive rather
+than evidential**: two further baselines use 16 frames and perform worse than the
+8-frame model, so architecture dominates frame count in that table. The authors
+themselves offer frames only as a hypothesis for the weaker models' performance.
 
 Two further confirmations of the same kind: that benchmark ranks on **linear
 power density** as a target in its own right, and the k-NN study predicts

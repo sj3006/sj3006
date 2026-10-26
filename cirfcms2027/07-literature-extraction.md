@@ -143,43 +143,68 @@ every cause is perfectly confounded.
 evidential form: the literature's success and our limit are about different
 questions, and the near-absence of overlap is itself the gap.
 
-## The one work that is directly comparable, and it confirms the framework
+## The one directly comparable work — and a correction
 
 **RAISE-LPBF-LASER** (Blanc, Ahar & De Grave, *Additive Manufacturing Letters* 7,
-2023; benchmark arXiv:2409.12475). On-axis video at 20 kHz, 128x128 grayscale,
-316L. Power and laser speed **independently sampled per scan line**, and models
-asked to reconstruct both. This is cause estimation of two faults our analysis
-places at 7.12 degrees instantaneously - below the practical floor.
+2023; arXiv:2409.12475). **Full text now read.** 316L, 500 W IPG ytterbium fibre
+laser at 1064 nm, 30 um layers, 75 um spot. On-axis Mikrotron camera at 20 kHz,
+8-bit 128x128, 30 us exposure, via a SCANLAB dichroic splitter. Power and speed
+**independently sampled per scan line** - power sigma 80 W over [60, 400], speed
+sigma 400 mm/s over [300, 2000].
 
-So they should struggle at a single frame and improve with temporal context.
-Their own baseline table:
+This is genuine cause estimation of two faults our analysis places at 7.12
+degrees instantaneously.
 
-| model | frames per sample | speed RMSE | power RMSE |
-|---|---|---|---|
-| 3D ResNet | 8 | 157.8 | 19.50 |
-| **SlowFast** | **32** | **67.6** | **11.12** |
+### What an earlier draft claimed, and why it was wrong
 
-**The model with 4x the temporal window halves the error on both targets** - 2.3x
-better on speed, 1.75x better on power. The authors note SlowFast "performs best
-by a great margin with less than half the RMSE of the second best... for both
-prediction targets".
+An earlier version of this section said *"four times the temporal window halves
+the error on both targets"*, citing 3D ResNet at 8 frames against SlowFast at 32.
+The frame counts are correct - the paper states them explicitly on p.6: "8 frames
+for 3D ResNet, 32 for SlowFast, and 16 for MViT and Swin3D".
 
-That is our result, measured by someone else, on real hardware, without
-reference to this framework:
+**But the full Table 4 has four models, not two:**
 
-    instantaneous (one frame)        power/speed  7.12 deg   below the floor
-    with temporal context            power/speed 25.83 deg   comfortable
+| model | frames | speed RMSE | power RMSE | PD RMSE |
+|---|---|---|---|---|
+| 3D ResNet | 8 | 157.8 | 19.50 | 0.0520 |
+| **SlowFast** | **32** | **67.6** | **11.12** | **0.0290** |
+| MViT | 16 | 191.9 | 24.88 | 0.0623 |
+| Swin3D | 16 | 205.0 | 25.34 | 0.0568 |
 
-We predict that power and speed are hard to separate from a single instant and
-become separable once temporal structure is used. Their benchmark shows exactly
-that ordering, and the mechanism they are implicitly exploiting is the one this
-paper makes explicit.
+MViT and Swin3D use **twice** 3D ResNet's frames and perform **worse**. Frame
+count does not order the models:
 
-A caution on how far to push this: the comparison is **qualitative and ordinal**.
-Their RMSE and our angles are not on a common scale, frame counts are reported in
-a fragmentary snippet and should be confirmed from the full text, and
-architectures differ in more than window length. The claim is that the
-*direction* agrees, not that the numbers do.
+    8 frames -> 157.8     16 -> 191.9     16 -> 205.0     32 -> 67.6
+
+The earlier claim compared only the two models that fit the hypothesis. The
+search snippet it was built from happened to omit exactly the contradicting pair.
+**Architecture dominates frame count here**, and the authors say so, offering
+frames only as a hypothesis: *"we hypothesise that their design is less suited
+for the task at hand and could benefit from more input frames (16 vs. 32 for
+SlowFast)"*.
+
+### What this work does still support
+
+Weakly and suggestively: the best model is also the one using the most frames,
+and the authors themselves propose more frames as the remedy for the weaker two.
+That is consistent with our mechanism but is **not evidence for it**, and the
+paper must not present it as such.
+
+Two things from the same source *are* clean evidence, and both are stronger:
+
+**The benchmark ranks on linear power density (P/v) as a target in its own
+right**, alongside power and speed separately. Why benchmark the lumped ratio
+unless the components are hard to recover individually? Same tell as the k-NN
+study predicting energy density class. Two independent groups, same fallback.
+
+**The authors flag a speed side channel and ask submitters not to use it** (p.5):
+the number of camera frames in a scan line directly encodes speed, "especially so
+when also taking the known geometry into account". They are protecting the task
+from a shortcut - which is an acknowledgement that the honest in-frame speed
+signal is weak. Consistent with 7.12 degrees.
+
+For scale: power RMSE 11.12 W against a sampling spread of 80 W is about 14%.
+They recover the parameters, but not sharply.
 
 ## Two further confirmations, both of the "falling back on the lumped group" kind
 
@@ -219,10 +244,12 @@ across every comparable work found.
 | our prediction | what the literature does | verdict |
 |---|---|---|
 | outcomes are separable regardless of cause confounding | 12 of 18 works classify outcomes successfully | consistent, and not a test |
-| power/speed hard instantaneously (7.12 deg), fine with temporal context (25.83) | RAISE-LPBF: 8 frames RMSE 157.8, 32 frames 67.6 | **confirmed, ordinally** |
+| power/speed hard instantaneously (7.12 deg), fine with temporal context (25.83) | RAISE-LPBF: best model uses most frames, but 16-frame models beat by an 8-frame one - architecture dominates | **suggestive only, not evidence** |
 | the lumped group is what survives confounding | benchmark targets P/v; k-NN targets energy density class | **confirmed, twice** |
 | power/gas identical (0.00 deg) | no work attempts it | consistent, absence of evidence |
 | power/layer effectively confounded (3.46 deg) | no work attempts it | consistent, absence of evidence |
 
-**No published result contradicts the predicted limits.** One directly supports
-the central mechanism.
+**No published result contradicts the predicted limits.** The strongest external
+support is indirect: two independent groups fall back on the lumped group, and
+the one benchmark that attempts the separation protects itself from a shortcut
+that would otherwise make the weak signal look strong.
