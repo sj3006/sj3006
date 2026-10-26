@@ -30,7 +30,7 @@ discussion buried in a discussion section.
 | 3 | Raj et al., *J. Manufacturing Processes* 89:24-38, 2023 | coaxial MPM: CMOS area + photodiode intensity, IN718, GE Concept Laser M2 | ML surrogate predicting **spatial variation** in area and intensity, attributed to beam/shield-gas interaction | nuisance correction | No | A |
 | 4 | Owen et al., *Trans. American Nuclear Society*, 2023 | coaxial in-situ melt pool signals | spatial features | feature engineering | No | A |
 | 5 | Scime & Beuth, *Additive Manufacturing*, 2019 | high-speed visible camera | keyholing porosity, balling | outcome | No | A |
-| 6 | RAISE-LPBF benchmark, arXiv 2409.12475 | on-axis video, 316L | reconstructed laser power and speed | cause, separate | Regression accuracy only, no identifiability analysis | A |
+| 6 | RAISE-LPBF benchmark, arXiv 2409.12475 | on-axis video, 316L | reconstructed laser power and speed | cause, separate | Regression accuracy only, no identifiability analysis | F |
 | 7 | Akbari et al. (MeltpoolNet), *Additive Manufacturing* 55:102817, 2022 | published melt pool geometry across alloys | melt pool mode / defect class | outcome | No | A |
 | 8 | ThermoPore, arXiv 2404.16882 | thermal images | part porosity | outcome | No | A |
 | 9 | CMU, arXiv 2310.05289 | acoustic + photodiode, wavelet scalograms | melt pool visual characteristics, lack-of-fusion, R2 >= 0.8 | outcome | No | A |
@@ -43,6 +43,7 @@ discussion buried in a discussion section.
 | 16 | Honarmandi et al., *Additive Manufacturing* 47:102300, 2021 | Bayesian calibration of Eagar-Tsai with keyhole correction | calibrated absorptivity, conductivity, heat capacity | cause, separate | **Reports parameter correlations of 0.93-0.96** - the only entry that confronts confounding, and it does so in calibration, not diagnosis | F |
 | 17 | NIST AMS 100-35, Lane et al., 2020 | thermal calibration of an in-situ system | calibration RMSE 4.934 degrees C | instrumentation | No | F |
 | 18 | *Additive Manufacturing* multi-laser load balancing, 2023 + US 12,257,627 | - | productivity scheduling | unrelated, recorded to close a rejected candidate | A |
+| 19 | **Reijonen et al., *Additive Manufacturing Letters*, 2024, S2772369024000525** | co-axial photodiode, with laser power, scan speed, focal position, scan orientation and **shielding gas flow speed** all varied | reported functional forms: power **positive linear**; speed **y = a x^-b**; focal position, orientation and gas flow **highly non-linear and combinatorial** | cause-level sensitivity, **separate per parameter** | Not framed as identifiability, but it is the only work that varies power, speed and gas on one photodiode - the configuration in which our power/gas confound could be tested | **A, snippet only** |
 
 ## What the table shows
 
@@ -253,3 +254,122 @@ across every comparable work found.
 support is indirect: two independent groups fall back on the lumped group, and
 the one benchmark that attempts the separation protects itself from a shortcut
 that would otherwise make the weak signal look strong.
+
+---
+
+# Targeted full-text search, 2026-10-26: what was found and what is still needed
+
+## Access status
+
+Every scholarly host is denied at this session's egress gateway - `403 to
+CONNECT` for sciencedirect.com, osti.gov, arxiv.org, link.springer.com, mdpi.com,
+nature.com, researchgate.net, doi.org, scholar.google.com, semanticscholar.org,
+europepmc.org, api.crossref.org, api.openalex.org and two institutional
+repositories (scholarsmine.mst.edu, repositories.lib.utexas.edu). Web *search*
+works; fetching does not. **Everything below is from search-result snippets, not
+from full text**, and is marked accordingly.
+
+## Finding 1 (new paper, high value): Reijonen et al. 2024
+
+Not previously in the table. The only published work that varies laser power,
+scan speed **and shielding gas flow speed** against one co-axial photodiode -
+i.e. the exact experimental configuration in which this paper's power/gas
+confound would show up.
+
+Reported functional forms, verbatim from snippets:
+
+- "Power has a **positive linear relationship** with the photodiode signal."
+- "Scanning speed has a **non-linear correlation** with the photodiode signal,
+  expressed as **y = ax^-b**."
+- "the focal point position, scanning orientation and shielding gas flow speed
+  have **highly non-linear response** on the photodiode signal, depending on the
+  combinatorial effects of the parameters."
+- "The plume's presence and removal has **crucial role** on the photodiode
+  signal."
+
+**Why this is the most valuable row in the table.** A power law `y = a x^-b` has
+a *constant* relative sensitivity of exactly `-b` at every speed. Our Jacobian
+entry for the same quantity is
+
+    J[photodiode, speed] = -0.4835
+
+so **their fitted `b` is directly comparable to our 0.4835** - one published
+fitted exponent against one computed Jacobian entry, same sensor, same physical
+quantity, no reinterpretation needed. That is the quantitative test section 4.1
+has been missing.
+
+The power statement is the same opportunity and may cut against us. Our entry is
+
+    J[photodiode, power] = +1.5177
+
+i.e. 1% more power gives 1.52% more signal - a power-law exponent of 1.52, which
+is *super*linear. A strictly proportional relationship would give 1.00. A linear
+fit `y = a + bP` has local relative sensitivity `bP/(a+bP)`, which is below 1 for
+`a > 0` and above 1 only for `a > 0` reversed in sign. **So if their fit is
+proportional with a positive intercept, our entry is too steep and the paper must
+report that.** This is a genuine risk and it is worth taking, because a published
+discrepancy we identify ourselves is a stronger paper than an untested model.
+
+Also direct support for two modelling choices: that gas acts through the plume
+(their plume statement), and that gas enters by a different and non-linear route
+than power (their combinatorial statement).
+
+**Extract from the full text:** the fitted `b` for speed with its range of
+validity; the power fit's intercept and slope with units; the gas-flow-speed
+range tested and any reported signal change across it; whether any figure plots
+photodiode signal against power and against gas flow on comparable axes.
+
+## Finding 2: Raj et al. 2023 supports the load-bearing condition
+
+Verbatim: "Significant spatial variations are observed in the in-situ melt pool
+area, and intensity signals, and the subsequent analysis suggests that the
+interplay of the **angled laser beam and the shield gas flow** is likely a major
+source of the spatial trends."
+
+This is published evidence for **Part F condition 1** - that the gas effect has
+its own spatial signature across the build plate, rather than being uniform. It
+is the first external support for the premise of the whole enlarged-observation
+method.
+
+It also contains a caution and then disposes of it. The spatial trend is
+attributed to gas flow *and* beam angle together, i.e. the gas pattern and a
+purely positional/geometric pattern are entangled in their data. Our C3 collapse
+test already covers that case: anything sharing a pattern with the geometry fault
+leaves the worst angle at 25.83 degrees, unchanged. **The one pair that published
+work says is spatially entangled is the pair our analysis says does not matter.**
+Worth one sentence in 4.1.
+
+**Extract from the full text:** the magnitude of the spatial variation in area
+and intensity (percentage across the plate), and whether the gas component is
+separable from the beam-angle component in their surrogate model.
+
+## Finding 3: Liu et al. 2022 and the 2023 follow-up remain a target, not a result
+
+Confirmed mechanism only: a thermal camera watches the powder surface heat up
+after recoating, thickness correlates with heat-up time, and thermal transport
+properties are co-measured. The follow-up (*Additive Manufacturing* 74:103726,
+2023) uses lock-in thermography and reports that "larger particle sizes and
+slower wiper spreading speeds gave higher effective thermal diffusivity."
+
+Neither snippet gives a thickness-to-conductivity slope, which is what we need.
+`layer_to_conductivity = +0.50` is still **the one unmeasured coupling in the
+model**. C4 shows the result does not move across 0.1-1.0, so this is an
+improvement to defensibility, not a repair.
+
+**Extract from the full text:** any table of measured effective diffusivity or
+conductivity against layer thickness, and the layer thickness range covered. If
+a slope exists, it replaces our estimate with a derived value.
+
+Note on sign, checked while reading this: in our model a *positive* layer fault
+means a **thinner** layer (recoater short-feed, per the abstract). All three layer
+couplings are coherent with that convention - absorptivity falls (-0.230, less
+powder means less multiple scattering), powder enthalpy demand falls (+0.186 on
+power_scale, less mass to melt), and effective conductivity rises (+0.50, less
+insulating powder beneath the track). No sign error.
+
+## Findings 4 and 5: no change needed
+
+Guo et al. 2019 (row 1) and the k-NN energy-density study (row 2) returned
+nothing beyond what the table already holds. Both are already used at the level
+the paper needs - Guo for validation A3, k-NN as the lumped-group corroboration
+in 4.1 - and neither claim depends on a detail buried in the full text.
