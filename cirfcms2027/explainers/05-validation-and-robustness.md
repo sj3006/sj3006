@@ -749,25 +749,39 @@ evidence". No claim in the paper now rests on it.
 
 # Part F - What the whole thing rests on
 
-After all of the above, the result reduces to **one physical condition** and three
-conservative modelling choices.
+After all of the above, the result reduces to **two physical conditions** and
+three conservative modelling choices.
 
-## The one condition
+## The two conditions
 
-**The recoater-driven effect and the gas-flow effect must vary differently across
-the build.** That is it. From C3: if those two faults are given the same spatial
-pattern, the worst angle collapses to 3.84 degrees, below the 10-degree floor,
-and the method fails. Every other collapse is survivable - geometry can share a
-pattern with anything and the worst angle stays at 25.83 - and pattern
-*assignment* is irrelevant (C2: rank 5 in all 120 permutations).
+Both come from C3, and both are about the gas fault.
 
-Physically the condition is mild. Layer-to-layer powder-bed variation follows the
+**Condition 1: the recoater-driven effect and the gas-flow effect must vary
+differently across the build.** If those two faults are given the same spatial
+pattern the worst angle collapses to **3.84 degrees**, well below the 10-degree
+floor, and the method fails outright.
+
+Physically this one is mild. Layer-to-layer powder-bed variation follows the
 recoater, which advances once per layer in a fixed direction. Gas flow follows
 the nozzle-to-outlet axis, fixed in the chamber frame and in-plane. These are
-different axes of the build volume by construction, so for them to be aligned,
-the recoater would have to be the gas source. But it is an assumption about the
-machine, not a result, and it is the one assumption the paper should state in its
-own sentence rather than bury.
+different axes of the build volume by construction - for them to be aligned, the
+recoater would have to be the gas source.
+
+**Condition 2: commanded speed must not track the gas axis.** Forcing those two
+equal gives **8.12 degrees**, also below the floor. This condition is weaker than
+the first, because speed is set by the scan strategy and a strategy *could*
+align with the gas axis - a part whose contours cluster downstream of the nozzle
+would do it. It is a condition on the build, not just on the machine, and it is
+the one a reviewer is most entitled to press on.
+
+A third case sits close to the line without crossing it: speed sharing the layer
+pattern gives 13.02 degrees, only 1.3x the floor. Everything else is comfortable,
+and anything sharing a pattern with geometry leaves the answer at 25.83 entirely
+unchanged. Pattern *assignment* is irrelevant (C2: rank 5 in all 120
+permutations) - it is pattern *distinctness* that carries the result.
+
+These two sentences are what the paper should state plainly, in their own
+paragraph, rather than leave the reader to assemble from the sweep tables.
 
 ## The three choices made against our own interest
 
