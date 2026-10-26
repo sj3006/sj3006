@@ -213,9 +213,12 @@ new row, not a new direction.
 
 With build context, rank rises from 3 to 5, the worst pair from 0.00° to
 **25.83°**, power/gas to 29.34°, and the worst finite collinearity index from
-141 869 to 2.1 (Fig. 1). The result holds at finite fault magnitude — rank 5 and
-22–49° across magnitudes from 0.2 % to 20 %, both signs (Fig. 3) — confirmed by
-a no-interpolation run agreeing to 0.66° at +5 %.
+141 869 to 2.1 (Fig. 1). The result holds at finite fault magnitude — rank 5 at
+every magnitude from 0.2 % to 20 %, both signs, with the worst pair between
+22.2° and 36.9° and the condition number within 30–43 (Fig. 3) — confirmed by a
+no-interpolation run agreeing to 0.10°. The derivative limit is not strictly
+conservative: a −2 % fault gives 22.19°, below the 25.83° limit, though still
+2.2× the isolability floor.
 
 A control in which all five faults are given one shared profile returns the
 instantaneous result bit-identically, confirming that the gain arises from the
