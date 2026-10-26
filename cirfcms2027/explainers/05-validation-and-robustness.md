@@ -197,13 +197,69 @@ cancellation dominates. Shrink the step and watch when the answer stops moving.
     step 0.002   max change vs previous    0.05%
     step 0.001   max change vs previous    0.01%
 
-Study uses **0.002**.
+Study uses **0.002**. The worst entry is almost always a pyrometer one, because
+the metric is max *relative* change and the pyrometer entries are ~40x smaller
+in absolute size (0.036 against 1.52). That is the conservative choice, not a
+defect: the noise ratios are [1.0, 1.0, 0.03], so whitened, pyrometer/gas is
+-0.036/0.03 = -1.211 against photodiode/gas at -1.518/1.0. They contribute
+almost equally to every angle, and a metric based on the largest entry would
+have declared convergence at 0.02 where the pyrometer row is still 7% wrong.
+
+**Second-order convergence, verified.** Stopping moving is necessary but not
+sufficient - a number can settle at the wrong value. Central differences must
+converge as h^2. For pyrometer/gas, against h = 0.0005 as reference:
+
+    h        value        error        ratio to previous   (h^2 predicts)
+    0.0800  -0.00661203   +2.971e-02        -
+    0.0400  -0.02428826   +1.203e-02      2.47
+    0.0200  -0.03384453   +2.477e-03      4.86
+    0.0100  -0.03640766   -8.637e-05    -28.68   <- error crosses zero
+    0.0050  -0.03634272   -2.143e-05      4.03      (4.00)
+    0.0020  -0.03632454   -3.248e-06      6.60      (6.25)
+    0.0010  -0.03632194   -6.495e-07      5.00      (4.00, reference-limited)
+
+Below h = 0.01 the ratios match h^2. Above it they are erratic, because the h^3
+term is not yet negligible. **Note the sign change between 0.02 and 0.01**: the
+error crosses zero near h ~ 0.011, so there exists a step that is accidentally
+exact. Comparing two steps either side of it would show a tiny change and
+produce a false convergence verdict. This is the argument for checking the
+convergence *rate* over a sequence rather than differencing two steps.
+
+**The too-small branch, measured not assumed.** An earlier version of this
+section asserted that cancellation had not appeared at 0.001 without testing it.
+Measured, on photodiode/power:
+
+    h = 1e-3   y(+h)-y(-h) = +2.5447871238e-05   deriv 1.51766909
+    h = 1e-5                 +2.5447835758e-07         1.51766697
+    h = 1e-7                 +2.5447835766e-09         1.51766697
+    h = 1e-9                 +2.5447836546e-11         1.51766702
+    h = 1e-10                +2.5447820934e-12         1.51766609
+    h = 1e-12                +2.5448393393e-14         1.51770023
+
+Stable to nine significant figures from 1e-3 to 1e-7; first damage at 1e-9; even
+at 1e-12 still right to five digits, with relative error 2.2e-5 against the
+eps/h = 2.2e-4 the theory predicts. So the **safe window spans six orders of
+magnitude**, roughly 1e-7 to 5e-3, and 0.002 sits well inside it. In this problem
+the too-small failure mode is effectively absent - the chain is a smooth analytic
+function in double precision with no iterative solver - and the only real risk
+was ever too-large.
 
 **Mathematically.** The second-order Taylor term dominates above ~0.005 and is
-negligible below it; cancellation has not yet appeared at 0.001.
+negligible below it, with the h^2 rate confirmed above; floating-point
+cancellation does not appear until h ~ 1e-9.
 
 **Physically.** At a 2% fault the model's response is already visibly curved, so
-a chord over +/-2% is not the local slope.
+a chord over +/-2% is not the local slope. At an 8% gas fault the pyrometer slope
+reads -0.0066 against a true -0.0363 - understated by a factor of five and a
+half.
+
+**A free consistency check.** The geometry column is step-independent at full
+precision - the camera entry is bit-identical (0.092968815300) across a 160x
+range of steps, the other two agree to one part in 1e5. Geometry enters as a
+preheat offset and the model's response to preheat is linear to machine
+precision on the camera channel, and a central difference of a linear function
+is exact at any step. Nothing about the geometry fault was ever at risk from
+step size; its genuine nonlinearity shows up only at finite fault magnitude (D2).
 
 **This test caught a real error.** An earlier default of 0.02 produced numbers
 that were wrong by about 20%, and those numbers had already been reported. No
