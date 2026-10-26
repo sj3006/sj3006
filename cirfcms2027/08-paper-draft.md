@@ -242,47 +242,48 @@ engineering distinction (Fig. 1):
 **Class 3 is empty in both regimes.** Nothing is structurally irreducible for
 this suite.
 
-### 3.6 Commercial configurations
+### 3.6 Configurations typical of commercial machines
 
-Mapping vendor suites onto the observable set **[PROVISIONAL — vendor details
-from secondary review literature, not datasheets; detection bands are commonly
-withheld under supplier confidentiality; sources conflict for SLM Solutions]**:
+No vendor is named. The mapping from product to observable rests on secondary
+review literature rather than datasheets — detection bands are routinely
+withheld under supplier confidentiality, and published descriptions of the same
+product disagree — so attaching a named product to a computed diagnosability
+limit would assert more than the evidence carries. Naming also adds nothing: the
+result depends on what a suite measures, not whose badge is on it.
+
+Stripping the names reveals something a vendor-by-vendor table hides. **Across
+five commercial systems surveyed there are only three distinct configurations**
+for the purposes of this analysis; several vendors ship what is effectively the
+same instrument set.
 
 | configuration | inst. rank | class 1 | power/gas |
 |---|---|---|---|
-| EOS, MeltPool only | 1 | 0/10 | 0.00 |
-| EOS, MeltPool + Exposure OT | 2 | 4/10 | 0.00 |
-| SLM Solutions MPM | 2 | 0/10 | 0.00 |
-| Concept Laser QM Meltpool 3D | 2 | 4/10 | 0.00 |
-| Renishaw InfiniAM Spectral | 2 | 0/10 | 0.00 |
-| *any suite with upstream power monitoring* | *3* | *4/10* | ***84.02*** |
-| research-grade reference | 3 | 5/10 | 0.00 |
+| A  single coaxial photodiode | 1 | 0/10 | 0.00 |
+| B  photodiode + melt pool imaging | 2 | 4/10 | 0.00 |
+| C  two photodiodes, separate bands | 2 | 0/10 | 0.00 |
+| D  research reference (A + imaging + pyrometry) | 3 | 5/10 | 0.00 |
+| *E  C plus upstream power monitoring* | *3* | *4/10* | ***84.02*** |
 
-**No commercial configuration we were able to establish separates laser power
-from gas degradation instantaneously.** All read 0.00°, for the reason given in
-§3.2: every observable in every one of them reads the melt pool, and both faults
-reach the melt pool only through the product (absorptivity × power).
+**No configuration built solely from melt-pool observables separates laser power
+from gas degradation**, whatever its sensor count. All read 0.00°, for the reason
+in §3.2: every observable reads the melt pool, and both faults reach it only
+through the product (absorptivity × power).
 
-The final hypothetical row is the actionable one. A suite that includes a
-**direct measurement of delivered laser power, sampled upstream of the process
-zone**, separates the pair at 84.02°, because such a sensor sees the laser's
-output without seeing plume attenuation. It is a configuration *type*, not a
-product, and the figure follows from this analysis alone.
+Configuration E is the actionable row. Adding a **direct measurement of delivered
+laser power, sampled upstream of the process zone**, separates the pair at
+84.02°, because such a sensor sees the laser's output without seeing plume
+attenuation. It is a configuration type, and the figure follows from this
+analysis alone.
 
-One vendor case is genuinely unresolved and is modelled conservatively.
-Renishaw's InfiniAM Spectral is described in the review literature as combining
-MeltVIEW (melt pool emissions) with **LaserVIEW, "a photosensitive diode
-measuring the intensity of the laser energy"**. Whether that diode samples
-upstream of the process zone or views the beam through the process window
-determines which of the last two rows applies. We could not establish this from
-public documentation, so LaserVIEW is modelled as a melt-pool observable — the
-reading that does not favour this analysis. If it is in fact an upstream tap,
-that configuration performs better than reported here, not worse.
+One surveyed system is described as pairing melt pool emission sensing with a
+photodiode measuring laser energy, which would place it at E rather than C if
+that photodiode samples upstream of the process zone. This could not be
+established from public documentation, so it is counted conservatively as C —
+the reading that does not favour this analysis.
 
-Separately, SLM's two-spectral-band suite performs worse than EOS's
-photodiode-plus-camera despite both having two observables: two bands of the
-same emitted light are near-redundant, whereas a geometric measurement adds a
-different direction.
+Note also that C performs worse than B despite both having two observables: two
+bands of the same emitted light are near-redundant, whereas a geometric
+measurement adds a different direction.
 
 ### 3.7 What an added measurement would buy
 
@@ -385,9 +386,10 @@ are not meaningful.
    at 40 % of the asserted profile strength.
 4. That free method **outperforms two idealised direct measurements of the
    causes themselves**, because neither addresses power versus speed.
-5. No commercial configuration examined separates power from gas instantaneously.
-   A suite including an upstream measurement of delivered laser power would, at
-   84°, and that is the design recommendation for real-time control.
+5. No configuration built from melt-pool observables alone separates power from
+   gas instantaneously, whatever its sensor count. Adding an upstream
+   measurement of delivered laser power does, at 84°, and that is the design
+   recommendation for real-time control.
 6. Among melt-pool observables the most valuable addition is free — reporting
    the camera's two axes separately is worth 13.4° on the binding pair, while
    two new instruments are worth nothing.

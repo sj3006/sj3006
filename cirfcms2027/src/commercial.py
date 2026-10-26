@@ -1,56 +1,45 @@
-"""Diagnosability matrices for sensor suites found on commercial machines.
+"""Diagnosability matrices for sensor suites typical of commercial machines.
 
-The abstract promises "matrices reported for configurations found on current
-commercial machines". Route B swept *generic* subsets - photodiode only, camera
-plus pyrometer. This maps real vendor suites onto the observable set and reports
-a matrix for each.
+The abstract promises matrices for "configurations found on current commercial
+machines". Route B swept generic subsets; this covers the configurations that
+are actually fitted.
 
-VERIFICATION STATUS - read before citing
-----------------------------------------
-Vendor sensor details come from secondary literature (reviews and comparative
-studies), not from vendor datasheets, and the sources disagree in places. Bands
-are commonly withheld: at least one study records that the detection range is
-"protected under the confidentiality clause by the supplier". Specific caveats:
+No vendor is named
+------------------
+Two reasons, and the second is the stronger one.
 
-  - SLM Solutions MPM is described in one source as two photodiodes with
-    different spectral ranges, and in another as a coaxial pyrometer. Modelled
-    here as two spectral bands, which is the more conservative reading.
-  - Concept Laser QM Meltpool 3D appears only as a table entry: coaxial
-    photodiodes giving melt pool area and intensity.
-  - EOSTATE Exposure OT is an off-axis camera producing a layer-wise thermal
-    map. It is inherently an accumulated observable - it integrates a whole
-    layer - which is noted in the results rather than modelled separately.
+First, the mapping from product to observable rests on **secondary review
+literature rather than vendor datasheets**. Detection bands are routinely
+withheld under supplier confidentiality - one survey records them as "protected
+under the confidentiality clause by the supplier" - and published descriptions
+of the same product disagree. Attaching a named product to a computed
+diagnosability limit on that basis would assert more than the evidence carries.
 
-Every row below must be checked against vendor documentation before submission.
-The *method* does not depend on getting these exactly right; the specific
-per-vendor conclusions do.
+Second, **naming adds nothing**. The result depends only on what a suite
+measures, not on whose badge is on it. Stripping the names also reveals
+something the vendor-by-vendor table hid: across five commercial systems there
+are only **three distinct configurations**. Several vendors ship what is, for
+this analysis, the same instrument set.
 
-The Renishaw case: unresolved, and modelled conservatively
-----------------------------------------------------------
-InfiniAM Spectral is described in the review literature as two functions:
-LaserVIEW, "a photosensitive diode measuring the intensity of the laser energy",
-and MeltVIEW, capturing melt pool emissions in NIR and IR.
+The configurations below are described by their contents. Readers who wish to
+map them to products can do so from the monitoring surveys cited in the paper.
 
-Whether LaserVIEW samples the beam **upstream of the process zone** or views it
-through the process window decides everything about that configuration:
+The unresolved case, handled conservatively
+-------------------------------------------
+One commercial system is described as pairing melt pool emission sensing with a
+photodiode that measures laser energy. Whether that photodiode samples the beam
+**upstream of the process zone** or views it through the process window changes
+the answer completely:
 
     upstream    a direct measurement of delivered power that cannot see plume
-                attenuation - exactly the Route C sensor that breaks the
-                power/gas confound
-    downstream  another melt-pool observable, adding a row and no direction
+                attenuation - the sensor that breaks the power/gas confound
+    downstream  another melt-pool observable: a row, not a direction
 
-**This could not be established from public documentation.** So the conservative
-assumption is taken: LaserVIEW is modelled as a melt-pool observable, which is
-the reading that does *not* flatter this paper. If it turns out to be upstream,
-the configuration is better than reported here, not worse.
-
-The upstream case is retained separately under `HYPOTHETICAL_UPSTREAM`, labelled
-as a configuration *type* rather than a product, because the design lesson is
-real regardless of which machine implements it.
-
-Asserting the favourable reading would risk publishing a false claim about a
-commercial product. Understating it costs nothing that cannot be corrected by a
-single sentence from the vendor.
+This could not be established from public documentation, so the conservative
+reading is taken - downstream, the assumption that does **not** flatter this
+analysis. The upstream case is retained as configuration E, a configuration
+*type* rather than any product, because the design lesson holds regardless of
+which machine implements it.
 """
 
 from __future__ import annotations
@@ -70,27 +59,21 @@ __all__ = ["CONFIGS", "report"]
 # Mapping onto this study's observable set. `direct` names a fault measured
 # directly rather than through the melt pool.
 CONFIGS = {
-    "EOS - EOSTATE MeltPool only": {
+    "A  single coaxial photodiode": {
         "obs": ("photodiode",), "direct": (),
-        "note": "coaxial photodiode in the beam path"},
-    "EOS - MeltPool + Exposure OT": {
+        "note": "one melt pool emission channel; the minimum fitted suite"},
+    "B  photodiode + melt pool imaging": {
         "obs": ("photodiode", "camera"), "direct": (),
-        "note": "coaxial photodiode plus off-axis layer-wise thermal map"},
-    "SLM Solutions - MPM": {
+        "note": "emission plus pool area; two commercial systems map here"},
+    "C  two photodiodes, separate bands": {
         "obs": ("photodiode", "photodiode_swir"), "direct": (),
-        "note": "two photodiodes, different spectral ranges (sources conflict)"},
-    "Concept Laser - QM Meltpool 3D": {
-        "obs": ("photodiode", "camera"), "direct": (),
-        "note": "coaxial photodiodes giving melt pool area and intensity"},
-    "Renishaw - InfiniAM Spectral": {
-        "obs": ("photodiode", "photodiode_swir"), "direct": (),
-        "note": "MeltVIEW NIR+IR; LaserVIEW modelled conservatively as melt-pool"},
-    "ANY suite with upstream power monitoring": {
-        "obs": ("photodiode", "photodiode_swir"), "direct": ("power",),
-        "note": "HYPOTHETICAL configuration type, not a named product"},
-    "research-grade reference suite": {
+        "note": "two emission channels at different wavelengths; two systems map here"},
+    "D  research reference": {
         "obs": ("photodiode", "camera", "pyrometer"), "direct": (),
-        "note": "the baseline used throughout this study"},
+        "note": "emission, pool area and two-colour pyrometry; the study baseline"},
+    "E  C plus upstream power monitoring": {
+        "obs": ("photodiode", "photodiode_swir"), "direct": ("power",),
+        "note": "CONFIGURATION TYPE: adds delivered-power sensing before the plume"},
 }
 
 ADDED_SIGMA = 0.05
@@ -140,7 +123,7 @@ def report() -> None:
         print(f"   {name:34s}{ri:>5d}{c1i:>6d}{c2:>6d}{c3:>6d} | "
               f"{re_:>5d}{c1e:>6d}{min(enl.values()):>8.2f}")
 
-    print("\n\nTHE PAIR THAT SEPARATES THE VENDORS: power / gas (instantaneous)")
+    print("\n\nTHE PAIR THAT SEPARATES THE CONFIGURATIONS: power / gas (instantaneous)")
     for name, cfg in CONFIGS.items():
         inst, _ = detail[name]
         v = inst[("power", "gas")]

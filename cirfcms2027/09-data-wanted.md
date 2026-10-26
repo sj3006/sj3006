@@ -35,22 +35,23 @@ measurement (melt pool length) that our Route B result turns on.
 
 **What to get:** the PDF, and the dataset if the PDF looks usable.
 
-### 2. Renishaw LaserVIEW — where in the beam path does it sit?
+### 2. ~~Renishaw LaserVIEW — where in the beam path?~~ **CLOSED — not obtainable**
 
-One question: **does LaserVIEW measure the laser before or after the plume?**
+Could not be established from public documentation and Amit could not obtain it
+through other channels. **Resolved by taking the conservative reading**: the
+photodiode is assumed to sit downstream of the plume, making it another
+melt-pool observable rather than a direct power measurement. That is the
+assumption which does *not* flatter the analysis.
 
-Before - it is a direct measurement of delivered power that cannot see gas
-attenuation, which is exactly the sensor our analysis says breaks the worst
-confound. A production machine already carries the remedy.
+Superseded in any case by a policy decision: **the paper names no commercial
+products.** Configurations are described by their contents (A through E), which
+makes the claim more general — it holds for any machine anyone builds, not for a
+named product — and removes the dependence on vendor details that rest on
+secondary literature.
 
-After - it is another melt-pool observable and that row of our table collapses
-to match everyone else's.
-
-Currently sourced from a secondary review, flagged **[PROVISIONAL]** in the
-draft. A datasheet, an applications engineer, or anyone with an InfiniAM licence
-settles it.
-
-**Highest value per minute spent of anything on this list.**
+The design recommendation survives intact and needs no verification: a suite
+adding a direct measurement of delivered laser power, sampled upstream of the
+process zone, separates power from gas at 84 degrees.
 
 ### 3. In-process noise figures for a coaxial photodiode and a two-colour pyrometer
 

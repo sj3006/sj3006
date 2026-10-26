@@ -1675,6 +1675,11 @@ separates the two tiers.
 
 ## COMMERCIAL CONFIGURATIONS - the abstract's "current commercial machines"
 
+> **Policy, decided later: the paper names no commercial products.** Vendor names
+> are retained *in this record only*, for traceability of how the configurations
+> were derived. In the paper they appear as configurations A to E, described by
+> contents. See "VENDOR NAMES REMOVED" below.
+
 `src/commercial.py`. Route B swept generic subsets; the abstract promises real
 vendor suites. Mapped from secondary literature onto this study's observables.
 
@@ -1852,6 +1857,52 @@ or the suites look *worse* than the favourable reading would.
 They should be collected into one short paragraph in the limitations section
 rather than scattered. A reviewer who sees three conservative choices stated
 together trusts the rest of the paper more, not less.
+
+## VENDOR NAMES REMOVED FROM THE PAPER
+
+Amit's decision: no actual company product is named. Implemented, and it
+improved the section rather than costing anything.
+
+### Why it is also the better academic choice
+
+The mapping from product to observable rested on **secondary review literature,
+not datasheets**. Detection bands are routinely withheld under supplier
+confidentiality, and published descriptions of the same product disagree.
+Attaching a named product to a computed diagnosability limit on that basis
+asserts more than the evidence carries. The anonymity now *follows from* the
+verification problem rather than being imposed on top of it.
+
+### What it revealed
+
+Stripping the names collapsed the table. **Across five commercial systems there
+are only three distinct configurations** for this analysis - several vendors
+ship what is effectively the same instrument set. The vendor-by-vendor
+presentation hid that.
+
+| configuration | inst. rank | class 1 | power/gas |
+|---|---|---|---|
+| A single coaxial photodiode | 1 | 0/10 | 0.00 |
+| B photodiode + melt pool imaging | 2 | 4/10 | 0.00 |
+| C two photodiodes, separate bands | 2 | 0/10 | 0.00 |
+| D research reference | 3 | 5/10 | 0.00 |
+| **E = C + upstream power monitoring** | 3 | 4/10 | **84.02** |
+
+### The claim is now more general
+
+Was: *"one named product separates power from gas."*
+
+Is: *"no configuration built from melt-pool observables alone separates power
+from gas, whatever its sensor count; adding upstream delivered-power sensing
+does, at 84 degrees."*
+
+The second holds for any machine anyone builds, cannot be contradicted by a
+datasheet, and needs no verification beyond our own analysis.
+
+### Where names legitimately remain
+
+`07-literature-extraction.md` records Raj et al.'s own stated equipment when
+describing their experiment. That is ordinary citation practice, not product
+endorsement, and it stays.
 
 ## The three real risks
 
