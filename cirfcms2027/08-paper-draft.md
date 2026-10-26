@@ -245,8 +245,8 @@ this suite.
 ### 3.6 Commercial configurations
 
 Mapping vendor suites onto the observable set **[PROVISIONAL — vendor details
-from secondary literature; bands are commonly withheld under supplier
-confidentiality; sources conflict for SLM Solutions]**:
+from secondary review literature, not datasheets; detection bands are commonly
+withheld under supplier confidentiality; sources conflict for SLM Solutions]**:
 
 | configuration | inst. rank | class 1 | power/gas |
 |---|---|---|---|
@@ -254,15 +254,30 @@ confidentiality; sources conflict for SLM Solutions]**:
 | EOS, MeltPool + Exposure OT | 2 | 4/10 | 0.00 |
 | SLM Solutions MPM | 2 | 0/10 | 0.00 |
 | Concept Laser QM Meltpool 3D | 2 | 4/10 | 0.00 |
-| **Renishaw InfiniAM Spectral** | **3** | 4/10 | **84.02** |
+| Renishaw InfiniAM Spectral | 2 | 0/10 | 0.00 |
+| *any suite with upstream power monitoring* | *3* | *4/10* | ***84.02*** |
+| research-grade reference | 3 | 5/10 | 0.00 |
 
-Renishaw's suite is the only commercial configuration separating power from gas
-instantaneously, because it pairs melt pool emissions (MeltVIEW) with
-**LaserVIEW, a photodiode measuring laser energy directly**. If LaserVIEW reads
-upstream of the plume it is precisely the sensor §3.7 predicts breaks the
-confound, already fitted to a production machine. **[PROVISIONAL — requires
-verification against vendor documentation; if LaserVIEW sits downstream of the
-plume this row collapses to the others.]**
+**No commercial configuration we were able to establish separates laser power
+from gas degradation instantaneously.** All read 0.00°, for the reason given in
+§3.2: every observable in every one of them reads the melt pool, and both faults
+reach the melt pool only through the product (absorptivity × power).
+
+The final hypothetical row is the actionable one. A suite that includes a
+**direct measurement of delivered laser power, sampled upstream of the process
+zone**, separates the pair at 84.02°, because such a sensor sees the laser's
+output without seeing plume attenuation. It is a configuration *type*, not a
+product, and the figure follows from this analysis alone.
+
+One vendor case is genuinely unresolved and is modelled conservatively.
+Renishaw's InfiniAM Spectral is described in the review literature as combining
+MeltVIEW (melt pool emissions) with **LaserVIEW, "a photosensitive diode
+measuring the intensity of the laser energy"**. Whether that diode samples
+upstream of the process zone or views the beam through the process window
+determines which of the last two rows applies. We could not establish this from
+public documentation, so LaserVIEW is modelled as a melt-pool observable — the
+reading that does not favour this analysis. If it is in fact an upstream tap,
+that configuration performs better than reported here, not worse.
 
 Separately, SLM's two-spectral-band suite performs worse than EOS's
 photodiode-plus-camera despite both having two observables: two bands of the
@@ -370,10 +385,13 @@ are not meaningful.
    at 40 % of the asserted profile strength.
 4. That free method **outperforms two idealised direct measurements of the
    causes themselves**, because neither addresses power versus speed.
-5. Among melt-pool observables the most valuable addition is free — reporting
+5. No commercial configuration examined separates power from gas instantaneously.
+   A suite including an upstream measurement of delivered laser power would, at
+   84°, and that is the design recommendation for real-time control.
+6. Among melt-pool observables the most valuable addition is free — reporting
    the camera's two axes separately is worth 13.4° on the binding pair, while
    two new instruments are worth nothing.
-6. Nothing is structurally irreducible for this suite. Post-build diagnosis
+7. Nothing is structurally irreducible for this suite. Post-build diagnosis
    requires no new hardware; real-time per-segment isolation does, and crude
    direct sensing of the right cause suffices.
 

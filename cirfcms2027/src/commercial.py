@@ -25,17 +25,32 @@ Every row below must be checked against vendor documentation before submission.
 The *method* does not depend on getting these exactly right; the specific
 per-vendor conclusions do.
 
-The Renishaw case is the interesting one
-----------------------------------------
-InfiniAM Spectral is described as two functions: LaserVIEW, "a photosensitive
-diode measuring the intensity of the laser energy", and MeltVIEW, capturing melt
-pool emissions in NIR and IR.
+The Renishaw case: unresolved, and modelled conservatively
+----------------------------------------------------------
+InfiniAM Spectral is described in the review literature as two functions:
+LaserVIEW, "a photosensitive diode measuring the intensity of the laser energy",
+and MeltVIEW, capturing melt pool emissions in NIR and IR.
 
-If LaserVIEW measures laser output *upstream of the plume*, it is a direct
-measurement of delivered power that does not see gas attenuation - which is
-exactly the Route C sensor that breaks the power/gas confound. Modelled that way
-here, flagged as conditional on that reading being right, because it is the one
-place where a real commercial machine may already carry the remedy.
+Whether LaserVIEW samples the beam **upstream of the process zone** or views it
+through the process window decides everything about that configuration:
+
+    upstream    a direct measurement of delivered power that cannot see plume
+                attenuation - exactly the Route C sensor that breaks the
+                power/gas confound
+    downstream  another melt-pool observable, adding a row and no direction
+
+**This could not be established from public documentation.** So the conservative
+assumption is taken: LaserVIEW is modelled as a melt-pool observable, which is
+the reading that does *not* flatter this paper. If it turns out to be upstream,
+the configuration is better than reported here, not worse.
+
+The upstream case is retained separately under `HYPOTHETICAL_UPSTREAM`, labelled
+as a configuration *type* rather than a product, because the design lesson is
+real regardless of which machine implements it.
+
+Asserting the favourable reading would risk publishing a false claim about a
+commercial product. Understating it costs nothing that cannot be corrected by a
+single sentence from the vendor.
 """
 
 from __future__ import annotations
@@ -68,8 +83,11 @@ CONFIGS = {
         "obs": ("photodiode", "camera"), "direct": (),
         "note": "coaxial photodiodes giving melt pool area and intensity"},
     "Renishaw - InfiniAM Spectral": {
+        "obs": ("photodiode", "photodiode_swir"), "direct": (),
+        "note": "MeltVIEW NIR+IR; LaserVIEW modelled conservatively as melt-pool"},
+    "ANY suite with upstream power monitoring": {
         "obs": ("photodiode", "photodiode_swir"), "direct": ("power",),
-        "note": "MeltVIEW NIR+IR, plus LaserVIEW measuring laser energy directly"},
+        "note": "HYPOTHETICAL configuration type, not a named product"},
     "research-grade reference suite": {
         "obs": ("photodiode", "camera", "pyrometer"), "direct": (),
         "note": "the baseline used throughout this study"},

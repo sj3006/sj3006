@@ -1705,7 +1705,7 @@ every one of them reaches 10/10 in the accumulated regime - including a single
 photodiode. The paper's positive result is not conditional on owning a
 well-instrumented machine.
 
-### The finding worth leading with
+### SUPERSEDED - see "Renishaw unresolved" below. The original finding read:
 
 **Renishaw's InfiniAM Spectral is the only commercial configuration that
 separates power from gas instantaneously, at 84.02 degrees.**
@@ -1800,6 +1800,58 @@ This belongs in the robustness subsection and strengthens it. The claim becomes:
 > sharing a pattern.
 
 That is one named, physically obvious condition in place of five asserted ones.
+
+## RENISHAW UNRESOLVED - modelled conservatively, and the claim is better for it
+
+Amit could not obtain the verification, so the question of where LaserVIEW sits
+in the optical path stays open. Resolved by taking the assumption that does
+**not** flatter the paper - the same principle already applied to the dropped gas
+convection channel and to plume attenuation.
+
+### The decision
+
+LaserVIEW is now modelled as a **melt-pool observable** (downstream of the
+plume). Renishaw's row therefore reads 0.00 degrees like every other commercial
+configuration.
+
+Rationale: asserting the favourable reading risks publishing a false claim about
+a commercial product. Understating costs nothing that a single sentence from the
+vendor could not correct. Asymmetric downside, so take the safe side.
+
+### The claim that replaces it is stronger
+
+| configuration | power/gas, instantaneous |
+|---|---|
+| every named commercial suite examined | **0.00 confounded** |
+| *any suite with upstream power monitoring* | ***84.02 separated*** |
+
+**No commercial configuration we could establish separates power from gas.** The
+84 degrees now belongs to a configuration *type* - "includes a direct measurement
+of delivered laser power, sampled upstream of the process zone" - which follows
+from our own analysis and needs no vendor verification at all.
+
+That is a better paper claim than the original. It is a **design recommendation**
+rather than a product endorsement, it cannot be falsified by a datasheet, and it
+generalises to any machine anyone builds.
+
+### What stays in the paper about Renishaw
+
+One hedged paragraph: the review literature describes LaserVIEW as a photodiode
+measuring laser energy; whether it samples upstream decides which of the two rows
+applies; we could not establish it; we assume the unfavourable case. That is
+honest, it flags a question worth answering, and it invites the vendor or a
+reader to settle it - a legitimate thing for a paper to do.
+
+### Pattern worth noting
+
+This is the third time a choice has been made against the paper's own interest -
+the gas convection channel, plume attenuation depending on power and speed, and
+now LaserVIEW. All three make the instantaneous baseline look *less* confounded
+or the suites look *worse* than the favourable reading would.
+
+They should be collected into one short paragraph in the limitations section
+rather than scattered. A reviewer who sees three conservative choices stated
+together trusts the rest of the paper more, not less.
 
 ## The three real risks
 
