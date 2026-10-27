@@ -328,8 +328,30 @@ None to the paper. Two process notes worth keeping:
 
 # Still open, not yet errata
 
-Carried here so they are not lost. These are decisions rather than defects.
+Carried here so they are not lost. These are decisions, untested assumptions and
+loose ends rather than established defects.
 
+- **The sqrt(N) noise gain assumes independent segment-to-segment noise, and
+  nothing tests that.** Section 3.5 states: *"...which here lies between 0.109
+  and 0.136, so fitting N = 84 segments to five regressors buys roughly a
+  ninefold noise reduction."* That factor is sqrt(84) = 9.165, and it follows
+  from `Cov(r) = sigma_s^2 I` - the assumption that the noise on each segment is
+  independent of every other and of the same size. Real in-process noise need
+  not be: laser drift, a thermal transient across a build, or a slow detector
+  gain change would all correlate neighbouring segments, and correlated noise
+  averages down more slowly than sqrt(N). The true gain would then be smaller,
+  by an amount set by the correlation length relative to the 84 segments.
+  **What it would and would not touch:** nothing in the reported angles, rank or
+  condition number, which are invariant to a common scaling - the same argument
+  as in E1 of `explainers/07-coefficient-noise.md`. It would touch any absolute
+  statement about how quiet the enlarged observation is, and it would matter a
+  great deal for a detectability claim, which the paper is careful not to make.
+  The honest status is that this is an unexamined assumption in a sentence that
+  currently reads as a derived fact. Options for draft 2: soften "buys roughly a
+  ninefold noise reduction" to note the i.i.d. condition, or test it by imposing
+  a correlated noise model on the residuals and re-deriving the coefficient
+  covariance as `(G^T G)^-1 G^T Sigma G (G^T G)^-1` for a non-diagonal Sigma.
+  Not yet done either way.
 - **Class 3 is empty by construction.** The class-2 test allows an idealised
   direct sensor with 5 % relative noise, which forces any pair containing the
   measured fault to 83-84 degrees. Class 3 cannot be populated unless that
