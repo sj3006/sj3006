@@ -29,6 +29,7 @@ Entries are classified:
 |---|---|---|---|
 | E1 | error | "every conclusion invariant" to the conductivity coupling is too strong | **yes, one cell** |
 | E2 | error | 11.7 % / 13.0 % is an aggregate that hides the base-case error and a one-sided bias | no |
+| E3 | error | the VED correlation coefficients do not reproduce, are grid-dependent, and are mis-framed as a check against external data | no diagnosability result; weakens one validation leg |
 | O1 | omission | the operating point the whole analysis linearises about is never stated | no |
 | W1 | working | spot size used as the Gaussian sigma instead of a D4-sigma diameter | no |
 
@@ -221,6 +222,103 @@ the one point that matters.
    also a cleaner statement of the model's limitation than the current prose.
 3. Decide 13.0 or 13.1 and make the code and paper agree, or state which
    parameter set the figure comes from.
+
+---
+
+# E3. The energy-density correlation check [E]
+
+## What draft 1 says
+
+Section 4.1, `paper.tex` lines 345-348:
+
+> "**Two checks are made against data not used in the fit.** Over 27 melted
+> conditions the model reproduces the benchmark correlation structure: depth
+> correlates with volumetric energy density (**r = +0.727**) while width does
+> not (**r = +0.032**)."
+
+## What is wrong
+
+Three separate things.
+
+**(a) The coefficients do not reproduce.** Running the check now:
+
+| source | n | width r | depth r |
+|---|---|---|---|
+| `sanity_checks.py` as it stands | 27 | **+0.206** | **+0.778** |
+| same grid, calibrated absorptivity 0.384 | 27 | +0.201 | +0.767 |
+| **paper** | 27 | **+0.032** | **+0.727** |
+
+The "27 melted conditions" does identify the grid - a 3 x 3 x 3 sweep over power
+{150, 250, 350} W, speed {0.4, 0.8, 1.6} m/s and spot {60, 100, 140} um - but
+that grid returns +0.206 for width, not +0.032. Five other plausible grids were
+tried and none produced the published pair. The width figure is the one that
+moved, and it is the load-bearing one: +0.032 reads as "no relationship at all",
++0.206 does not.
+
+**(b) The width result is not robust to the sweep grid.** Depth is stable
+everywhere; width is not:
+
+| grid | width r | depth r |
+|---|---|---|
+| Weaver's own spot range 49/67/82 um | **+0.644** | +0.860 |
+| Weaver-like P and v | **-0.376** | +0.527 |
+| wide spots 50/100/200 um | -0.223 | +0.704 |
+| 4 x 4 x 2 grid | -0.004 | +0.704 |
+| sanity_checks 3 x 3 x 3 | +0.206 | +0.778 |
+
+Width's correlation swings from -0.38 to +0.64 depending purely on which region
+of parameter space is sampled. **"Width does not correlate with VED" is a
+statement about the chosen grid, not a property of the model.** What survives
+every grid is the weaker comparative claim: depth tracks VED far more strongly
+than width does. That is the defensible version and it is what the code's own
+pass criterion actually tests (`abs(r_depth) > abs(r_width)`).
+
+**(c) "Two checks are made against data not used in the fit" is wrong for this
+check.** It is true of the Guo check. It is false here on two counts:
+
+- **No data enters it.** All 27 points are model output. The check correlates
+  the model's own input with the model's own output; nothing is compared against
+  a measurement.
+- **The property is not independent of the fit.** Weaver's "depth tracks VED,
+  width does not" is derived from the same seven Table 4 cases that the four
+  parameters were fitted to.
+
+Something real remains - the fit targeted seven point residuals, never a
+correlation, and the sweep extrapolates to a parameter region containing none of
+the fitted points - but the honest description is **one external validation
+(Guo) and one structural self-consistency check**, not two external checks. The
+module docstring in `src/validation.py` already states this correctly
+("Validation means reproducing something the fit did not target"); the paper
+overstates it.
+
+## Does it change the result?
+
+**No diagnosability result.** The r values appear nowhere downstream. Angles,
+ranks, condition numbers and the matrix are untouched.
+
+**It does weaken one of the two validation legs**, and it removes one strand of
+support for "width carries information depth does not". Note that the split-
+camera recommendation in Section 4.7 does **not** rest on these coefficients -
+it rests on the constant-VED sweep, where length varies 2.53x against 1.11x for
+width and depth, which is a different measurement and is unaffected.
+
+## Change for draft 2
+
+1. Regenerate the coefficients from the calibrated model and quote what it
+   actually returns, with the grid stated so the number is reproducible.
+2. Replace the absolute claim with the comparative one, which holds on every
+   grid tried: *"depth tracks volumetric energy density far more strongly than
+   width does"*, and state the grid sensitivity rather than hiding it.
+3. Reword the opening sentence. Proposed: *"One external check and one check of
+   internal structure. Over 27 melted conditions spanning power, speed and spot
+   size, ..."*.
+
+**Also fix in the code, not the paper:** `src/sanity_checks.py` hard-codes
+`ABS = 0.35` and `NQ = 100` at module level instead of using the calibrated
+`IN718_ABSORPTIVITY = 0.384` and the standard quadrature. The module that
+produces this validation figure is therefore not running the calibrated model.
+That alone accounts for +0.206 against +0.201, not for the gap to +0.032, but it
+should not be there.
 
 ---
 
