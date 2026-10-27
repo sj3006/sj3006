@@ -777,11 +777,16 @@ whitened by the raw sensor noise `sigma_s`, when the correct scale for the
 
     sigma_s * sqrt( [ (G^T G)^-1 ]_jj )
 
-The error threw away an averaging gain of roughly 9x (84 segments fitted to 5
-regressors) and mis-weighted the regressors relative to each other by up to 25%,
-which distorts every angle. Fixed with `coefficient_sigmas`, and `pair_angles`
-and `rank_cond` now **refuse** a noise vector whose length does not match the
-matrix rather than broadcasting it.
+The error did two separable things. It threw away an averaging gain of roughly
+9x (84 segments fitted to 5 regressors), which matters for any absolute noise
+statement but *not* for the reported angles, since those are invariant to a
+common scaling of the whole matrix. And it mis-weighted the five regressors
+relative to each other by up to 25% (0.136040 / 0.109109 = 1.2468), which is a
+non-uniform row scaling and therefore **does** distort every angle. The second
+is what corrupted the numbers. See `07-coefficient-noise.md` for the derivation.
+Fixed with `coefficient_sigmas`, and `pair_angles` and `rank_cond` now
+**refuse** a noise vector whose length does not match the matrix rather than
+broadcasting it.
 
 **E5. An unconverged derivative step.** The first step size tried gave a 267%
 error in the derivative. Caught by running the convergence study in B1 rather
