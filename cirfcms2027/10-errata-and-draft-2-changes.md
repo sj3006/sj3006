@@ -1,13 +1,16 @@
 # Errata and changes for draft 2
 
 A running list of defects found in the first draft of the paper
-(`paper/paper.tex`, 6 pages, two-column Procedia layout) after it was written.
+(`paper/paper.tex`, 6 pages, two-column Procedia layout) after it was written,
+together with suggested additions.
 
-**How this file works.** One entry per defect, newest at the top of its section.
+**How this file works.** One entry per item, newest at the top of its section.
 Every entry carries the same five fields:
 
     WHAT DRAFT 1 SAYS   verbatim, with the paper section and the .tex line
-    WHAT IS WRONG       the defect, stated plainly
+    WHAT IS WRONG       the defect, stated plainly. For an [S] entry this reads
+                        WHY IT IS WORTH ADDING - nothing is wrong, something is
+                        missing that would make the paper stronger.
     EVIDENCE            the measurement that establishes it
     DOES IT CHANGE THE RESULT?   honestly, including "no"
     CHANGE FOR DRAFT 2  the edit to make
@@ -16,6 +19,8 @@ Entries are classified:
 
     [E]  error present in draft 1 - the paper states something untrue or too strong
     [O]  omission in draft 1 - nothing false, but something load-bearing is missing
+    [S]  suggested addition - draft 1 is correct as it stands; this would make it
+         better. Costs page space, so each entry says what it would displace.
     [W]  working error - a mistake made during analysis, caught before it reached
          the paper. Logged so it is not repeated, not because draft 1 is wrong.
 
@@ -31,6 +36,7 @@ Entries are classified:
 | E2 | error | 11.7 % / 13.0 % is an aggregate that hides the base-case error and a one-sided bias | no |
 | E3 | error | the VED correlation coefficients do not reproduce, are grid-dependent, and are mis-framed as a check against external data | no diagnosability result; weakens one validation leg |
 | O1 | omission | the operating point the whole analysis linearises about is never stated | no |
+| S1 | suggestion | add the sensor correlation matrix - the plainest statement of the paper's problem | no, strengthens presentation |
 | W1 | working | spot size used as the Gaussian sigma instead of a D4-sigma diameter | no |
 
 ---
@@ -376,6 +382,92 @@ operating point understates the result rather than flattering it.
    conditions and five off-benchmark points leaves the instantaneous rank at 3,
    the enlarged rank at 5 and the enlarged worst pair within 25.65-29.34
    degrees."* This is a strengthening, not a concession.
+
+---
+
+# S1. Add the sensor correlation matrix [S]
+
+## What draft 1 says
+
+Section 4.3, `paper.tex` lines 375-381, opens the argument with the singular
+values:
+
+> "The whitened 3 x 5 Jacobian has singular values 3.451, 0.155 and 0.041 ---
+> rank 3, condition number 85 --- so two fault directions are unobservable, and
+> they are computable..."
+
+Correct, and nothing needs changing. But it asks the reader to accept an SVD
+before they are given any reason to believe the three sensors are redundant.
+
+## Why it is worth adding
+
+There is a plainer statement of the same fact, available one step earlier in the
+derivation and requiring no eigenvalue, no whitening argument and no SVD.
+
+Multiply the whitened Jacobian by its own transpose to get the 3 x 3
+sensor-against-sensor matrix, normalise it, and it is a correlation table:
+
+| | photodiode | camera | pyrometer |
+|---|---|---|---|
+| photodiode | 1.00000 | **0.99960** | **0.99508** |
+| camera | 0.99960 | 1.00000 | **0.99477** |
+| pyrometer | 0.99508 | 0.99477 | 1.00000 |
+
+**Three physically different instruments - a photodiode integrating band
+radiance, a camera measuring melt pool area in square metres, and a two-colour
+pyrometer reporting kelvin - respond to the five faults in patterns that agree
+to better than 99.4 %.**
+
+A reader who stops at that table already understands why the suite is
+rank-deficient, why a fourth melt-pool observable adds nothing, and why the
+paper's recommendation has to point upstream of the melt pool. The singular
+values then arrive as quantification of something already believed, rather than
+as the thing the reader is asked to take on faith.
+
+It also makes the design rule in Section 5.2 land harder. "A sensor reading the
+melt pool adds a row, not a direction" is an assertion in draft 1; with this
+table in hand it is the obvious reading of measured redundancy.
+
+## Evidence
+
+Derived in `explainers/09-where-the-singular-values-come-from.md`, Part B1. The
+diagonal is each sensor's total squared response (photodiode 5.18565, camera
+3.38626, pyrometer 3.36098, each equal to the sum of squares of its row of the
+whitened Jacobian), and the off-diagonal normalised by sqrt(A_ii A_jj) gives the
+correlations above.
+
+The same file records why the correlations are so high: 99.79 % of the total
+response energy (trace 11.932892) sits in the single largest eigenvalue
+11.907373.
+
+## Does it change the result?
+
+**No.** It is the same matrix the singular values already come from, presented
+one step earlier. No number changes. It is a presentation improvement, and the
+reason to log it is that it may be the single most persuasive object in the
+whole analysis and it currently appears nowhere in the paper.
+
+## Change for draft 2
+
+1. Insert the 3 x 3 correlation table at the start of Section 4.3, before the
+   singular values, with one sentence of the form: *"The three observables are
+   not independent: normalising the whitened Jacobian's sensor Gram matrix gives
+   pairwise correlations above 0.994."*
+2. Keep the singular values immediately after, now read as quantification rather
+   than assertion.
+
+**Page cost.** A 3 x 3 table with a short caption is roughly a third of a
+column. Candidates to displace, in order of preference: the unobservable-
+direction arithmetic in the same paragraph (lines 377-381) could be cut to its
+conclusion, since the factor of 85 is restated as the condition number anyway;
+or the segment-count sweep in Section 4.5 could lose two of its four values.
+
+**Related caution, same section.** The angles, the rank and the condition number
+all come from the same two Gram matrices and share their nonzero eigenvalues, so
+they are consistent by construction and cannot disagree. Draft 1 presents them
+in sequence in a way that could read as three independent confirmations. Adding
+this table makes the shared origin more visible, so the sequence should be
+worded to match - as quantification of one fact, not three lines of evidence.
 
 ---
 
