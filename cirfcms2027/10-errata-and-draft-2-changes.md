@@ -21,6 +21,8 @@ Entries are classified:
     [O]  omission in draft 1 - nothing false, but something load-bearing is missing
     [S]  suggested addition - draft 1 is correct as it stands; this would make it
          better. Costs page space, so each entry says what it would displace.
+    [P]  plan - a structural choice for draft 2 affecting several sections, not a
+         single edit. Needs a decision before the edits under it can be made.
     [W]  working error - a mistake made during analysis, caught before it reached
          the paper. Logged so it is not repeated, not because draft 1 is wrong.
 
@@ -38,6 +40,7 @@ Entries are classified:
 | O1 | omission | the operating point the whole analysis linearises about is never stated | no |
 | S1 | suggestion | add the sensor correlation matrix - the plainest statement of the paper's problem | no, strengthens presentation |
 | S2 | suggestion | the gas profile can be inverted from benchmark data and is conservative; say so instead of calling it asserted | no, converts the paper's largest exposure |
+| P1 | plan | how to fix the asserted profiles properly: measure what is measurable, then stop asserting | no numbers; changes what the paper claims to deliver |
 | W1 | working | spot size used as the Gaussian sigma instead of a D4-sigma diameter | no |
 
 ---
@@ -383,6 +386,97 @@ operating point understates the result rather than flattering it.
    conditions and five off-benchmark points leaves the instantaneous rank at 3,
    the enlarged rank at 5 and the enlarged worst pair within 25.65-29.34
    degrees."* This is a strengthening, not a concession.
+
+---
+
+# P1. Fixing the asserted profiles properly [P]
+
+S2 converts one profile from asserted to measured. This entry is the plan for
+the other four, and for the deeper problem that measuring them all would still
+not settle the question.
+
+## Level 1 - measure what can be measured
+
+| profile | status | route | effort |
+|---|---|---|---|
+| **gas** | **done** - see S2 | inverted from Weaver's pad scans | complete |
+| **layer** | **available now** | Liu et al. (2022) and the 2023 lock-in follow-up measure local powder layer thickness **in situ**. Their layer-to-layer spread gives the contrast **directly - no inversion, no model in the loop**, so it is cleaner than the gas result. | needs the full text, which is reachable with institutional access |
+| **geometry** | attempted, failed | needs an overhang or thin-wall dataset where preheat dominates, rather than a pad where remelting confounds it | moderate |
+| **speed** | bounded only | scanner tracking error against vector length is a standard measurement; Weaver cite turnaround work where "double-wide" melt pools form | moderate |
+| **power** | likely stays asserted | needs laser output stability over build-length timescales; no obvious benchmark source | hard, and matters least |
+
+Power carries the **smallest** asserted contrast (0.3 against 1.0 for layer) and
+the contrast sweep shows the binding pairs survive scaling to 0.33, so it is the
+right one to leave unmeasured.
+
+**Outcome of Level 1: two of five measured, three bounded by sweep.** Achievable
+for draft 2 and mostly reading rather than computing. The layer profile is the
+single highest-value item left in the whole project.
+
+## Level 2 - stop asserting, which is the actual fix
+
+**Even five perfectly measured profiles would not settle this**, because the
+profiles are **machine- and build-specific**. A different gas nozzle geometry, a
+different scan strategy or a different part produces different patterns. There
+is no universal set of five numbers to go and find.
+
+So the fix is not to measure harder. It is to change what the paper asserts:
+
+- report the result **as a function of profile strength** - which the contrast
+  sweep already half does, and which S2's margin figures strengthen
+- give the reader the **recipe to calibrate their own machine** - which is Part A
+  of `explainers/10-measuring-the-profiles.md`
+
+That converts the weakness into the contribution. The deliverable becomes *"here
+is the method, here is how you calibrate it for your machine, and here is how
+much pattern strength you need for it to work"* rather than *"here is the answer
+for the machine we assumed"*.
+
+**This is a reframing, not new computation.** No number changes. Sections 3.5,
+4.5 and 5.3 change emphasis, and the conclusions gain one sentence.
+
+## Level 3 - the requirement is weaker than the paper implies
+
+Worth stating because it changes what has to be measured at all.
+
+The collapse test (C3 in `05-validation-and-robustness.md`) shows the method
+does **not** need five accurate contrasts. It needs the patterns to be
+**distinct**, and it fails in only two specific cases: recoater sharing with gas
+(3.84 degrees) and speed sharing with gas (8.12 degrees).
+
+So the quantity that must be established on a given machine is not "how strong
+is each profile" but **"are the recoater, gas and speed signatures
+distinguishable here"**. That is a far weaker and far more achievable claim.
+
+**And half of it is already settled by measurement.** The Weaver data shows the
+gas signature alternating at **track** scale, while a recoater signature
+alternates at **layer** scale - different periodicities, which is exactly what
+Condition 1 requires. The recoater/gas half of the requirement is met by
+benchmark data, not by assumption.
+
+## Level 4 - what stays future work
+
+**No benchmark dataset with deliberately induced machine faults exists.** Until
+one does, no profile can be measured on a genuinely faulted build rather than
+inferred from a healthy one. Every inversion in S2 reads baseline behaviour in a
+normal build and extrapolates to a degradation.
+
+That experiment - a build with known, deliberately injected faults, monitored
+with a coaxial suite - is the natural follow-on and the only thing that would
+fully close the gap. The paper should name it as such rather than leaving the
+reader to infer it.
+
+## Recommendation
+
+**Do Level 1 for the layer profile, write the paper at Level 2, name Level 4 as
+future work, and use Level 3 to narrow what Level 1 has to achieve.**
+
+That is a stronger paper than one which got lucky with five correct guesses,
+because it is honest about what is machine-specific and it hands the reader
+something they can apply to their own equipment.
+
+**Decision needed before the S2 and E1 edits are finalised**, since Level 2
+changes the surrounding wording those edits sit in.
 
 ---
 
