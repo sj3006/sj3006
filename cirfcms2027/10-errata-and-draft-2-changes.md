@@ -39,6 +39,7 @@ Entries are classified:
 | E3 | error | the VED correlation coefficients do not reproduce, are grid-dependent, and are mis-framed as a check against external data | no diagnosability result; weakens one validation leg |
 | E4 | error | the mechanism given for the split-camera recommendation has width and length the wrong way round | no, the recommendation stands; the explanation does not |
 | E5 | error | "counted conservatively as C" is the wrong word - that choice protects our novelty claim rather than costing us | no |
+| E6 | error | the literature tally in Section 5.1 is wrong: seven works classify outcomes, not twelve, and the total is now 19 | no, but it is the paragraph a reviewer will check first |
 | O1 | omission | the operating point the whole analysis linearises about is never stated | no |
 | S1 | suggestion | add the sensor correlation matrix - the plainest statement of the paper's problem | no, strengthens presentation |
 | S2 | suggestion | the gas profile can be inverted from benchmark data and is conservative; say so instead of calling it asserted | no, converts the paper's largest exposure |
@@ -465,6 +466,104 @@ Optionally add the consequence in half a sentence: if that system does sample
 upstream, it is evidence that the recommendation is already reachable on
 existing hardware - which strengthens the paper's practical relevance even as it
 weakens its novelty.
+
+---
+
+# E6. The literature tally in Section 5.1 is wrong [E]
+
+## What draft 1 says
+
+Section 5.1, `paper.tex` lines 546-552:
+
+> "The premise that predicted limits could be compared against reported
+> accuracies turns out to be mostly unrealisable, and the reason is itself the
+> result. **Of 18 works extracted, 12 classify outcomes**, about which this
+> analysis makes no prediction: a melt pool deeper than the layer will fuse
+> whatever made it deep. No published work attempts to separate power from gas,
+> or layer from power --- the pairs identified here as confounded. That is
+> absence of evidence rather than evidence of absence, but no published result
+> contradicts the predicted limits."
+
+This paragraph carries the abstract's final promise - *"the predicted limits are
+compared against the defect classes and accuracies reported in the monitoring
+literature"* - and converts its failure into a finding. It is therefore the
+paragraph a reviewer will scrutinise hardest, because "we could not do what we
+promised, but that is actually the result" is the shape of an excuse.
+
+Which makes it worse that the numbers do not hold up.
+
+## What is wrong
+
+**(a) "12 classify outcomes" is false.** Counting the class column of
+`07-literature-extraction.md`:
+
+| class | count |
+|---|---|
+| **outcome** | **7** |
+| cause, separate | 3 |
+| cause-level physics | 2 |
+| cause, but lumped | 1 |
+| cause-level sensitivity, separate | 1 |
+| nuisance correction | 1 |
+| feature engineering | 1 |
+| forward optimisation | 1 |
+| instrumentation | 1 |
+| unrelated | 1 |
+
+**Seven classify outcomes, not twelve.**
+
+The 12 is traceable: 7 outcome + nuisance correction + feature engineering +
+forward optimisation + instrumentation + unrelated = 12, which is **every work
+making no cause-separation claim**. That is a real and defensible category. It
+simply is not "classify outcomes", which is what the sentence says. **The number
+was attached to the wrong label.**
+
+**(b) "18 works" is stale.** The table now has **19** rows; Reijonen et al.
+(2024) was added as row 19 after the draft was written. 18 was correct when
+written.
+
+**(c) There is no stated inclusion criterion.** Nothing in the paper or in
+`07-literature-extraction.md` says how the works were selected. A reviewer can
+ask, and the current answer is "we extracted them". This is the genuine soft
+spot in the paragraph and **it is not fixed by correcting the count.**
+
+## Does it change the result?
+
+**No diagnosability result.** The tally appears nowhere upstream.
+
+But it damages the one paragraph that can least afford it. A reviewer who opens
+the supporting table and counts will find seven where the paper claims twelve,
+in the passage that is already asking for the benefit of the doubt.
+
+## Change for draft 2
+
+**1. Correct the numbers, and note that the honest version is stronger.**
+Proposed: *"Of 19 works extracted, seven classify outcomes and five more address
+neither outcomes nor cause separation. Only four attempt to estimate process
+inputs from in-situ signals, and one of those predicts a lumped energy-density
+class rather than its components."*
+
+"Only four of nineteen even try, and one of those reports the lumped group" is a
+sharper indictment than "12 classify outcomes".
+
+**2. Argue from Section 4.3 instead of from a head-count.** The parenthetical -
+*"a melt pool deeper than the layer will fuse whatever made it deep"* - is doing
+more work than it is credited with. It is an instance of the four-channel
+argument already proved in Section 4.3:
+
+> Outcomes are functions of the melt pool. The melt pool is a function of the
+> four channels. **Therefore outcome classification cannot separate two causes
+> that share a channel - for exactly the reason no melt-pool instrument can.**
+
+That converts the paragraph from a survey result (*the field happened not to ask
+this*) into a structural one (*the field's dominant method cannot answer it, and
+we proved why two sections ago*). It also makes the paragraph robust to the
+tally being argued with at all, since the claim would no longer rest on counting
+papers.
+
+**3. State the inclusion criterion**, even briefly - what was searched, over what
+period, and what was excluded. One sentence in the paper, with the detail in the
+extraction file.
 
 ---
 
