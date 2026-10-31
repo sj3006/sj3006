@@ -118,6 +118,10 @@ values**, and finding them is what the singular value decomposition does. The
 idea came first: they are simply the loudest, middling and quietest mixtures.
 The SVD is the tool that locates those mixtures, not the concept itself.
 
+**Where those three numbers actually come from**, and why the pairwise angles
+turn out to be the same computation seen from the other side, is derived in
+`09-where-the-singular-values-come-from.md`.
+
 ---
 
 # Part B - The exact definition in the code
