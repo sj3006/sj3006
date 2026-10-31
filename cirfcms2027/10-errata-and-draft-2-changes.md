@@ -37,6 +37,8 @@ Entries are classified:
 | E1 | error | "every conclusion invariant" to the conductivity coupling is too strong | **yes, one cell** |
 | E2 | error | 11.7 % / 13.0 % is an aggregate that hides the base-case error and a one-sided bias | no |
 | E3 | error | the VED correlation coefficients do not reproduce, are grid-dependent, and are mis-framed as a check against external data | no diagnosability result; weakens one validation leg |
+| E4 | error | the mechanism given for the split-camera recommendation has width and length the wrong way round | no, the recommendation stands; the explanation does not |
+| E5 | error | "counted conservatively as C" is the wrong word - that choice protects our novelty claim rather than costing us | no |
 | O1 | omission | the operating point the whole analysis linearises about is never stated | no |
 | S1 | suggestion | add the sensor correlation matrix - the plainest statement of the paper's problem | no, strengthens presentation |
 | S2 | suggestion | the gas profile can be inverted from benchmark data and is conservative; say so instead of calling it asserted | no, converts the paper's largest exposure |
@@ -329,6 +331,140 @@ width and depth, which is a different measurement and is unaffected.
 produces this validation figure is therefore not running the calibrated model.
 That alone accounts for +0.206 against +0.201, not for the gap to +0.032, but it
 should not be there.
+
+---
+
+# E4. The split-camera mechanism has width and length inverted [E]
+
+## What draft 1 says
+
+Section 4.7, `paper.tex` lines 535-538:
+
+> "The mechanism is the validation result above: length carries 2.5x the
+> variation of width and depth at constant energy density, and **an area
+> multiplies the least informative dimension by the most informative one**."
+
+By that sentence, length is "most informative" (it varies 2.53x at constant
+energy density) and width is "least informative" (1.11x).
+
+## What is wrong
+
+It conflates two different meanings of "informative", and for diagnosability it
+picks the wrong one.
+
+- **Responsiveness** - how much a dimension moves. Length wins, 2.53x to 1.11x.
+  This is what Section 4.1 measured.
+- **Independence** - how *differently* a dimension moves from what the other
+  sensors already see. This is what diagnosability depends on, and on this
+  measure the ranking **inverts**.
+
+How alike each observable is to the base photodiode, from the whitened sensor
+correlation matrix:
+
+| added observable | correlation | angle from photodiode |
+|---|---|---|
+| SWIR photodiode | 0.99996 | 0.49 deg |
+| camera (area) | 0.99960 | 1.63 deg |
+| pyrometer | 0.99508 | 5.68 deg |
+| pyrometer, wide band | 0.99135 | 7.54 deg |
+| **camera length** | 0.97906 | **11.75 deg** |
+| **camera width** | **0.77930** | **38.80 deg** |
+
+**Width is the independent direction, by a factor of three over length.** A
+sensor can move a great deal and still tell you nothing new; width moves least
+and tells you most.
+
+Two further consequences the sentence misses:
+
+**Area is nearly as redundant as a second photodiode** - 1.63 degrees against
+0.49. So "a geometric measurement adds a direction" (Section 4.6) is true of B
+versus C but is not true of *area* in any strong sense. Area buries the
+independent information rather than carrying it.
+
+## Evidence
+
+Adding one dimension at a time to the baseline three-sensor suite:
+
+| added | instantaneous class 1 | power/speed |
+|---|---|---|
+| nothing (area only) | 5/10 | 25.83 deg |
+| **width only** | **9/10** | 31.24 deg |
+| length only | 7/10 | 32.14 deg |
+| both | 9/10 | 36.45 deg |
+| SWIR photodiode | 4/10 | 25.75 deg |
+
+Width alone takes the instantaneous class-1 count from 5/10 to **9/10**; length
+alone reaches 7/10. Width is the stronger single addition, which is the opposite
+of what the draft's mechanism predicts.
+
+## Does it change the result?
+
+**No. The recommendation and its number are both correct.** Splitting the camera
+is still worth +13.40 degrees on the binding pair, and the SWIR photodiode and
+wide-band pyrometer are still worth nothing. Only the *explanation* is wrong.
+
+That still matters: it is an explanation a reviewer can check in two minutes,
+and it is wrong in a way that suggests the authors did not understand their own
+result.
+
+## Change for draft 2
+
+1. Replace the mechanism sentence. Proposed: *"The mechanism is independence
+   rather than responsiveness: melt pool width is the least correlated of the
+   available observables with the coaxial photodiode (0.78 against 0.99996 for a
+   second photodiode band), so reporting it separately adds a direction, while
+   folding it into an area does not."*
+2. Keep the Section 4.1 responsiveness result where it is, but stop using it to
+   explain the split-camera gain - the two are different measurements answering
+   different questions.
+3. If S1 is adopted, this follows from the same correlation table, so the two
+   changes share their evidence and cost no extra space.
+
+---
+
+# E5. "Counted conservatively as C" is the wrong word [E]
+
+## What draft 1 says
+
+Section 4.6, `paper.tex` lines 499-501:
+
+> "One surveyed system may belong at E rather than C, depending on whether its
+> laser-energy photodiode samples upstream; this could not be established from
+> public documentation, so it is **counted conservatively** as C."
+
+## What is wrong
+
+"Conservatively" implies we chose the reading that costs us. It does not.
+
+If that machine really belongs at E, a commercial system **already implements
+the paper's central hardware recommendation**, which makes the recommendation
+less novel. Classing it as C keeps the claim "no surveyed machine separates
+power from gas" intact. **The choice protects our contribution rather than
+restraining it.**
+
+There is a defensible reason for the choice - we should not credit a product
+with a capability we cannot verify - but that is epistemic caution about a third
+party, not conservatism about our own result, and the wording should say which.
+
+An earlier draft of this sentence went further and called C "the reading that
+does not favour this analysis". That phrase was removed during page trimming,
+which was lucky; it was the same error stated more strongly.
+
+## Does it change the result?
+
+**No.** The configuration table and every angle in it are unaffected. This is a
+one-word honesty point, and the kind of thing a sharp reviewer notices.
+
+## Change for draft 2
+
+Replace "counted conservatively as C" with something that states the actual
+reason, for example: *"this could not be established from public documentation,
+so it is classed by what is documented rather than by what is likely."*
+
+Optionally add the consequence in half a sentence: if that system does sample
+upstream, it is evidence that the recommendation is already reachable on
+existing hardware - which strengthens the paper's practical relevance even as it
+weakens its novelty.
 
 ---
 
