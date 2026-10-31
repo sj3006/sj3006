@@ -40,6 +40,7 @@ Entries are classified:
 | E4 | error | the mechanism given for the split-camera recommendation has width and length the wrong way round | no, the recommendation stands; the explanation does not |
 | E5 | error | "counted conservatively as C" is the wrong word - that choice protects our novelty claim rather than costing us | no |
 | E6 | error | the literature tally in Section 5.1 is wrong: seven works classify outcomes, not twelve, and the total is now 19 | no, but it is the paragraph a reviewer will check first |
+| E7 | error | the proposed Reijonen comparison uses the wrong quantity on our side and calls the test "decisive" | no, but the test as specified would be biased by ~12 % |
 | O1 | omission | the operating point the whole analysis linearises about is never stated | no |
 | S1 | suggestion | add the sensor correlation matrix - the plainest statement of the paper's problem | no, strengthens presentation |
 | S2 | suggestion | the gas profile can be inverted from benchmark data and is conservative; say so instead of calling it asserted | no, converts the paper's largest exposure |
@@ -564,6 +565,92 @@ papers.
 **3. State the inclusion criterion**, even briefly - what was searched, over what
 period, and what was excluded. One sentence in the paper, with the detail in the
 extraction file.
+
+---
+
+# E7. The proposed Reijonen comparison is mis-specified [E]
+
+## What draft 1 says
+
+Section 5.1, `paper.tex` lines 558-564:
+
+> "One quantitative comparison remains available and should be made before any
+> strong claim of model fidelity. Reijonen reports the photodiode response to
+> scan speed as a power law y = ax^-b, **whose relative sensitivity is exactly
+> -b and so is directly comparable to the Jacobian entry here, -0.483**; the
+> same work reports the power response as approximately linear where the entry
+> here, +1.518, is superlinear. **Whether these agree is a decisive test of the
+> forward model.**"
+
+This is the paper's **only** proposed quantitative check against external data.
+Everything else in Section 5.1 is qualitative. So it matters that it is
+specified correctly, and it is not.
+
+## What is wrong
+
+**(a) The Jacobian entry is not the comparable quantity.** The step "relative
+sensitivity is exactly -b" holds only if the response is an *exact* power law.
+Ours is close but not exact. Fitting a power law to our own model's photodiode
+output:
+
+| | our global fit | our Jacobian entry | gap |
+|---|---|---|---|
+| speed, over 0.4-2.2 m/s | **-0.4302** | -0.4835 | **12 %** |
+| power, over 150-500 W | **+1.3638** | +1.5177 | **11 %** |
+
+Log-log residual is about 1 % in ln units - a good power law, not a perfect one
+- and the local slope drifts from roughly -0.38 to -0.47 across the speed range.
+
+Reijonen's *b* is a **global fit** over their sweep. It must be compared against
+**our global fit, -0.430**, not against the Jacobian's -0.483. As specified, the
+test carries a built-in 12 % discrepancy before any physics enters. If their b
+returned 0.45, the paper as written would report disagreement where the correct
+comparison shows agreement.
+
+**(b) "Decisive" overclaims.** Even done correctly, disagreement would not
+isolate the model as the cause. Four things differ between the two quantities:
+
+- **Band.** Ours integrates 700-1000 nm; theirs is a real photodiode of unstated
+  band, and a different slice of the Planck curve gives a different exponent.
+- **Plume emission.** Reijonen states the plume's presence and removal plays a
+  crucial role in the signal. **Our photodiode has no plume emission at all** -
+  in our model gas only *attenuates*, never *emits*. Their signal contains a
+  component ours does not represent.
+- **Powder versus bare plate.** Our parameters are calibrated on AM-Bench
+  bare-plate single tracks.
+- **What is held constant** during each sweep, which their full text would have
+  to confirm.
+
+Agreement would be strong corroboration; disagreement would be ambiguous.
+
+**(c) The power comparison asserts a conflict we cannot demonstrate.**
+"Approximately linear" most likely means a straight-line fit y = a + bP, whose
+relative sensitivity is bP/(a+bP) - below 1 for a positive intercept, above 1
+for a negative one. Only a fit *through the origin* implies relative sensitivity
+1.0 and genuinely conflicts with a superlinear value. **Without the intercept we
+cannot say whether their result disagrees with ours at all.**
+
+## Does it change the result?
+
+**No.** Nothing upstream depends on it; the comparison has not been performed.
+What is wrong is the specification of a test the paper recommends, in the one
+place it offers an external quantitative check.
+
+## Change for draft 2
+
+1. **Compare fitted exponent to fitted exponent.** Refit our model over whatever
+   speed range Reijonen used and quote that number. State the range, so the
+   comparison is reproducible.
+2. **Downgrade "decisive"** to something like *"the closest available external
+   check on the forward model"*, and name the band, plume and powder caveats in
+   half a sentence - the plume one especially, since it is a component our model
+   omits entirely.
+3. **Drop or soften the power half** until the intercept is known. As written it
+   claims a conflict that may not exist.
+
+**Note for whoever reads Reijonen's full text** (see the open items): extract
+the fitted b *and its range of validity*, and the power fit's **intercept** as
+well as its slope. Without the intercept, point 3 cannot be resolved.
 
 ---
 
