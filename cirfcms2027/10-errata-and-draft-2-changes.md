@@ -37,6 +37,7 @@ Entries are classified:
 | E3 | error | the VED correlation coefficients do not reproduce, are grid-dependent, and are mis-framed as a check against external data | no diagnosability result; weakens one validation leg |
 | O1 | omission | the operating point the whole analysis linearises about is never stated | no |
 | S1 | suggestion | add the sensor correlation matrix - the plainest statement of the paper's problem | no, strengthens presentation |
+| S2 | suggestion | the gas profile can be inverted from benchmark data and is conservative; say so instead of calling it asserted | no, converts the paper's largest exposure |
 | W1 | working | spot size used as the Gaussian sigma instead of a D4-sigma diameter | no |
 
 ---
@@ -382,6 +383,89 @@ operating point understates the result rather than flattering it.
    conditions and five off-benchmark points leaves the instantaneous rank at 3,
    the enlarged rank at 5 and the enlarged worst pair within 25.65-29.34
    degrees."* This is a strengthening, not a concession.
+
+---
+
+# S2. The gas profile can be measured, not asserted [S]
+
+## What draft 1 says
+
+Section 3.5, after the Weaver pad-scan paragraph:
+
+> "Because the remaining profiles are asserted, all results are reported against
+> swept profile contrast rather than at a single value."
+
+and Section 5.3:
+
+> "The modulation profiles are the largest remaining exposure. One is supported
+> by benchmark measurement, but by a measurement organised differently from the
+> regressor used here; the others are asserted."
+
+Draft 1 therefore uses the Weaver gas data **qualitatively only** - as evidence
+that a gas-related modulation exists. It never converts it to a number.
+
+## Why it is worth adding
+
+It converts. Inverting Weaver's measured depth changes through the model's depth
+channel gives the gas channel's effective severity at two scan directions inside
+one healthy build:
+
+| Weaver measurement | depth change | implied f_gas |
+|---|---|---|
+| perpendicular control | -3.6 % | **0.0467** |
+| parallel, weakest cross-section | -19.4 % | 0.2749 |
+| parallel, mean of four | **-27.2 %** | **0.4043** |
+| parallel, strongest | -31.5 % | 0.4817 |
+
+    swing = 0.4043 / 0.0467 = 8.66x      measured contrast  c = ln(8.66)/2 = 1.079
+    asserted gas profile    = 6.05x      asserted contrast  c = 0.90
+
+**The one profile that can be checked against measurement is understated by
+about 20 %, not overstated.** The paper currently claims less than its own data
+supports, in the direction that costs it credibility for no reason.
+
+Depth is the right channel to invert through: at the base case the model's depth
+error is +1.72 % (0.2x the measurement uncertainty) against -15.54 % on width
+(3.4x, and one-sided). Full derivation in
+`explainers/10-measuring-the-profiles.md`.
+
+## Does it change the result?
+
+**No number in the paper changes.** The profiles stay as they are; the sweep
+stays as it is. What changes is the standing of the largest assumption: from
+"asserted, defended by sweeping" to "one channel checked against benchmark
+measurement and found conservative, the rest defended by sweeping."
+
+It also **strengthens the robustness claim**. The sweep shows the binding pairs
+survive scaling to 0.33 of asserted strength; the measurement says the real gas
+contrast is 1.2x asserted. The margin is larger than draft 1 claims.
+
+## Change for draft 2
+
+1. In Section 3.5, replace the qualitative use of the Weaver result with the
+   inverted number: *"Inverting the measured depth changes through the model's
+   depth channel gives an effective gas severity swinging 8.7x within a single
+   build, against the 6.05x asserted here - so the assumed profile is
+   conservative relative to the one channel that can be checked."*
+2. Carry the three caveats verbatim: the measured driver is scan direction
+   rather than position along the gas axis; the measurement is of baseline plume
+   behaviour in a healthy build rather than of a fault; and the inversion is
+   model-mediated.
+3. In Section 5.3, change "one is supported by benchmark measurement" to "one
+   is quantitatively consistent with benchmark measurement, and conservatively
+   so".
+
+**Report the failure too.** The same inversion applied to the geometry profile
+returns f_geometry = 6.87, that is +687 K of preheat, which is not credible as a
+measurement: a pad differs from a single track by remelting of adjacent tracks as
+well as by preheat. Reporting only the channel that worked would be
+cherry-picking. The failure also surfaces something worth one line in the
+limitations - the model's preheat channel buys only +2.23 % depth per 100 K, so
+the paper's "per 100 K" geometry results may be quoted at an unrealistically
+small fault size.
+
+**Page cost.** Roughly a third of a column for the table and caveats. The
+qualitative Weaver paragraph it replaces already occupies about half of that.
 
 ---
 
