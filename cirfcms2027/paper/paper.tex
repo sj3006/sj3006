@@ -202,10 +202,14 @@ Gladush--Smurov keyhole depth correction following Honarmandi et al.\
 \cite{Hon2021}. Four parameters --- effective absorptivity, effective
 conductivity, heat capacity and the keyhole constant --- are fitted to the seven
 IN718 bare-plate single-track cases of the 2022 Additive Manufacturing Benchmark
-\cite{Weaver2024}, giving \textbf{11.7\,\% error on melt pool width and 13.0\,\%
-on depth}. The keyhole correction is necessary rather than optional: all seven
-cases have depth-to-half-width aspect ratios between 1.45 and 4.28, and pure
-conduction gives a 27.8\,\% depth error on the same cases.
+\cite{Weaver2024}, giving \textbf{11.7\,\% mean error on melt pool width and
+13.0\,\% on depth}. All results below are evaluated at that benchmark's own
+baseline condition, 285\,W, 960\,mm\,s$^{-1}$ and a 67\,\textmu m D4$\sigma$
+spot, where the errors are $-15.5$\,\% on width and $+1.7$\,\% on depth against
+expanded uncertainties ($k=2$) of 6.2 and 14.1\,\textmu m. Width is under-predicted at all seven conditions, the
+one-sided bias of a conduction solution with no mechanism that widens a pool. The keyhole correction is necessary rather than optional: all seven cases are
+keyholing, aspect ratios 1.45--4.28, and pure conduction gives 27.8\,\% depth
+error.
 
 The quadrature in the Eagar--Tsai history integral and the derivative step are
 both set by convergence tests rather than assumed. Central differences
@@ -373,12 +377,11 @@ identifies the same pair from equation form alone.
 \label{sec:melt}
 
 The whitened $3\times5$ Jacobian has singular values 3.451, 0.155 and 0.041 ---
-rank 3, condition number 85 --- so two fault directions are unobservable, and
-they are computable. The dominant one is $(\text{power}+0.670,\
-\text{gas}+0.731,\ \text{layer}-0.112,\ \text{speed}-0.056)$; applied as a real
-fault of 5\,\% vector norm it moves the sensors by $-0.083\,\%$, $-0.067\,\%$ and
-$-0.002\,\%$, against $+7.03\,\%$, $+6.02\,\%$ and $+0.049\,\%$ for a plain 5\,\%
-power fault --- a factor of 85, the condition number.
+rank 3, condition number 85 --- so two fault directions are unobservable. The
+dominant one, $(\text{power}+0.670,\ \text{gas}+0.731,\ \text{layer}-0.112,\
+\text{speed}-0.056)$, applied as a real 5\,\% fault moves the sensors 85 times
+less than a plain 5\,\% power fault does --- the condition number, recovered
+from the model.
 
 Adding all four candidate observables gives seven rows and raises the rank only
 from 3 to \textbf{4}. The fourth direction is of no practical use: the singular
@@ -422,14 +425,12 @@ contrast. Eight of ten pairs clear the floor at or below 25\,\% of the asserted
 strength and the two hardest, power/speed and power/gas, at \textbf{40\,\%}: the
 conclusion survives the real profiles being 2.5$\times$ weaker than claimed.
 
-Four further sweeps are reported. All 120 permutations of which fault carries
-which profile give rank 5, worst angle $17.13^\circ$--$30.58^\circ$, so the
-\emph{assignment} of profiles does not matter. The unmeasured conductivity
+Four further sweeps are reported. All 120 permutations of profile assignment
+give rank 5, worst angle $17.13^\circ$--$30.58^\circ$. The unmeasured conductivity
 coupling leaves the worst angle at $25.83^\circ$ throughout its range, and four
-noise-ratio assumption sets give $24.97^\circ$--$25.83^\circ$. Segment count gives
-$11.74^\circ$ at $N=12$, $23.91^\circ$ at $N=30$, $25.83^\circ$ at $N=84$ and
-$23.03^\circ$ at $N=2400$: of order 30 segments are required, and more adds
-nothing.
+noise-ratio assumption sets give $24.97^\circ$--$25.83^\circ$. Segment count gives $11.74^\circ$ at $N=12$ and
+$23.91^\circ$ at $N=30$, flat thereafter: of order 30 segments are required, and
+more adds nothing.
 
 What the method does require is that the profiles be \emph{distinct}. Forcing
 pairs equal identifies two conditions on which the result depends: if the
@@ -496,11 +497,11 @@ $0.00^\circ$, for the reason given in Section~\ref{sec:melt}. Configuration E is
 the actionable row --- a direct measurement of delivered laser power sampled
 \emph{upstream} of the process zone separates the pair at $84.02^\circ$, because
 such a sensor sees the laser output without the plume attenuation. One surveyed
-system may belong at E rather than C, depending on whether its laser-energy
-photodiode samples upstream; this could not be established from public
-documentation, so it is counted conservatively as C. Note also that C performs worse than B despite both having two
-observables: two bands of the same emitted light are near-redundant, whereas a
-geometric measurement adds a direction.
+system may belong at E rather than C depending on whether its laser-energy
+photodiode samples upstream; public documentation does not say, so it is classed
+by what is documented. Note also that C performs worse than B despite both
+having two observables: two bands of the same emitted light are near-redundant,
+whereas a geometric measurement adds a direction.
 
 \subsection{What an added measurement would buy}
 \label{sec:added}
@@ -577,8 +578,8 @@ independent directions from those already fitted.
 \label{sec:limits}
 
 The thermal model is a conduction solution with an analytic keyhole patch: it
-partial-passes the Guo validation, absolute magnitudes are not claimed, and the
-fitted parameters sit at their bounds. The absorptivity, conductivity and heat
+partial-passes the Guo validation and its fitted parameters sit at their
+bounds. The absorptivity, conductivity and heat
 capacity correlations of 0.93--0.96 reported during Bayesian calibration of the
 same model family \cite{Hon2021} are the same pathology this paper studies,
 appearing in its own calibration. One coupling remains an unmeasured estimate,
@@ -711,7 +712,7 @@ Eagar-Tsai model for melt pool characteristics in laser powder bed fusion
 additive manufacturing, Addit. Manuf. 47 (2021) 102300.
 
 \bibitem{Trapp2017}
-J. Trapp, A. M. Rubenchik, G. Guss, M. J. Matthews, In situ absorptivity
+J. Trapp, A. M. Rubenchik, G. Guss, et al., In situ absorptivity
 measurements of metallic powders during laser powder-bed fusion additive
 manufacturing, Appl. Mater. Today (2017).
 doi:10.1016/j.apmt.2017.08.006.

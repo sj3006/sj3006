@@ -26,7 +26,9 @@ Entries are classified:
     [W]  working error - a mistake made during analysis, caught before it reached
          the paper. Logged so it is not repeated, not because draft 1 is wrong.
 
-**Nothing in this file has been applied to the paper yet.**
+**Applied to the paper so far:** O1, E2, E5, E9 (commit below). Everything else
+is still open. E8 and P1 are decisions that cascade and should be settled before
+the entries that depend on them are edited.
 
 ---
 
@@ -35,15 +37,15 @@ Entries are classified:
 | id | type | one line | changes a result? |
 |---|---|---|---|
 | E1 | error | "every conclusion invariant" to the conductivity coupling is too strong | **yes, one cell** |
-| E2 | error | 11.7 % / 13.0 % is an aggregate that hides the base-case error and a one-sided bias | no |
+| E2 | DONE | 11.7 % / 13.0 % is an aggregate that hides the base-case error and a one-sided bias | no |
 | E3 | error | the VED correlation coefficients do not reproduce, are grid-dependent, and are mis-framed as a check against external data | no diagnosability result; weakens one validation leg |
 | E4 | error | the mechanism given for the split-camera recommendation has width and length the wrong way round | no, the recommendation stands; the explanation does not |
-| E5 | error | "counted conservatively as C" is the wrong word - that choice protects our novelty claim rather than costing us | no |
+| E5 | DONE | "counted conservatively as C" is the wrong word - that choice protects our novelty claim rather than costing us | no |
 | E6 | error | the literature tally in Section 5.1 is wrong: seven works classify outcomes, not twelve, and the total is now 19 | no, but it is the paragraph a reviewer will check first |
 | E7 | error | the proposed Reijonen comparison uses the wrong quantity on our side and calls the test "decisive" | no, but the test as specified would be biased by ~12 % |
 | **E8** | **error** | **the pyrometer noise ratio is contradicted by a first-principles estimate by a factor of ~35, and the sweep that "validates" it is centred on it** | **no conclusion breaks; the headline angle drops 25.83 -> 24.98** |
-| E9 | error | the paper claims four noise assumption sets; the code contains three | no, but the paper is not reproducible from its own code |
-| O1 | omission | the operating point the whole analysis linearises about is never stated | no |
+| E9 | DONE | the paper claims four noise assumption sets; the code contains three | no, but the paper is not reproducible from its own code |
+| O1 | DONE | the operating point the whole analysis linearises about is never stated | no |
 | S1 | suggestion | add the sensor correlation matrix - the plainest statement of the paper's problem | no, strengthens presentation |
 | S2 | suggestion | the gas profile can be inverted from benchmark data and is conservative; say so instead of calling it asserted | no, converts the paper's largest exposure |
 | P1 | plan | how to fix the asserted profiles properly: measure what is measurable, then stop asserting | no numbers; changes what the paper claims to deliver |

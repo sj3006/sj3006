@@ -60,6 +60,12 @@ RATIO_SETS = {
     "fine pyrometer": {"photodiode": 1.0, "camera": 1.0, "pyrometer": 0.003,
                        "camera_width": 1.0, "camera_length": 1.0,
                        "photodiode_swir": 1.0, "pyrometer_wide": 0.003},
+    # Added to close errata E9: the paper reports four assumption sets, but this
+    # one was computed ad hoc when the robustness table was generated and never
+    # written back, so the paper was not reproducible from its own code.
+    "coarse pyrometer": {"photodiode": 1.0, "camera": 1.0, "pyrometer": 0.3,
+                         "camera_width": 1.0, "camera_length": 1.0,
+                         "photodiode_swir": 1.0, "pyrometer_wide": 0.3},
 }
 
 # Subsets worth reporting. The full power set of seven observables is 127 rows,
