@@ -41,6 +41,8 @@ Entries are classified:
 | E5 | error | "counted conservatively as C" is the wrong word - that choice protects our novelty claim rather than costing us | no |
 | E6 | error | the literature tally in Section 5.1 is wrong: seven works classify outcomes, not twelve, and the total is now 19 | no, but it is the paragraph a reviewer will check first |
 | E7 | error | the proposed Reijonen comparison uses the wrong quantity on our side and calls the test "decisive" | no, but the test as specified would be biased by ~12 % |
+| **E8** | **error** | **the pyrometer noise ratio is contradicted by a first-principles estimate by a factor of ~35, and the sweep that "validates" it is centred on it** | **no conclusion breaks; the headline angle drops 25.83 -> 24.98** |
+| E9 | error | the paper claims four noise assumption sets; the code contains three | no, but the paper is not reproducible from its own code |
 | O1 | omission | the operating point the whole analysis linearises about is never stated | no |
 | S1 | suggestion | add the sensor correlation matrix - the plainest statement of the paper's problem | no, strengthens presentation |
 | S2 | suggestion | the gas profile can be inverted from benchmark data and is conservative; say so instead of calling it asserted | no, converts the paper's largest exposure |
@@ -651,6 +653,168 @@ place it offers an external quantitative check.
 **Note for whoever reads Reijonen's full text** (see the open items): extract
 the fitted b *and its range of validity*, and the power fit's **intercept** as
 well as its slope. Without the intercept, point 3 cannot be resolved.
+
+---
+
+# E8. The pyrometer noise ratio is contradicted by first principles [E]
+
+**This is the entry to look into deeply.** It is not a wrong number copied from
+one place to another; it is an assumption that a derivation appears to
+contradict, defended by a sweep that could not have failed.
+
+## What draft 1 says
+
+Section 3.6, `paper.tex` lines 328-337:
+
+> "Only one in-process noise figure proved citable... No comparable in-process
+> characterisation was found for a coaxial photodiode or two-colour pyrometer...
+> Sensor noise is therefore treated as a *ratio* and **swept over four
+> assumption sets, with every conclusion required to hold under all of them.**"
+
+and Section 4.5, line 428-429:
+
+> "...and four noise-ratio assumption sets give $24.97^\circ$--$25.83^\circ$."
+
+The study default throughout is **photodiode 1.0, camera 1.0, pyrometer 0.03**.
+
+## What is wrong
+
+### (a) 0.03 has no derivation
+
+There is none in the code, the notes or the paper. The comment beside the
+constant reads *"same noise ratio as the Tier 2 headline"*, which points at
+another use of the same number.
+
+### (b) A first-principles estimate gives ~1, not 0.03
+
+The pyrometer reports temperature from the ratio of two bands. Using Wien,
+`dlnL/dlnT = c2 / (lam T)` with `c2 = 1.4388e-2 m K` and `T = 3030.644 K`:
+
+    lam = 750 nm    dlnL/dlnT = 6.330
+    lam = 950 nm    dlnL/dlnT = 4.997
+
+For the ratio `R = L(750)/L(950)`:
+
+    dlnR/dlnT = 6.330 - 4.997 = 1.333
+    =>  dlnT   = (1/1.333) dlnR = 0.750 dlnR
+
+If each band carries independent relative noise `eps`, the ratio carries
+`sqrt(2) eps`, so
+
+    relative temperature noise = 0.750 * 1.414 * eps = 1.06 eps
+
+and the photodiode, a single integrated band, carries about `eps`. Hence
+
+    pyrometer / photodiode  ~  1.06        the study uses 0.03
+    favourable by a factor of ~35
+
+**Why the ratio is noisier, not quieter:** taking a ratio amplifies random noise
+(sqrt(2)), and inverting it to temperature divides by a **small** exponent
+difference (1.333), which amplifies again.
+
+### (c) The sweep is centred on the assumption, so it could not fail
+
+The code's own comment states the construction: *"The first set is the one used
+throughout the study. The others are deliberate stress cases."* The four sets
+are our value, one decade either side, and the equal case. **A sweep centred on
+an assumption tests local sensitivity, not the assumption.**
+
+### (d) And our value sits on a local maximum
+
+| pyrometer sigma | 0.001 | 0.01 | **0.02** | **0.03** | 0.05 | 0.3 | 1.0 | 5.0 |
+|---|---|---|---|---|---|---|---|---|
+| enlarged worst angle | 24.90 | 25.50 | **25.92** | **25.83** | 25.48 | 24.99 | 24.98 | 24.97 |
+
+Stepping either way from 0.03 lowers the number, so the sweep **presents our
+choice as naturally optimal**. It was reassuring before it was run.
+
+There is a real mechanism behind the hump, and it is worth keeping: whitening
+divides each row by its noise, so an over-quiet pyrometer gets an enormous row
+that dominates the matrix - and one row, however loud, is still one direction,
+which cannot separate five faults. An over-noisy one vanishes and leaves two
+sensors. The optimum is the balance. **That finding is sound; using its peak as
+the default is what is not.**
+
+### (e) We labelled the defensible value as the stress case
+
+`RATIO_SETS` calls **[1, 1, 1] "equal noise"** a *"deliberate stress case"*. On
+the derivation above that set is **closer to the physically motivated value than
+our default is.**
+
+## Does it change the result?
+
+**Nothing structural.** At sigma = 1.0:
+
+- power/gas still **0.00 deg** - algebraic, noise-independent
+- instantaneous rank **3**, enlarged rank **5** - unchanged
+- enlarged worst angle **24.98 deg** against 25.83 - a loss of **0.85 deg**,
+  still 2.5x the 10 deg floor
+
+Every conclusion in the paper survives. The headline angle drops by under a
+degree.
+
+## Caveats on the derivation, for whoever picks this up
+
+The estimate above is a sketch and must be checked before it is used:
+
+- assumes both sensors are **shot-noise limited** with comparable photon budgets
+- treats the two pyrometer bands as **independent**
+- covers **random** noise only. Two-colour ratios genuinely do suppress
+  common-mode **systematic** drift (window fouling, emissivity), which whitening
+  does not model at all - so the "right" answer may differ by error type
+- narrow pyrometer bands collect **fewer** photons than the integrated
+  photodiode band, so `eps_band > eps_photodiode` and the true ratio is likely
+  **larger** than 1.06, not smaller
+- should be sanity-checked against a real two-colour pyrometer's published
+  noise-equivalent temperature difference
+
+## Change for draft 2
+
+1. **Derive the ratio properly** and report the derivation, replacing an
+   assertion with a number. An afternoon's work.
+2. **Set the sweep range from the derivation**, bracketing what the physics
+   permits rather than what we guessed.
+3. **Quote the headline at the defensible value** and report the favourable one
+   as the upper end - the opposite of the current presentation.
+4. If the derived value is near 1, **make [1,1,1] the study default** and
+   relabel 0.03 as the optimistic case.
+5. Keep the pyrometer-optimum finding; it is real and interesting. Report it as
+   a result about sensor specification, not as a justification for the default.
+
+That turns *"we assumed a number and swept around it"* into *"we derived a
+number, swept the range physics allows, and the conclusion holds throughout"* -
+which is what Section 3.6 already implies but does not do.
+
+---
+
+# E9. The paper claims four noise sets; the code contains three [E]
+
+## What draft 1 says
+
+Section 3.6 line 333 and Section 4.5 line 428 both say **four** assumption sets.
+
+## What is wrong
+
+`RATIO_SETS` in `src/route_b.py` contains **three**: study default, equal noise,
+fine pyrometer. The fourth, the coarse pyrometer at **[1, 1, 0.3]**, was
+computed ad hoc when the robustness table was generated and **never written into
+the code**.
+
+Our own files disagree too: `04-noise-position.md` says three,
+`05-validation-and-robustness.md` shows a four-row table, the paper says four.
+
+## Does it change the result?
+
+**No.** All four were reproduced and they agree, 24.97-25.83 deg. This is a
+**reproducibility** failure rather than a numerical one: a reader running the
+published code gets three sets and finds the paper describing an analysis its
+own code does not perform. That is the first thing a careful reviewer tests.
+
+## Change for draft 2
+
+Add `[1, 1, 0.3]` to `RATIO_SETS` - one line - and make the three documents
+agree. If E8 is acted on, the whole set list is being rebuilt anyway and this
+is subsumed.
 
 ---
 
