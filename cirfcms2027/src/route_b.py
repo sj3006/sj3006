@@ -44,28 +44,38 @@ from faults import FAULT_NAMES, FaultState, apply_faults
 from locality_routeA import pair_angles, rank_cond
 from observables import (PROFILE_CONTRAST, coefficient_sigmas, drivers,
                          enlarged_jacobian, regressors, scan_plan)
+from noise import DERIVED
 from sensors import ALL_SENSOR_NAMES, SENSOR_NAMES, sensor_readings
 
 __all__ = ["RATIO_SETS", "full_jacobian", "subset_summary",
            "misspecification_error", "report"]
 
-# Relative noise per sensor. The first set is the one used throughout the study.
-# The others are deliberate stress cases: an excellent pyrometer, and all
-# sensors equal. Geometric sensors (width, length) inherit the camera's figure.
+# Relative noise per observable. The default is derived from transduction
+# physics in `noise.py`; the other three are not arbitrary stress cases but the
+# named limits of the two choices that derivation had to make, plus the agnostic
+# case. Earlier drafts asserted 1 : 1 : 0.03 and swept around it, so the sweep
+# could not have failed - errata E8.
+#
+#   derived          detection-noise limit, no perimeter averaging, width and
+#                    length treated as independent. The default.
+#   gain dominated   if slow gain or emissivity drift dominates instead, the
+#                    pyrometer's ratio rejects it and the pyrometer becomes very
+#                    quiet. This is the limit the asserted 0.03 corresponds to.
+#   averaged camera  if independent per-pixel noise averages along the melt pool
+#                    boundary, the camera is quieter by sqrt(N_el) = 8.53 at
+#                    this model's grid spacing.
+#   equal noise      all observables alike; assumes nothing about transduction.
+_GAIN_PYROMETER = 0.03
+_PERIMETER_SQRT_N = 8.53
+
 RATIO_SETS = {
-    "study default": {"photodiode": 1.0, "camera": 1.0, "pyrometer": 0.03,
-                      "camera_width": 1.0, "camera_length": 1.0,
-                      "photodiode_swir": 1.0, "pyrometer_wide": 0.03},
+    "derived": dict(DERIVED),
+    "gain dominated": {**DERIVED, "pyrometer": _GAIN_PYROMETER,
+                       "pyrometer_wide": _GAIN_PYROMETER},
+    "averaged camera": {**DERIVED,
+                        **{n: DERIVED[n] / _PERIMETER_SQRT_N
+                           for n in ("camera", "camera_width", "camera_length")}},
     "equal noise": {n: 1.0 for n in ALL_SENSOR_NAMES},
-    "fine pyrometer": {"photodiode": 1.0, "camera": 1.0, "pyrometer": 0.003,
-                       "camera_width": 1.0, "camera_length": 1.0,
-                       "photodiode_swir": 1.0, "pyrometer_wide": 0.003},
-    # Added to close errata E9: the paper reports four assumption sets, but this
-    # one was computed ad hoc when the robustness table was generated and never
-    # written back, so the paper was not reproducible from its own code.
-    "coarse pyrometer": {"photodiode": 1.0, "camera": 1.0, "pyrometer": 0.3,
-                         "camera_width": 1.0, "camera_length": 1.0,
-                         "photodiode_swir": 1.0, "pyrometer_wide": 0.3},
 }
 
 # Subsets worth reporting. The full power set of seven observables is 127 rows,

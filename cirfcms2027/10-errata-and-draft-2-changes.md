@@ -26,9 +26,10 @@ Entries are classified:
     [W]  working error - a mistake made during analysis, caught before it reached
          the paper. Logged so it is not repeated, not because draft 1 is wrong.
 
-**Applied to the paper so far:** O1, E2, E5, E9, S1, E4, E6, E7. Still open:
-E1, E3, S2 and the two decisions, E8 and P1, which cascade and should be settled
-before the entries depending on them are edited.
+**Applied to the paper so far:** O1, E2, E5, E9, S1, E4, E6, E7, **E8** and
+E10. E8 was the big one: the noise figures are now derived rather than asserted,
+which moved most numbers in the paper. Still open: E1, E3, S2 and the P1
+decision.
 
 ---
 
@@ -43,7 +44,8 @@ before the entries depending on them are edited.
 | E5 | DONE | "counted conservatively as C" is the wrong word - that choice protects our novelty claim rather than costing us | no |
 | E6 | DONE | the literature tally in Section 5.1 is wrong: seven works classify outcomes, not twelve, and the total is now 19 | no, but it is the paragraph a reviewer will check first |
 | E7 | DONE | the proposed Reijonen comparison uses the wrong quantity on our side and calls the test "decisive" | no, but the test as specified would be biased by ~12 % |
-| **E8** | **error** | **the pyrometer noise ratio is contradicted by a first-principles estimate by a factor of ~35, and the sweep that "validates" it is centred on it** | **no conclusion breaks; the headline angle drops 25.83 -> 24.98** |
+| **E8** | **DONE** | **both free noise ratios were asserted and both are wrong - pyrometer by ~35x, camera by ~7x, in opposite directions** | **no conclusion breaks; headline 25.83 -> 24.90, instantaneous class 1 drops 5/10 -> 0/10** |
+| E10 | DONE | the power/gas confound formula in Section 4.2 has the wrong sign | no, the angle and column ratio were right either way |
 | E9 | DONE | the paper claims four noise assumption sets; the code contains three | no, but the paper is not reproducible from its own code |
 | O1 | DONE | the operating point the whole analysis linearises about is never stated | no |
 | S1 | DONE | add the sensor correlation matrix - the plainest statement of the paper's problem | no, strengthens presentation |
@@ -1322,3 +1324,172 @@ displaces the qualitative Weaver paragraph, which is about half of that, so S2
 costs about a sixth of a column net. P1 at Level 2 would rewrite Sections 3.5,
 4.5 and 5.3 and its page cost is not yet known. **Neither can be applied without
 finding space first**, and the cheap sources above are now spent.
+
+---
+
+# E10. The power/gas confound formula has the wrong sign [E]
+
+Found while checking which fault-space direction the whitened Jacobian cannot
+observe, during the E8 work.
+
+## What draft 1 says
+
+Section 4.2, `paper.tex`:
+
+> "Both faults act \emph{only} on the product (effective absorptivity $\times$
+> power), and the Eagar--Tsai temperature rise is linear in that product.
+> Choosing **$f_{\mathrm{gas}}=-\ln(1+f_{\mathrm{power}})$** therefore produces
+> an identical melt pool: the same temperature at every point, hence identical
+> readings from any instrument that could be built."
+
+## What is wrong
+
+The sign. Gas attenuates absorptivity as `A e^(-f_gas)` and power scales as
+`P (1 + f_power)`, so the product `A P` is unchanged when
+
+    (1 + f_power) * e^(-f_gas) = 1    =>    f_gas = +ln(1 + f_power)
+
+The draft has a minus sign, which **doubles** the perturbation instead of
+cancelling it.
+
+## Evidence
+
+Run directly against the model at f_power = +0.05:
+
+| f_gas | photodiode | camera | pyrometer |
+|---|---|---|---|
+| **+ln(1.05) = +0.048790** | ratio **1.00000000** | **1.00000000** | **1.00000000** |
+| -ln(1.05) = -0.048790 | ratio 1.13583360 | 1.12162113 | 0.99892087 |
+
+The absorptivity-power product confirms it: nominal 109.440, with f_gas = +0.0488
+it is 109.440 exactly, with f_gas = -0.0488 it is 120.658.
+
+The same conclusion from the null space of the whitened Jacobian: the direction
+(power +1, gas +1)/sqrt(2) lies **entirely** in the unobservable null space
+(projection 1.000000, response 1.8e-05 against 8.7e+00 for a plain power fault),
+while (power +1, gas -1)/sqrt(2) has only 0.325 of its norm there and a response
+of 1.24e+01. Power and gas are unobservable together when they move with the
+**same** sign, because their Jacobian columns are anti-parallel.
+
+## Does it change the result?
+
+**No.** Every reported quantity is right: the Jacobian column ratio of
+-0.99999 / -1.00000 / -0.99993, the 0.00-degree angle, the rank deficiency, the
+structural result. The formula was a one-line gloss on an identity the code never
+used - the code perturbs each fault separately and reads the columns.
+
+But it is a formula a reviewer can check in ten seconds, in the section making
+the paper's headline claim, and getting it backwards suggests not understanding
+one's own degeneracy.
+
+## Change for draft 2
+
+Applied. Section 4.2 now derives it rather than asserting it:
+
+> "Gas attenuates absorptivity as $A\,e^{-f_{\mathrm{gas}}}$ and power scales as
+> $P(1+f_{\mathrm{power}})$, so the product is unchanged whenever
+> $f_{\mathrm{gas}}=\ln(1+f_{\mathrm{power}})$, which produces an identical melt
+> pool --- the same temperature at every point, hence identical readings from any
+> instrument that could be built, verified to reproduce all three nominal
+> readings to eight significant figures."
+
+Showing the two factors and letting the cancellation fall out is both shorter and
+harder to get wrong than quoting the result.
+
+---
+
+# E8, resolved: the noise figures are now derived
+
+The entry above records the defect. This records the fix, which was large enough
+to touch nearly every number in the paper.
+
+Full derivation, with all intermediates, convergence checks and the before/after
+table: **`explainers/11-deriving-sensor-noise.md`**. Code: **`src/noise.py`**.
+
+## What was done
+
+One assumption - each radiometric channel carries the same fractional noise
+`eps` - and each instrument's chain propagated from there. Only ratios enter the
+whitening, so `eps` cancels and no absolute noise is claimed.
+
+| observable | derived sigma/eps | chain |
+|---|---|---|
+| photodiode | 1.0000 | its reading *is* a band-integrated radiometric power |
+| camera (area) | 0.1422 | eps is equivalent to a liquidus shift of eps/10.52, pushed through the real dimension solver |
+| pyrometer | 1.0612 | sqrt(2) eps on the ratio, divided by |dlnR/dlnT| = 1.333 |
+| camera_width | 0.0298 | steep lateral gradient |
+| camera_length | 0.1124 | shallow trailing edge, 3.8x worse localised |
+| photodiode_swir | 1.0000 | another band-integrated power |
+| pyrometer_wide | 0.3583 | separated bands recover sensitivity, |dlnR/dlnT| = 3.947 |
+
+**Derived 1 : 0.142 : 1.061 against the asserted 1 : 1 : 0.03.** Both free
+entries were wrong and in opposite directions: the draft made the pyrometer 35x
+too quiet and the camera 7x too noisy.
+
+## What it changed
+
+The full table is in the explainer. The ones that matter:
+
+- **Instantaneous class 1 went 5/10 to 0/10.** With the pyrometer no longer
+  granted a 35x precision advantage it stops dominating the whitened matrix, and
+  since all three rows are 99.5 % correlated the suite separates nothing per
+  segment. The paper's two-regime story gets *starker*: none per segment, all ten
+  over a build.
+- **Enlarged worst pair 25.83 -> 24.90 degrees.** Rank still 5, power/gas still
+  29.34, all ten pairs still clear the floor. The central claim is untouched.
+- **Seven observables now attain rank 3, not 4.** The fourth singular value sits
+  at 2e-7 of the leading one against the 1e-6 threshold. The paper now reports
+  the singular values and the threshold rather than the bare integer, since the
+  integer is the fragile part.
+- **Splitting the camera axes went from +13.40 to +23.89 degrees**, and is now
+  the only change that resolves anything per segment at all, 0/10 to 7/10. It
+  became the paper's strongest practical recommendation.
+- **The sensor correlation table did not move by a single digit**, because the
+  row scalings cancel in the normalisation. S1's table is invariant to the noise
+  assumption, which the paper now says explicitly.
+- **The permutation sweep narrowed from 17.13-30.58 to 24.89-25.29 degrees.**
+
+Weaker, and stated in the paper: the profiles must now be *strictly* distinct -
+every collapse falls below the floor, where the draft said only two did; the
+contrast margin is 2x rather than 2.5x; and the nonlinear margin at a +20 % fault
+is 12.82 degrees, 1.3x the floor rather than 2.2x.
+
+## The 0.03 was not arbitrary - it was an unstated limit
+
+Worth recording, because it is the fairest reading of what the draft did. The
+common-mode part of a real system's radiometric error **cancels in the
+pyrometer's ratio**, both bands sharing the optical path - that is why two-colour
+pyrometers exist. A system dominated by slow gain or emissivity drift rather than
+detection noise really would have a very quiet pyrometer, approaching 0.03.
+
+So 0.03 is the **gain-dominated limit, asserted without saying so**. For
+per-segment diagnosability the detection-noise limit is the right one, because
+gain is static over a segment and a shared bias does not discriminate between two
+fault hypotheses at the same operating point. Both limits are now swept, as two
+of the four assumption sets, along with the perimeter-averaged camera and the
+all-alike case. The old sweep was centred on the assumption it was meant to test
+(E8c); the new one brackets it.
+
+## Code consequences
+
+The noise figures were hardcoded in six places across five modules. They are now
+in `src/noise.py` alone, with `verify()` recomputing them from the model and
+asserting the stored values reproduce. That single file is what makes E9 - the
+paper claiming four assumption sets while the code held three - structurally
+unable to recur.
+
+`figures.py` also had the class counts written into a figure title in words
+("Five pairs need a measurement per segment"), which went stale the moment the
+noise changed. The title is now computed from the data.
+
+## Still open under E8
+
+- The derivation assumes independent noise on the two pyrometer channels. If an
+  instrument ratios them from a shared photocurrent the sqrt(2) is wrong.
+- `camera_width` and `camera_length` are whitened as independent while a
+  common-mode error correlates them perfectly. The honest treatment is a full
+  covariance rather than a diagonal; independence understates the split's value,
+  so the reported +23.89 degrees is a floor, but the correct number is unknown.
+- The perimeter-averaging factor sqrt(N_el) = 8.53 uses the simulation grid
+  spacing, which is not a camera's instantaneous field of view. It is swept, not
+  used, for that reason.

@@ -25,7 +25,8 @@ correction), `src/calibrate.py`, `src/structural.py` (Tier 1), and
 `src/sanity_checks.py`.
 
 **Gate 1 PASSED** — width 11.7 %, depth 13.0 % MAPE against AM-Bench 2022
-single-track data. **Tier 1 complete** — a power deviation is never isolable from
+single-track data (at the baseline condition itself, −15.5 % and +1.7 %; see
+errata E2). **Tier 1 complete** — a power deviation is never isolable from
 a degraded gas flow, under any modelling variant. Details in
 `05-risks-and-decisions.md`.
 

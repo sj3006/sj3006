@@ -49,6 +49,7 @@ import numpy as np
 from faults import FAULT_NAMES
 from locality_routeA import pair_angles, rank_cond
 from matrix import FLOOR, PAIRS, classify
+from noise import sigmas_for
 from observables import coefficient_sigmas, enlarged_jacobian, scan_plan
 from route_b import full_jacobian
 from route_c_added_sensor import add_direct_sensor
@@ -83,7 +84,7 @@ def _angles(cfg, plan):
     J_all, _ = full_jacobian()
     idx = [list(ALL_SENSOR_NAMES).index(n) for n in cfg["obs"]]
     J = J_all[idx, :]
-    sig = np.array([1.0 if "pyrometer" not in n else 0.03 for n in cfg["obs"]])
+    sig = sigmas_for(cfg["obs"])
     if cfg["direct"]:
         J, sig = add_direct_sensor(J, sig, list(cfg["direct"]), ADDED_SIGMA)
     inst = pair_angles(J, sig)
@@ -111,7 +112,7 @@ def report() -> None:
         J_all, _ = full_jacobian()
         idx = [list(ALL_SENSOR_NAMES).index(n) for n in cfg["obs"]]
         J = J_all[idx, :]
-        sig = np.array([1.0 if "pyrometer" not in n else 0.03 for n in cfg["obs"]])
+        sig = sigmas_for(cfg["obs"])
         if cfg["direct"]:
             J, sig = add_direct_sensor(J, sig, list(cfg["direct"]), ADDED_SIGMA)
         resc = {f: pair_angles(*add_direct_sensor(J, sig, [f], ADDED_SIGMA))

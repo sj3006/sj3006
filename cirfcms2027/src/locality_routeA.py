@@ -62,7 +62,7 @@ _HALF = (1e-3, 2e-3, 3e-3, 5e-3, 7e-3, 0.01, 0.015, 0.02, 0.03, 0.04, 0.05,
          0.52, 0.62, 0.75)   # top node covers profile_sweep.MAX_REACH
 NODES = np.array([-x for x in reversed(_HALF)] + [0.0] + list(_HALF))
 
-SIGMAS = np.array([1.0, 1.0, 0.03])   # same noise ratio as the Tier 2 headline
+from noise import SIGMAS               # derived; see noise.py and errata E8
 
 
 def response_curves(couplings: FaultCouplings | None = None

@@ -211,8 +211,14 @@ def fig6(J, plan):
     ax.set_xlabel("separation angle (degrees)")
     ax.set_xlim(0, 80)
     ax.legend(loc="lower right", frameon=False)
-    ax.set_title("Five pairs need a measurement per segment, none over a build",
-                 fontsize=8.5)
+    # Computed, not written in: the counts move with the noise figures and a
+    # hardcoded title went stale once already.
+    n_need = sum(1 for p in PAIRS if ri[p]["instant"] < FLOOR)
+    n_need_a = sum(1 for p in PAIRS if ra[p]["enlarged"] < FLOOR)
+    word = {0: "none", 1: "one", 2: "two", 3: "three", 4: "four", 5: "five",
+            6: "six", 7: "seven", 8: "eight", 9: "nine", 10: "ten"}
+    ax.set_title(f"{word[n_need].capitalize()} of ten pairs need a measurement per"
+                 f" segment, {word[n_need_a]} over a build", fontsize=8.5)
     return _save(fig, "fig6_matrix.png")
 
 

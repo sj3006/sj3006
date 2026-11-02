@@ -267,7 +267,8 @@ if __name__ == "__main__":
     for j, r in enumerate(REGRESSOR_NAMES):
         print(f"   {r:14s}" + "".join(f"{B[j, k]:>11.3f}" for k in range(len(FAULT_NAMES))))
 
-    sig_inst = np.array([1.0, 1.0, 0.03])
+    from noise import SIGMAS
+    sig_inst = SIGMAS
     inst = whiten(J, sig_inst)
     big = enlarged_jacobian(J, plan)
     sig_big = np.repeat(sig_inst, len(REGRESSOR_NAMES))

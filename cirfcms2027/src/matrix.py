@@ -73,6 +73,7 @@ import numpy as np
 from diagnosability import jacobian
 from faults import FAULT_NAMES
 from locality_routeA import SIGMAS, pair_angles, rank_cond
+from noise import sigmas_for
 from observables import coefficient_sigmas, enlarged_jacobian, scan_plan
 from route_b import full_jacobian
 from route_c_added_sensor import add_direct_sensor
@@ -99,7 +100,7 @@ def classify(sensor_subset, plan=None, floor=FLOOR, regime="accumulated"):
     J_all, _ = full_jacobian()
     idx = [list(ALL_SENSOR_NAMES).index(n) for n in sensor_subset]
     J = J_all[idx, :]
-    sig = np.array([1.0 if "pyrometer" not in n else 0.03 for n in sensor_subset])
+    sig = sigmas_for(sensor_subset)
 
     inst = pair_angles(J, sig)
     big = enlarged_jacobian(J, plan)
@@ -179,7 +180,7 @@ def contrast_to_clear(sensor_subset, plan=None, floor=FLOOR,
     J_all, _ = full_jacobian()
     idx = [list(ALL_SENSOR_NAMES).index(n) for n in sensor_subset]
     J = J_all[idx, :]
-    sig = np.array([1.0 if "pyrometer" not in n else 0.03 for n in sensor_subset])
+    sig = sigmas_for(sensor_subset)
     G = regressors(plan)
     out = {}
     for p in PAIRS:

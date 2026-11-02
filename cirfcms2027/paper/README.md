@@ -38,22 +38,44 @@ Content removed, in case any of it should come back if the venue allows more:
   and NIST AMS 100-35 (Lane et al.). The claims they supported either have
   sibling citations or were reworded to stand without one.
 
-Only `fig6_matrix.png` (the diagnosability matrix) remains in the paper. The
-other figure files are kept in this directory so they can be reinstated.
+### Cut again when the derived noise figures were added
+
+Deriving the sensor noise (errata E8) added a methods subsection and moved most
+numbers in the paper, which cost roughly a page and a half. What went, beyond
+another compression pass over essentially every paragraph:
+
+- **All figures.** `fig6_matrix.png` was the last one standing and is now
+  Table~1, the same information as exact numbers in about two thirds of the
+  space. With the derived figures every instantaneous bar sits near zero, so the
+  chart had half its data as invisible slivers; the table is both smaller and
+  more precise. **The paper currently has no figures**, which is unusual for
+  Procedia and is the first thing to reinstate if a seventh page is available.
+- **The configuration table.** Four of its five rows had become identical
+  (0/10 and 0.00 degrees for A through D), so it carried almost no information.
+  The five classes are now enumerated in prose with their ranks.
+- **The standalone "A design rule" subsection**, folded into the end of
+  Section 4.7 as two sentences.
+- **One citation**, Frisk et al. (2017), the FDI toolbox paper. It appeared only
+  alongside Krysander and Frisk (2008), which carries the same claim.
+
+The figure files are all kept in this directory so they can be reinstated.
 
 ## Still to do before submission
 
 1. **Author block and affiliation** --- currently a marked placeholder.
 2. **Acknowledgements / funding** --- marked `TODO` in the source.
 3. **Journal name** in `\journal{}`, and the conference line Procedia requires.
-4. **Trapp et al. (2017)** --- volume and page numbers could not be confirmed
-   from this machine (publisher hosts are blocked); the DOI is confirmed. Add
-   volume/pages, believed to be 9:341--349.
-5. **The Reijonen comparison** (Section 5.1) is proposed in the paper as the
-   decisive test of the forward model. If the fitted exponent `b` can be read
-   from that paper, it is directly comparable to our Jacobian entry of
-   $-0.483$, and the power response to $+1.518$. Worth doing before submission
-   because it could also contradict the model.
+4. **Trapp et al. (2017)** --- volume **9** is now confirmed and in the
+   bibliography; the page range still is not (publisher hosts are blocked from
+   this machine). Believed to be 341--349. The DOI is confirmed.
+5. **The Reijonen comparison** (Section 5.1). The paper now specifies it
+   correctly --- a fitted exponent must be compared against a fitted exponent,
+   and this model gives $-0.429$ over 0.4--2.2\,m\,s$^{-1}$, not the Jacobian
+   entry $-0.483$ (errata E7). What is still needed from that paper's full text
+   is the fitted `b` **with its range of validity**, and the power fit's
+   **intercept**, without which the paper cannot say whether their power result
+   disagrees with ours at all.
+6. **Consider restoring a figure.** See the cut list above.
 
 ## Numbers
 
@@ -61,10 +83,23 @@ Every figure quoted in the paper was regenerated from the current code during
 drafting, not copied from the earlier markdown draft. Three claims in that draft
 did not reproduce and were corrected here:
 
-- The seven-observable rank is **4**, not 3, with the fourth direction at a
-  condition number of 2.3e5. The draft said rank stayed at 3.
-- The whitened singular values are 3.451 / 0.155 / 0.041; the draft listed
-  2.928 / 0.0407 / 0.0054.
 - The collinearity-index figures (141 869 -> 2.1) did not reproduce and were
-  replaced throughout by the condition number (85 -> 30), which is cleaner and
-  was verified.
+  replaced throughout by the condition number, which is cleaner and was verified.
+
+Two further corrections in that list have since been superseded by the derived
+noise figures (errata E8), which changed the whitening and so most numbers in the
+paper. Current values, all from `src/noise.py`'s derived set:
+
+- Whitened singular values **13.14 / 0.0638 / 0.00513**, rank 3, condition
+  number **2562**. (The first draft listed 2.928 / 0.0407 / 0.0054; the asserted
+  noise gave 3.451 / 0.155 / 0.041 and a condition number of 85.)
+- Seven observables attain rank **3**, not 4, the fourth singular value sitting
+  at 2e-7 of the leading one against the 1e-6 threshold. Under the asserted noise
+  it reached 4, which shows the integer was tolerance-sensitive; the paper now
+  reports the singular values and the threshold rather than the bare rank.
+- Enlarged: rank 5, worst pair **24.90 degrees**, condition number 50, all ten
+  pairs clearing the floor. (Asserted noise gave 25.83 and 30.)
+- Instantaneous class 1 for the baseline suite is **0/10**, not 5/10.
+
+The before-and-after table for every affected quantity is in
+`explainers/11-deriving-sensor-noise.md`, section H.
