@@ -26,9 +26,9 @@ Entries are classified:
     [W]  working error - a mistake made during analysis, caught before it reached
          the paper. Logged so it is not repeated, not because draft 1 is wrong.
 
-**Applied to the paper so far:** O1, E2, E5, E9 (commit below). Everything else
-is still open. E8 and P1 are decisions that cascade and should be settled before
-the entries that depend on them are edited.
+**Applied to the paper so far:** O1, E2, E5, E9, S1, E4, E6, E7. Still open:
+E1, E3, S2 and the two decisions, E8 and P1, which cascade and should be settled
+before the entries depending on them are edited.
 
 ---
 
@@ -39,14 +39,14 @@ the entries that depend on them are edited.
 | E1 | error | "every conclusion invariant" to the conductivity coupling is too strong | **yes, one cell** |
 | E2 | DONE | 11.7 % / 13.0 % is an aggregate that hides the base-case error and a one-sided bias | no |
 | E3 | error | the VED correlation coefficients do not reproduce, are grid-dependent, and are mis-framed as a check against external data | no diagnosability result; weakens one validation leg |
-| E4 | error | the mechanism given for the split-camera recommendation has width and length the wrong way round | no, the recommendation stands; the explanation does not |
+| E4 | DONE | the mechanism given for the split-camera recommendation has width and length the wrong way round | no, the recommendation stands; the explanation does not |
 | E5 | DONE | "counted conservatively as C" is the wrong word - that choice protects our novelty claim rather than costing us | no |
-| E6 | error | the literature tally in Section 5.1 is wrong: seven works classify outcomes, not twelve, and the total is now 19 | no, but it is the paragraph a reviewer will check first |
-| E7 | error | the proposed Reijonen comparison uses the wrong quantity on our side and calls the test "decisive" | no, but the test as specified would be biased by ~12 % |
+| E6 | DONE | the literature tally in Section 5.1 is wrong: seven works classify outcomes, not twelve, and the total is now 19 | no, but it is the paragraph a reviewer will check first |
+| E7 | DONE | the proposed Reijonen comparison uses the wrong quantity on our side and calls the test "decisive" | no, but the test as specified would be biased by ~12 % |
 | **E8** | **error** | **the pyrometer noise ratio is contradicted by a first-principles estimate by a factor of ~35, and the sweep that "validates" it is centred on it** | **no conclusion breaks; the headline angle drops 25.83 -> 24.98** |
 | E9 | DONE | the paper claims four noise assumption sets; the code contains three | no, but the paper is not reproducible from its own code |
 | O1 | DONE | the operating point the whole analysis linearises about is never stated | no |
-| S1 | suggestion | add the sensor correlation matrix - the plainest statement of the paper's problem | no, strengthens presentation |
+| S1 | DONE | add the sensor correlation matrix - the plainest statement of the paper's problem | no, strengthens presentation |
 | S2 | suggestion | the gas profile can be inverted from benchmark data and is conservative; say so instead of calling it asserted | no, converts the paper's largest exposure |
 | P1 | plan | how to fix the asserted profiles properly: measure what is measurable, then stop asserting | no numbers; changes what the paper claims to deliver |
 | W1 | working | spot size used as the Gaussian sigma instead of a D4-sigma diameter | no |
@@ -389,7 +389,8 @@ independent information rather than carrying it.
 
 ## Evidence
 
-Adding one dimension at a time to the baseline three-sensor suite:
+Adding one dimension at a time to the baseline three-sensor suite, keeping the
+area channel (instantaneous class-1 count; power/speed in the enlarged regime):
 
 | added | instantaneous class 1 | power/speed |
 |---|---|---|
@@ -402,6 +403,27 @@ Adding one dimension at a time to the baseline three-sensor suite:
 Width alone takes the instantaneous class-1 count from 5/10 to **9/10**; length
 alone reaches 7/10. Width is the stronger single addition, which is the opposite
 of what the draft's mechanism predicts.
+
+**Care with this table: it is not the paper's configuration.** The rows above ADD
+a dimension on top of the area channel. The paper's +13.40 deg is the REPLACE
+case - photodiode, width, length, pyrometer, with the area channel dropped -
+which is what "reporting the camera's two axes separately rather than as an area"
+means. Both were recomputed:
+
+| configuration | inst class 1 | power/speed inst | power/speed enlarged |
+|---|---|---|---|
+| base (area) | 5/10 | 7.12 | 25.83 |
+| **replace area by w+l** | **9/10** | **31.35** | **39.23** |
+| add w+l to area | 9/10 | 27.53 | 36.45 |
+| replace: width only | 9/10 | 21.98 | 32.74 |
+| replace: length only | 7/10 | 24.29 | 34.23 |
+
+**The paper's 39.23 deg is correct**; it is the replace row. Note that under the
+replace framing the two measures disagree on which single axis is better: width
+wins the class-1 count 9/10 to 7/10, length wins the power/speed angle 34.23 to
+32.74. The correlation argument is the one that generalises, so the paper's
+corrected sentence rests on the correlation (0.779 vs 0.979), not on either
+single-axis angle.
 
 ## Does it change the result?
 
@@ -550,6 +572,32 @@ class rather than its components."*
 
 "Only four of nineteen even try, and one of those reports the lumped group" is a
 sharper indictment than "12 classify outcomes".
+
+**Correction made while applying this, the "four" is three.** Re-counting the
+class column against each row's *input* column, the works that estimate a
+process input **from an in-situ signal** are:
+
+| row | work | input | estimated |
+|---|---|---|---|
+| 2 | k-NN parameter estimation, 2025 | melt pool images | energy density **class** (lumped) |
+| 6 | RAISE-LPBF, 2024 | on-axis video | laser power and speed |
+| 11 | Liu et al., 2022 | infrared camera, post-recoat transient | local powder layer thickness |
+
+Row 16 (Honarmandi et al.) was counted in the proposed "four" but does not
+belong: its input is *Bayesian calibration of Eagar-Tsai*, not an in-situ
+signal, so it is model-parameter inference rather than in-situ estimation. Row
+19 (Reijonen) reports sensitivities, not estimates.
+
+Full accounting of the 19: 7 outcome, 5 addressing neither, 3 estimating an
+input from a signal, and 4 reporting cause-level physics or sensitivity without
+estimating anything (rows 1, 15, 16, 19).
+
+**What went into the paper:** *"Of 19 works extracted --- in-situ LPBF
+monitoring with a stated input signal and output, 2019--2025 --- seven classify
+outcomes and only three estimate a process input from an in-situ signal, one of
+those a lumped energy-density class rather than its components."* Point 2 (the
+structural argument from Section 4.3) and point 3 (the inclusion criterion, as
+the em-dashed clause) were applied in the same rewrite.
 
 **2. Argue from Section 4.3 instead of from a head-count.** The parenthetical -
 *"a melt pool deeper than the layer will fuse whatever made it deep"* - is doing
@@ -1229,3 +1277,48 @@ loose ends rather than established defects.
 - **The Reijonen comparison** proposed in Section 5.1 has not been carried out.
   Their fitted speed exponent b is directly comparable to our Jacobian entry of
   -0.483, and their power response to our +1.518. It could contradict the model.
+
+---
+
+# Applying S1, E4, E6 and E7: what it cost in page space
+
+Logged because the next person to apply an errata entry will hit the same wall.
+
+The four entries together **added** material to a paper that was already at
+exactly six pages: the correlation matrix (S1), a longer and more careful
+mechanism sentence (E4), and a Section 5.1 that now states its inclusion
+criterion, argues structurally and specifies the Reijonen test properly (E6,
+E7). That pushed it to seven pages, and roughly half a column had to be
+recovered from elsewhere.
+
+Where it came from, in the order it was tried:
+
+1. **Prose compression across fourteen passages** - Sections 1, 2.1, 2.2, 2.3,
+   3.1, 3.2, 3.5, 3.6, 4.4, 4.5, 4.6, 4.7, 5.2, 5.3 and the conclusions. No
+   claim, number or citation was removed; only wording. Worth about five lines
+   in total, which is far less than it feels like while doing it.
+2. **S1's table became a displayed matrix.** The 3x3 correlation table with a
+   float and caption cost about sixteen lines; `\begin{equation}` with the same
+   nine numbers costs about eight, and arguably reads better, since it shows the
+   object *is* the normalised Gram matrix rather than a table derived from one.
+   The sensor order moved into the sentence above it.
+3. **The bibliography was justified rather than ragged-right**, then set in
+   `\scriptsize` rather than `\footnotesize`. This is what actually closed the
+   gap - worth more than every prose trim combined, because fourteen references
+   at about four lines each is a large fixed block.
+
+**What did not work, and is worth knowing.** The matrix figure's width makes no
+difference anywhere between 0.60 and 0.90 of the column: the overflow is
+identical at both, because the float lands at the top of a column either way and
+the surrounding text fills the same space. Only below about 0.46 does it change
+the page count, and at that size the figure is illegible. It is now set at
+**0.90** - legible, and free. Float-driven page breaks are quantised; measuring
+"lines on page 7" after each small trim is misleading, because nothing moves
+until a threshold is crossed.
+
+**Remaining space position.** The paper is at six pages with no slack. S2 asks
+for roughly a third of a column (the inverted gas table and its caveats) and
+displaces the qualitative Weaver paragraph, which is about half of that, so S2
+costs about a sixth of a column net. P1 at Level 2 would rewrite Sections 3.5,
+4.5 and 5.3 and its page cost is not yet known. **Neither can be applied without
+finding space first**, and the cheap sources above are now spent.
