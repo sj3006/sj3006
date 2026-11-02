@@ -26,10 +26,11 @@ Entries are classified:
     [W]  working error - a mistake made during analysis, caught before it reached
          the paper. Logged so it is not repeated, not because draft 1 is wrong.
 
-**Applied to the paper so far:** O1, E2, E5, E9, S1, E4, E6, E7, **E8** and
-E10. E8 was the big one: the noise figures are now derived rather than asserted,
-which moved most numbers in the paper. Still open: E1, E3, S2 and the P1
-decision.
+**Applied to the paper so far:** all of them --- O1, E2, E5, E9, S1, E4, E6, E7,
+E8, E10, E1, E3, S2 and the P1 reframing (Level 2), plus E11 and W2 found while
+applying them. Nothing in this file is outstanding. E8 was the largest: the noise
+figures are now derived rather than asserted, which moved most numbers in the
+paper.
 
 ---
 
@@ -37,9 +38,9 @@ decision.
 
 | id | type | one line | changes a result? |
 |---|---|---|---|
-| E1 | error | "every conclusion invariant" to the conductivity coupling is too strong | **yes, one cell** |
+| E1 | DONE | "every conclusion invariant" to the conductivity coupling is too strong | no longer, after E8: the cell it changed is now moot |
 | E2 | DONE | 11.7 % / 13.0 % is an aggregate that hides the base-case error and a one-sided bias | no |
-| E3 | error | the VED correlation coefficients do not reproduce, are grid-dependent, and are mis-framed as a check against external data | no diagnosability result; weakens one validation leg |
+| E3 | DONE | the VED correlation coefficients do not reproduce, are grid-dependent, and are mis-framed as a check against external data | no diagnosability result; replaced by a grid-independent exponent test |
 | E4 | DONE | the mechanism given for the split-camera recommendation has width and length the wrong way round | no, the recommendation stands; the explanation does not |
 | E5 | DONE | "counted conservatively as C" is the wrong word - that choice protects our novelty claim rather than costing us | no |
 | E6 | DONE | the literature tally in Section 5.1 is wrong: seven works classify outcomes, not twelve, and the total is now 19 | no, but it is the paragraph a reviewer will check first |
@@ -49,8 +50,10 @@ decision.
 | E9 | DONE | the paper claims four noise assumption sets; the code contains three | no, but the paper is not reproducible from its own code |
 | O1 | DONE | the operating point the whole analysis linearises about is never stated | no |
 | S1 | DONE | add the sensor correlation matrix - the plainest statement of the paper's problem | no, strengthens presentation |
-| S2 | suggestion | the gas profile can be inverted from benchmark data and is conservative; say so instead of calling it asserted | no, converts the paper's largest exposure |
-| P1 | plan | how to fix the asserted profiles properly: measure what is measurable, then stop asserting | no numbers; changes what the paper claims to deliver |
+| S2 | DONE | the gas profile can be inverted from benchmark data and is conservative; say so instead of calling it asserted | no, converts the paper's largest exposure |
+| E11 | DONE | the pad depth "175 um, U = 6-11 um" in Section 3.5 has no traceable source | no, the inversion uses the percentages |
+| W2 | working | I evaluated the keyhole correction on model rather than measured dimensions, breaking the S2 inversion | no, caught before it reached the paper |
+| P1 | DONE | how to fix the asserted profiles properly: measure what is measurable, then stop asserting | no numbers; changes what the paper claims to deliver |
 | W1 | working | spot size used as the Gaussian sigma instead of a D4-sigma diameter | no |
 
 ---
@@ -1493,3 +1496,257 @@ noise changed. The title is now computed from the data.
 - The perimeter-averaging factor sqrt(N_el) = 8.53 uses the simulation grid
   spacing, which is not a camera's instantaneous field of view. It is swept, not
   used, for that reason.
+
+---
+
+# E1, resolved: the conductivity coupling, re-derived after E8
+
+The original entry was written under the asserted noise figures and two of its
+three findings did not survive E8. Re-derived under the derived set:
+
+**Dead.** "speed/layer crosses the isolability floor inside the swept range" and
+"the instantaneous class-1 count of 5/10 depends on this one marginal pair".
+Under the derived noise, speed/layer runs 0.70--1.06 degrees across the whole
+coupling range, nowhere near the 10 degree floor, and the instantaneous count is
+0/10 at every value. The contingency E1 worried about was removed by E8, not by
+E1.
+
+**Confirmed and sharper.** At `layer_to_conductivity = 0` the layer fault joins
+the power/gas degeneracy **exactly**, and this is noise-independent because it is
+a statement about column direction:
+
+    c_k = 0.00   layer column / power column = [-0.044, -0.044, -0.043999]
+    c_k = 0.50   layer column / power column = [-0.385, -0.372, -0.332]
+
+The predicted net on the absorbed-power product is -0.230 + 0.186 = **-0.044**,
+which the three sensors reproduce to five figures. Power/layer and layer/gas both
+read 0.00 degrees: a **three-way** exact confound instead of a pair.
+
+**Confirmed, and now exact.** The enlarged worst pair is **24.90 degrees at
+every value of the coupling from 0 to 1.5**, and power/layer and speed/layer are
+constant to two decimals (36.26 and 46.16). The mechanism is unchanged: the
+coupling moves the layer column's *magnitude* by 23x (whitened norm 0.384 to
+9.003) while moving its *direction* by under a third of a degree, and angles
+depend only on direction.
+
+## Change for draft 2
+
+Applied. Section 3.2 now reads:
+
+> "The conductivity coupling remains an unmeasured estimate, swept across its
+> range in Section 4.5 with every accumulated-regime result invariant to it, but
+> it is load-bearing instantaneously: the other two channels nearly cancel on the
+> absorbed-power product ($-0.230+0.186=-0.044$), so without it the layer fault
+> acts only through that product and joins the power/gas degeneracy
+> *exactly* --- its Jacobian column becomes $-0.044$ times the power column on all
+> three sensors, and power/layer and layer/gas both read $0.00^\circ$. This one
+> unmeasured coupling is all that distinguishes a thin layer from a weak laser at
+> an instant."
+
+## The code fix, which was worse than the entry said
+
+`FaultCouplings` claimed conductivity was "by far the weakest of the three layer
+effects", quoting 3.4% / 1.6% / 0.35% depth changes at f = 0.2. Those do not
+reproduce. Re-measured, isolating each channel:
+
+| at f_layer = 0.2 | depth | width |
+|---|---|---|
+| absorptivity only | -2.57 % | -1.19 % |
+| enthalpy only | +2.12 % | +0.94 % |
+| conductivity only | -0.75 % | +1.16 % |
+| absorptivity + enthalpy | **-0.50 %** | **-0.23 %** |
+| all three | -1.25 % | +0.93 % |
+
+Because the first two nearly cancel, conductivity is the **dominant surviving
+channel**, not the weakest: it supplies -0.75 of the -1.25 net on depth, and on
+**width** - which is what the camera actually measures - it is five times the
+other two combined and **flips the sign** of the net. The docstring stated the
+opposite of the truth and now carries the table above.
+
+(The earlier errata re-measurement quoted -3.55 / +2.97 / -1.41. Those were
+measured on a different depth definition; the figures above are from the current
+code, isolating each coupling with the other two set to zero.)
+
+---
+
+# E3, resolved: a grid-independent replacement for the correlation
+
+The entry stands as written: +0.032 does not reproduce (the grid returns
+**+0.201**), the width correlation is not robust to the grid, and "two checks
+against data not used in the fit" was wrong for this one. All three are fixed.
+
+The interesting part is what replaced it. A Pearson coefficient answers "does
+this track VED" badly, because it depends on which region of parameter space is
+sampled:
+
+| grid | width r | depth r |
+|---|---|---|
+| sanity_checks 3x3x3 | **+0.201** | +0.767 |
+| benchmark spot range | **+0.644** | +0.860 |
+| benchmark P and v | **+0.677** | +0.877 |
+| wide spots | **-0.223** | +0.704 |
+| dense 4x4x3 | **+0.109** | +0.748 |
+
+Width swings from +0.68 to -0.22. Depth is stable. So the *comparative* claim
+survives every grid and the absolute one does not.
+
+**The exponents are a property of the model, not of the sample.** Each dimension
+follows a power law in (P, v, d) to R^2 >= 0.94 for width and depth, and VED =
+P/(v d^2) means a pure function of VED must have exponents along the ray
+(1, -1, -2). Measuring the angle to that ray:
+
+| dim | cos(exponents, VED ray) across five grids |
+|---|---|
+| **width** | **-0.107 to +0.002** - essentially orthogonal |
+| **depth** | **+0.642 to +0.736** |
+| length | +0.250 to +0.397 |
+
+Depth sits closer to the VED ray than width on **every** grid, where the
+correlation coefficient reverses sign across them.
+
+**The mechanism, which the correlation hides.** The fitted exponents are
+
+    width  ~ (P/v)^0.32 * d^(+0.38)
+    depth  ~ (P/v)^0.56 * d^(-0.14)
+    length ~ P^1.00     * v^(~0) * d^(~0)
+
+Both width and depth are near-functions of P/v; they differ in the **sign of the
+spot exponent**, and spot size is the one variable a volumetric density folds
+away. A bigger spot makes a wider but shallower pool, while VED treats it as
+reducing energy density - so depth follows VED's sign in d and width opposes it.
+That is why depth tracks VED and width does not, stated without reference to any
+grid.
+
+**Length corroborates Section 4.7 from a new direction.** Length goes as P^1.00
+with essentially no speed or spot dependence, which is the classic high-Peclet
+Rosenthal limit (Pe = 5.05 at the base case). So at constant energy density,
+where P and v scale together, length moves with P while width barely moves -
+independently reproducing the 2.53x against 1.11x result, and explaining why the
+two axes carry different information.
+
+## Change for draft 2
+
+Applied to Section 4.1, which now opens "One external check and one of internal
+structure", quotes the reproducible +0.20 / +0.77, states the grid sensitivity,
+and gives the cos values and the mechanism. The code fix is applied too:
+`sanity_checks.py` used a hardcoded `ABS = 0.35` instead of the calibrated 0.384,
+and now imports `IN718_ABSORPTIVITY`. A new `check_energy_density_exponents()`
+runs the five-grid exponent test so the paper's numbers come from the code.
+
+---
+
+# E11. An unsourced measurement in Section 3.5 [E]
+
+## What draft 1 says
+
+> "...on tracks scanned parallel to the gas flow relative to anti-parallel
+> tracks, against expanded uncertainties of **6--11 um on depths near 175 um**,
+> attributed to vapour-plume interaction with the laser."
+
+## What is wrong
+
+Neither figure is traceable. "175 um" and "6--11 um" appear nowhere in this
+project's records - not in the extraction table, not in the explainers, not in
+`calibrate.py`'s transcription of Weaver Table 4. The single-track figures that
+*are* recorded are different numbers (depth 139.7 um, U(k=2) = 14.1 um at case 0),
+and the pads are a different measurement from the single tracks.
+
+While applying S2 I first "corrected" 175 to 140 by substituting the single-track
+value, which is equally wrong for a different reason: it quotes a single-track
+depth as if it were a pad depth.
+
+## Does it change the result?
+
+**No.** The inversion uses the measured depth *percentages* (-3.6 %, -19.4 %,
+-27.2 %, -31.5 %), which are recorded and traceable. The absolute depth was
+context only.
+
+## Change for draft 2
+
+Applied: both figures are removed and the sentence now states the percentages
+and the control, plus the condition the inversion is performed at. An absolute
+pad depth should go back only if it can be read from the paper's own tables.
+
+---
+
+# W2. The keyhole correction evaluated on the wrong dimensions [W]
+
+## Where it happened
+
+Not in the paper. In the script that re-verified S2's gas inversion.
+
+## What is wrong
+
+`corrected_depth(beam, material, C, conduction_depth, conduction_width)` applies
+the Gladush-Smurov term only if `is_keyholing(width, depth)` passes. I passed the
+**model's** conduction dimensions (115.1 x 69.7 um), which fail the criterion, so
+the correction was silently inert and the function returned the bare conduction
+depth.
+
+The criterion is meant to be evaluated on the **measured** dimensions - its own
+docstring says so, "so that the criterion does not depend on the model being
+corrected". Case 0's measured 136.3 x 139.7 um passes it, and the correction adds
+72.40 um to the conduction depth's 69.70, giving 142.10 um against a measured
+139.7 - the **+1.72 %** the paper quotes.
+
+## How it was caught
+
+The gas channel's depth response came out at -2.79 % per f_gas = 0.05 where
+`explainers/10-measuring-the-profiles.md` recorded -3.85 %, and the inversion
+returned f_gas = 0.0645 against the recorded 0.0467. **A number that had been
+computed before stopped reproducing**, which is the check that mattered. I first
+suspected the explainer, then the D4-sigma bug of W1, then the operating point,
+before finding it was the regime criterion.
+
+With the correction active the response reproduces exactly: -3.85 %, -14.53 %,
+-26.96 % at f_gas = 0.05, 0.20, 0.40, and f_gas = 0.0467 / 0.2749 / 0.4043 /
+0.4817 for the four measurements. The keyhole term scales as A*P, so a gas fault
+attenuating absorptivity by exp(-f) scales it by exp(-f) too - which is *why* the
+response is steeper than conduction alone and why getting this wrong mattered.
+
+## Does it change the result?
+
+**No.** The error was mine, during verification; the explainer and the paper were
+right. Logged because the failure mode is subtle and will recur.
+
+## Change for draft 2
+
+None to the paper. One process note: `corrected_depth` takes the dimensions used
+for the regime test as arguments, which makes it easy to pass the wrong ones
+silently. It would be safer if it took the measured pair explicitly, or warned
+when the criterion fails on inputs that look like model output.
+
+---
+
+# P1, resolved: Level 2 adopted
+
+The recommendation was "do Level 1 for the layer profile, write the paper at
+Level 2, name Level 4 as future work, and use Level 3 to narrow what Level 1 has
+to achieve." Of these:
+
+**Level 2 is adopted, and is the main change.** The paper no longer presents one
+assumed profile set with a robustness sweep attached. Section 3.5 states that the
+profiles are machine-specific - a different nozzle, scan strategy or part gives
+different patterns, so there is no universal set of five to find - and Section 4.5
+now opens "Because the profiles are machine-specific, the primary result is
+separability *as a function of* profile strength". The S2 inversion is presented
+as the recipe a reader applies to their own machine, and the conclusions say so.
+
+**Level 4 is named.** Section 5.3: "no dataset yet offers a build with
+*deliberately induced* machine faults: every inversion here reads a healthy build
+and extrapolates, and that experiment is the natural follow-on."
+
+**Level 3 needed re-deriving and came out weaker.** The original argument was
+that the method needs only *distinct* patterns and fails in two specific cases.
+Under the derived noise figures every collapse falls below the floor, because
+forcing two profiles equal returns that pair to its instantaneous angle and all
+of those are now under 5 degrees. What survives is the part that matters: the
+requirement is distinctness, **not accuracy**, so what must be established on a
+given machine is "are these signatures distinguishable here", not "how strong is
+each of five profiles". The paper states it that way, and notes that the
+recoater/gas half is settled by the benchmark periodicity evidence.
+
+**Level 1 for the layer profile was not done.** It needs the full text of Liu et
+al. (2022) and the 2023 lock-in follow-up, which are not reachable from this
+machine. It remains the single highest-value item outstanding, and is now the
+only one.

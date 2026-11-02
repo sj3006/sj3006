@@ -176,9 +176,38 @@ class FaultCouplings:
     parameter, not the powder's own, so the published ratio does not transfer and
     no measurement constrains its sensitivity to layer thickness.
 
-    It is kept, declared an estimate, and swept 0 to 1.5. It is also by far the
-    weakest of the three layer effects: isolating each at f = 0.2 moves the melt
-    depth by 3.4% (absorptivity), 1.6% (enthalpy) and 0.35% (conductivity).
+    It is kept, declared an estimate, and swept 0 to 1.5.
+
+    An earlier version of this docstring called it "by far the weakest of the
+    three layer effects", quoting 3.4% / 1.6% / 0.35% depth changes at f = 0.2.
+    Those figures do not reproduce and the ordering they imply is misleading
+    (errata E1). Re-measured at f = 0.2, isolating each channel in turn:
+
+                        depth      width
+        absorptivity   -2.57%     -1.19%
+        enthalpy       +2.12%     +0.94%
+        conductivity   -0.75%     +1.16%
+        absorp+enth    -0.50%     -0.23%     <- the two nearly cancel
+        all three      -1.25%     +0.93%
+
+    Because the first two nearly cancel, conductivity is the *dominant surviving*
+    channel, not the weakest: it supplies -0.75 of the -1.25 net on depth, and on
+    WIDTH - which is what the camera actually measures - it is five times the
+    other two combined and flips the sign of the net.
+
+    The consequence is structural. The absorptivity and enthalpy couplings act on
+    the product (absorptivity x power), netting -0.230 + 0.186 = -0.044. With
+    layer_to_conductivity = 0 the layer fault therefore acts ONLY through that
+    product, which is the same channel power and gas act through, and its Jacobian
+    column becomes exactly -0.044 times the power column on all three sensors.
+    Power/layer and layer/gas both collapse to 0.00 degrees: a three-way exact
+    confound instead of a pair.
+
+    So this one unmeasured coupling is the only thing that makes a thin layer
+    instantaneously distinguishable from a weak laser. Every accumulated-regime
+    result is invariant to it - the enlarged worst pair is 24.90 degrees at every
+    value from 0 to 1.5, because the coupling changes the layer column's
+    magnitude by 23x while moving its direction by under a third of a degree.
     """
 
     layer_to_absorptivity: float = -0.230

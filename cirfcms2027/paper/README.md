@@ -38,6 +38,17 @@ Content removed, in case any of it should come back if the venue allows more:
   and NIST AMS 100-35 (Lane et al.). The claims they supported either have
   sibling citations or were reworded to stand without one.
 
+### Cut a third time for E1, E3, S2 and the P1 reframing
+
+Those four added a grid-independent validation test, the gas-profile inversion
+and the machine-specificity framing --- about another column. Recovered by:
+consolidating the profile discussion, which by then repeated across Sections 3.5,
+4.5 and 5.3; merging two introduction paragraphs and two limitations paragraphs;
+shortening the abstract, where each full-width line is worth two column lines;
+and dropping **Reijonen et al. (2020)**, by then cited once in a sentence whose
+claim Reijonen (2024) carries alone, the porosity finding it uniquely supported
+having been compressed away earlier.
+
 ### Cut again when the derived noise figures were added
 
 Deriving the sensor noise (errata E8) added a methods subsection and moved most
@@ -76,6 +87,11 @@ The figure files are all kept in this directory so they can be reinstated.
    **intercept**, without which the paper cannot say whether their power result
    disagrees with ours at all.
 6. **Consider restoring a figure.** See the cut list above.
+7. **The layer modulation profile** is the one remaining item from the profile
+   plan (errata P1, Level 1). It needs the full text of Liu et al. (2022) and the
+   2023 lock-in follow-up, which measure local powder layer thickness in situ;
+   their layer-to-layer spread gives the contrast directly, with no model in the
+   loop, so it would be a cleaner result than the gas inversion.
 
 ## Numbers
 

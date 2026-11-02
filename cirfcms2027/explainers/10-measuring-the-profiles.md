@@ -65,7 +65,22 @@ The authors attribute it to increased vapour-plume interaction with the laser.
 ## B2. Inverted into fault units
 
 Running the forward model's gas channel and solving for the magnitude that
-reproduces each depth change:
+reproduces each depth change.
+
+**One trap, which cost an afternoon on re-verification** (errata W2). The
+inversion must run with the **keyhole correction active**. Case 0's *measured*
+dimensions, 136.3 x 139.7 um, satisfy Honarmandi's criterion depth >= width/1.5,
+so the condition is keyholing and `corrected_depth` adds the Gladush-Smurov term:
+69.70 um of conduction depth plus 72.40 um of keyhole gives 142.10 um, against a
+measured 139.7 - the +1.72 % quoted above. The criterion is deliberately
+evaluated on the **measured** dimensions, not the model's, which fail it
+(115.1 x 69.7). Passing the model's dimensions makes the correction silently
+inert, returns the bare conduction depth, and gives a gas response about 40 %
+too shallow.
+
+It matters because the keyhole term scales as A*P, so a gas fault attenuating
+absorptivity by exp(-f) scales it by exp(-f) as well. That is *why* the depth
+response below is steeper than conduction alone would give.
 
 | Weaver measurement | depth change | implied f_gas |
 |---|---|---|
@@ -122,7 +137,8 @@ Weaver's pads are **+24.3 %** deeper than single tracks (Y-pad odd-track mean
 attribute to heat buildup. That is exactly what the geometry fault represents,
 so the same inversion should apply.
 
-It returns **f_geometry = 6.87**, that is **+687 K** of preheat.
+It returns **f_geometry = 7.33**, that is **+733 K** of preheat - 59 % of the way
+from ambient to the solidus.
 
 ## C2. Why that is not a measurement
 
@@ -130,7 +146,7 @@ Two readings, and both are worth recording.
 
 **The comparison is contaminated.** A pad differs from a single track by more
 than preheat: the laser is partially **remelting adjacent solidified tracks**, a
-mechanism the geometry fault does not represent at all. So +687 K is an upper
+mechanism the geometry fault does not represent at all. So +733 K is an upper
 bound on the preheat-equivalent, with a second effect folded into it.
 
 **The model's preheat channel may be under-responsive.** +100 K of preheat buys
