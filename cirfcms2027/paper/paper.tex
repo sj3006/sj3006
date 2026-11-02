@@ -487,21 +487,30 @@ requirement than measuring five contrasts.
 
 \begin{table}[htbp]
 \centering
-\caption{The diagnosability matrix: pairwise separation of the baseline coaxial
-suite in both regimes, degrees. Every pair falls below the $10^\circ$ floor per
-segment and every pair clears it over a build; all ten are class~2
-instantaneously and class~1 accumulated, and class~3 is empty in both.}
+\caption{The diagnosability matrix, in degrees; bold clears the $10^\circ$ floor.
+Power/gas reads $0.00^\circ$ in both melt-pool columns, being algebraic. The free
+split clears seven pairs and mildly worsens two that stay below the floor either
+way; accumulation over $N=84$ clears all ten.}
 \label{tab:matrix}
 \scriptsize
-\begin{tabular}{@{}lrr@{\hspace{1.4em}}lrr@{}}
+\begin{tabular}{@{}lrrr@{}}
 \toprule
-pair & seg. & build & pair & seg. & build \\
+ & \multicolumn{2}{c}{per segment} & over a build \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-4}
+fault pair & baseline & split camera & baseline \\
 \midrule
-power / gas   & 0.00 & 29.34 & speed / layer    & 1.03 & 46.16 \\
-layer / gas   & 0.32 & 44.48 & speed / geometry & 3.62 & 31.95 \\
-power / layer & 0.32 & 36.26 & power / geometry & 4.31 & 25.42 \\
-power / speed & 0.70 & \textbf{24.90} & gas / geometry & 4.31 & 31.39 \\
-speed / gas   & 0.70 & 35.87 & layer / geometry & 4.63 & 40.54 \\
+power / gas      & 0.00 & 0.00 & \textbf{29.34} \\
+layer / gas      & 0.32 & \textbf{64.53} & \textbf{44.48} \\
+power / layer    & 0.32 & \textbf{64.53} & \textbf{36.26} \\
+power / speed    & 0.70 & \textbf{43.43} & \textbf{24.90} \\
+speed / gas      & 0.70 & \textbf{43.43} & \textbf{35.87} \\
+speed / layer    & 1.03 & \textbf{72.04} & \textbf{46.16} \\
+speed / geometry & 3.62 & \textbf{43.28} & \textbf{31.95} \\
+power / geometry & 4.31 & 3.08 & \textbf{25.42} \\
+gas / geometry   & 4.31 & 3.08 & \textbf{31.39} \\
+layer / geometry & 4.63 & \textbf{64.81} & \textbf{40.54} \\
+\midrule
+pairs clearing the floor & 0/10 & \textbf{7/10} & \textbf{10/10} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -512,9 +521,8 @@ Classifying on the enlarged observation alone places all ten pairs in class~1 fo
 every configuration, a single photodiode included --- true but uninformative. Two
 regimes are therefore reported (Table~\ref{tab:matrix}): \emph{instantaneous},
 per-segment decisions for closed-loop control, and \emph{accumulated}, diagnosis
-over a build for qualification and drift monitoring. The baseline suite resolves
-\textbf{none} of the ten instantaneously and \textbf{all ten} accumulated, class~3
-empty in both.
+over a build for qualification and drift monitoring. The baseline suite resolves none of the ten instantaneously and all ten
+accumulated, class~3 empty in both.
 
 Five commercial systems were surveyed and collapse to three distinct
 configurations, reported as classes rather than products: \textbf{A}, a single
@@ -563,10 +571,10 @@ anything about power versus speed.
 
 Among melt-pool observables the most valuable addition is free, and is the
 strongest practical result here. Reporting the camera's two axes separately
-rather than as an area is worth \textbf{+23.89$^\circ$} on the binding pair,
-raising power/speed from $24.90^\circ$ to $48.79^\circ$, and is the only change
-making any pair resolvable \emph{per segment}, taking the instantaneous count
-from none of ten to \textbf{seven of ten}; a short-wave infrared photodiode
+rather than as an area is worth \textbf{+23.89$^\circ$} on the binding pair
+accumulated ($24.90^\circ$ to $48.79^\circ$) and is the only change resolving
+anything \emph{per segment}, taking that count from none of ten to \textbf{seven
+of ten} (Table~\ref{tab:matrix}); a short-wave infrared photodiode
 ($+0.01^\circ$) and a wide-band pyrometer ($0.00^\circ$) are worth nothing. The
 mechanism is independence, not responsiveness: width is both the candidate least
 correlated with the coaxial photodiode, 0.779 against 0.979 for length, and the
