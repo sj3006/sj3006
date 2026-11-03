@@ -1963,3 +1963,97 @@ contrasts at 1.0, so it should reproduce the collapse test exactly. It gives
 renormalisation used in the sweep script against `_range_normalise` in
 `observables.py`. Both are below the floor and the conclusion is unaffected, but
 the two numbers are not interchangeable and should not be quoted as if they were.
+
+---
+
+# E14. The 0.00-degree confound is exact only because gas has one channel [E]
+
+Found while re-examining whether Reijonen et al. (2020) was safe to drop for
+space. It was not, and the reason is the most substantive finding from the three
+uploaded papers.
+
+## What the paper claims
+
+Power and gas are confounded at **0.00 degrees**, "by algebra rather than noise",
+because both act only on the product (absorptivity x power). That is the paper's
+headline result.
+
+## The observation that undermines its exactness
+
+Reijonen (2024) cites their own 2020 work for this:
+
+> "loss of penetration and **increased melt pool width** was associated with
+> **reduced gas flow speeds** due to laser attenuation and **scattering** in the
+> plume."
+
+Reduced gas flow -> **wider** pool. Our model gives the opposite:
+
+| f_gas | width | depth | length |
+|---|---|---|---|
+| 0.0 | 115.12 um | 142.10 | 415.47 |
+| 0.2 | -5.00 % | -14.53 % | -17.25 % |
+| 0.4 | **-9.97 %** | -26.96 % | -31.08 % |
+
+**A sign disagreement on the width channel**, which is the informative one (E4).
+
+## Why it happens
+
+Our gas fault is an optical depth: it attenuates, so less power reaches the pool
+and everything shrinks. A real plume does two things - attenuates (all dimensions
+down) and **scatters**, broadening the beam (width up, depth down). On depth the
+two agree; on width they oppose, and experiment says broadening wins.
+
+## Why it matters more than a sign
+
+**The exact degeneracy exists precisely because gas has only one channel.** Gas
+acts on absorbed power; power acts on absorbed power; the Jacobian columns are
+anti-parallel and the angle is zero. Give gas a *second* channel that power
+lacks - effective spot size - and the degeneracy must break.
+
+## The measurement
+
+Modelling the scattering as sigma -> sigma * exp(k * f_gas):
+
+| k | width at f=0.4 | power/gas | worst pair |
+|---|---|---|---|
+| 0.00 (model as it stands) | **-9.97 %** | **0.00** | 0.00 |
+| 0.50 | -2.12 % | 1.25 | 0.32 |
+| **0.75** (width sign reverses) | **+2.22 %** | **2.05** | 0.32 |
+| 1.00 | +6.95 % | 3.01 | 0.32 |
+| 1.50 | +16.81 % | 5.61 | 0.32 |
+
+## What this does and does not cost
+
+**Costs:** the word "exactly" is a property of the model, not of the process. At
+the broadening needed to match the observed width sign, the pair sits at about
+2-3 degrees, not 0.
+
+**Does not cost:** 2-3 degrees against a 10-degree floor is still confounded in
+practice, and the suite's **worst pair does not move at all** (0.32 degrees, a
+different pair). So no class changes, no count changes, no conclusion changes.
+
+**Buys:** Section 5.3 previously asserted "the reported 0.00 degrees is an upper
+bound". It is now a measured sensitivity with a named mechanism and a citation.
+
+## Change for draft 2
+
+Applied to Section 5.3, and **Reijonen et al. (2020) is restored to the
+bibliography** - it had been dropped for space when its claim was compressed to
+a passing remark, and it is now the only source for the width-sign observation.
+
+Frisk et al. (2017) stays out: a tools paper whose methodological claim
+Krysander (2008) carries.
+
+## The pattern across all three uploaded papers
+
+Each source identifies more physical channels than this model represents, and in
+each case the omission runs in the conservative direction:
+
+| source | their mechanism | ours |
+|---|---|---|
+| Weaver (2024) | attenuation, scattering **and lensing** | attenuation |
+| Reijonen (2024) | plume emission + power- and speed-dependent obstruction | neither |
+| Reijonen (2020) | attenuation **and scattering** -> width up | attenuation -> width down |
+| Liu (2022) | layer thickness driven by support **and** layer index | recoater cycle |
+
+Worth stating once in the paper rather than four times.

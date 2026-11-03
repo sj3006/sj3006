@@ -666,9 +666,20 @@ modelling choices then make the instantaneous case \emph{more} confounded than
 reality: the gas fault as pure optical depth omits a convective channel; treating
 plume attenuation as independent of power and speed is what makes the degeneracy
 exact; and modelling upstream power monitoring as a melt-pool-derived signal is
-likewise pessimistic. \textbf{The reported $0.00^\circ$ is an upper bound},
-though the rank limit is unaffected, deriving from channel counting rather than
-the form of this coupling.
+likewise pessimistic.
+
+\textbf{The $0.00^\circ$ is therefore an upper bound, and its exactness is an
+artefact of the one-channel gas model.} Gas here acts only on absorbed power,
+precisely the channel a power fault acts on, which is what makes the two
+algebraically identical. A real plume also scatters: Reijonen et al.\ report
+reduced gas flow giving loss of penetration together with \emph{increased} melt
+pool width \cite{Reijonen2020}, where attenuation alone gives a decrease ---
+$-10$\,\% here at $f_{\mathrm{gas}}=0.4$. Adding that broadening as a spot-size
+channel, which power does not possess, opens the pair to \textbf{2--3$^\circ$}
+at the strength needed to reverse the width sign, and leaves the suite's worst
+pair unmoved at $0.32^\circ$. The exactness is a property of the model; the
+inseparability is not. The rank limit is unaffected either way, deriving from
+channel counting rather than the form of this coupling.
 
 The geometry inversion fails, returning $+733$\,K of preheat because a pad
 differs from a single track by remelting as well as preheat, and no dataset yet
@@ -747,6 +758,11 @@ stainless steel, arXiv preprint arXiv:2409.12475 (2024).
 J. Reijonen, Effect of laser parameters and shielding gas flow on co-axial
 photodiode-based melt pool monitoring signals in laser powder bed fusion,
 Addit. Manuf. Lett. 11 (2024) 100244.
+
+\bibitem{Reijonen2020}
+J. Reijonen et al., On the effect of shielding gas flow on porosity and melt
+pool geometry in laser powder bed fusion additive manufacturing, Addit. Manuf.
+32 (2020) 101030.
 
 \bibitem{Liu2022}
 T. Liu et al., In-situ infrared thermographic inspection for local powder layer
