@@ -609,10 +609,38 @@ no published result contradicts the predicted limits, and two groups
 independently report the lumped group this analysis identifies as what survives
 confounding \cite{Blanc2024,kNN2025}.
 
-One external check remains unmade: Reijonen reports the photodiode response to
-scan speed as $y=ax^{-b}$, and the comparable quantity is a power law fitted to
-this model over the same sweep, $-0.429$ over 0.4--2.2\,m\,s$^{-1}$ rather than
-the Jacobian entry $-0.483$.
+The one external check on this model's sensor response can be made, and it
+partly fails. Reijonen reports the coaxial photodiode response to scan speed as
+$y=ax^{-b}$ with $b=0.337$ at 400\,W over 400--1200\,mm\,s$^{-1}$
+\cite{Reijonen2024}. The comparable quantity is a power law fitted to this model
+over \emph{their} range rather than the Jacobian entry $-0.483$; that fit gives
+\textbf{0.468}, some 39\,\% too steep. The qualitative comparison is worse: they
+find $b$ growing with laser power, ``almost non-existent'' at 100\,W and
+reaching 0.337 at 400\,W, where this model gives 0.50, 0.44 and 0.47 at 100, 285
+and 400\,W --- flat.
+
+\textbf{The discrepancy lies in physics this model assumes away.} Reijonen
+attributes the speed dependence to the vapour plume: the trend holds only where
+gas flow is high and constant, and at low power, in conduction mode, there is no
+plume and no speed effect at all. Here the plume is a \emph{fixed} optical depth,
+independent of power and speed and emitting nothing of its own, so no mechanism
+exists by which $b$ could grow with power. That same assumption is what makes
+the power/gas degeneracy exact (Section~\ref{sec:confound}), and these
+measurements show the real attenuation depends on both parameters and can even
+reverse sign with scan speed at low gas flow. \textbf{The reported $0.00^\circ$
+is an upper bound on the instantaneous confounding on external evidence, not
+merely by assertion.}
+
+Three caveats on the comparison: it crosses material (316L against IN718),
+detection band (a shortpass below 800\,nm against 700--1000\,nm) and bed
+condition (30\,\textmu m powder layers against bare plate). One point in the
+model's defence: it is calibrated at 285\,W where all seven benchmark cases
+keyhole, so the fixed optical depth is a local approximation \emph{inside} the
+regime where a plume exists rather than a claim about conduction-mode melting.
+And on the power response, Reijonen reports a linear fit $y=ax+b$ without
+quoting the intercept; since relative sensitivity is then $aP/(aP+b)$, equal to
+one only through the origin, this model's $+1.52$ cannot be called a conflict
+until that intercept is known.
 
 \subsection{Limitations}
 \label{sec:limits}

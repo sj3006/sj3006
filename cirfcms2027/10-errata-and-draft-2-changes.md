@@ -51,7 +51,8 @@ paper.
 | O1 | DONE | the operating point the whole analysis linearises about is never stated | no |
 | S1 | DONE | add the sensor correlation matrix - the plainest statement of the paper's problem | no, strengthens presentation |
 | S2 | DONE | the gas profile can be inverted from benchmark data and is conservative; say so instead of calling it asserted | no, converts the paper's largest exposure |
-| E11 | DONE | the pad depth "175 um, U = 6-11 um" in Section 3.5 has no traceable source | no, the inversion uses the percentages |
+| E11 | DONE, **partly retracted** | the pad depth "175 um" IS in Weaver Table 5; only the uncertainty label was wrong | no, the inversion uses the percentages |
+| E12 | DONE | the Reijonen check is now performed: the model is 39 % too steep on the speed exponent and does not reproduce its power-dependence | no number changes; one validation leg now partly fails, for a declared reason |
 | W2 | working | I evaluated the keyhole correction on model rather than measured dimensions, breaking the S2 inversion | no, caught before it reached the paper |
 | P1 | DONE | how to fix the asserted profiles properly: measure what is measurable, then stop asserting | no numbers; changes what the paper claims to deliver |
 | W1 | working | spot size used as the Gaussian sigma instead of a D4-sigma diameter | no |
@@ -1750,3 +1751,119 @@ recoater/gas half is settled by the benchmark periodicity evidence.
 al. (2022) and the 2023 lock-in follow-up, which are not reachable from this
 machine. It remains the single highest-value item outstanding, and is now the
 only one.
+
+---
+
+# E11, partly retracted: "175 um" was traceable after all
+
+Amit supplied the Weaver full text. **The figure I removed as unsourced is in
+Table 5.** It is the Y-pad odd-track depth:
+
+| Y-pad cross-section | odd (anti-parallel) | even (parallel) | change |
+|---|---|---|---|
+| 0.6 mm | 175.2 | 120.0 | **-31.5 %** |
+| 1.5 mm | 175.1 | 123.5 | -29.5 % |
+| 1.9 mm | 174.0 | 124.7 | -28.3 % |
+| 2.9 mm | 170.1 | 137.1 | **-19.4 %** |
+| | | **mean** | **-27.2 %** |
+
+X-pad control (perpendicular): -2.41 % and -4.71 %.
+
+So "depths near 175 um" was correct. I could not verify it from this machine and
+removed it; that was over-cautious, and the entry as written -- "appears nowhere
+in this project" -- was true of our own records but drew the wrong conclusion
+about the source.
+
+**What was genuinely wrong** is the label. Draft 1 said "expanded uncertainties
+of 6-11 um". Table 5 reports **standard deviations**, and across all twelve rows
+they run **3.9-10.7 um**. Different quantity, slightly different range.
+
+**The whole gas inversion is now verified against its source.** The -27.2 %
+mean, the 19.4-31.5 % range and the 2.4-4.7 % control all reproduce exactly from
+Table 5 by direct computation. S2 stands.
+
+**What went into the paper:** "melt pool depth falling from 175 to 125 um ... a
+27.2 % mean reduction against standard deviations of 4-11 um". That says what
+the draft never let the reader see - the effect is about 50 um against a scatter
+of about 10 um, five times the noise.
+
+**Lesson, and it is not the obvious one.** "I cannot verify this" is not the same
+finding as "this is unsourced", and I conflated them. The right response to the
+first is to flag it and leave the number alone, or to get the source. Removing it
+was a silent loss of correct content. What justified removal was only the
+mislabelled uncertainty, which is a different defect.
+
+---
+
+# E12. The Reijonen check, performed [E]
+
+The check E7 specified has now been carried out, Amit having supplied the full
+text. **The model partly fails it.**
+
+## What Reijonen reports
+
+- Scan speed: `y = a x^-b`, with **b = 0.337 at 400 W** over 400-1200 mm/s
+- The trend **grows with laser power**: "almost non-existent" at 100 W
+- Laser power: **"Positive linear y = ax + b"** (their Table 2) - so there IS an
+  intercept, which settles E7(c); they do not quote its value
+- Material 316L, 30 um layers, 120 um hatch, 80 +/- 6 um beam
+- The TED photodiode is a **shortpass below 800 nm**; ours integrates 700-1000 nm
+
+## What our model gives, refitted over their range
+
+| power | our fitted b | theirs |
+|---|---|---|
+| 100 W | 0.501 | ~0 |
+| 200 W | 0.414 | - |
+| 285 W | 0.439 | - |
+| 400 W | **0.468** | **0.337** |
+
+**Magnitude: 39 % too steep** at the one power they quote.
+**Trend: not reproduced at all.** Theirs grows strongly with power; ours is flat.
+
+## Why, and this is the part worth keeping
+
+Reijonen's own Table 2 attributes the speed dependence to the **vapour plume**:
+the trend holds only "if gas flow speed is high and constant", and at low power,
+"corresponding to conduction mode melting there is no vapor plume, and in such
+conditions, the shielding gas flow speed has no impact on the photodiode signal."
+
+**The trend IS the plume appearing as power rises.** Our model has:
+
+- no plume emission at all - gas only attenuates
+- attenuation independent of power and speed
+
+So there is no mechanism by which `b` could grow with power. **We assumed away
+exactly the physics their measurement resolves.**
+
+## What it costs and what it buys
+
+**Costs:** the only external check on our sensor model is now a partial failure,
+and the paper says so.
+
+**Buys:** that same assumption - plume attenuation independent of power and
+speed - is what makes the power/gas degeneracy *exact*. Reijonen measures the
+real attenuation depending on both, and reversing sign with scan speed at low
+gas flow. So **the 0.00 degrees is an upper bound on external evidence**, where
+Section 5.3 previously asserted it. That is a real strengthening of the paper's
+most-scrutinised claim.
+
+## Caveats, recorded so they are not re-derived
+
+Against the comparison: different material (316L vs IN718), different band
+(shortpass <800 nm vs 700-1000 nm), powder bed vs bare plate.
+
+In the model's defence: it is calibrated at 285 W where all seven benchmark
+cases keyhole (aspect ratios 1.45-4.28), so the fixed optical depth is a local
+approximation *inside* the regime where a plume exists, not a claim about
+conduction-mode melting. Reijonen's "no plume at 100 W" does not contradict us at
+our operating point; it contradicts us if the model is extrapolated downward.
+
+## Still open
+
+The power-response comparison remains unresolvable: their fit is linear with an
+unquoted intercept, and relative sensitivity `aP/(aP+b)` equals one only through
+the origin. Reading points off their Figs. 2 and 6 suggests the intercept is
+small relative to `aP` at 285 W, so their relative sensitivity is near 1 against
+our +1.52 - but that is eyeball estimation from a figure and is not quotable. The
+data is "available on request" per their data-availability statement.
