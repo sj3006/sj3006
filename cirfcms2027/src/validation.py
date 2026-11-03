@@ -128,9 +128,10 @@ def report() -> None:
     print("   This independently explains Route B's result. The camera reports")
     print("   area = pi/4 * width * length, which multiplies the least informative")
     print("   dimension by the most informative one and reports the product. That")
-    print("   is why splitting the camera into its two axes was worth 13 deg on the")
-    print("   power/speed pair while two new sensors were worth nothing: the")
-    print("   information was already in the image, being averaged away.")
+    print("   is why splitting the camera into its two axes is worth +23.89 deg on")
+    print("   the power/speed pair accumulated, while two new sensors are worth")
+    print("   nothing: the information was already in the image, being averaged")
+    print("   away. See route_b.py for the figure itself.")
 
     print("\nVERDICT")
     vals = np.array([r["corrected_depth"] for r in rows if r["corrected_depth"] > 0])

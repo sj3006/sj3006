@@ -165,8 +165,7 @@ def render(name, rows, meta, floor=FLOOR, regime="accumulated"):
     return counts
 
 
-def contrast_to_clear(sensor_subset, plan=None, floor=FLOOR,
-                      grid=(0.05, 0.10, 0.15, 0.25, 0.4, 0.6, 0.8, 1.0, 1.5, 2.0)):
+def contrast_to_clear(sensor_subset, plan=None, floor=FLOOR):
     """Smallest profile contrast at which each pair clears the floor.
 
     The accumulated-regime result rests on the modulation profiles, which are
@@ -174,27 +173,14 @@ def contrast_to_clear(sensor_subset, plan=None, floor=FLOOR,
     reports, per pair, how much of the asserted profile strength is actually
     needed - so a reader can judge the result against their own view of how
     strongly faults vary across a build. Contrast 1.0 is the asserted strength.
+
+    Solved by bisection in `profile_robustness.contrast_thresholds`. An earlier
+    version of this function searched a fixed grid and so reported the first
+    grid point above the floor, which overstated the binding pair's requirement
+    as 0.60 when it in fact clears at 0.45.
     """
-    from observables import modulations, regressors
-    plan = scan_plan() if plan is None else plan
-    J_all, _ = full_jacobian()
-    idx = [list(ALL_SENSOR_NAMES).index(n) for n in sensor_subset]
-    J = J_all[idx, :]
-    sig = sigmas_for(sensor_subset)
-    G = regressors(plan)
-    out = {}
-    for p in PAIRS:
-        out[p] = None
-        for c in grid:
-            M = modulations(plan, contrast=c)
-            B = np.linalg.lstsq(G, M, rcond=None)[0]
-            rows = [J[s_, :] * B[j, :] for s_ in range(J.shape[0])
-                    for j in range(B.shape[0])]
-            a = pair_angles(np.vstack(rows), coefficient_sigmas(sig, plan))
-            if a[p] >= floor:
-                out[p] = c
-                break
-    return out
+    from profile_robustness import contrast_thresholds
+    return contrast_thresholds(floor=floor, sensor_subset=sensor_subset)
 
 
 if __name__ == "__main__":
@@ -225,7 +211,7 @@ if __name__ == "__main__":
     for p in sorted(PAIRS, key=lambda q: (ctc[q] is None, ctc[q] or 0)):
         v = ctc[p]
         if v is None:
-            print(f"   {p[0]+' / '+p[1]:20s}{'>2.0':>17s}   needs more than twice the asserted strength")
+            print(f"   {p[0]+' / '+p[1]:20s}{'>3.0':>17s}   needs more than three times the asserted strength")
         else:
             tag = ("very robust" if v <= 0.15 else "robust" if v <= 0.4
                    else "needs most of the asserted strength" if v <= 1.0

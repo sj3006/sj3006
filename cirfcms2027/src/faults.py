@@ -181,14 +181,17 @@ class FaultCouplings:
     An earlier version of this docstring called it "by far the weakest of the
     three layer effects", quoting 3.4% / 1.6% / 0.35% depth changes at f = 0.2.
     Those figures do not reproduce and the ordering they imply is misleading
-    (errata E1). Re-measured at f = 0.2, isolating each channel in turn:
+    (errata E1). Re-measured at f = 0.2, isolating each channel in turn, in the
+    corrected depth the sensors actually see (`src/layer_couplings.py` computes
+    this table; the last column is the plain conduction depth, which is what an
+    earlier version of this note quoted without saying so):
 
-                        depth      width
-        absorptivity   -2.57%     -1.19%
-        enthalpy       +2.12%     +0.94%
-        conductivity   -0.75%     +1.16%
-        absorp+enth    -0.50%     -0.23%     <- the two nearly cancel
-        all three      -1.25%     +0.93%
+                        depth      width    (conduction depth)
+        absorptivity   -3.55%     -1.19%      -2.57%
+        enthalpy       +2.97%     +0.94%      +2.12%
+        conductivity   -1.41%     +1.16%      -0.75%
+        absorp+enth    -0.69%     -0.23%      -0.50%     <- the two nearly cancel
+        all three      -2.09%     +0.93%      -1.25%
 
     Because the first two nearly cancel, conductivity is the *dominant surviving*
     channel, not the weakest: it supplies -0.75 of the -1.25 net on depth, and on

@@ -205,7 +205,7 @@ def report() -> None:
         print()
 
     print("WHICH PAIR IS THE BINDING CONSTRAINT, baseline vs each addition")
-    ratios = RATIO_SETS["study default"]
+    ratios = RATIO_SETS["derived"]
     base = subset_summary(J_all, names, SUBSETS["all three (baseline)"], ratios, plan)
     worst_pair = min(base["big_angles"], key=base["big_angles"].get)
     print(f"   baseline worst pair is {worst_pair[0]}/{worst_pair[1]} at "
@@ -215,9 +215,11 @@ def report() -> None:
         s = subset_summary(J_all, names, SUBSETS[name], ratios, plan)
         wp = min(s["big_angles"], key=s["big_angles"].get)
         gain = s["big_angles"][worst_pair] - base["big_angles"][worst_pair]
+        suite = s["big_angles"][wp] - base["big_angles"][worst_pair]
         print(f"   {name:28s} {worst_pair[0]}/{worst_pair[1]} "
               f"{s['big_angles'][worst_pair]:6.2f} deg ({gain:+5.2f})   "
-              f"new worst pair {wp[0]}/{wp[1]} at {s['big_angles'][wp]:.2f} deg")
+              f"new worst pair {wp[0]}/{wp[1]} at {s['big_angles'][wp]:.2f} deg "
+              f"({suite:+5.2f} on the suite's worst)")
 
     print("\nROBUSTNESS TO PROFILE MISSPECIFICATION")
     print("worst-case relative error in the recovered fault vector when each")
