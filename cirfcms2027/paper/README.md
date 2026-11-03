@@ -87,7 +87,37 @@ The figure files are all kept in this directory so they can be reinstated.
    **intercept**, without which the paper cannot say whether their power result
    disagrees with ours at all.
 6. **Consider restoring a figure.** See the cut list above.
-7. **The layer modulation profile** is the one remaining item from the profile
+7. **BUILD THE REPRODUCE HARNESS.** Agreed as the last job before submission,
+   deliberately deferred so it is built once against final numbers.
+
+   Five numbers in this project's history failed to reproduce (the VED
+   correlations, the layer-channel figures in the `FaultCouplings` docstring, the
+   collinearity indices, the first draft's singular values, and the fourth noise
+   assumption set which existed in the paper but not in the code). All five have
+   the same cause: a number computed in a working session, written into prose,
+   and never given a home in the repository. None is instability in the
+   pipeline, which is deterministic - W1 was caught precisely *because* case 0 is
+   asserted to reproduce a stored Jacobian, and matches it to 0.00e+00.
+
+   Every number now in the paper was regenerated from the code, but by hand, in
+   ad-hoc scripts. **Nothing in the repository knows what the paper claims**, so
+   a change to the model would silently invalidate the PDF again.
+
+   The fix:
+
+   - `src/reproduce.py` computes every quoted figure and writes
+     `paper/numbers.tex` as `\newcommand` definitions
+   - `paper.tex` uses `\WorstEnlarged` in place of a literal `24.90`, so there is
+     no second copy to drift
+   - a `--check` mode diffs against stored values and exits non-zero, suitable
+     for gating a commit
+
+   Scope: the paper quotes roughly 60 numbers. Do the ~25 load-bearing ones
+   first - every angle, rank, condition number, count and noise figure - and
+   list the remainder in `reproduce.py` as not yet covered, so the gap stays
+   visible rather than being assumed away.
+
+8. **The layer modulation profile** is the one remaining item from the profile
    plan (errata P1, Level 1). It needs the full text of Liu et al. (2022) and the
    2023 lock-in follow-up, which measure local powder layer thickness in situ;
    their layer-to-layer spread gives the contrast directly, with no model in the
