@@ -304,20 +304,20 @@ The profiles in $M$ are physical claims rather than measurements, and they are
 different patterns, so there is no universal set of five to go and find. One of
 them can nonetheless be calibrated from published data, and the inversion is the
 recipe by which a reader calibrates the rest on their own machine. The AM Bench pad scans \cite{Weaver2024}, under a 4.3\,m\,s$^{-1}$ cross-flow,
-show melt pool depth reduced by 27.2\,\% on average (range 19.4--31.5\,\%) on
-tracks scanned parallel to the gas flow against anti-parallel ones, with
-perpendicular pads as a control at 2.4--4.7\,\%. Inverting each depth change
+show melt pool depth falling from 175 to 125\,\textmu m on tracks scanned
+parallel to the gas flow against anti-parallel ones --- a 27.2\,\% mean
+reduction against standard deviations of 4--11\,\textmu m --- with perpendicular
+pads as a control at 2.4--4.7\,\%. Inverting each depth change
 through the model's gas channel at the benchmark's baseline condition --- where
 the model's depth error is $+1.7$\,\% against $-15.5$\,\% on width --- gives
 $f_{\mathrm{gas}}=0.047$ for the control against $0.404$ for the parallel mean,
 an \textbf{8.7$\times$ swing within one healthy build} against the 6.05$\times$
 assumed here. In contrast units that is 1.08 where this work assumes 0.90, so
-\textbf{the one profile that can be checked is understated by 20\,\%}. Three
-qualifications: the measured driver is scan direction rather than position along
-the flow, it is baseline plume behaviour rather than a fault, and the inversion
-is model-mediated. The gas signature also alternates at track scale where a
-recoater signature alternates at layer scale, which Section~\ref{sec:robust}
-shows is the condition the method actually needs.
+\textbf{the one profile that can be checked is understated by 20\,\%}. Three qualifications: the driver is scan direction rather than position along the
+flow, it is baseline plume behaviour rather than a fault, and the inversion is
+model-mediated. The gas signature also alternates at track scale where a recoater
+signature alternates at layer scale --- the distinctness
+Section~\ref{sec:robust} shows the method needs.
 
 \subsection{Sensor noise, derived from transduction}
 \label{sec:noise}
@@ -530,8 +530,8 @@ coaxial photodiode (rank 1); \textbf{B}, photodiode plus pool imaging, and
 \textbf{C}, two photodiodes in separate bands (rank 2); \textbf{D}, the research
 reference adding pyrometry, and \textbf{E}, C plus upstream power monitoring
 (rank 3). No vendor is named: mapping a product to a set of observables rests on
-secondary literature rather than datasheets, detection bands being routinely
-withheld and published descriptions of one product disagreeing.
+secondary literature rather than datasheets, detection bands being withheld and
+published descriptions of one product disagreeing.
 
 \textbf{No configuration built solely from melt-pool observables separates laser
 power from gas degradation}, whatever its sensor count: A through D all read
@@ -618,32 +618,29 @@ the Jacobian entry $-0.483$.
 \label{sec:limits}
 
 The thermal model is a conduction solution with an analytic keyhole patch: it
-partial-passes the Guo validation and its fitted parameters sit at their bounds,
-and the absorptivity, conductivity and heat capacity correlations of 0.93--0.96
+partial-passes the Guo validation, its fitted parameters sit at their bounds, and
+the absorptivity, conductivity and heat capacity correlations of 0.93--0.96
 reported during Bayesian calibration of the same model family \cite{Hon2021} are
 the pathology this paper studies appearing in its own calibration. Three
 modelling choices then make the instantaneous case \emph{more} confounded than
 reality: the gas fault as pure optical depth omits a convective channel; treating
 plume attenuation as independent of power and speed is what makes the degeneracy
-exact, whereas the photodiode response to gas flow is reported to depend
-interactively on the other parameters \cite{Reijonen2024}; and
-modelling upstream power monitoring as a melt-pool-derived signal is likewise
-pessimistic. \textbf{The reported $0.00^\circ$ is an upper bound}, though the
-rank limit is unaffected, deriving from channel counting rather than the form of
-this coupling.
+exact; and modelling upstream power monitoring as a melt-pool-derived signal is
+likewise pessimistic. \textbf{The reported $0.00^\circ$ is an upper bound},
+though the rank limit is unaffected, deriving from channel counting rather than
+the form of this coupling.
 
-The geometry profile is the one inversion that fails, returning $+733$\,K of
-preheat because a pad differs from a single track by remelting as well as by
-preheat. More fundamentally, no dataset yet offers a build with
-\emph{deliberately induced} machine faults: every inversion here reads a healthy
-build and extrapolates, and that experiment is the natural follow-on. The noise
-derivation rests on one assumption, that every radiometric channel carries the
-same fractional noise, bounded by the gain-dominated sweep. The five fault
-magnitudes are physical but not on a common severity scale, so comparisons
-\emph{across pairs at fixed magnitude} are not meaningful, and all results are
-diagnosability statements --- what a suite can distinguish in principle, at a
-given relative noise, under a given forward model --- not that any algorithm
-achieves it.
+The geometry inversion fails, returning $+733$\,K of preheat because a pad
+differs from a single track by remelting as well as preheat, and no dataset yet
+offers a build with \emph{deliberately induced} machine faults: every inversion
+here reads a healthy build and extrapolates, which is the natural follow-on
+experiment. The noise derivation rests on one assumption, that every radiometric
+channel carries the same fractional noise, bounded by the gain-dominated sweep.
+The five fault magnitudes are physical but not on a common severity scale, so
+comparisons \emph{across pairs at fixed magnitude} are not meaningful, and all
+results are diagnosability statements --- what a suite can distinguish in
+principle, at a given relative noise, under a given forward model --- not that
+any algorithm achieves it.
 
 %% ===========================================================================
 \section{Conclusions}
