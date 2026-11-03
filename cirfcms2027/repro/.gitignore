@@ -1,0 +1,5 @@
+# Recomputation cache. Not committed: a stale cache would let check.py pass
+# against values the code no longer produces, which is the exact failure this
+# harness exists to catch. Delete it freely; `check.py --no-cache` rebuilds it
+# in about four minutes.
+cache/

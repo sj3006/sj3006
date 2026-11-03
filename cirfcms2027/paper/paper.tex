@@ -190,16 +190,17 @@ heat source on a semi-infinite solid, extended with the Gladush--Smurov keyhole
 depth correction following Honarmandi et al.\ \cite{Hon2021}. Four parameters ---
 effective absorptivity, effective conductivity, heat capacity, the keyhole
 constant --- are fitted to the seven IN718 bare-plate single-track cases of the
-2022 Additive Manufacturing Benchmark \cite{Weaver2024}, giving \textbf{11.7\,\%
-mean error on melt pool width and 13.0\,\% on depth}. All results below are evaluated at that benchmark's own baseline condition,
+2022 Additive Manufacturing Benchmark \cite{Weaver2024}, giving \textbf{11.7\,\% mean error on melt pool width and 13.1\,\% on depth}. All results below are evaluated at that benchmark's own baseline condition,
 285\,W, 960\,mm\,s$^{-1}$ and a 67\,\textmu m D4$\sigma$ spot, where the errors
 are $-15.5$\,\% on width and $+1.7$\,\% on depth against expanded uncertainties
 ($k=2$) of 6.2 and 14.1\,\textmu m respectively. Width is under-predicted at all seven conditions, the one-sided bias of a
 conduction solution with no mechanism that widens a pool. The keyhole correction
-is necessary rather than optional: all seven cases keyhole, aspect ratios
-1.45--4.28, and pure conduction gives 27.8\,\% depth error. The quadrature in the
+is necessary rather than optional: all seven cases keyhole, depth-to-width
+ratios running 0.72--2.14 against the criterion's 0.67, and a pure conduction
+fit given the same three free parameters leaves 23.6\,\% depth error against
+13.1\,\%, at an essentially unchanged 8.5\,\% on width. The quadrature in the
 history integral and the derivative step are both set by convergence tests:
-central differences are evaluated at $h=0.002$, entries still moving 39.4\,\%
+central differences are evaluated at $h=0.002$, entries still moving 39.3\,\%
 between $h=0.04$ and $h=0.02$ but below 0.3\,\% at $h=0.005$, the residual
 following the predicted second-order scaling.
 
@@ -218,7 +219,8 @@ Two of those three channels derive from published measurement. The absorptivity
 coupling, $-0.230$, follows from the powder-to-solid absorptivity ratio of
 approximately two measured calorimetrically at 1070\,nm \cite{Trapp2017} with a
 radiative penetration depth of a few particle diameters, implying a bare-solid
-absorptivity of 0.258 consistent with the fitted value. The powder-melting
+absorptivity of 0.258, inside the 0.25--0.35 reported for nickel alloys near
+1\,\textmu m --- a consistency the calibration was not built to produce. The powder-melting
 enthalpy coupling, $+0.186$, follows from an energy balance in which melting the
 layer consumes 15.7\,\% of the absorbed energy, so a thinner layer frees
 proportionally more for penetration. The conductivity coupling remains an unmeasured estimate, swept across its range
@@ -295,8 +297,9 @@ J^{\mathrm{big}}_{(s,j),k} = J_{sk}\,B_{jk},
 \end{equation}
 %
 The noise on the $j$-th coefficient from sensor $s$ is not $\sigma_s$ but
-$\sigma_{(s,j)} = \sigma_s\sqrt{[(G^{\!\top}G)^{-1}]_{jj}}$, here 0.109 to 0.136, so fitting $N=84$ segments to five regressors buys roughly
-a ninefold noise reduction. Results use $N=84$, with the dependence on $N$ in
+$\sigma_{(s,j)} = \sigma_s\sqrt{[(G^{\!\top}G)^{-1}]_{jj}}$, the square-root
+factor running 0.109 to 0.136, so fitting $N=84$ segments to five regressors
+buys a seven- to ninefold noise reduction. Results use $N=84$, with the dependence on $N$ in
 Section~\ref{sec:robust}.
 
 The profiles in $M$ are physical claims rather than measurements, and they are
@@ -312,8 +315,8 @@ and report that none of the four challenge submissions predicted it; this model
 represents the attenuation alone. Inverting each depth change
 through the model's gas channel at the benchmark's baseline condition --- where
 the model's depth error is $+1.7$\,\% against $-15.5$\,\% on width --- gives
-$f_{\mathrm{gas}}=0.047$ for the control against $0.404$ for the parallel mean,
-an \textbf{8.7$\times$ swing within one healthy build} against the 6.05$\times$
+$f_{\mathrm{gas}}=0.046$ for the control against $0.404$ for the parallel mean,
+an \textbf{8.8$\times$ swing within one healthy build} against the 6.05$\times$
 assumed here. In contrast units that is 1.08 where this work assumes 0.90, so
 \textbf{the one profile that can be checked is understated by 20\,\%}. Three qualifications: the driver is scan direction rather than position along the
 flow, it is baseline plume behaviour rather than a fault, and the inversion is
@@ -385,7 +388,7 @@ As a correlation it is unreliable --- over 27 melted conditions the model gives
 $r=+0.20$ for width against $+0.77$ for depth, but width's coefficient runs
 $+0.68$ to $-0.22$ across five such grids, a property of the sampled region
 rather than of the model. The exponents are stable where the correlation is not.
-Each dimension is a power law in $(P,v,d)$ to $R^{2}\ge0.94$, and a pure function
+Width and depth are each a power law in $(P,v,d)$ to $R^{2}\ge0.94$, and a pure function
 of $\mathrm{VED}=P/(vd^{2})$ must have exponents along $(1,-1,-2)$: on every grid
 depth's lie at $\cos 0.64$--$0.74$ of that ray against width's $-0.11$ to
 $0.00$, because the two depend on spot size with opposite signs --- the one
@@ -401,7 +404,8 @@ absorptivity as $A\,e^{-f_{\mathrm{gas}}}$ and power scales as
 $P(1+f_{\mathrm{power}})$, so the product is unchanged whenever
 $f_{\mathrm{gas}}=\ln(1+f_{\mathrm{power}})$, giving an identical melt pool ---
 the same temperature at every point, hence identical readings from any instrument
-that could be built, verified to eight significant figures on all three. The
+that could be built --- the two faults cancel bit-identically in double
+precision on all three. The
 ratio of the two Jacobian columns is $-0.99999$, $-1.00000$, $-0.99993$ across
 the sensors, a spread of $7\times10^{-5}$ from finite-difference error on an
 exact identity, and the pairwise angle is \textbf{0.00$^\circ$}. The degeneracy
@@ -469,13 +473,17 @@ segment reproduces the angles to $0.04^\circ$.
 Because the profiles are machine-specific, the primary result is separability
 \emph{as a function of} profile strength: five of ten pairs clear the floor at or
 below 25\,\% of the strength assumed here and the hardest, power/speed, at
-\textbf{50\,\%}, so a machine whose patterns are half as strong still resolves
+\textbf{45\,\%}, so a machine whose patterns are half as strong still resolves
 every pair --- and the one profile calibrated against measurement came back
 20\,\% \emph{stronger} than assumed. The headline moves by under half a degree
-across all 120 permutations of profile assignment, the full range of the
-unmeasured conductivity coupling, and all four noise sets of
-Section~\ref{sec:noise}; segment count is the one real requirement, at
-$11.23^\circ$ for $N=12$ and $22.90^\circ$ for $N=30$, flat thereafter.
+across the full range of the unmeasured conductivity coupling and all four
+noise sets of Section~\ref{sec:noise}. Reassigning which fault follows which
+build variable moves it further, the worst pair running $16.2^\circ$ to
+$30.1^\circ$ across all 120 permutations, but \textbf{every one of the 120
+leaves rank five and all ten pairs above the floor} --- the result needs the
+patterns to differ, not any particular fault to own any particular one.
+Segment count is the one real requirement, at $11.23^\circ$ for $N=12$ and
+$22.90^\circ$ for $N=30$ on a near-square plan, flat thereafter.
 
 What the method requires is not accurate contrasts but \emph{distinct} patterns,
 and at these noise figures strictly so: forcing any two equal collapses that pair
@@ -492,7 +500,7 @@ variable, which matters because measured layer-thickness variation is reported
 to follow part support rather than the recoater cycle assumed here
 \cite{Liu2022}. Mixing the geometry fault's support driver into the layer
 profile leaves layer/geometry above the floor until that profile is roughly
-85\,\% support-driven ($12.21^\circ$ at 80\,\%), and mixing the power fault's
+84\,\% support-driven ($12.07^\circ$ at 80\,\%), and mixing the power fault's
 build-drift driver never brings power/layer below it at any fraction, since
 every profile is normalised to unit mean and two faults sharing a driver still
 differ wherever their contrasts do.
@@ -536,8 +544,9 @@ per-segment decisions for closed-loop control, and \emph{accumulated}, diagnosis
 over a build for qualification and drift monitoring. The baseline suite resolves none of the ten instantaneously and all ten
 accumulated, class~3 empty in both.
 
-Five commercial systems were surveyed and collapse to three distinct
-configurations, reported as classes rather than products: \textbf{A}, a single
+Five commercial systems were surveyed and present only three distinct
+observable sets. Those are reported as classes rather than products, alongside
+a single-photodiode floor and the research reference: \textbf{A}, a single
 coaxial photodiode (rank 1); \textbf{B}, photodiode plus pool imaging, and
 \textbf{C}, two photodiodes in separate bands (rank 2); \textbf{D}, the research
 reference adding pyrometry, and \textbf{E}, C plus upstream power monitoring
@@ -583,10 +592,12 @@ anything about power versus speed.
 
 Among melt-pool observables the most valuable addition is free, and is the
 strongest practical result here. Reporting the camera's two axes separately
-rather than as an area is worth \textbf{+23.89$^\circ$} on the binding pair
-accumulated ($24.90^\circ$ to $48.79^\circ$) and is the only change resolving
-anything \emph{per segment}, taking that count from none of ten to \textbf{seven
-of ten} (Table~\ref{tab:matrix}); a short-wave infrared photodiode
+rather than as an area is worth \textbf{+23.89$^\circ$} on the pair that binds
+the baseline accumulated result ($24.90^\circ$ to $48.79^\circ$), after which
+power/geometry binds instead at $25.26^\circ$, so the suite's worst accumulated
+pair gains only $0.35^\circ$. What the split buys outright is \emph{per
+segment}: it is the only change resolving anything there, taking that count
+from none of ten to \textbf{seven of ten} (Table~\ref{tab:matrix}); a short-wave infrared photodiode
 ($+0.01^\circ$) and a wide-band pyrometer ($0.00^\circ$) are worth nothing. The
 mechanism is independence, not responsiveness: width is both the candidate least
 correlated with the coaxial photodiode, 0.779 against 0.979 for length, and the
@@ -607,7 +618,7 @@ the melt pool adds a row, not a direction.}
 \subsection{Relation to reported monitoring performance}
 
 Comparing predicted limits against reported accuracies proves largely
-unrealisable, and the reason is itself a result. Of 19 works extracted --- in-situ
+unrealisable, and the reason is itself a result. Of 19 works surveyed --- in-situ
 LPBF monitoring with a stated input signal and output, 2019--2025 --- seven
 classify outcomes and only \textbf{three estimate a process input from an in-situ
 signal}, one of those a lumped energy-density class. None analyses whether two
@@ -628,7 +639,7 @@ $y=ax^{-b}$ with $b=0.337$ at 400\,W over 400--1200\,mm\,s$^{-1}$
 over \emph{their} range rather than the Jacobian entry $-0.483$; that fit gives
 \textbf{0.468}, some 39\,\% too steep. The qualitative comparison is worse: they
 find $b$ growing with laser power, ``almost non-existent'' at 100\,W and
-reaching 0.337 at 400\,W, where this model gives 0.50, 0.44 and 0.47 at 100, 285
+reaching 0.337 at 400\,W, where this model gives 0.51, 0.44 and 0.47 at 100, 285
 and 400\,W --- flat.
 
 \textbf{The discrepancy lies in physics this model assumes away.} Reijonen
@@ -681,7 +692,7 @@ pair unmoved at $0.32^\circ$. The exactness is a property of the model; the
 inseparability is not. The rank limit is unaffected either way, deriving from
 channel counting rather than the form of this coupling.
 
-The geometry inversion fails, returning $+733$\,K of preheat because a pad
+The geometry inversion fails, returning $+687$\,K of preheat because a pad
 differs from a single track by remelting as well as preheat, and no dataset yet
 offers a build with \emph{deliberately induced} machine faults: every inversion
 here reads a healthy build and extrapolates, which is the natural follow-on
@@ -710,9 +721,9 @@ free entries and in opposite directions.
 Build structure already present dissolves the limit at no hardware cost --- rank
 3 $\rightarrow$ 5, worst pair $0.00^\circ \rightarrow 24.90^\circ$, all ten pairs
 resolved where none is per segment --- surviving at half the assumed profile
-strength, across all 120 permutations, under all four noise sets and at fault
-magnitudes from 0.2\,\% to 20\,\%, with a shared-profile control reproducing the
-instantaneous result exactly. It outperforms two idealised direct measurements of
+strength, under all four noise sets, at fault magnitudes from 0.2\,\% to
+20\,\%, and in all 120 reassignments of profile to fault, with a shared-profile
+control reproducing the instantaneous result exactly. It outperforms two idealised direct measurements of
 the causes themselves and requires only that no two faults share a spatial
 signature; those patterns being machine-specific, the deliverable is the method
 plus the strength a machine needs, with the inversion of
@@ -721,8 +732,9 @@ Section~\ref{sec:context} as the recipe for calibrating it.
 For real-time control an upstream measurement of delivered laser power is the
 recommendation, separating power from gas at $84^\circ$ where no melt-pool
 configuration separates them at all; among melt-pool observables the most
-valuable addition is free, reporting the camera's two axes separately being worth
-$+23.89^\circ$ and the only change resolving anything per segment. Post-build
+valuable addition is free, reporting the camera's two axes separately being
+worth $+23.89^\circ$ on the pair that binds the baseline and being the only
+change resolving anything per segment. Post-build
 diagnosis needs no new hardware, real-time isolation does, and crude sensing of
 the right cause suffices. The method needs only a forward model and a sensor
 description, and answers at specification time what is otherwise settled after

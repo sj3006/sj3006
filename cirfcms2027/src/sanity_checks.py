@@ -127,6 +127,46 @@ _GRIDS = {
 }
 
 
+def grid_statistics(grids=None) -> dict:
+    """Per grid and per dimension: the VED correlation, the power-law fit, its
+    R-squared, and the cosine between its exponents and the VED ray.
+
+    Factored out of `check_energy_density_exponents` so the paper's figures can
+    be checked against values rather than against printed text. The correlation
+    `r` is included here precisely because it is the unstable quantity: the
+    paper's claim is about how far it swings, which needs it per grid.
+    """
+    grids = _GRIDS if grids is None else grids
+    out = {}
+    for name, (Ps, vs, ds) in grids.items():
+        rows = []
+        for P in Ps:
+            for v in vs:
+                for d in ds:
+                    g = dims(P, v, d)
+                    if min(g["width"], g["depth"], g["length"]) > 0:
+                        rows.append((P, v, d, g["width"], g["depth"], g["length"]))
+        a = np.array(rows)
+        ved = a[:, 0] / (a[:, 1] * a[:, 2] ** 2)
+        lv = np.log(ved)
+        X = np.column_stack([np.ones(len(a)), np.log(a[:, 0]), np.log(a[:, 1]),
+                             np.log(a[:, 2])])
+        entry = {"n": len(a)}
+        for j, dim in ((3, "width"), (4, "depth"), (5, "length")):
+            ln = np.log(a[:, j])
+            coef, *_ = np.linalg.lstsq(X, ln, rcond=None)
+            e = coef[1:]
+            entry[dim] = {
+                "r": float(np.corrcoef(lv, ln)[0, 1]),
+                "exponents": tuple(float(x) for x in e),
+                "r2": float(1.0 - (ln - X @ coef).var() / ln.var()),
+                "cos": float(e @ VED_RAY
+                             / (np.linalg.norm(e) * np.linalg.norm(VED_RAY))),
+            }
+        out[name] = entry
+    return out
+
+
 def check_energy_density_exponents() -> bool:
     """Weaver's depth/width split, stated so that it does not depend on the grid.
 
@@ -142,34 +182,31 @@ def check_energy_density_exponents() -> bool:
     print("\n4. ENERGY-DENSITY EXPONENTS (grid-independent form of check 3)")
     print("   a pure function of VED = P/(v d^2) has exponents along (1, -1, -2)")
     print(f"     {'grid':23s}{'dim':8s}{'a(P)':>7s}{'b(v)':>7s}{'g(d)':>7s}"
-          f"{'R2':>7s}{'cos':>8s}")
-    agree, cos_by_dim = True, {"width": [], "depth": [], "length": []}
-    for name, (Ps, vs, ds) in _GRIDS.items():
-        rows = []
-        for P in Ps:
-            for v in vs:
-                for d in ds:
-                    g = dims(P, v, d)
-                    if min(g["width"], g["depth"], g["length"]) > 0:
-                        rows.append((P, v, d, g["width"], g["depth"], g["length"]))
-        a = np.array(rows)
-        X = np.column_stack([np.ones(len(a)), np.log(a[:, 0]), np.log(a[:, 1]),
-                             np.log(a[:, 2])])
-        for j, dim in ((3, "width"), (4, "depth"), (5, "length")):
-            ln = np.log(a[:, j])
-            coef, *_ = np.linalg.lstsq(X, ln, rcond=None)
-            e = coef[1:]
-            r2 = 1.0 - (ln - X @ coef).var() / ln.var()
-            cos = float(e @ VED_RAY / (np.linalg.norm(e) * np.linalg.norm(VED_RAY)))
-            cos_by_dim[dim].append(cos)
-            print(f"     {name if dim == 'width' else '':23s}{dim:8s}{e[0]:+7.3f}"
-                  f"{e[1]:+7.3f}{e[2]:+7.3f}{r2:7.3f}{cos:+8.3f}")
-            if r2 < 0.90:
+          f"{'R2':>7s}{'cos':>8s}{'r':>8s}")
+    stats = grid_statistics()
+    agree = True
+    cos_by_dim = {"width": [], "depth": [], "length": []}
+    r_by_dim = {"width": [], "depth": [], "length": []}
+    for name, entry in stats.items():
+        for dim in ("width", "depth", "length"):
+            e = entry[dim]
+            cos_by_dim[dim].append(e["cos"])
+            r_by_dim[dim].append(e["r"])
+            x = e["exponents"]
+            print(f"     {name if dim == 'width' else '':23s}{dim:8s}{x[0]:+7.3f}"
+                  f"{x[1]:+7.3f}{x[2]:+7.3f}{e['r2']:7.3f}{e['cos']:+8.3f}"
+                  f"{e['r']:+8.3f}")
+            if e["r2"] < 0.90:
                 agree = False
     print()
     for dim in ("width", "depth", "length"):
-        c = cos_by_dim[dim]
-        print(f"     {dim:8s} cos(exponents, VED ray) spans {min(c):+.3f} to {max(c):+.3f}")
+        c, rr = cos_by_dim[dim], r_by_dim[dim]
+        print(f"     {dim:8s} cos(exponents, VED ray) spans {min(c):+.3f} to "
+              f"{max(c):+.3f};   correlation r spans {min(rr):+.3f} to "
+              f"{max(rr):+.3f}")
+    print("\n     The correlation is the unstable quantity and the exponents are "
+          "not: width's\n     r swings right across zero while its cosine to "
+          "the VED ray never does.")
     ok = (max(cos_by_dim["width"]) < min(cos_by_dim["depth"])) and agree
     print(f"\n     depth sits closer to the VED ray than width on EVERY grid: {ok}")
     print("     Mechanism: width and depth depend on spot size with opposite")
