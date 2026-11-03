@@ -2,9 +2,20 @@ __pycache__/
 *.pyc
 .venv/
 
-# LaTeX build artifacts
-paper/*.aux
-paper/*.log
-paper/*.out
-paper/*.spl
+# run_all.py --save writes here
+output/
+
+# repro/check.py recomputation cache (see repro/.gitignore for why)
+repro/cache/
+
+# LaTeX build artefacts, and the two-column .tex generated from paper.tex
+*.aux
+*.log
+*.out
+*.bbl
+*.blg
+*.spl
+*.fdb_latexmk
+*.fls
+*.synctex.gz
 paper/paper_2col.tex

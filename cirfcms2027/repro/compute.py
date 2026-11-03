@@ -731,3 +731,18 @@ def sources() -> dict:
         "honarmandi_corr_min": 0.93,
         "honarmandi_corr_max": 0.96,
     }
+
+
+# ===========================================================================
+@group("provenance")
+def provenance() -> dict:
+    """docs/measured-inputs.md against the data actually held in the code."""
+    from provenance_check import compare
+
+    r = compare()
+    return {
+        "worst_relative_disagreement": r["worst_relative_disagreement"],
+        "n_single_tracks": float(r["n_single_tracks"]),
+        "n_pad_sections": float(r["n_pad_sections"]),
+        "n_uncertainties_checked": float(r["n_uncertainties_checked"]),
+    }

@@ -1,6 +1,6 @@
 # Reproduction report
 
-`230` claims checked, `230` reproduced, `0` not.
+`234` claims checked, `234` reproduced, `0` not.
 
 Every row is a number the paper prints. **paper** is what it prints,
 **code** is what this repository computes, and a row passes only if the
@@ -318,22 +318,32 @@ threshold or unit this work chose.
 | ok | `tab.split-count` | 7/10 | 7 | computed | Pairs clearing it per segment with the camera split. |
 | ok | `tab.acc-count` | 10/10 | 10 | computed | Pairs clearing it over a build. |
 
+## Section inputs
+
+| | id | paper | code | kind | what it means |
+|---|---|---|---|---|---|
+| ok | `prov.agreement` | 0 | 1.94023e-16 | computed | Largest relative disagreement between the measurements tabulated in docs/measured-inputs.md and the values the code actually holds. Zero means the document describing where every external number came from has not drifted from the numbers themselves. It does not mean either matches the article - that still needs a person and a copy of the paper. |
+| ok | `prov.n-tracks` | seven | 7 | computed | Single-track conditions cross-checked between the document and calibrate.py. |
+| ok | `prov.n-pads` | four | 4 | computed | Pad cross-sections cross-checked between the document and weaver_pads.py. |
+| ok | `prov.n-uncertainties` | seven | 7 | computed | Expanded-uncertainty pairs cross-checked. |
+
 ## Compute groups
 
 | group | seconds | cached |
 |---|---|---|
-| `added` | 2.1 | no |
-| `calibration` | 31.1 | no |
-| `configs` | 2.6 | no |
-| `context` | 3.1 | no |
-| `couplings` | 0.3 | no |
-| `couplings_sweep` | 14.7 | no |
-| `discussion` | 13.5 | no |
-| `meltpool` | 2.1 | no |
-| `noise` | 1.1 | no |
-| `noise_sets` | 0.9 | no |
-| `robustness` | 5.0 | no |
-| `secants` | 87.1 | no |
-| `sources` | 0.0 | no |
-| `validation` | 0.3 | no |
-| `ved` | 6.0 | no |
+| `added` | 0.0 | yes |
+| `calibration` | 0.0 | yes |
+| `configs` | 0.0 | yes |
+| `context` | 0.0 | yes |
+| `couplings` | 0.0 | yes |
+| `couplings_sweep` | 0.0 | yes |
+| `discussion` | 0.0 | yes |
+| `meltpool` | 0.0 | yes |
+| `noise` | 0.0 | yes |
+| `noise_sets` | 0.0 | yes |
+| `provenance` | 5.4 | no |
+| `robustness` | 0.0 | yes |
+| `secants` | 0.0 | yes |
+| `sources` | 0.0 | yes |
+| `validation` | 0.0 | yes |
+| `ved` | 0.0 | yes |

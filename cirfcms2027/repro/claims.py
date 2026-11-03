@@ -828,6 +828,26 @@ CLAIMS: list[Claim] = [
       "differs from a single track by remelting adjacent tracks as well as by "
       "preheat, so this is an upper bound with a second mechanism folded in.",
       tol=1.0),
+    # =====================================================================
+    # Provenance: the document of measured inputs against the code
+    # =====================================================================
+    C("prov.agreement", "inputs", "0", "provenance.worst_relative_disagreement",
+      0.0, "Largest relative disagreement between the measurements tabulated in "
+      "docs/measured-inputs.md and the values the code actually holds. Zero "
+      "means the document describing where every external number came from has "
+      "not drifted from the numbers themselves. It does not mean either matches "
+      "the article - that still needs a person and a copy of the paper.",
+      tol=1e-9),
+    C("prov.n-tracks", "inputs", "seven", "provenance.n_single_tracks", 7,
+      "Single-track conditions cross-checked between the document and "
+      "calibrate.py."),
+    C("prov.n-pads", "inputs", "four", "provenance.n_pad_sections", 4,
+      "Pad cross-sections cross-checked between the document and "
+      "weaver_pads.py."),
+    C("prov.n-uncertainties", "inputs", "seven",
+      "provenance.n_uncertainties_checked", 7,
+      "Expanded-uncertainty pairs cross-checked."),
+
     C("lim.preheat-response", "5.2", "+2.23 % depth per 100 K",
       "discussion.preheat_depth_pct_per_100K", 2.23,
       "What the model's preheat channel buys, which is why the geometry unit "

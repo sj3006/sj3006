@@ -11,11 +11,17 @@ produces two PDFs from the one source:
 
 | file | layout | pages |
 |---|---|---|
-| `paper.pdf` | `preprint`, single column, as the supplied preamble sets | 12 |
-| `paper_2col.pdf` | `final,5p,twocolumn` --- the published Procedia CIRP page | **6** |
+| `paper.pdf` | `preprint`, single column, as the supplied preamble sets | 13 |
+| `paper_2col.pdf` | `final,5p,twocolumn` --- the published Procedia CIRP page | **7** |
 
-The page limit applies to the Procedia layout, and the paper is **exactly 6
-pages** there, references included. The single-column preprint is longer simply
+The page limit applies to the Procedia layout, where the paper currently runs to
+**7 pages**, references included --- one over. The cross-check of every quoted
+number (see `../repro/`) added about a column of text: the permutation-sweep
+sentence in Section 4.5, the split-camera qualification in Section 4.7, and the
+conduction-baseline comparison in Section 3.1 all had to say more than the
+versions they replaced. Getting back to six is a compression pass, not a
+retraction; the list of what has already been cut is below, and
+`../overleaf/CORRECTIONS-to-apply.md` says exactly which sentences grew. The single-column preprint is longer simply
 because one column holds less; it is the same text.
 
 To switch the main file over permanently, replace the first line with the
