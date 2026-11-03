@@ -1867,3 +1867,99 @@ the origin. Reading points off their Figs. 2 and 6 suggests the intercept is
 small relative to `aP` at 285 W, so their relative sensitivity is near 1 against
 our +1.52 - but that is eyeball estimation from a figure and is not quotable. The
 data is "available on request" per their data-availability statement.
+
+---
+
+# E13. The profiles were never tested against following the wrong driver [E]
+
+Raised by Liu et al. (2022), supplied by Amit. Not a defect in any number - a
+gap in what the robustness section tested.
+
+## The gap
+
+A modulation profile can be wrong in three ways. Draft 1 tested two:
+
+| failure mode | tested by | result |
+|---|---|---|
+| too weak | contrast sweep | survives to 50 % of assumed strength |
+| swapped between faults | all 120 permutations | survives every one |
+| **follows the wrong build variable** | **nothing** | **not tested** |
+
+## Why Liu raises the third
+
+We assert the layer fault follows the **recoater cycle** - worse on alternate
+layers, which is the `layer_sync` regressor. Liu measures local powder layer
+thickness in a real build and finds the variation organised by **part support**:
+the unsupported edge of an overhang thins progressively, from about 100 um
+against 200 um at the specimen centre, then collapsing from layer 180 to
+breakthrough at 212.
+
+`support_depth` is the **geometry** fault's driver. If the layer fault loads on
+it too, the two approach a shared profile - and the collapse test says that pair
+falls to roughly 5 degrees, below the floor.
+
+Liu also shows the thinning growing with layer index, a monotonic drift, which
+is the **power** fault's driver (`build_index`). So there are two contamination
+routes, not one.
+
+## The measurement
+
+Mixing a fraction alpha of the contaminating driver into the layer profile and
+renormalising:
+
+| alpha | (a) layer/geometry | (b) power/layer | worst pair |
+|---|---|---|---|
+| 0.0 | 40.54 | 36.26 | 24.90 |
+| 0.4 | 29.99 | 26.25 | 24.90 |
+| 0.6 | 22.00 | 21.24 | 22.00 |
+| 0.8 | **12.21** | 17.82 | 12.21 |
+| 0.9 | **7.23** | 17.38 | 7.23 |
+| 1.0 | 5.36 | **18.02** | 5.36 |
+
+**Route (a) tolerates about 85 %** before layer/geometry crosses the floor. The
+headline degrades from about alpha = 0.55, where layer/geometry overtakes
+power/speed as the binding pair.
+
+**Route (b) never fails**, even at alpha = 1 where the two faults follow the
+identical variable. The reason is structural and worth keeping: every profile is
+rescaled to unit mean, so each is "1 plus a varying part", and two faults on the
+same driver give (1, a) and (1, b). Those are non-proportional wherever a != b.
+Layer and power carry contrasts 1.0 and 0.3, so they stay distinguishable.
+**Sharing a driver is not sharing a profile, provided the strengths differ.**
+
+## Does it change a result?
+
+**No.** Nothing in the paper moves. It closes a hole in the robustness argument,
+and the answer is favourable on both routes.
+
+## One distinction the entry should keep
+
+Liu measures *baseline* layer-thickness variation. Our fault is a *recoater
+short-feed*, which is a recoater mechanism and follows the recoater cycle. They
+are different phenomena affecting the same quantity, and they interact -
+distortion thins the powder, which worsens overheating, which worsens distortion.
+So alpha for a short-feed fault is probably well below 0.5, against a tolerance
+of 0.85. The risk is real but second-order.
+
+## Change for draft 2
+
+Applied to Section 4.5, after the distinctness paragraph:
+
+> "Distinctness also tolerates a profile being attributed to the wrong build
+> variable, which matters because measured layer-thickness variation is reported
+> to follow part support rather than the recoater cycle assumed here. Mixing the
+> geometry fault's support driver into the layer profile leaves layer/geometry
+> above the floor until that profile is roughly 85 % support-driven (12.21
+> degrees at 80 %), and mixing the power fault's build-drift driver never brings
+> power/layer below it at any fraction, since every profile is normalised to
+> unit mean and two faults sharing a driver still differ wherever their
+> contrasts do."
+
+## Note on alpha = 1 versus the collapse test
+
+At alpha = 1 the layer profile is built from the geometry driver with both
+contrasts at 1.0, so it should reproduce the collapse test exactly. It gives
+5.36 degrees against the collapse test's 4.63. The difference is the
+renormalisation used in the sweep script against `_range_normalise` in
+`observables.py`. Both are below the floor and the conclusion is unaffected, but
+the two numbers are not interchangeable and should not be quoted as if they were.

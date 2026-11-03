@@ -487,6 +487,16 @@ benchmark measurement of Section~\ref{sec:context} confirms they alternate at
 different scales --- and establishing that on another machine is a far weaker
 requirement than measuring five contrasts.
 
+Distinctness also tolerates a profile being attributed to the wrong build
+variable, which matters because measured layer-thickness variation is reported
+to follow part support rather than the recoater cycle assumed here
+\cite{Liu2022}. Mixing the geometry fault's support driver into the layer
+profile leaves layer/geometry above the floor until that profile is roughly
+85\,\% support-driven ($12.21^\circ$ at 80\,\%), and mixing the power fault's
+build-drift driver never brings power/layer below it at any fraction, since
+every profile is normalised to unit mean and two faults sharing a driver still
+differ wherever their contrasts do.
+
 \begin{table}[htbp]
 \centering
 \caption{The diagnosability matrix, in degrees; bold clears the $10^\circ$ floor.
