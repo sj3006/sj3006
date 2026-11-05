@@ -1,0 +1,840 @@
+\documentclass[final,5p,times,twocolumn]{elsarticle}
+% This is the two-column Procedia CIRP submission layout.
+% For a wider single-column draft to mark up, swap the line above for:
+%   \documentclass[preprint,times]{elsarticle}
+
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{lineno}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{rotating}
+\usepackage{xurl}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit}
+\usepackage[T1]{fontenc}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}
+
+\newcolumntype{M}{>{\hsize=1.5\hsize\raggedright\arraybackslash}X}
+\newcolumntype{D}{>{\hsize=0.6\hsize\centering\arraybackslash}X}
+\newcolumntype{T}{>{\hsize=0.6\hsize\centering\arraybackslash}X}
+\newcolumntype{S}{>{\hsize=1.5\hsize\raggedright\arraybackslash}X}
+\newcolumntype{F}{>{\hsize=0.8\hsize\raggedright\arraybackslash}X}
+
+\journal{[Journal name -- see cover letter]}
+
+% compact reference list, as in the published Procedia page
+\setlength{\bibsep}{0pt plus 0.3ex}
+
+\begin{document}
+
+\begin{frontmatter}
+
+\title{Which process faults can be told apart? Diagnosability limits of
+in-situ monitoring in laser powder bed fusion}
+
+%% ---------------------------------------------------------------------------
+%% TODO before submission: complete author list, affiliation and corresponding
+%% author details. The entry below is a placeholder.
+%% ---------------------------------------------------------------------------
+\author[a]{Soham Jain\corref{cor1}}
+\ead{f20240343@pilani.bits-pilani.ac.in}
+\cortext[cor1]{Corresponding author.}
+\affiliation[a]{organization={[Affiliation to be completed]},
+                city={[City]},
+                country={[Country]}}
+
+\begin{abstract}
+In-situ monitoring is standard on metal additive manufacturing systems, and
+classifiers report high accuracies for detecting defects from photodiode and
+imaging signals. Those results answer a question about outcomes: which defect
+formed. Specifying hardware requires an answer one step upstream: which process
+\emph{causes} a configuration can separate in principle, and which remain
+confounded whatever classifier is applied. Where two causes produce signatures
+differing by less than the sensor noise, no volume of training data distinguishes
+them: the limit is structural, not algorithmic. This paper applies structural and
+quantitative diagnosability analysis, mature in automotive and aerospace process
+control, to laser powder bed fusion. A calibrated reduced-order thermal model
+gives the response of a coaxial suite to five injected faults (laser power and
+scan speed deviation, thin powder layers, degraded shielding gas flow and
+geometry-driven heat accumulation) with separability measured as an angle
+between noise-whitened signatures and each sensor's relative noise derived from
+its transduction chain rather than assumed. Laser power and gas degradation prove
+\emph{exactly} confounded instantaneously, by algebra rather than noise, and
+seven candidate observables leave the attained rank at three against a structural
+bound of four. Regressing the same three sensors onto known build context raises
+the rank to five and the worst pair from $0.00^\circ$ to $24.90^\circ$ at no
+hardware cost, outperforming two idealised direct measurements of the causes
+themselves. Matrices are reported for five configuration classes found on current
+commercial machines.
+\end{abstract}
+
+\begin{keyword}
+Additive manufacturing \sep Process monitoring \sep Diagnosability \sep
+Fault diagnosis \sep Laser powder bed fusion
+\end{keyword}
+
+\end{frontmatter}
+
+%% ===========================================================================
+\section{Introduction}
+
+Laser powder bed fusion (LPBF) builds a part by melting thousands of short track
+segments per layer, and a modest excursion in any of several independent inputs
+can produce a rejected part. Manufacturers have responded by fitting in-situ
+monitoring as standard, with coaxial photodiodes, melt pool cameras, pyrometers,
+increasingly acoustic and powder-bed imaging, and a large literature maps
+those signals onto defects with high reported accuracy.
+
+Almost all of that work answers a question about \emph{outcomes}: given the
+signals, which defect formed? That matters for part acceptance, but not for the
+machine builder specifying hardware or the process engineer facing a drifting
+build. Those concern \emph{causes}, that the laser is under-delivering, the
+recoater short-feeding, the gas flow degraded, and which it is determines what
+gets corrected. The distinction is not semantic, because causes can be mutually
+indistinguishable in a way outcomes are not: if two of them drive the readings
+along the same direction in signal space, the readings carry no information
+separating them and no classifier, however trained, recovers the difference. That
+limit is structural, a property of the measurement and the physics rather than of
+the algorithm, where a pair separable in principle but misclassified in practice
+is an algorithm that can be improved.
+
+Diagnosability analysis is the established discipline for deciding which case
+holds. Developed within model-based fault detection and isolation, it asks,
+before any estimator is built, which faults a measurement set can detect and
+which it can isolate from one another \cite{Krysander2008}. The methods
+are standard where sensor sets are costly and must be justified in advance, but
+to the authors' knowledge have not been applied to LPBF.
+
+This paper applies them. A calibrated reduced-order thermal model is driven by
+five injected fault modes and the signatures compared pairwise against noise,
+yielding a diagnosability matrix per configuration that divides fault pairs into
+those resolvable from existing signals, those needing an added measurement and
+those structurally irreducible. The contributions are the first such matrix for
+the process, to the authors' knowledge; noise figures derived from each sensor's
+transduction chain rather than assumed; a demonstration that laser power and gas
+degradation are \emph{exactly} confounded instantaneously; the finding that the
+binding limit is the melt pool rather than the instrumentation; and that build
+structure already present dissolves it at no hardware cost.
+
+\section{Related work}
+
+\subsection{What in-situ monitoring classifies}
+
+Melt pool monitoring with coaxial photodiodes and cameras is a most widely
+deployed configuration for flaw classification in LPBF processes.
+Scime and Beuth identified signatures indicative of keyholing porosity and
+balling from high-speed visible imaging \cite{Scime2019}. Analysis also exists across modalities and alloys, including mechanical-property prediction from
+coaxial signals \cite{Raj2023}. The predicted quantity is in each case an outcome
+or a material state, and whether two distinct excursions could have produced the
+same signal is never posed.
+
+Experimental methods have been applied to LPBF to get the relationship between process inputs and obtained outputs. RAISE-LPBF reconstructs laser power and scan speed independently from
+on-axis video on 316L, sampling both on every scan line from continuous distributions
+so interactions can be studied \cite{Blanc2024}. Reijonen reports coaxial
+photodiode response to power, speed, focal position, scan orientation and
+shielding gas flow, finding power approximately linear, speed a power law and the
+rest non-linear and interactive \cite{Reijonen2024}. Both characterise
+\emph{sensitivity}; identifiability, meaning whether sensitivities to different causes
+are linearly distinguishable, is what neither addresses.
+
+A third class observes the powder bed, attacking causes the melt pool reports
+only indirectly \cite{Liu2022,Bugatti2022}, and returns in
+Section~\ref{sec:added} as a target rather than a modelled option.
+
+\subsection{Use of lumped process metrics}
+
+\emph{Lumped} process quantities have are increasingly being used in place of component values. Volumetric energy density (VED) is a common choice, and
+state-of-the-art parameter estimation from melt pool imagery predict
+energy density \emph{class} rather than power and speed separately \cite{kNN2025}.
+
+While analytically helpful, lumped quantities often discard information. Guo et al.\ held input
+energy density constant while varying power and speed together and saw melt pool
+dimensions change by orders of magnitude with transitions between melting
+regimes \cite{Guo2019}. The 2022 Additive Manufacturing Benchmark found
+single-track depth correlated with VED while width did not \cite{Weaver2024}.
+Both are reproduced in Section~\ref{sec:valid}. If the signals cannot distinguish power from speed, then only some combination
+of the two is estimable. Energy density, though, is a lumping adopted by convention rather than derived from what any particular suite measures. Section~\ref{sec:valid} finds melt pool depth only partly a function of it and width not at all. Whether the components are in fact separable for a given
+sensor set, is the diagnosability question we investigate in this work.
+
+\subsection{Diagnosability analysis}
+
+Structural analysis uses only which variables appear in which equations to
+decide which faults are detectable and which separable \cite{Krysander2008}. It
+is immune to parameter error but optimistic: structurally separable faults can
+still be numerically indistinguishable. Quantitative analysis settles that from
+the geometry of the linearised fault-to-sensor map. Both are run here.
+
+%% ===========================================================================
+\section{Methodology}
+%% ===========================================================================
+
+\subsection{Forward model and calibration}
+
+Melt pool geometry is computed from the Eagar--Tsai solution for a moving Gaussian
+heat source on a semi-infinite solid, extended with the Gladush--Smurov keyhole
+depth correction following Honarmandi et al.\ \cite{Hon2021}. Four parameters: effective absorptivity, effective conductivity, heat capacity, the keyhole
+constant are fitted to the seven IN718 bare-plate single-track cases of the
+2022 Additive Manufacturing Benchmark \cite{Weaver2024}, giving \textbf{11.7\,\%
+mean error on melt pool width and 13.1\,\% on depth}. All results below are evaluated at that benchmark's own baseline condition,
+285\,W, 960\,mm\,s$^{-1}$ and a 67\,\textmu m D4$\sigma$ spot, where the model under-predicts width by 15.5\,\% and over-predicts depth by
+1.7\,\%. The keyhole correction
+is necessary as all seven cases are keyhole with depth-to-width
+ratios 0.72--2.14 against the criterion's 0.67, and pure conduction gives 23.6\,\% depth error. Equation~\eqref{eq:jac} is evaluated numerically, one fault at a time:
+%
+\begin{equation}
+\frac{\partial y_s}{\partial f_k} \;\simeq\;
+\frac{y_s(f_k = +h) - y_s(f_k = -h)}{2h} + O(h^{2}).
+\label{eq:cd}
+\end{equation}
+%
+Too large a step measures curvature rather than slope, so $h$ is chosen by
+sweeping it. At $h=0.02$ the entries still shift 39.3\,\% per halving and below
+$h=0.01$ they settle, and the shift then falls fourfold per halving, as the
+$O(h^{2})$ term requires. All results use $h=0.002$, where halving again moves
+them by 0.007\,\%.
+
+\subsection{Fault definitions}
+
+Five faults are modelled, each defined as a \emph{physical} quantity acting on a
+model input. For
+magnitude $f$: \emph{power} scales laser power, $P(1+f)$; \emph{speed} scales
+scan speed, $v(1+f)$; \emph{gas} is a plume optical depth attenuating effective
+absorptivity, $A\,e^{-f}$; \emph{geometry} is a preheat rise in units of 100\,K,
+$T_0+100f$; \emph{layer} is a fractional layer-thickness deviation, positive
+denoting a \emph{thinner} layer as produced by recoater short-feed, acting at
+once on absorptivity, effective conductivity and effective power,
+$A\,e^{c_A f}$, $\kappa\,e^{c_\kappa f}$ and $P\,e^{c_H f}$.
+
+The absorptivity
+coupling, $-0.230$, follows from the powder-to-solid absorptivity ratio of
+approximately two measured calorimetrically at 1070\,nm \cite{Trapp2017} with a
+radiative penetration depth of a few particle diameters, implying a bare-solid
+absorptivity of 0.258 consistent with the fitted value. The powder-melting
+enthalpy coupling, $+0.186$, follows from an energy balance in which melting the
+layer consumes 15.7\,\% of the absorbed energy, so a thinner layer frees
+proportionally more for penetration. The conductivity coupling remains an unmeasured estimate, swept across its range
+in Section~\ref{sec:robust} with every accumulated-regime result invariant to it,
+but is important as the other two channels nearly cancel on
+the absorbed-power product ($-0.230+0.186=-0.044$), so without it the layer fault
+acts only through that product and joins the power/gas degeneracy
+\emph{exactly} as its Jacobian column becomes $-0.044$ times the power column on
+all three sensors, and power/layer and layer/gas both read $0.00^\circ$. This one
+unmeasured coupling is all that distinguishes a thin layer from a weak laser at
+an instant. All couplings are applied in exponential form $A\,e^{cf}$ as they may agree with
+$A(1+cf)$ to first order but are unable to pass through zero, where the linear form
+would drive thermal diffusivity negative and the integrand imaginary.
+
+\subsection{Sensor models}
+
+Three coaxial data points are computed from the temperature field: a
+band-integrated photodiode (700--1000\,nm), melt pool area, and a two-colour
+pyrometer (750/950\,nm) evaluated as the ratio of integrated band powers and
+inverted for temperature. Spectral radiance follows Planck's law, temperature
+being capped at the boiling point before any radiance is computed. Four
+additional options are defined for Section~\ref{sec:melt}: the camera's width and length
+reported separately, a short-wave infrared photodiode and a wide-band
+pyrometer.
+
+\subsection{Diagnosability measures}
+\label{sec:measures}
+
+The relative-sensitivity Jacobian is
+%
+\begin{equation}
+J_{sk} \;=\; \frac{1}{y_s}\,\frac{\partial y_s}{\partial f_k},
+\label{eq:jac}
+\end{equation}
+%
+so entry $(s,k)$ is the fractional change in sensor $s$ per unit of fault $k$.
+Each row is then
+divided by that sensor's relative noise $\sigma_s$, derived in
+Section~\ref{sec:noise}, to give the whitened matrix $J^{\mathrm{w}}$. This makes the rows be in a common unit and angles between columns physically meaningful.
+
+Three quantities are reported throughout. The \emph{angle} between whitened columns,
+\begin{equation}
+\theta_{kl} = \arccos\frac{|\langle J^{\mathrm{w}}_{:k},
+J^{\mathrm{w}}_{:l}\rangle|}{\|J^{\mathrm{w}}_{:k}\|\,\|J^{\mathrm{w}}_{:l}\|},
+\label{eq:angle}
+\end{equation}
+measures separability: at $0^\circ$ two faults move the readings along one line and no estimator separates them, at $90^\circ$ they are orthogonal. A
+$10^\circ$ floor marks a pair resolved, a convention whose influence is reported. The \emph{rank} of $J^{\mathrm{w}}$ counts how many fault directions are seen at all, a singular value below $10^{-6}$ of the largest counting as none. Rank alone misleads, scoring a direction barely above that cut equal to the strongest, so the \emph{condition number} of the retained singular values,
+\begin{equation}
+\kappa = \sigma_1/\sigma_r,
+\qquad \sigma_1 \ge \dots \ge \sigma_r > 10^{-6}\sigma_1,
+\label{eq:cond}
+\end{equation}
+is reported beside it: the weakest direction seen responds $\kappa$ times less than the strongest. Structural analysis runs in parallel on an eleven-equation representation using minimal structurally overdetermined sets, as an independent check.
+
+\subsection{Build context and the enlarged observation}
+\label{sec:context}
+
+A build is not a single instant. It comprises thousands of segments whose
+toolpath, layer index, gas-flow direction and local geometry are known to the
+machine, and the five faults do not vary identically across them: laser
+degradation drifts with build time, galvanometer error concentrates at turns, a
+recoater short-feed recurs with layer parity, gas degradation follows the flow
+axis, heat accumulation follows support depth. Treat the build rather than the
+instant as the observation. Let $G\in\mathbb{R}^{N\times 5}$ hold a constant and
+the last four of those quantities as known regressors over $N$ segments, and
+$M\in\mathbb{R}^{N\times 5}$ the modulation profile of each fault. Regressing
+each sensor's relative residual onto $G$ returns five coefficients per sensor in
+place of one reading, so three sensors give 15 observables, with Jacobian
+%
+\begin{equation}
+J^{\mathrm{big}}_{(s,j),k} = J_{sk}\,B_{jk},
+\qquad B = (G^{\!\top}G)^{-1}G^{\!\top}M .
+\label{eq:big}
+\end{equation}
+%
+Coefficient $(s,j)$ carries noise $\sigma_{(s,j)} =
+\sigma_s\sqrt{[(G^{\!\top}G)^{-1}]_{jj}}$, not $\sigma_s$. Were the regressors
+orthogonal that factor would be $1/\sqrt{N}$, or 0.109 at $N=84$; correlation
+among them lifts the worst to 0.136, so fitting a build buys a seven- to
+ninefold noise reduction. Section~\ref{sec:robust} gives the dependence on $N$.
+
+The profiles in $M$ are physical claims rather than measurements, and they are
+\emph{machine-specific}: a different nozzle geometry, scan strategy or part
+gives different patterns, so there is no universal set of five to go and find.
+One can nonetheless be calibrated against published data, and that inversion is
+the recipe by which a reader calibrates the rest on their own machine. The
+AM Bench pad scans \cite{Weaver2024}, under a 4.3\,m\,s$^{-1}$ cross-flow, show
+melt pool depth falling from 175 to 125\,\textmu m on tracks scanned parallel to
+the gas flow rather than anti-parallel, a 27.2\,\% mean reduction against
+standard deviations of 4--11\,\textmu m, with perpendicular pads as a control at
+2.4--4.7\,\%. Weaver et al.\ attribute it to plume by-products attenuating,
+scattering and lensing the beam; this model represents the attenuation alone.
+The gas fault is a plume optical depth, transmitting $e^{-f}$, so each measured
+depth change inverts to the severity reproducing it, through depth, where the
+model errs by $+1.7$\,\% against $-15.5$\,\% on width. The control's $-3.6$\,\%
+gives $f=0.046$, a plume taking 4.5\,\% of the beam; the parallel mean's
+$-27.2$\,\% gives $0.404$, taking 33\,\%: an \textbf{8.8$\times$ swing in gas
+severity inside one healthy build}, from scan direction alone. A profile of
+\emph{contrast} $c$ varies as $e^{cz}$ with $z$ over $[-1,1]$ across the build,
+so it swings $e^{2c}$ between mildest segment and worst; 8.8$\times$ is $c=1.08$
+against the 0.90, or 6.05$\times$, assumed here, so \textbf{the one profile that
+can be checked is conservative by 20\,\%}. Three qualifications: the driver is
+scan direction rather than position along the flow, it is baseline plume
+behaviour rather than a fault, and the inversion is model-mediated. The gas
+signature also alternates at track scale where a recoater signature alternates
+at layer scale, the distinctness Section~\ref{sec:robust} shows the method
+needs.
+
+\subsection{Sensor noise, derived from transduction}
+\label{sec:noise}
+
+The angles of Section~\ref{sec:measures} are angles between \emph{whitened}
+columns, and whitening divides each sensor's row by its own relative noise. That
+division is what puts a photodiode's radiometric power, a camera's square metres
+and a pyrometer's kelvin into one common unit, so the noise figures are half of
+the measurement geometry, not a detail applied after it. No published value for
+these instruments' in-process relative noise was found; the one citable
+figure, 2.3\,\%, is the precision of a post-mortem cross-section
+(6.2\,\textmu m at $k=2$ on 136.3\,\textmu m \cite{Weaver2024}) rather than of a
+signal acquired during a build. The three are therefore derived from a single
+assumption, that every radiometric channel carries the same fractional noise
+$\varepsilon$ whatever its physical cause, with the rest following from how each
+instrument converts radiance into a reading. Only ratios enter the whitening, so
+$\varepsilon$ cancels and no absolute noise level is claimed.
+
+\textbf{Photodiode.} Its reading is the light in its band, summed, so a
+fractional error in the light is the same fractional error in the reading:
+$\sigma_{\mathrm{pd}} = \varepsilon$, the unit the other two are quoted in.
+
+\textbf{Two-colour pyrometer.} It divides the power in one band by the power in
+another and inverts the ratio for temperature. Two independent channel errors
+put $\sqrt{2}\,\varepsilon$ on the ratio, and the ratio changes by 1.333\,\% for
+each 1\,\% change in temperature, so the inferred temperature carries
+$\sqrt{2}\,\varepsilon/1.333 = 1.061\,\varepsilon$: as a fraction of its own
+reading, slightly noisier than the photodiode it is built from. The reason is
+that 750 and 950\,nm are close together, either band alone changes by
+5--6\,\% per 1\,\% of temperature, so their ratio keeps under a quarter of the
+sensitivity available, and a single calibrated band would do five to six times
+better. That is the price of the ratio's one virtue, needing no absolute
+calibration.
+
+\textbf{Camera.} It reports melt pool extent, found by thresholding at the
+liquidus, where a fractional brightness error is indistinguishable from the
+threshold sitting at a different temperature, $\delta \ln T = -\varepsilon /
+(\partial \ln L/\partial \ln T)$. Planck's law is steep there, a 1\,\%
+temperature change alters the radiance at 850\,nm by 10.52\,\%, so
+$\varepsilon = 1\,\%$ displaces the apparent isotherm by only 0.095\,\% in
+temperature. Carrying that through the model's own dimension solver moves width
+by 0.030\,\% and length by 0.112\,\%, and the reported area is their product:
+$\sigma_{\mathrm{cam}} = 0.030 + 0.112 = 0.142\,\varepsilon$. Thresholding on a
+steep function localises an edge well, making the camera the quietest of the
+three by a factor of seven and its width axis alone by a factor of thirty-four,
+which is why Section~\ref{sec:added} finds the two axes worth reporting
+separately.
+
+The derived set is $1 : 0.142 : 1.061$. Two choices inside it were taken in the
+direction that costs this analysis: the camera's extent is read from one
+threshold crossing rather than averaged around the perimeter, and width and
+length are treated as independent although a common brightness error moves both
+together, which understates what separating them is worth. Both limits are swept
+in Section~\ref{sec:robust}, alongside a case in which the dominant error is a
+slow gain drift shared by the pyrometer's two channels, where the ratio then
+cancels it and the pyrometer becomes the quietest of the three rather than the
+noisiest. The worst pair over a build moves by under half a degree across all
+four sets.
+
+%% ===========================================================================
+\section{Results}
+%% ===========================================================================
+
+\subsection{Validation}
+\label{sec:valid}
+
+This paper's quantities are angles between whitened Jacobian columns,
+\emph{directions} in signal space, so what the model must get right is how
+differently the faults move the readings, not how far. Guo et al.\ held
+volumetric energy density constant while raising laser power and scan speed
+together, and found the melt pool changing by orders of magnitude, passing
+between melting regimes \cite{Guo2019}. The same sweep here, power 150 to
+500\,W at compensated speed, changes in the same direction and does change
+regime, but by a factor of a few rather than orders: depth moves 1.11$\times$
+across the six conduction conditions and reaches 2.37$\times$, pool volume
+5.64$\times$, only once the seventh keyholes. The model's whole variation is
+that single discrete transition. Absorption varying with the geometry of the
+vapour depression, which Guo et al.\ identify as the cause, is absent from a
+conduction solution.
+
+Its absence runs in a known direction. An absorption tracking the depression
+responds to power and to speed unequally, a channel the two faults would not
+share, and Section~\ref{sec:limits} measures what adding such a channel does to
+the gas fault: it \emph{opens} a confounded pair. The model understates how
+differently power and speed act, so the confounding reported here is an upper
+bound. The same sweep also settles which dimension carries the information, used
+in Section~\ref{sec:added}: width and depth move 1.11$\times$ each, in opposite
+directions, while length varies 2.53$\times$. The cross-section is nearly blind
+to how power and speed were traded off and the length is not, again a
+statement about direction, untouched by the magnitude shortfall.
+
+The second check is internal: does the model reproduce the structure the
+benchmark reports, depth tracking volumetric energy density while width does not
+\cite{Weaver2024}? As a correlation the answer is unstable, over 27 melted
+conditions the model gives $r=+0.20$ for width against $+0.77$ for depth, but
+width's coefficient runs $+0.68$ to $-0.22$ across five such grids, a property of
+the region sampled rather than of the model. The exponents are stable where the
+correlation is not. Width and depth are each a power law in $(P,v,d)$ to
+$R^{2}\ge0.94$, and a pure function of $\mathrm{VED}=P/(vd^{2})$ must have
+exponents along $(1,-1,-2)$: on every grid depth's lie at $\cos 0.64$--$0.74$ of
+that ray against width's $-0.11$ to $0.00$, because the two depend on spot size
+with opposite signs, the one variable a volumetric density folds away. All 27
+points are model output, so this establishes internal consistency, not external
+agreement.
+
+\subsection{Laser power and shielding gas are exactly confounded}
+\label{sec:confound}
+
+Both faults act \emph{only} on the product (effective absorptivity $\times$
+power), in which the Eagar--Tsai temperature rise is linear. Gas attenuates
+absorptivity as $A\,e^{-f_{\mathrm{gas}}}$ and power scales as
+$P(1+f_{\mathrm{power}})$, so the product is unchanged whenever
+$f_{\mathrm{gas}}=\ln(1+f_{\mathrm{power}})$, giving an identical melt pool i.e.
+the same temperature at every point, hence identical readings from any instrument
+that could be built, the two cancelling bit-identically in double precision on
+all three. The
+ratio of the two Jacobian columns is $-0.99999$, $-1.00000$, $-0.99993$ across
+the sensors, a spread of $7\times10^{-5}$ from finite-difference error on an
+exact identity, and the pairwise angle is \textbf{0.00$^\circ$}.
+
+\subsection{The limit is the melt pool, not the sensor count}
+\label{sec:melt}
+
+The three observables are not independent. Normalising the Jacobian's sensor Gram
+matrix $JJ^{\mathsf T}$ gives pairwise correlations of \textbf{0.99960}
+(photodiode--camera), \textbf{0.99508} (photodiode--pyrometer) and
+\textbf{0.99477} (camera--pyrometer): a photodiode reading band radiance, a
+camera reading pool area in square metres and a two-colour pyrometer reading
+kelvin respond to the five faults in patterns agreeing to better than 0.994, their sensitivity vectors lying within $6^\circ$ of one another. Row scalings cancel in the normalisation exactly, so this is the one result here that does
+\emph{not} depend on the derived noise figures.
+
+Those correlations set the rank. The whitened Jacobian's singular values are
+13.14, 0.0638 and 0.00513: three of the five fault directions are observed, and
+the power--gas combination of Section~\ref{sec:confound} lies \textbf{entirely}
+inside the unobserved subspace, where power and gas each lie only partly. Of the
+three observed, the weakest responds \textbf{2562} times less than the strongest. Adding all four
+candidate observables gives seven rows and does not raise the attained rank:
+the singular values become $(23.7,\ 9.74,\ 6.0\times10^{-2},\ 5.0\times10^{-6},\
+1.4\times10^{-6})$, the fourth at $2\times10^{-7}$ of the leading one, two orders
+below the $10^{-6}$ threshold adopted here, so four directions are formally
+present but only three are measurements. \textbf{Seven instruments leave power
+and gas exactly as confounded as one.}
+
+The reason is structural. Everything the model knows funnels into four physical
+channels: absorbed power, scan speed, effective conductivity and preheat,
+with three of the five faults crowding onto the first. Any instrument reading
+only the melt pool is a function of those four channels. The fault-to-sensor
+map cannot exceed rank 4 however many sensors are fitted.
+
+\subsection{Introducing full build context}
+
+With the enlarged observation of Section~\ref{sec:context} the rank rises from 3
+to \textbf{5}, the worst pair from $0.00^\circ$ to \textbf{24.90$^\circ$}, power
+against gas to $29.34^\circ$, and the condition number falls from 2562 to 50.
+All ten pairs clear the $10^\circ$ floor (Table~\ref{tab:matrix}) where none
+does per segment.
+
+The mechanism is visible in the form of Equation~\eqref{eq:big}. Each enlarged
+observable is a product, $J^{\mathrm{big}}_{(s,j),k} = J_{sk}B_{jk}$: the first
+factor is how sensor $s$ responds to fault $k$ at an instant, the second how
+strongly fault $k$'s spatial pattern loads onto regressor $j$. The
+instantaneous matrix has three rows, so at most three fault directions are
+observable whatever the physics. The enlarged matrix has fifteen, but rows
+alone buy nothing. What buys separability is that the second factor differs
+between faults, so two faults whose sensor signatures are nearly parallel
+acquire distinguishable signatures across the regression coefficients.
+
+Three controls establish that this is the mechanism rather than an artefact of
+the arithmetic. The first gives all five faults one identical profile. Then $B$
+has proportional columns, $B_{jk}=b_j c_k$, and enlarged column $k$ becomes
+$c_k\,(J_{:k}\otimes b)$: a scaled Kronecker product of the instantaneous column
+with a vector common to every fault. Both the scalar and the common factor
+cancel from any angle between two such columns, so the enlarged geometry is the
+instantaneous geometry exactly, giving rank 3, condition number 2562, worst pair
+$0.00^\circ$, despite the matrix still having fifteen rows. \textbf{The gain is
+not dimensionality; it is the profiles differing.}
+
+The second control addresses linearisation. A Jacobian describes infinitesimal
+faults, and a real fault has size, so every derivative is replaced by a secant
+through the full nonlinear chain. The rank stays 5 at every magnitude from
+0.2\,\% to 20\,\% in both signs, but the binding pair ranges $12.82^\circ$ to
+$37.95^\circ$ and the condition number 47 to 62: the derivative limit is
+therefore \emph{not} a conservative bound, and a $+20\,\%$ fault leaves
+$12.82^\circ$, clearing the floor by only 1.3$\times$. The third control
+replaces the interpolated response curves with the full model evaluated at all
+84 segments, and reproduces the angles to $0.04^\circ$.
+
+\subsection{Robustness}
+\label{sec:robust}
+
+The modulation profiles are machine-specific claims rather than measurements, so
+the primary result is not an angle but a requirement: how strong a machine's
+patterns must be. Scaling every contrast by a common factor, five of the ten
+pairs clear the floor at or below 25\,\% of the strength assumed here, and the
+hardest, power against speed, at \textbf{45\,\%}. A machine whose patterns are
+half as strong as assumed therefore still resolves every pair, and the one
+profile that could be calibrated against measurement came back 20\,\%
+\emph{stronger} than assumed (Section~\ref{sec:context}).
+
+A second question is which fault follows which build variable. Permuting that
+assignment changes the columns of $B$ while leaving each fault's sensor
+signature $J_{:k}$ untouched, so the products in Equation~\eqref{eq:big} are
+genuinely different vectors and the pairwise angles move. Across all 120
+assignments the rank is 5 and all ten pairs clear the floor in every one, while
+the worst pair ranges $16.2^\circ$ to $30.1^\circ$. The conclusion is thus
+insensitive to the assignment even though the headline angle is not: the method
+requires that the patterns differ, not that any particular fault own any
+particular one. The headline moves by under half a degree across the full range
+of the unmeasured conductivity coupling and across all four noise sets of
+Section~\ref{sec:noise}. Segment count is the one hard requirement, at
+$11.23^\circ$ for $N=12$ and $22.90^\circ$ for $N=30$ on a near-square plan,
+flat thereafter.
+
+That the patterns must differ is a strict requirement, and the same algebra says
+why. Give faults $k$ and $l$ identical profiles and $B_{:k}=B_{:l}$, so their
+enlarged columns are $J_{:k}\otimes b$ and $J_{:l}\otimes b$ and the angle
+between them collapses to the instantaneous one; this is reproduced to better
+than $10^{-3}$ degrees for all ten pairs. Every instantaneous angle lies below
+the floor, the mildest at $4.63^\circ$, so \textbf{no two faults may share a
+spatial signature.} None does on this machine, as the recoater advances once per
+layer along a fixed axis while the gas flows along a fixed chamber axis, and the
+benchmark measurement of Section~\ref{sec:context} confirms the two alternate at
+different scales. Establishing that on another machine is a far weaker
+requirement than measuring five contrasts.
+
+Distinctness also tolerates a profile being attributed to the wrong build
+variable, which matters because measured layer-thickness variation is reported
+to follow part support rather than the recoater cycle assumed here
+\cite{Liu2022}. Mixing the geometry fault's support driver into the layer
+profile holds layer against geometry above the floor until that profile is
+roughly \textbf{84\,\%} support-driven ($12.07^\circ$ at 80\,\%). Mixing the
+power fault's build-drift driver never brings power against layer below the
+floor at any fraction, because every profile is normalised to unit mean: two
+faults sharing a driver give $(1, a z)$ and $(1, b z)$, which are
+non-proportional wherever the contrasts $a$ and $b$ differ. Sharing a driver is
+not sharing a profile.
+
+\begin{table}[htbp]
+\centering
+\caption{The diagnosability matrix, in degrees; bold clears the $10^\circ$ floor.
+Power/gas reads $0.00^\circ$ in both melt-pool columns, being algebraic. The free
+split clears seven pairs and mildly worsens two that stay below the floor either
+way; accumulation over $N=84$ clears all ten.}
+\label{tab:matrix}
+\scriptsize
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+ & \multicolumn{2}{c}{per segment} & over a build \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-4}
+fault pair & baseline & split camera & baseline \\
+\midrule
+power / gas      & 0.00 & 0.00 & \textbf{29.34} \\
+layer / gas      & 0.32 & \textbf{64.53} & \textbf{44.48} \\
+power / layer    & 0.32 & \textbf{64.53} & \textbf{36.26} \\
+power / speed    & 0.70 & \textbf{43.43} & \textbf{24.90} \\
+speed / gas      & 0.70 & \textbf{43.43} & \textbf{35.87} \\
+speed / layer    & 1.03 & \textbf{72.04} & \textbf{46.16} \\
+speed / geometry & 3.62 & \textbf{43.28} & \textbf{31.95} \\
+power / geometry & 4.31 & 3.08 & \textbf{25.42} \\
+gas / geometry   & 4.31 & 3.08 & \textbf{31.39} \\
+layer / geometry & 4.63 & \textbf{64.81} & \textbf{40.54} \\
+\midrule
+pairs clearing the floor & 0/10 & \textbf{7/10} & \textbf{10/10} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Diagnosability matrix and configuration classes}
+
+Classifying on the enlarged observation alone places all ten pairs in class~1 for
+every configuration, a single photodiode included. Both
+regimes are therefore reported (Table~\ref{tab:matrix}): \emph{instantaneous},
+per-segment decisions for closed-loop control, and \emph{accumulated}, diagnosis
+over a build for qualification and drift monitoring. The baseline resolves none of the ten instantaneously but all ten in the
+accumulated run, leaving class~3 empty in both.
+
+Five commercial systems were surveyed and present only three distinct observable
+sets, reported as classes rather than products because the mapping from product
+to observable set rests on secondary literature rather than datasheets: a single
+coaxial photodiode (\textbf{A}, rank 1); photodiode plus pool imaging
+(\textbf{B}) and two photodiodes in separate bands (\textbf{C}), both rank 2;
+the research reference adding pyrometry (\textbf{D}) and C plus upstream power
+monitoring (\textbf{E}), both rank 3. \textbf{No configuration built solely from
+melt-pool observables separates laser power from gas degradation}, whatever its
+sensor count: A through D read $0.00^\circ$ on that pair, for the reason of
+Section~\ref{sec:melt}, and none resolves any pair per segment at the derived
+noise figures. E is the actionable class, separating the pair at $84.02^\circ$
+and resolving four of ten, because a delivered-power measurement sampled
+\emph{upstream} of the process zone sees the laser output before the plume
+attenuates it.
+
+\subsection{What an added measurement would buy}
+\label{sec:added}
+
+Plume and powder-bed sensing cannot be simulated by a model with neither a plume
+nor a powder layer, so each candidate is represented as an idealised unit row on
+its cause. One such row raises the rank to 4 and clears the four pairs involving
+that cause. \textbf{Build context outperforms two idealised, perfect direct
+measurements of the causes themselves}: gas and layer sensors together give rank
+5 but $0.70^\circ$ and seven of ten, against $24.90^\circ$ and ten of ten at no
+cost. Among melt-pool observables the most valuable addition is free, as
+reporting the camera's two axes separately rather than as an area is worth
+\textbf{+23.89$^\circ$} on the pair that binds the baseline and is the only
+change resolving anything \emph{per segment}, taking that count from none of ten
+to \textbf{seven of ten} (Table~\ref{tab:matrix}), while a short-wave infrared
+photodiode and a wide-band pyrometer are worth nothing. Width is the least
+correlated of the candidates with the coaxial photodiode, 0.779 against 0.979 for
+length, and an area averages it away; \emph{a sensor added to break a confound
+must observe upstream of the shared channel, where a sensor reading the melt pool
+adds a row, not a direction.}
+
+%% ===========================================================================
+\section{Discussion}
+%% ===========================================================================
+
+\subsection{Relation to reported monitoring performance}
+
+Comparing predicted limits against reported accuracies proves largely
+unrealisable, and the reason is itself a result. Of 19 works surveyed, covering in-situ
+LPBF monitoring with a stated input and output over 2019--2025, seven classify
+outcomes and only \textbf{three estimate a process input from an in-situ
+signal}, one of those a lumped energy-density class; none analyses whether two
+causes are separable. That is not an accident of what the field chose to study.
+Outcomes are functions of the melt pool, and the melt pool is a function of the
+four channels of Section~\ref{sec:melt}, so outcome classification cannot
+separate two causes sharing a channel, for the same reason no melt-pool
+instrument can. No published result contradicts the predicted limits, and
+state-of-the-art parameter estimation predicts precisely the lumped group this
+analysis identifies as what survives confounding \cite{kNN2025}.
+
+The one external check available on this model's sensor response turns on an
+assumption worth stating before the result. The plume here is a \emph{fixed}
+optical depth, independent of power and speed and emitting nothing of its own,
+so the model admits no mechanism by which its scan-speed response could
+strengthen with laser power. Reijonen measures that response on a commercial
+coaxial photodiode as $y=ax^{-b}$, reporting $b=0.337$ at 400\,W over
+400--1200\,mm\,s$^{-1}$ and the exponent growing with power, ``almost
+non-existent'' at 100\,W \cite{Reijonen2024}. Fitting the same form to this
+model over their range, which is the comparable quantity rather than the Jacobian
+entry $-0.483$, gives \textbf{0.468} at 400\,W, some 39\,\% too steep, and
+0.51, 0.44 and 0.47 at 100, 285 and 400\,W: flat, as the assumption requires.
+Reijonen attribute the trend to the vapour plume, absent in conduction mode at
+low power, which is the mechanism omitted here. \textbf{That omission is the
+same one that makes the power/gas degeneracy exact} (Section~\ref{sec:confound}):
+their measurements show the real attenuation depending on both parameters and
+even reversing sign with scan speed at low gas flow, so the reported
+$0.00^\circ$ is an upper bound on the instantaneous confounding on external
+evidence rather than by assertion.
+
+The comparison crosses material (316L against IN718), detection band (a
+shortpass below 800\,nm against 700--1000\,nm) and bed condition
+(30\,\textmu m powder layers against bare plate). In the model's defence it is
+calibrated at 285\,W, where all seven benchmark cases keyhole, so the fixed
+optical depth is a local approximation \emph{inside} the regime where a plume
+exists rather than a claim about conduction-mode melting. On the power response,
+Reijonen report a linear fit $y=ax+b$ without quoting the intercept; relative
+sensitivity is then $aP/(aP+b)$, equal to one only through the origin, so this
+model's $+1.52$ cannot be called a conflict until that intercept is known.
+
+\subsection{Limitations}
+\label{sec:limits}
+
+The thermal model is a conduction solution with an analytic keyhole patch: it
+only partly reproduces the Guo validation, its fitted parameters sit at their bounds, and
+the absorptivity, conductivity and heat capacity correlations of 0.93--0.96
+reported during Bayesian calibration of the same model family \cite{Hon2021} are
+the pathology this paper studies appearing in its own calibration. Three
+modelling choices then make the instantaneous case \emph{more} confounded than
+reality: the gas fault as pure optical depth omits a convective channel; treating
+plume attenuation as independent of power and speed is what makes the degeneracy
+exact; and modelling upstream power monitoring as a melt-pool-derived signal is
+likewise pessimistic.
+
+\textbf{The $0.00^\circ$ is therefore an upper bound, and its exactness is an
+artefact of the one-channel gas model.} Gas here acts only on absorbed power,
+precisely the channel a power fault acts on, which is what makes the two
+algebraically identical. A real plume also scatters: Reijonen et al.\ report
+reduced gas flow giving loss of penetration together with \emph{increased} melt
+pool width \cite{Reijonen2020}, where attenuation alone gives a decrease of
+$-10$\,\% here at $f_{\mathrm{gas}}=0.4$. Adding that broadening as a spot-size
+channel, which power does not possess, opens the pair to \textbf{2--3$^\circ$}
+at the strength needed to reverse the width sign, and leaves the suite's worst
+pair unmoved at $0.32^\circ$. The exactness is a property of the model; the
+inseparability is not. The rank limit is unaffected either way, deriving from
+channel counting rather than the form of this coupling.
+
+The geometry inversion fails, returning $+687$\,K of preheat because a pad
+differs from a single track by remelting as well as preheat, and no dataset yet
+offers a build with \emph{deliberately induced} machine faults: every inversion
+here reads a healthy build and extrapolates, which is the natural follow-on
+experiment. The noise derivation rests on one assumption, that every radiometric
+channel carries the same fractional noise, bounded by the gain-dominated sweep.
+The five fault magnitudes are physical but not on a common severity scale, so
+comparisons \emph{across pairs at fixed magnitude} are not meaningful, and all
+results are diagnosability statements, meaning what a suite can distinguish in
+principle, at a given relative noise, under a given forward model, not that
+any algorithm achieves it.
+
+%% ===========================================================================
+\section{Conclusions}
+%% ===========================================================================
+
+Laser power deviation and shielding gas degradation produce identical melt pools
+in this model, confounded at $0.00^\circ$ by algebra rather than noise, so no
+instrument reading the melt pool separates them from a single instant. The
+binding limit is the melt pool's four physical channels, not the instrumentation:
+at noise derived from each sensor's transduction chain, seven observables attain
+rank 3 against that bound of 4 and leave the worst pair at $0.00^\circ$. Deriving
+those figures rather than assuming them matters, whitening being half of the
+measurement geometry.
+
+Build structure already present dissolves the limit at no hardware cost, taking
+rank 3 $\rightarrow$ 5, worst pair $0.00^\circ \rightarrow 24.90^\circ$ and all ten pairs
+resolved where none is per segment, surviving at half the assumed profile
+strength, across all 120 permutations, under all four noise sets and at fault
+magnitudes from 0.2\,\% to 20\,\%, with a shared-profile control reproducing the
+instantaneous result exactly. It outperforms two idealised direct measurements of
+the causes themselves and requires only that no two faults share a spatial
+signature; those patterns being machine-specific, the deliverable is the method
+plus the strength a machine needs, with the inversion of
+Section~\ref{sec:context} as the recipe for calibrating it.
+
+For real-time control an upstream measurement of delivered laser power is the
+recommendation, separating power from gas at $84^\circ$ where no melt-pool
+configuration separates them at all; among melt-pool observables the most
+valuable addition is free, reporting the camera's two axes separately being worth
+$+23.89^\circ$ and the only change resolving anything per segment. Post-build
+diagnosis needs no new hardware, real-time isolation does, and crude sensing of
+the right cause suffices. The method needs only a forward model and a sensor
+description, and answers at specification time what is otherwise settled after
+the hardware is bought.
+
+%% ===========================================================================
+\section*{Declaration of generative AI and AI-assisted technologies in the
+manuscript preparation process}
+
+During the preparation of this work the author used Claude Code (Anthropic) in
+order to carry out part of the formal analysis and to edit the original draft. After using
+this tool, the author reviewed and edited the content as needed and takes full
+responsibility for the content of the published article.
+%% ===========================================================================
+%% TODO before submission: add funding and acknowledgements section if required.
+
+%% ===========================================================================
+\begin{thebibliography}{99}
+\scriptsize
+\setlength{\itemsep}{-2pt}\setlength{\parskip}{0pt}
+
+\bibitem{Krysander2008}
+M. Krysander, E. Frisk, Sensor placement for fault diagnosis, IEEE Trans. Syst. Man Cybern. A 38 (6) (2008)
+1398--1410.
+
+\bibitem{Scime2019}
+L. Scime, J. Beuth, Using machine learning to identify in-situ melt pool
+signatures indicative of flaw formation in a laser powder bed fusion additive
+manufacturing process, Addit. Manuf. 25 (2019) 151--165.
+
+\bibitem{Raj2023}
+A. Raj et al., Modeling spatial variations in co-axial melt pool monitoring signals in laser
+powder bed fusion, J. Manuf. Process. 89 (2023) 24--38.
+
+\bibitem{Blanc2024}
+C. Blanc, A. Ahar, K. De Grave, Reference dataset and benchmark for
+reconstructing laser parameters from on-axis video in powder bed fusion of bulk
+stainless steel, arXiv preprint arXiv:2409.12475 (2024).
+
+\bibitem{Reijonen2024}
+J. Reijonen, Effect of laser parameters and shielding gas flow on co-axial
+photodiode-based melt pool monitoring signals in laser powder bed fusion,
+Addit. Manuf. Lett. 11 (2024) 100244.
+
+\bibitem{Reijonen2020}
+J. Reijonen et al., On the effect of shielding gas flow on porosity and melt
+pool geometry in laser powder bed fusion additive manufacturing, Addit. Manuf.
+32 (2020) 101030.
+
+\bibitem{Liu2022}
+T. Liu et al., In-situ infrared thermographic inspection for local powder layer
+thickness measurement in laser powder bed fusion, Addit. Manuf. 55
+(2022) 102873.
+
+\bibitem{Bugatti2022}
+M. Bugatti, B. M. Colosimo, The intelligent recoater: A new solution for in-situ
+monitoring of geometric and surface defects in powder bed fusion, Addit. Manuf. Lett. 3 (2022) 100048.
+
+\bibitem{kNN2025}
+Estimation of laser powder bed fusion process parameters from melt pool images
+using k-nearest neighbours, Int. J. Adv. Manuf. Technol. (2025). doi:10.1007/s00170-025-15591-y.
+
+\bibitem{Guo2019}
+Q. Guo et al., In-situ
+characterization and quantification of melt pool variation under constant input
+energy density in laser powder bed fusion additive manufacturing process,
+Addit. Manuf. 28 (2019) 600--609.
+
+\bibitem{Weaver2024}
+J. S. Weaver et al., Cross-sectional melt pool geometry of laser scanned tracks and pads on nickel
+alloy 718 for the 2022 additive manufacturing benchmark challenges, Integr. Mater. Manuf. Innov. 13 (2024) 363--379.
+
+\bibitem{Hon2021}
+P. Honarmandi et al., A rigorous test and improvement of the
+Eagar-Tsai model for melt pool characteristics in laser powder bed fusion
+additive manufacturing, Addit. Manuf. 47 (2021) 102300.
+
+\bibitem{Trapp2017}
+J. Trapp et al., In situ absorptivity
+measurements of metallic powders during laser powder-bed fusion additive
+manufacturing, Appl. Mater. Today 9 (2017).
+doi:10.1016/j.apmt.2017.08.006.
+
+\end{thebibliography}
+
+\end{document}

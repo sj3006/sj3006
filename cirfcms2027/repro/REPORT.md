@@ -331,19 +331,19 @@ threshold or unit this work chose.
 
 | group | seconds | cached |
 |---|---|---|
-| `added` | 0.0 | yes |
-| `calibration` | 0.0 | yes |
-| `configs` | 0.0 | yes |
-| `context` | 0.0 | yes |
-| `couplings` | 0.0 | yes |
-| `couplings_sweep` | 0.0 | yes |
-| `discussion` | 0.0 | yes |
-| `meltpool` | 0.0 | yes |
-| `noise` | 0.0 | yes |
-| `noise_sets` | 0.0 | yes |
-| `provenance` | 5.4 | no |
-| `robustness` | 0.0 | yes |
-| `secants` | 0.0 | yes |
-| `sources` | 0.0 | yes |
-| `validation` | 0.0 | yes |
-| `ved` | 0.0 | yes |
+| `added` | 8.0 | no |
+| `calibration` | 36.5 | no |
+| `configs` | 2.7 | no |
+| `context` | 3.6 | no |
+| `couplings` | 0.5 | no |
+| `couplings_sweep` | 18.2 | no |
+| `discussion` | 15.6 | no |
+| `meltpool` | 2.4 | no |
+| `noise` | 1.1 | no |
+| `noise_sets` | 1.2 | no |
+| `provenance` | 0.0 | no |
+| `robustness` | 5.7 | no |
+| `secants` | 99.9 | no |
+| `sources` | 0.0 | no |
+| `validation` | 0.3 | no |
+| `ved` | 6.7 | no |
