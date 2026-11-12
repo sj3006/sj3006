@@ -1,0 +1,13 @@
+grid,simulator,rule,runs,fwer,se
+toy,good,cone,400,0.0025,0.0025
+toy,good,max,400,0.0025,0.0025
+toy,good,none,400,0.0,0.0
+toy,adversarial,cone,400,0.01,0.005
+toy,adversarial,max,400,0.01,0.005
+toy,adversarial,none,400,0.0,0.0
+dose,good,cone,400,0.0075,0.0043
+dose,good,max,400,0.01,0.005
+dose,good,none,400,0.0075,0.0043
+dose,adversarial,cone,400,0.0275,0.0082
+dose,adversarial,max,400,0.025,0.0078
+dose,adversarial,none,400,0.025,0.0078

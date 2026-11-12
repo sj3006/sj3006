@@ -6,6 +6,7 @@ writes CSVs to results/final/; `plot` turns whatever CSVs exist into figures.
     python3 experiments/final.py scaling --scen toy-good [--reps 5]
     python3 experiments/final.py bounds [--reps 3]
     python3 experiments/final.py ablation --scen toy-good [--reps 8]
+    python3 experiments/final.py gp --n 16 [--reps 40]
     python3 experiments/final.py plot
 
 Methods (all adaptive ones share allocation, re-check and futility code):
@@ -276,6 +277,43 @@ def cmd_ablation(args):
     write(rows, f"ablation_{args.scen}_{n}.csv")
 
 
+# -- 6. model-based baseline: GP level-set certification --------------------------------
+
+def cmd_gp(args):
+    """How often does a GP upper-confidence-bound certificate include an unsafe
+    setting? Ours on the same scenario for comparison (same budget)."""
+    from pwcert.gp_baseline import GPLevelSet
+    n, budget = args.n, args.budget or 60 * args.n * args.n
+    rows = []
+    for scen in ("toy-good", "lpbf-good", "dose-bliss"):
+        sc = SCENARIOS[scen](n)
+        A = sc.true_window().sum()
+        for beta in (2.0, 3.0, 4.0):
+            for ls in (0.1, 0.2, 0.3):
+                t0, errs, areas = time.time(), 0, []
+                for r in range(args.reps):
+                    g = GPLevelSet(sc, beta=beta, lengthscale=ls, batch=2 * n,
+                                   rng=np.random.default_rng(r))
+                    h = g.run(budget)
+                    errs += int(max(x["errors"] for x in h) > 0)
+                    areas.append(h[-1]["area"] - h[-1]["errors"])
+                rows.append(dict(scen=scen, n=n, method="GP level set", beta=beta, lengthscale=ls,
+                                 runs=args.reps, fwer=round(errs / args.reps, 3),
+                                 correct_area_frac=round(float(np.mean(areas)) / A, 3)))
+                print(rows[-1], f"({time.time() - t0:.0f}s)", flush=True)
+        errs, areas = 0, []
+        for r in range(args.reps):
+            c, _ = build("ours", scen, n, np.random.default_rng(r))
+            h = c.run(budget)
+            errs += int(max(x["errors"] for x in h) > 0)
+            areas.append(h[-1]["area"])
+        rows.append(dict(scen=scen, n=n, method="ours", beta="", lengthscale="", runs=args.reps,
+                         fwer=round(errs / args.reps, 3),
+                         correct_area_frac=round(float(np.mean(areas)) / A, 3)))
+        print(rows[-1], flush=True)
+        write(rows, "gp_baseline.csv")
+
+
 # -- plotting ----------------------------------------------------------------------------
 
 # Reference categorical palette, fixed order (dataviz skill, palette.md).
@@ -296,6 +334,14 @@ def _style(ax):
     ax.xaxis.label.set_color(INK)
     ax.yaxis.label.set_color(INK)
     ax.title.set_color(INK)
+
+
+def _int_ticks(ax, ns):
+    """Label a log x-axis with the actual grid sizes as plain integers."""
+    from matplotlib.ticker import FixedLocator, NullLocator
+    ax.xaxis.set_major_locator(FixedLocator(ns))
+    ax.xaxis.set_minor_locator(NullLocator())
+    ax.set_xticklabels([str(n) for n in ns])
 
 
 def _read(path):
@@ -358,10 +404,11 @@ def cmd_plot(args):
                 ax.loglog(ns, c0 * ns / n0, ":", color=INK2, lw=1, label="slope 1 (boundary)")
                 ax.loglog(ns, c0 * (ns / n0) ** 2, "--", color=INK2, lw=1, label="slope 2 (area)")
             _style(ax)
+            _int_ticks(ax, ns_all)
             ax.set_xlabel("grid size n (n x n settings)")
             ax.set_ylabel(f"coupons to certify {int(float(rows[0]['frac']) * 100)}% of window")
             ax.set_title(LABELS.get(rows[0]["scen"], rows[0]["scen"]), fontsize=10)
-        axes.ravel()[0].legend(fontsize=8, frameon=False, labelcolor=INK)
+        axes.ravel()[-1].legend(fontsize=8, frameon=False, labelcolor=INK, loc="upper left")
         fig.tight_layout()
         fig.savefig(os.path.join(OUT, "fig_scaling.png"), dpi=150)
         print("-> fig_scaling.png")
@@ -381,6 +428,7 @@ def cmd_plot(args):
             ax.loglog([ns[i] for i in ok], [ys[i] for i in ok], "o" + ls if ls != "-" else "o-",
                       color=col, lw=2 if ls == "-" else 1.2, ms=5, label=lab)
         _style(ax)
+        _int_ticks(ax, ns)
         ax.set_xlabel("grid size n (n x n settings)")
         ax.set_ylabel("coupons to certify all rates <= eps/2")
         ax.legend(fontsize=8, frameon=False, labelcolor=INK)
@@ -391,7 +439,7 @@ def cmd_plot(args):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["validity", "curves", "scaling", "bounds", "ablation", "plot"])
+    ap.add_argument("cmd", choices=["validity", "curves", "scaling", "bounds", "ablation", "gp", "plot"])
     ap.add_argument("--scen", default="toy-good", choices=list(SCENARIOS))
     ap.add_argument("--n", type=int, default=24)
     ap.add_argument("--reps", type=int, default=5)

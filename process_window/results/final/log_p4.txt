@@ -1,0 +1,40 @@
+{'scen': 'toy-good', 'n': 8, 'method': 'ours', 'frac': 0.5, 'median': 6320.0, 'costs': '5664;4896;6320;6368;6608'} (7s)
+{'scen': 'toy-good', 'n': 8, 'method': 'unstructured', 'frac': 0.5, 'median': 8032.0, 'costs': '8112;8032;7696;7648;8176'} (6s)
+{'scen': 'toy-good', 'n': 8, 'method': 'grid DoE', 'frac': 0.5, 'median': 17536.0, 'costs': '17536'}
+-> /home/user/sj3006/process_window/experiments/../results/final/scaling_toy-good.csv
+{'scen': 'toy-good', 'n': 12, 'method': 'ours', 'frac': 0.5, 'median': 11160.0, 'costs': '11256;10416;11160;12096;10512'} (13s)
+{'scen': 'toy-good', 'n': 12, 'method': 'unstructured', 'frac': 0.5, 'median': 19200.0, 'costs': '18912;19776;18888;19200;19224'} (11s)
+{'scen': 'toy-good', 'n': 12, 'method': 'grid DoE', 'frac': 0.5, 'median': 39456.0, 'costs': '39456'}
+-> /home/user/sj3006/process_window/experiments/../results/final/scaling_toy-good.csv
+{'scen': 'toy-good', 'n': 16, 'method': 'ours', 'frac': 0.5, 'median': 14880.0, 'costs': '15360;16352;14784;14592;14880'} (25s)
+{'scen': 'toy-good', 'n': 16, 'method': 'unstructured', 'frac': 0.5, 'median': 32480.0, 'costs': '31840;32480;35424;32768;30848'} (22s)
+{'scen': 'toy-good', 'n': 16, 'method': 'grid DoE', 'frac': 0.5, 'median': 77056.0, 'costs': '77056'}
+-> /home/user/sj3006/process_window/experiments/../results/final/scaling_toy-good.csv
+{'scen': 'toy-good', 'n': 24, 'method': 'ours', 'frac': 0.5, 'median': 25488.0, 'costs': '25488;24192;24048;26256;26784'} (59s)
+{'scen': 'toy-good', 'n': 24, 'method': 'unstructured', 'frac': 0.5, 'median': 75696.0, 'costs': '77760;75696;74304;78384;74400'} (57s)
+{'scen': 'toy-good', 'n': 24, 'method': 'grid DoE', 'frac': 0.5, 'median': 173376.0, 'costs': '173376'}
+-> /home/user/sj3006/process_window/experiments/../results/final/scaling_toy-good.csv
+{'scen': 'toy-good', 'n': 32, 'method': 'ours', 'frac': 0.5, 'median': 38848.0, 'costs': '37504;38848;36352;43264;45696'} (158s)
+{'scen': 'toy-good', 'n': 32, 'method': 'unstructured', 'frac': 0.5, 'median': 140864.0, 'costs': '132800;142784;138368;147008;140864'} (149s)
+{'scen': 'toy-good', 'n': 32, 'method': 'grid DoE', 'frac': 0.5, 'median': 338944.0, 'costs': '338944'}
+-> /home/user/sj3006/process_window/experiments/../results/final/scaling_toy-good.csv
+{'scen': 'toy-good', 'n': 48, 'method': 'ours', 'frac': 0.5, 'median': 71520.0, 'costs': '73344;79296;65664;71520;69216'} (342s)
+{'scen': 'toy-good', 'n': 48, 'method': 'unstructured', 'frac': 0.5, 'median': 330048.0, 'costs': '334368;352224;325920;320448;330048'} (371s)
+{'scen': 'toy-good', 'n': 48, 'method': 'grid DoE', 'frac': 0.5, 'median': 762624.0, 'costs': '762624'}
+-> /home/user/sj3006/process_window/experiments/../results/final/scaling_toy-good.csv
+{'scen': 'lpbf-good', 'n': 12, 'method': 'ours', 'frac': 0.5, 'median': 8328.0, 'costs': '8328;9000;7680;10344;8280'} (18s)
+{'scen': 'lpbf-good', 'n': 12, 'method': 'unstructured', 'frac': 0.5, 'median': 7560.0, 'costs': '7440;8256;6696;7560;8256'} (18s)
+{'scen': 'lpbf-good', 'n': 12, 'method': 'grid DoE', 'frac': 0.5, 'median': 69264.0, 'costs': '69264'}
+-> /home/user/sj3006/process_window/experiments/../results/final/scaling_lpbf-good.csv
+{'scen': 'lpbf-good', 'n': 16, 'method': 'ours', 'frac': 0.5, 'median': 14688.0, 'costs': '12896;14688;13376;18752;18272'} (30s)
+{'scen': 'lpbf-good', 'n': 16, 'method': 'unstructured', 'frac': 0.5, 'median': 14048.0, 'costs': '16064;14048;13760;13952;14080'} (32s)
+{'scen': 'lpbf-good', 'n': 16, 'method': 'grid DoE', 'frac': 0.5, 'median': 135424.0, 'costs': '135424'}
+-> /home/user/sj3006/process_window/experiments/../results/final/scaling_lpbf-good.csv
+{'scen': 'lpbf-good', 'n': 24, 'method': 'ours', 'frac': 0.5, 'median': 34752.0, 'costs': '35856;34320;30384;34752;37392'} (78s)
+{'scen': 'lpbf-good', 'n': 24, 'method': 'unstructured', 'frac': 0.5, 'median': 36336.0, 'costs': '39840;34416;36336;34464;37104'} (63s)
+{'scen': 'lpbf-good', 'n': 24, 'method': 'grid DoE', 'frac': 0.5, 'median': 367488.0, 'costs': '367488'}
+-> /home/user/sj3006/process_window/experiments/../results/final/scaling_lpbf-good.csv
+{'scen': 'lpbf-good', 'n': 32, 'method': 'ours', 'frac': 0.5, 'median': 63168.0, 'costs': '62208;53696;64448;70720;63168'} (124s)
+{'scen': 'lpbf-good', 'n': 32, 'method': 'unstructured', 'frac': 0.5, 'median': 72448.0, 'costs': '72448;74560;68032;73472;62976'} (120s)
+{'scen': 'lpbf-good', 'n': 32, 'method': 'grid DoE', 'frac': 0.5, 'median': 653312.0, 'costs': '653312'}
+-> /home/user/sj3006/process_window/experiments/../results/final/scaling_lpbf-good.csv

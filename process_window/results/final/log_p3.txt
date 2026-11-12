@@ -1,0 +1,10 @@
+lpbf-good ours                         final frac 0.873  errors 0/8  (73s)
+lpbf-good ours, no simulator           final frac 0.821  errors 0/8  (65s)
+lpbf-good unstructured                 final frac 0.823  errors 0/8  (67s)
+lpbf-good unstructured, no simulator   final frac 0.825  errors 0/8  (83s)
+-> /home/user/sj3006/process_window/experiments/../results/final/curves_lpbf-good_24.csv
+lpbf-optimistic ours                         final frac 0.829  errors 0/8  (91s)
+lpbf-optimistic ours, no simulator           final frac 0.821  errors 0/8  (85s)
+lpbf-optimistic unstructured                 final frac 0.853  errors 0/8  (81s)
+lpbf-optimistic unstructured, no simulator   final frac 0.825  errors 0/8  (85s)
+-> /home/user/sj3006/process_window/experiments/../results/final/curves_lpbf-optimistic_24.csv

@@ -1,4 +1,5 @@
-pocket_size,pocket_rate,runs,pocket_certified,caught_by_audit_given_certified,audit_coupons
-1,0.15,60,0.767,0.022,1200
-2,0.15,60,0.9,0.074,1200
-2,0.08,60,0.917,0.0,1200
+pocket_size,pocket_rate,runs,pocket_certified,caught_by_audit_given_certified,audit_budget,certification_budget
+1,0.15,60,0.767,0.957,37180,30000
+2,0.15,60,0.9,1.0,37120,30000
+1,0.08,60,0.75,0.044,37210,30000
+2,0.08,60,0.917,0.091,37205,30000

@@ -1,0 +1,4 @@
+{'pocket_size': 1, 'pocket_rate': 0.15, 'runs': 60, 'pocket_certified': 0.767, 'caught_by_audit_given_certified': 0.957, 'audit_budget': 37180, 'certification_budget': 30000}
+{'pocket_size': 2, 'pocket_rate': 0.15, 'runs': 60, 'pocket_certified': 0.9, 'caught_by_audit_given_certified': 1.0, 'audit_budget': 37120, 'certification_budget': 30000}
+{'pocket_size': 1, 'pocket_rate': 0.08, 'runs': 60, 'pocket_certified': 0.75, 'caught_by_audit_given_certified': 0.044, 'audit_budget': 37210, 'certification_budget': 30000}
+{'pocket_size': 2, 'pocket_rate': 0.08, 'runs': 60, 'pocket_certified': 0.917, 'caught_by_audit_given_certified': 0.091, 'audit_budget': 37205, 'certification_budget': 30000}

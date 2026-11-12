@@ -232,17 +232,98 @@ simulator; and current practice (full factorial, exact binomial
 Clopper-Pearson bounds, Bonferroni). alpha = 0.05, eps = 5% per LPBF mode
 (30% toxicity, 50% non-response for the drug screen).
 
-**Validity.** [TBD table from results/final/validity.csv: worst case with
-every setting at the threshold, 400 runs per row.]
+**Validity** (`results/final/validity.csv`). Worst case: every setting has
+every defect rate exactly at its tolerance, so any certification is an error.
+400 runs per row, 8x8 grids, 4,000 coupons per run.
 
-**Certified area vs budget.** [TBD fig_curves.png and numbers.]
+| scenario | simulator | cone rule (ours) | Bonferroni + spreading | no ordering |
+|---|---|---|---|---|
+| toy LPBF | good | 0.25% | 0.25% | 0.00% |
+| toy LPBF | adversarial | 1.00% | 1.00% | 0.00% |
+| drug screen | good | 0.75% | 1.00% | 0.75% |
+| drug screen | adversarial | 2.75% | 2.50% | 2.50% |
 
-**Scaling.** [TBD fig_scaling.png: coupons to certify 50% of the window vs
-grid size.]
+All rates are below alpha = 5%. Across all efficiency runs below (hundreds
+of runs, millions of simulated coupons), no unsafe setting was ever
+certified by our method.
 
-**Bounds next to practice.** [TBD fig_bounds.png.]
+**Certified area vs budget** (`fig_curves.png`; 24x24 grids, 8 runs per
+method, budget 115,200 coupons). Coupons needed to certify half of the true
+window:
 
-**Ablations.** [TBD table from ablation_*.csv.]
+| scenario | ours | ours, no simulator | no ordering | no ordering, no sim. | grid DoE |
+|---|---|---|---|---|---|
+| toy LPBF, good simulator | **28.8k** | 34.6k | 77.8k | 77.8k | not reached |
+| toy LPBF, optimistic simulator | 37.4k | **34.6k** | 77.8k | 77.8k | not reached |
+| Rosenthal 316L, good simulator | **34.6k** | 43.2k | 37.4k | 40.3k | not reached |
+| Rosenthal 316L, optimistic sim. | 40.3k | 43.2k | 40.3k | 40.3k | not reached |
+| two-drug screen, Bliss simulator | **31.7k** | 40.3k | 49.0k | 51.8k | not reached |
+
+(Resolution: budget / 40 = 2,880 coupons.) On the toy window, ours needs
+about 2.7x fewer coupons than adaptive testing without the ordering; on the
+drug screen 1.5x, and only the ordered methods reach 70% of the window
+within the budget. On the Rosenthal 316L model the window is a thin
+diagonal band (a few settings thick at 24x24), almost every window setting
+is an edge setting, and ours is at parity with adaptive testing without
+the ordering. All adaptive methods beat full-factorial practice by an
+order of magnitude.
+
+**Scaling** (`fig_scaling.png`; coupons to certify 50% of the window,
+median of 5 runs):
+
+| grid | ours | no ordering | grid DoE |
+|---|---|---|---|
+| 8x8 | 6.3k | 8.0k | 17.5k |
+| 16x16 | 14.9k | 32.5k | 77.1k |
+| 24x24 | 25.5k | 75.7k | 173.4k |
+| 32x32 | 38.8k | 140.9k | 338.9k |
+| 48x48 | 71.5k | 330.0k | 762.6k |
+
+Fitted exponents (cost ~ n^k, 8 -> 48): ours k = 1.35, no ordering 2.07,
+grid DoE 2.10. On the toy window the gap grows with resolution, as the
+theory predicts (edge ~ n, area ~ n^2). On the Rosenthal band: [TBD 32x32
+and 48x48; prediction: as the band becomes more grid points thick, ours
+pulls ahead.]
+
+**Bounds next to practice** (`fig_bounds.png`). [TBD]
+
+**Ablations** (toy LPBF 16x16, good simulator, coupons to certify 50%,
+median of 8 runs; `ablation_*.csv`):
+
+| variant | coupons | vs ours |
+|---|---|---|
+| ours | 15.2k | |
+| fixed maximum bet instead of hedge | 14.0k | -8% |
+| no optimism in allocation | 16.1k | +6% |
+| Bonferroni + spreading (no pooling) | 16.5k | +8% |
+| no simulator prior in bets | 16.6k | +9% |
+| uniform weights | 17.7k | +17% |
+| no ordering | 32.7k | +115% |
+
+The ordering is what matters most; weights, pooling, optimism and bet
+seeding each give a smaller consistent gain. The fixed maximum bet is
+cheaper here because half the window is reached mostly through clean
+settings, where the largest bet is near-optimal; at a 2.5% rate its growth
+is about zero and it never certifies, which is why we hedge. [TBD:
+optimistic-simulator and drug-screen ablations.]
+
+**Model-based baseline.** [TBD: GP level-set certification false
+certification rates.]
+
+**When monotonicity fails** (`violation.csv`; 16x16 toy window with a
+pocket of unsafe settings inside it, 60 runs per row):
+
+| pocket | certified by spreading | caught by a full audit | false audit flags |
+|---|---|---|---|
+| 1 setting at 15% | 77% of runs | 96% | 0 |
+| 2x2 settings at 15% | 90% | 100% | 0 |
+| 1 setting at 8% | 75% | 4% | 0 |
+| 2x2 settings at 8% | 92% | 9% | 0 |
+
+Assumption A is load-bearing. An audit that re-tests every certified
+setting with a defect-betting e-process (up to 300 coupons each; about 1.2x
+the certification budget) catches gross violations reliably and mild ones
+rarely.
 
 ## 6. Related work
 
