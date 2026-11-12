@@ -1,1 +1,40 @@
 {'scen': 'toy-good', 'n': 16, 'variant': 'ours', 'frac': 0.5, 'median': 7824.0, 'costs': '8544;5312;6176;7616;8032;8928;9856;6368'} (46s)
+{'scen': 'toy-good', 'n': 16, 'variant': 'frontier allocation', 'frac': 0.5, 'median': 15200.0, 'costs': '15360;16352;14784;14592;14880;15648;15040;16064'} (50s)
+{'scen': 'toy-good', 'n': 16, 'variant': 'edge allocation aimed at the full window', 'frac': 0.5, 'median': 14960.0, 'costs': '11040;14144;6080;12512;24544;22368;17376;15776'} (45s)
+{'scen': 'toy-good', 'n': 16, 'variant': 'Bonferroni + spreading (max rule)', 'frac': 0.5, 'median': 7280.0, 'costs': '8544;5312;6176;6528;8032;8928;9856;6368'} (46s)
+{'scen': 'toy-good', 'n': 16, 'variant': 'no ordering (unstructured)', 'frac': 0.5, 'median': 24528.0, 'costs': '24064;25120;24832;24640;23584;24416;24736;23296'} (47s)
+{'scen': 'toy-good', 'n': 16, 'variant': 'uniform weights', 'frac': 0.5, 'median': 8304.0, 'costs': '6272;8384;7296;12928;8224;7840;14624;8416'} (46s)
+{'scen': 'toy-good', 'n': 16, 'variant': 'no optimism', 'frac': 0.5, 'median': 7824.0, 'costs': '8544;5312;6176;7616;8032;8928;9856;6368'} (47s)
+{'scen': 'toy-good', 'n': 16, 'variant': 'no simulator prior in bets', 'frac': 0.5, 'median': 9696.0, 'costs': '8736;8448;10016;10016;8992;9376;10752;11680'} (46s)
+{'scen': 'toy-good', 'n': 16, 'variant': 'fixed bet instead of hedge', 'frac': 0.5, 'median': 6544.0, 'costs': '5760;9376;3872;7328;5696;8992;9632;5376'} (30s)
+-> /home/user/sj3006/process_window/experiments/../results/final/ablation_toy-good_16.csv
+{'scen': 'toy-optimistic', 'n': 16, 'variant': 'ours', 'frac': 0.5, 'median': 10016.0, 'costs': '12000;7648;10976;8800;9056;17056;8992;13216'} (51s)
+{'scen': 'toy-optimistic', 'n': 16, 'variant': 'frontier allocation', 'frac': 0.5, 'median': 18992.0, 'costs': '18880;20736;18688;20288;18080;19936;19104;18240'} (47s)
+{'scen': 'toy-optimistic', 'n': 16, 'variant': 'edge allocation aimed at the full window', 'frac': 0.5, 'median': 27312.0, 'costs': '26432;23648;24064;55616;39072;19232;28640;28192'} (43s)
+{'scen': 'toy-optimistic', 'n': 16, 'variant': 'Bonferroni + spreading (max rule)', 'frac': 0.5, 'median': 10016.0, 'costs': '12160;7648;10976;8800;9056;17056;8992;12544'} (46s)
+{'scen': 'toy-optimistic', 'n': 16, 'variant': 'no ordering (unstructured)', 'frac': 0.5, 'median': 25728.0, 'costs': '25888;26144;24736;27808;25216;25568;26720;24512'} (47s)
+{'scen': 'toy-optimistic', 'n': 16, 'variant': 'uniform weights', 'frac': 0.5, 'median': 11840.0, 'costs': '11616;10592;9344;12064;11488;14080;12128;12448'} (47s)
+{'scen': 'toy-optimistic', 'n': 16, 'variant': 'no optimism', 'frac': 0.5, 'median': 10016.0, 'costs': '12000;7648;10976;8800;9056;17056;8992;13216'} (46s)
+{'scen': 'toy-optimistic', 'n': 16, 'variant': 'no simulator prior in bets', 'frac': 0.5, 'median': 9728.0, 'costs': '8064;15264;9504;9952;8512;11968;10912;8288'} (47s)
+{'scen': 'toy-optimistic', 'n': 16, 'variant': 'fixed bet instead of hedge', 'frac': 0.5, 'median': 12624.0, 'costs': '10880;24064;34272;12064;11296;13344;11200;13184'} (32s)
+-> /home/user/sj3006/process_window/experiments/../results/final/ablation_toy-optimistic_16.csv
+{'scen': 'dose-bliss', 'n': 16, 'variant': 'ours', 'frac': 0.5, 'median': 10432.0, 'costs': '10336;14496;10528;18208;10208;12352;9376;10336'} (41s)
+{'scen': 'dose-bliss', 'n': 16, 'variant': 'frontier allocation', 'frac': 0.5, 'median': 16992.0, 'costs': '14848;21760;17760;14752;13152;20384;20736;16224'} (41s)
+{'scen': 'dose-bliss', 'n': 16, 'variant': 'edge allocation aimed at the full window', 'frac': 0.5, 'median': 13472.0, 'costs': '13568;8192;17344;9248;30816;13376;16000;9600'} (30s)
+{'scen': 'dose-bliss', 'n': 16, 'variant': 'Bonferroni + spreading (max rule)', 'frac': 0.5, 'median': 12448.0, 'costs': '10336;14496;13856;16320;12544;12352;12096;10336'} (29s)
+{'scen': 'dose-bliss', 'n': 16, 'variant': 'no ordering (unstructured)', 'frac': 0.5, 'median': 17616.0, 'costs': '16448;14592;18880;17696;21504;17536;18816;14592'} (29s)
+{'scen': 'dose-bliss', 'n': 16, 'variant': 'uniform weights', 'frac': 0.5, 'median': 13072.0, 'costs': '13568;12576;10400;17792;14912;19232;10784;11392'} (29s)
+{'scen': 'dose-bliss', 'n': 16, 'variant': 'no optimism', 'frac': 0.5, 'median': 10432.0, 'costs': '10336;14496;10528;18208;10208;12352;9376;10336'} (29s)
+{'scen': 'dose-bliss', 'n': 16, 'variant': 'no simulator prior in bets', 'frac': 0.5, 'median': 14720.0, 'costs': '12096;15040;17344;16896;19328;11264;14400;10528'} (30s)
+{'scen': 'dose-bliss', 'n': 16, 'variant': 'fixed bet instead of hedge', 'frac': 0.5, 'median': inf, 'costs': 'inf;inf;inf;inf;inf;inf;inf;inf'} (21s)
+-> /home/user/sj3006/process_window/experiments/../results/final/ablation_dose-bliss_16.csv
+{'n': 8, 'T_size': 28, 'edge_points': 13, 'LB_ordered': 987, 'LB_unordered': 1787, 'ours': 5632.0, 'unstructured': 9680.0}
+-> /home/user/sj3006/process_window/experiments/../results/final/bounds.csv
+{'n': 12, 'T_size': 69, 'edge_points': 18, 'LB_ordered': 2142, 'LB_unordered': 5050, 'ours': 11112.0, 'unstructured': 30672.0}
+-> /home/user/sj3006/process_window/experiments/../results/final/bounds.csv
+{'n': 16, 'T_size': 122, 'edge_points': 24, 'LB_ordered': 2902, 'LB_unordered': 8572, 'ours': 19008.0, 'unstructured': 58240.0}
+-> /home/user/sj3006/process_window/experiments/../results/final/bounds.csv
+{'n': 24, 'T_size': 287, 'edge_points': 34, 'LB_ordered': 6158, 'LB_unordered': 21901, 'ours': 55344.0, 'unstructured': 159456.0}
+-> /home/user/sj3006/process_window/experiments/../results/final/bounds.csv
+{'n': 32, 'T_size': 513, 'edge_points': 45, 'LB_ordered': 8821, 'LB_unordered': 39026, 'ours': 114176.0, 'unstructured': inf}
+-> /home/user/sj3006/process_window/experiments/../results/final/bounds.csv

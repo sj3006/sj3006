@@ -108,6 +108,23 @@ their best rule, ours wins on every scenario, including the thin band
 one. The earlier parity came from the allocation rule, not the structure.
 Frontier-based results are archived in `results/final/frontier_v1/`.
 
+## Final numbers (edge allocation for every adaptive method)
+
+- Validity: worst-case false-certification rates 0-2.75% at alpha = 5%
+  (400 runs per row); no unsafe setting certified in any efficiency run.
+- 24x24, coupons to 70% of the window, ours vs no ordering: toy 5.0x
+  (optimistic simulator 3.3x), Rosenthal 316L band 1.5-1.7x, drug screen
+  1.3x. Grid DoE never reaches 25% of an LPBF window in the same budget.
+- Scaling to 48x48 (50% of the window): toy 9.1x fewer than no ordering
+  and 26x fewer than grid DoE; Rosenthal band 2.2x and 42x. The band starts
+  at parity at 12x12 and pulls ahead as predicted from its area/edge ratio.
+- GP level-set baseline: certifies an unsafe setting in 7.5-100% of runs
+  unless tuned so conservatively that it certifies at most 8% of the
+  window; ours: 0 errors, 54-84% of the window at the same budget.
+- Open problem, now quantified: on the strict "every setting of the
+  target" goal, our cost relative to the ordered lower bound grows from
+  5.7x (8x8) to 12.9x (32x32), driven by learning where the target ends.
+
 ## What I would do next
 
 1. Get Amit's answers (process, outcome type, replicates, window shape).

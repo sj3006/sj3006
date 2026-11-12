@@ -1,1 +1,23 @@
 lpbf-good ours                         final frac 0.871  errors 0/8  (82s)
+lpbf-good ours, no simulator           final frac 0.843  errors 0/8  (82s)
+lpbf-good unstructured                 final frac 0.833  errors 0/8  (84s)
+lpbf-good unstructured, no simulator   final frac 0.821  errors 0/8  (76s)
+-> /home/user/sj3006/process_window/experiments/../results/final/curves_lpbf-good_24.csv
+lpbf-optimistic ours                         final frac 0.851  errors 0/8  (83s)
+lpbf-optimistic ours, no simulator           final frac 0.843  errors 0/8  (77s)
+lpbf-optimistic unstructured                 final frac 0.831  errors 0/8  (85s)
+lpbf-optimistic unstructured, no simulator   final frac 0.821  errors 0/8  (80s)
+-> /home/user/sj3006/process_window/experiments/../results/final/curves_lpbf-optimistic_24.csv
+{'grid': 'toy', 'simulator': 'good', 'rule': 'cone', 'alloc': 'edge', 'runs': 400, 'fwer': 0.0025, 'se': np.float64(0.0025)} (143s)
+{'grid': 'toy', 'simulator': 'good', 'rule': 'max', 'alloc': 'edge', 'runs': 400, 'fwer': 0.0025, 'se': np.float64(0.0025)} (126s)
+{'grid': 'toy', 'simulator': 'good', 'rule': 'none', 'alloc': 'edge', 'runs': 400, 'fwer': 0.0, 'se': np.float64(0.0)} (81s)
+{'grid': 'toy', 'simulator': 'adversarial', 'rule': 'cone', 'alloc': 'edge', 'runs': 400, 'fwer': 0.0, 'se': np.float64(0.0)} (101s)
+{'grid': 'toy', 'simulator': 'adversarial', 'rule': 'max', 'alloc': 'edge', 'runs': 400, 'fwer': 0.0, 'se': np.float64(0.0)} (102s)
+{'grid': 'toy', 'simulator': 'adversarial', 'rule': 'none', 'alloc': 'edge', 'runs': 400, 'fwer': 0.0, 'se': np.float64(0.0)} (84s)
+{'grid': 'dose', 'simulator': 'good', 'rule': 'cone', 'alloc': 'edge', 'runs': 400, 'fwer': 0.0125, 'se': np.float64(0.0056)} (87s)
+{'grid': 'dose', 'simulator': 'good', 'rule': 'max', 'alloc': 'edge', 'runs': 400, 'fwer': 0.01, 'se': np.float64(0.005)} (89s)
+{'grid': 'dose', 'simulator': 'good', 'rule': 'none', 'alloc': 'edge', 'runs': 400, 'fwer': 0.0025, 'se': np.float64(0.0025)} (78s)
+{'grid': 'dose', 'simulator': 'adversarial', 'rule': 'cone', 'alloc': 'edge', 'runs': 400, 'fwer': 0.0275, 'se': np.float64(0.0082)} (93s)
+{'grid': 'dose', 'simulator': 'adversarial', 'rule': 'max', 'alloc': 'edge', 'runs': 400, 'fwer': 0.015, 'se': np.float64(0.0061)} (91s)
+{'grid': 'dose', 'simulator': 'adversarial', 'rule': 'none', 'alloc': 'edge', 'runs': 400, 'fwer': 0.015, 'se': np.float64(0.0061)} (81s)
+-> /home/user/sj3006/process_window/experiments/../results/final/validity_edge.csv

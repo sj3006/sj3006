@@ -1,0 +1,13 @@
+grid,simulator,rule,alloc,runs,fwer,se
+toy,good,cone,edge,400,0.0025,0.0025
+toy,good,max,edge,400,0.0025,0.0025
+toy,good,none,edge,400,0.0,0.0
+toy,adversarial,cone,edge,400,0.0,0.0
+toy,adversarial,max,edge,400,0.0,0.0
+toy,adversarial,none,edge,400,0.0,0.0
+dose,good,cone,edge,400,0.0125,0.0056
+dose,good,max,edge,400,0.01,0.005
+dose,good,none,edge,400,0.0025,0.0025
+dose,adversarial,cone,edge,400,0.0275,0.0082
+dose,adversarial,max,edge,400,0.015,0.0061
+dose,adversarial,none,edge,400,0.015,0.0061

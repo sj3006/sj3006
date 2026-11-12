@@ -135,9 +135,11 @@ Exit criterion: Theorems 1-2 written out in full, checked line by line.
 - [~] `experiments/final.py`: validity, area-vs-budget curves on five
       scenarios, scaling to 48x48, bounds, ablations. Figures in
       `results/final/`.
-- [ ] GP level-set and safe-BO baselines (to show their guarantees fail
-      under misspecification).
-- [ ] Robustness when monotonicity is violated (and a detection test).
+- [x] GP level-set baseline: 7.5-100% false-certification rates unless
+      nearly useless (`pwcert/gp_baseline.py`, `final.py gp`).
+- [ ] Safe-BO (M-SafeUCB) and BEAM-style baselines.
+- [x] Robustness when monotonicity is violated, plus an audit that detects
+      gross violations (`pwcert/audit.py`, `experiments/violation.py`).
 
 ### Phase 6: writing (weeks 9-10)
 
@@ -184,3 +186,8 @@ These change the method, so they need your answer before Phase 2:
   no-simulator stall (one near-threshold setting absorbed 40k coupons).
   Pilot-learned simulator. Two-drug dose scenario. Rigorous oracle upper
   bound (Wald). Consolidated benchmark and paper draft v0.
+- 2026-11-12 (overnight, later): edge allocation (aim at 0.7 eps) beats
+  greedy frontier by 1.3-2.5x and becomes the default for both methods;
+  ours now wins on every scenario including the thin Rosenthal band
+  (2.2x at 48x48). GP baseline, monotonicity audit. Full results in
+  notes/08 and paper/draft.md; figures in results/final/.

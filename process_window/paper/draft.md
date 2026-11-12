@@ -22,11 +22,13 @@ keyholing rises with it) reduces to two cumulative sums. We prove matching
 lower and upper bounds showing that, with the ordering, the cost of
 certification is governed by the *edge* of the target region (at most
 M n settings on an n x n grid with M failure modes), whereas any method
-that ignores it must pay for the region's *area*. On a physics-based LPBF
-model and a two-drug combination screen, the method certifies the same
-window with [TBD]x fewer experiments than adaptive testing without the
-ordering and [TBD]x fewer than current full-factorial practice, with zero
-false certifications across [TBD] runs.
+that ignores it must pay for the region's *area*. Across a toy LPBF window,
+a Rosenthal melt-pool model of 316L and a two-drug combination screen, the
+method needs 1.3-5x fewer experiments than the same adaptive tests without
+the ordering at 24x24 resolution (2.2-9x at 48x48) and 26-42x fewer than
+full-factorial practice at 48x48, with no false certification in any run,
+while a Gaussian-process level-set baseline either certifies unsafe
+settings in 7.5-100% of runs or certifies at most 8% of the window.
 
 ## 1. Introduction
 
@@ -235,83 +237,116 @@ simulator; and current practice (full factorial, exact binomial
 Clopper-Pearson bounds, Bonferroni). alpha = 0.05, eps = 5% per LPBF mode
 (30% toxicity, 50% non-response for the drug screen).
 
-**Validity** (`results/final/validity.csv`). Worst case: every setting has
-every defect rate exactly at its tolerance, so any certification is an error.
-400 runs per row, 8x8 grids, 4,000 coupons per run.
+All methods below use edge allocation aimed at rates below 0.7 eps, which
+is the best rule for both our method and the unordered baseline (ablation).
+
+**Validity** (`results/final/validity_edge.csv`, `validity.csv`). Worst
+case: every setting has every defect rate exactly at its tolerance, so any
+certification is an error. 400 runs per row, 8x8 grids, 4,000 coupons per
+run, edge allocation (frontier allocation gives the same picture).
 
 | scenario | simulator | cone rule (ours) | Bonferroni + spreading | no ordering |
 |---|---|---|---|---|
 | toy LPBF | good | 0.25% | 0.25% | 0.00% |
-| toy LPBF | adversarial | 1.00% | 1.00% | 0.00% |
-| drug screen | good | 0.75% | 1.00% | 0.75% |
-| drug screen | adversarial | 2.75% | 2.50% | 2.50% |
+| toy LPBF | adversarial | 0.00% | 0.00% | 0.00% |
+| drug screen | good | 1.25% | 1.00% | 0.25% |
+| drug screen | adversarial | 2.75% | 1.50% | 1.50% |
 
-All rates are below alpha = 5%. Across all efficiency runs below (hundreds
-of runs, millions of simulated coupons), no unsafe setting was ever
-certified by our method.
+All rates are below alpha = 5%. In every efficiency run below (over 30
+million simulated coupons in total), our method never certified an unsafe
+setting.
 
 **Certified area vs budget** (`fig_curves.png`; 24x24 grids, 8 runs per
-method, budget 115,200 coupons). Coupons needed to certify half of the true
-window:
+method, budget 115,200 coupons, resolution 2,880). Coupons (thousands) to
+certify 50% / 70% of the true window:
 
 | scenario | ours | ours, no simulator | no ordering | no ordering, no sim. | grid DoE |
 |---|---|---|---|---|---|
-| toy LPBF, good simulator | **28.8k** | 34.6k | 77.8k | 77.8k | not reached |
-| toy LPBF, optimistic simulator | 37.4k | **34.6k** | 77.8k | 77.8k | not reached |
-| Rosenthal 316L, good simulator | **34.6k** | 43.2k | 37.4k | 40.3k | not reached |
-| Rosenthal 316L, optimistic sim. | 40.3k | 43.2k | 40.3k | 40.3k | not reached |
-| two-drug screen, Bliss simulator | **31.7k** | 40.3k | 49.0k | 51.8k | not reached |
+| toy LPBF, good simulator | **11.5 / 17.3** | 11.5 / 20.2 | 60.5 / 86.4 | 74.9 / 103.7 | not reached |
+| toy LPBF, optimistic simulator | 23.0 / 28.8 | **11.5 / 20.2** | 66.2 / 95.0 | 74.9 / 103.7 | not reached |
+| Rosenthal 316L, good simulator | **14.4 / 25.9** | 17.3 / 37.4 | 23.0 / 43.2 | 28.8 / 49.0 | not reached |
+| Rosenthal 316L, optimistic sim. | 20.2 / **31.7** | **17.3** / 37.4 | 25.9 / 46.1 | 28.8 / 49.0 | not reached |
+| two-drug screen, Bliss simulator | **28.8 / 72.0** | 34.6 / 80.6 | 43.2 / 95.0 | 49.0 / 106.6 | 25% at 109k |
 
-(Resolution: budget / 40 = 2,880 coupons.) On the toy window, ours needs
-about 2.7x fewer coupons than adaptive testing without the ordering; on the
-drug screen 1.5x, and only the ordered methods reach 70% of the window
-within the budget. On the Rosenthal 316L model the window is a thin
-diagonal band (a few settings thick at 24x24), almost every window setting
-is an edge setting, and ours is at parity with adaptive testing without
-the ordering. All adaptive methods beat full-factorial practice by an
-order of magnitude.
+At 70% of the window, ours needs 5.0x fewer coupons than the same tests
+without the ordering on the toy window (3.3x with an optimistic simulator),
+1.5-1.7x fewer on the thin Rosenthal band and 1.3x fewer on the drug
+screen. A pilot plate without any simulator does about as well as a good
+simulator and *better than a badly optimistic one*. Full-factorial practice
+does not reach a quarter of any LPBF window within this budget.
 
 **Scaling** (`fig_scaling.png`; coupons to certify 50% of the window,
 median of 5 runs):
 
-| grid | ours | no ordering | grid DoE |
+| grid | toy: ours | toy: no ordering | toy: grid DoE | 316L: ours | 316L: no ordering | 316L: grid DoE |
+|---|---|---|---|---|---|---|
+| 8x8 | 2.6k | 4.9k | 17.5k | | | |
+| 12x12 | 3.8k | 12.3k | 39.5k | 4.8k | 4.1k | 69k |
+| 16x16 | 7.6k | 24.6k | 77.1k | 5.3k | 7.7k | 135k |
+| 24x24 | 10.8k | 61.1k | 173k | 13.0k | 21.1k | 367k |
+| 32x32 | 16.6k | 116k | 339k | 19.5k | 38.0k | 653k |
+| 48x48 | 29.6k | 270k | 763k | 42.5k | 93.5k | 1,772k |
+
+Fitted exponents (cost ~ n^k over the range): toy window, ours 1.36, no
+ordering 2.24, grid DoE 2.10; Rosenthal band, ours 1.58, no ordering 2.26,
+grid DoE 2.34. At 48x48 ours needs 9.1x (toy) and 2.2x (Rosenthal) fewer
+coupons than the same tests without the ordering, and 26x and 42x fewer
+than grid DoE. The gap grows with resolution as predicted. The thin band
+starts at parity (12x12, where its area/edge ratio is 1.2) and pulls ahead
+as the ratio grows (4.2 at 48x48).
+
+**Certifying every setting of a target** (`fig_bounds.png`; target: all
+rates <= eps/2, toy window, median of 3 runs):
+
+| grid | target size | edge points | lower bound, ordered | lower bound, unordered | ours | no ordering |
+|---|---|---|---|---|---|---|
+| 8x8 | 28 | 13 | 987 | 1,787 | 5.6k | 9.7k |
+| 12x12 | 69 | 18 | 2,142 | 5,050 | 11.1k | 30.7k |
+| 16x16 | 122 | 24 | 2,902 | 8,572 | 19.0k | 58.2k |
+| 24x24 | 287 | 34 | 6,158 | 21,901 | 55.3k | 159.5k |
+| 32x32 | 513 | 45 | 8,821 | 39,026 | 114.2k | not within 307k |
+
+The two lower bounds separate as predicted (edge vs area). Ours needs
+1.7-3.1x fewer coupons than the unordered method, but its ratio to the ordered lower bound
+grows from 5.7 to 12.9: on this strict goal, learning where the target ends
+costs more as the grid gets finer (Section 4, open problem; with an oracle
+allocation the cost tracks the upper bound of Theorem 3, note 4).
+
+**Ablations** (16x16, coupons to certify 50% of the window, median of 8
+runs; `ablation_*.csv`):
+
+| variant | toy, good sim. | toy, optimistic sim. | drug screen |
 |---|---|---|---|
-| 8x8 | 6.3k | 8.0k | 17.5k |
-| 16x16 | 14.9k | 32.5k | 77.1k |
-| 24x24 | 25.5k | 75.7k | 173.4k |
-| 32x32 | 38.8k | 140.9k | 338.9k |
-| 48x48 | 71.5k | 330.0k | 762.6k |
+| ours | 7.8k | 10.0k | 10.4k |
+| greedy frontier allocation | +94% | +90% | +63% |
+| edge allocation aimed at the full window (no slack) | +91% | +173% | +29% |
+| no ordering | +213% | +157% | +69% |
+| uniform weights | +6% | +18% | +25% |
+| Bonferroni + spreading (no pooling) | -7% | 0% | +19% |
+| no simulator prior in bets | +24% | -3% | +41% |
+| fixed maximum bet instead of hedge | -16% | +26% | never reaches 50% |
 
-Fitted exponents (cost ~ n^k, 8 -> 48): ours k = 1.35, no ordering 2.07,
-grid DoE 2.10. On the toy window the gap grows with resolution, as the
-theory predicts (edge ~ n, area ~ n^2). On the Rosenthal band: [TBD 32x32
-and 48x48; prediction: as the band becomes more grid points thick, ours
-pulls ahead.]
+The ordering and the allocation rule matter most. Weights and evidence
+pooling give smaller, mostly positive effects. The fixed maximum bet is
+cheaper when clean settings dominate but fails outright when the relevant
+rates are near the tolerance (drug screen), which is why we hedge.
 
-**Bounds next to practice** (`fig_bounds.png`). [TBD]
+**Model-based baseline** (`gp_baseline.csv`; GP level-set certification,
+certify where mean + beta * sd < eps, RBF kernel, binomial noise; 16x16,
+40 runs per row, budget 15,360 coupons):
 
-**Ablations** (toy LPBF 16x16, good simulator, coupons to certify 50%,
-median of 8 runs; `ablation_*.csv`):
+| scenario | GP, beta = 2 | GP, beta = 3 | GP, beta = 4 | ours |
+|---|---|---|---|---|
+| toy LPBF | 80-100% / 90-98% | 2.5-60% / 0-89% | 0-20% / 0-51% | **0% / 84%** |
+| Rosenthal 316L | 40-100% / 51-87% | 2.5-15% / 2-44% | 0-7.5% / 0-25% | **0% / 75%** |
+| drug screen | 92-98% / 90-94% | 38-53% / 61-78% | 7.5-15% / 29-69% | **0% / 54%** |
 
-| variant | coupons | vs ours |
-|---|---|---|
-| ours | 15.2k | |
-| fixed maximum bet instead of hedge | 14.0k | -8% |
-| no optimism in allocation | 16.1k | +6% |
-| Bonferroni + spreading (no pooling) | 16.5k | +8% |
-| no simulator prior in bets | 16.6k | +9% |
-| uniform weights | 17.7k | +17% |
-| no ordering | 32.7k | +115% |
-
-The ordering is what matters most; weights, pooling, optimism and bet
-seeding each give a smaller consistent gain. The fixed maximum bet is
-cheaper here because half the window is reached mostly through clean
-settings, where the largest bet is near-optimal; at a 2.5% rate its growth
-is about zero and it never certifies, which is why we hedge. [TBD:
-optimistic-simulator and drug-screen ablations.]
-
-**Model-based baseline.** [TBD: GP level-set certification false
-certification rates.]
+Entries: share of runs that certified at least one unsafe setting / share
+of the window correctly certified, over lengthscales 0.1, 0.2, 0.3. With
+beta = 2, the GP certifies an unsafe setting in nearly every run. The only
+GP settings with error rates at or below 5% certify at most 8% of the window.
+The GP's guarantee requires a correctly specified model, and defect rates
+with sharp transitions are not one.
 
 **When monotonicity fails** (`violation.csv`; 16x16 toy window with a
 pocket of unsafe settings inside it, 60 runs per row):
@@ -324,9 +359,9 @@ pocket of unsafe settings inside it, 60 runs per row):
 | 2x2 settings at 8% | 92% | 9% | 0 |
 
 Assumption A is load-bearing. An audit that re-tests every certified
-setting with a defect-betting e-process (up to 300 coupons each; about 1.2x
-the certification budget) catches gross violations reliably and mild ones
-rarely.
+setting with a defect-betting e-process (up to 300 coupons each, about
+1.2x the certification budget) catches gross violations and rarely catches
+mild ones.
 
 ## 6. Related work
 
@@ -357,14 +392,16 @@ BEAM, Doppa group 2026; NASA-STD-6030); dose finding for combinations
 - **Assumption A must hold.** If a mode is not monotone (for example
   spatter at extreme power), the guarantee can fail there. A sequential
   test of monotonicity should accompany the method; we have not built it.
-- **Thin windows.** When the window is a sliver (area close to its edge
-  length), the ordering helps little; unstructured adaptive testing is
-  competitive early on (Rosenthal model, Section 5).
+- **Thin windows.** When the window is a sliver at the chosen resolution
+  (area close to its edge length), the ordering helps little: on the
+  Rosenthal band the two methods are at parity at 12x12, and the gain
+  appears only as the grid gets finer.
 - **No simulator.** The pilot-learned simulator recovers much, not all, of
   the benefit of a good simulator.
-- **Learned allocation** is not yet covered by a theorem; its overhead
-  grows slowly with grid size when the goal is to certify every point of a
-  target.
+- **Learned allocation** is not covered by a theorem, and on the strict
+  goal of certifying every point of a target its cost relative to the
+  ordered lower bound grows with resolution (5.7x at 8x8 to 12.9x at
+  32x32), driven by learning which settings belong to the target.
 - **Real data.** All experiments are simulated; the defect criteria are
   placeholder calibrations. A real LPBF campaign is the next step.
 - **Grid, not continuum.** Certificates extend to a continuous box under

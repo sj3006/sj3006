@@ -1,0 +1,31 @@
+scen,n,method,beta,lengthscale,runs,fwer,correct_area_frac
+toy-good,16,GP level set,2.0,0.1,40,1.0,0.904
+toy-good,16,GP level set,2.0,0.2,40,0.95,0.979
+toy-good,16,GP level set,2.0,0.3,40,0.8,0.974
+toy-good,16,GP level set,3.0,0.1,40,0.025,0.004
+toy-good,16,GP level set,3.0,0.2,40,0.6,0.518
+toy-good,16,GP level set,3.0,0.3,40,0.5,0.891
+toy-good,16,GP level set,4.0,0.1,40,0.0,0.0
+toy-good,16,GP level set,4.0,0.2,40,0.2,0.149
+toy-good,16,GP level set,4.0,0.3,40,0.175,0.507
+toy-good,16,ours,,,40,0.0,0.835
+lpbf-good,16,GP level set,2.0,0.1,40,1.0,0.874
+lpbf-good,16,GP level set,2.0,0.2,40,0.625,0.702
+lpbf-good,16,GP level set,2.0,0.3,40,0.4,0.507
+lpbf-good,16,GP level set,3.0,0.1,40,0.025,0.021
+lpbf-good,16,GP level set,3.0,0.2,40,0.15,0.437
+lpbf-good,16,GP level set,3.0,0.3,40,0.1,0.277
+lpbf-good,16,GP level set,4.0,0.1,40,0.0,0.0
+lpbf-good,16,GP level set,4.0,0.2,40,0.075,0.247
+lpbf-good,16,GP level set,4.0,0.3,40,0.0,0.081
+lpbf-good,16,ours,,,40,0.0,0.748
+dose-bliss,16,GP level set,2.0,0.1,40,0.925,0.901
+dose-bliss,16,GP level set,2.0,0.2,40,0.95,0.945
+dose-bliss,16,GP level set,2.0,0.3,40,0.975,0.944
+dose-bliss,16,GP level set,3.0,0.1,40,0.525,0.609
+dose-bliss,16,GP level set,3.0,0.2,40,0.5,0.756
+dose-bliss,16,GP level set,3.0,0.3,40,0.375,0.782
+dose-bliss,16,GP level set,4.0,0.1,40,0.075,0.295
+dose-bliss,16,GP level set,4.0,0.2,40,0.075,0.639
+dose-bliss,16,GP level set,4.0,0.3,40,0.15,0.688
+dose-bliss,16,ours,,,40,0.0,0.536

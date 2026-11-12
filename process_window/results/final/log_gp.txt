@@ -3,3 +3,31 @@
 {'scen': 'toy-good', 'n': 16, 'method': 'GP level set', 'beta': 2.0, 'lengthscale': 0.3, 'runs': 40, 'fwer': 0.8, 'correct_area_frac': np.float64(0.974)} (66s)
 {'scen': 'toy-good', 'n': 16, 'method': 'GP level set', 'beta': 3.0, 'lengthscale': 0.1, 'runs': 40, 'fwer': 0.025, 'correct_area_frac': np.float64(0.004)} (302s)
 {'scen': 'toy-good', 'n': 16, 'method': 'GP level set', 'beta': 3.0, 'lengthscale': 0.2, 'runs': 40, 'fwer': 0.6, 'correct_area_frac': np.float64(0.518)} (126s)
+{'scen': 'toy-good', 'n': 16, 'method': 'GP level set', 'beta': 3.0, 'lengthscale': 0.3, 'runs': 40, 'fwer': 0.5, 'correct_area_frac': np.float64(0.891)} (80s)
+{'scen': 'toy-good', 'n': 16, 'method': 'GP level set', 'beta': 4.0, 'lengthscale': 0.1, 'runs': 40, 'fwer': 0.0, 'correct_area_frac': np.float64(0.0)} (299s)
+{'scen': 'toy-good', 'n': 16, 'method': 'GP level set', 'beta': 4.0, 'lengthscale': 0.2, 'runs': 40, 'fwer': 0.2, 'correct_area_frac': np.float64(0.149)} (140s)
+{'scen': 'toy-good', 'n': 16, 'method': 'GP level set', 'beta': 4.0, 'lengthscale': 0.3, 'runs': 40, 'fwer': 0.175, 'correct_area_frac': np.float64(0.507)} (89s)
+{'scen': 'toy-good', 'n': 16, 'method': 'ours', 'beta': '', 'lengthscale': '', 'runs': 40, 'fwer': 0.0, 'correct_area_frac': np.float64(0.456)}
+-> /home/user/sj3006/process_window/experiments/../results/final/gp_baseline.csv
+{'scen': 'lpbf-good', 'n': 16, 'method': 'GP level set', 'beta': 2.0, 'lengthscale': 0.1, 'runs': 40, 'fwer': 1.0, 'correct_area_frac': np.float64(0.874)} (292s)
+{'scen': 'lpbf-good', 'n': 16, 'method': 'GP level set', 'beta': 2.0, 'lengthscale': 0.2, 'runs': 40, 'fwer': 0.625, 'correct_area_frac': np.float64(0.702)} (107s)
+{'scen': 'lpbf-good', 'n': 16, 'method': 'GP level set', 'beta': 2.0, 'lengthscale': 0.3, 'runs': 40, 'fwer': 0.4, 'correct_area_frac': np.float64(0.507)} (67s)
+{'scen': 'lpbf-good', 'n': 16, 'method': 'GP level set', 'beta': 3.0, 'lengthscale': 0.1, 'runs': 40, 'fwer': 0.025, 'correct_area_frac': np.float64(0.021)} (292s)
+{'scen': 'lpbf-good', 'n': 16, 'method': 'GP level set', 'beta': 3.0, 'lengthscale': 0.2, 'runs': 40, 'fwer': 0.15, 'correct_area_frac': np.float64(0.437)} (137s)
+{'scen': 'lpbf-good', 'n': 16, 'method': 'GP level set', 'beta': 3.0, 'lengthscale': 0.3, 'runs': 40, 'fwer': 0.1, 'correct_area_frac': np.float64(0.277)} (86s)
+{'scen': 'lpbf-good', 'n': 16, 'method': 'GP level set', 'beta': 4.0, 'lengthscale': 0.1, 'runs': 40, 'fwer': 0.0, 'correct_area_frac': np.float64(0.0)} (306s)
+{'scen': 'lpbf-good', 'n': 16, 'method': 'GP level set', 'beta': 4.0, 'lengthscale': 0.2, 'runs': 40, 'fwer': 0.075, 'correct_area_frac': np.float64(0.247)} (154s)
+{'scen': 'lpbf-good', 'n': 16, 'method': 'GP level set', 'beta': 4.0, 'lengthscale': 0.3, 'runs': 40, 'fwer': 0.0, 'correct_area_frac': np.float64(0.081)} (94s)
+{'scen': 'lpbf-good', 'n': 16, 'method': 'ours', 'beta': '', 'lengthscale': '', 'runs': 40, 'fwer': 0.0, 'correct_area_frac': np.float64(0.484)}
+-> /home/user/sj3006/process_window/experiments/../results/final/gp_baseline.csv
+{'scen': 'dose-bliss', 'n': 16, 'method': 'GP level set', 'beta': 2.0, 'lengthscale': 0.1, 'runs': 40, 'fwer': 0.925, 'correct_area_frac': np.float64(0.901)} (64s)
+{'scen': 'dose-bliss', 'n': 16, 'method': 'GP level set', 'beta': 2.0, 'lengthscale': 0.2, 'runs': 40, 'fwer': 0.95, 'correct_area_frac': np.float64(0.945)} (37s)
+{'scen': 'dose-bliss', 'n': 16, 'method': 'GP level set', 'beta': 2.0, 'lengthscale': 0.3, 'runs': 40, 'fwer': 0.975, 'correct_area_frac': np.float64(0.944)} (33s)
+{'scen': 'dose-bliss', 'n': 16, 'method': 'GP level set', 'beta': 3.0, 'lengthscale': 0.1, 'runs': 40, 'fwer': 0.525, 'correct_area_frac': np.float64(0.609)} (79s)
+{'scen': 'dose-bliss', 'n': 16, 'method': 'GP level set', 'beta': 3.0, 'lengthscale': 0.2, 'runs': 40, 'fwer': 0.5, 'correct_area_frac': np.float64(0.756)} (44s)
+{'scen': 'dose-bliss', 'n': 16, 'method': 'GP level set', 'beta': 3.0, 'lengthscale': 0.3, 'runs': 40, 'fwer': 0.375, 'correct_area_frac': np.float64(0.782)} (36s)
+{'scen': 'dose-bliss', 'n': 16, 'method': 'GP level set', 'beta': 4.0, 'lengthscale': 0.1, 'runs': 40, 'fwer': 0.075, 'correct_area_frac': np.float64(0.295)} (91s)
+{'scen': 'dose-bliss', 'n': 16, 'method': 'GP level set', 'beta': 4.0, 'lengthscale': 0.2, 'runs': 40, 'fwer': 0.075, 'correct_area_frac': np.float64(0.639)} (48s)
+{'scen': 'dose-bliss', 'n': 16, 'method': 'GP level set', 'beta': 4.0, 'lengthscale': 0.3, 'runs': 40, 'fwer': 0.15, 'correct_area_frac': np.float64(0.688)} (41s)
+{'scen': 'dose-bliss', 'n': 16, 'method': 'ours', 'beta': '', 'lengthscale': '', 'runs': 40, 'fwer': 0.0, 'correct_area_frac': np.float64(0.453)}
+-> /home/user/sj3006/process_window/experiments/../results/final/gp_baseline.csv

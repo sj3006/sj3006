@@ -1,1 +1,15 @@
 toy-good ours                         final frac 0.946  errors 0/8  (75s)
+toy-good ours, no simulator           final frac 0.941  errors 0/8  (77s)
+toy-good unstructured                 final frac 0.832  errors 0/8  (78s)
+toy-good unstructured, no simulator   final frac 0.775  errors 0/8  (75s)
+-> /home/user/sj3006/process_window/experiments/../results/final/curves_toy-good_24.csv
+toy-optimistic ours                         final frac 0.942  errors 0/8  (82s)
+toy-optimistic ours, no simulator           final frac 0.941  errors 0/8  (74s)
+toy-optimistic unstructured                 final frac 0.810  errors 0/8  (80s)
+toy-optimistic unstructured, no simulator   final frac 0.775  errors 0/8  (73s)
+-> /home/user/sj3006/process_window/experiments/../results/final/curves_toy-optimistic_24.csv
+dose-bliss ours                         final frac 0.777  errors 0/8  (68s)
+dose-bliss ours, no simulator           final frac 0.765  errors 0/8  (65s)
+dose-bliss unstructured                 final frac 0.730  errors 0/8  (62s)
+dose-bliss unstructured, no simulator   final frac 0.712  errors 0/8  (64s)
+-> /home/user/sj3006/process_window/experiments/../results/final/curves_dose-bliss_24.csv
