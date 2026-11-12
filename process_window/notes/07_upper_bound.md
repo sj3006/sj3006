@@ -85,6 +85,21 @@ being worked on, and each is at most the stopping time in section 2 (other
 modes' coupons at the same setting only add evidence). Take expectations
 and apply the corollary. ∎
 
+*Correction (found on re-reading).* The code checks certification once per
+build plate, not after every coupon, so work on each cover point can run
+past its stopping time by up to one plate. The bound then gains an additive
+B * (number of (m, z) pairs in the covers), where B is the plate size.
+With B = 2n and at most M n cover points, that's at most 2 M n^2 coupons:
+lower order than the main term only if per-point costs are large compared
+with n. Checking after every coupon (valid: Ville covers all times) removes
+the term; the main experiments check per plate for speed.
+
+*Another point to check:* the transportation lemma used for the lower bound
+(note 5) is stated for stopping times that are almost surely finite; a
+procedure that never stops under the alternative needs the version of the
+lemma for general events (Garivier, Menard & Stoltz 2019, "Explore first,
+exploit next", fundamental inequality).
+
 **With uniform weights** w = 1/(M N), the log term is ln(16 M N / alpha), the
 Bonferroni price. **With ensemble weights** concentrated on likely edge
 points it approaches ln(16 |E| / alpha), where |E| <= M n on an n x n grid
