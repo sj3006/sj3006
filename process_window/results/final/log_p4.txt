@@ -38,3 +38,15 @@
 {'scen': 'lpbf-good', 'n': 32, 'method': 'unstructured', 'frac': 0.5, 'median': 72448.0, 'costs': '72448;74560;68032;73472;62976'} (120s)
 {'scen': 'lpbf-good', 'n': 32, 'method': 'grid DoE', 'frac': 0.5, 'median': 653312.0, 'costs': '653312'}
 -> /home/user/sj3006/process_window/experiments/../results/final/scaling_lpbf-good.csv
+{'scen': 'lpbf-good', 'n': 48, 'method': 'ours', 'frac': 0.5, 'median': 115680.0, 'costs': '108576;119616;107520;121920;115680'} (334s)
+{'scen': 'lpbf-good', 'n': 48, 'method': 'unstructured', 'frac': 0.5, 'median': 164256.0, 'costs': '167520;168192;151488;164256;155328'} (318s)
+{'scen': 'lpbf-good', 'n': 48, 'method': 'grid DoE', 'frac': 0.5, 'median': 1771776.0, 'costs': '1771776'}
+-> /home/user/sj3006/process_window/experiments/../results/final/scaling_lpbf-good.csv
+{'n': 8, 'T_size': 28, 'edge_points': 13, 'LB_ordered': 987, 'LB_unordered': 1787, 'ours': 5632.0, 'unstructured': 9680.0}
+-> /home/user/sj3006/process_window/experiments/../results/final/bounds.csv
+{'n': 12, 'T_size': 69, 'edge_points': 18, 'LB_ordered': 2142, 'LB_unordered': 5050, 'ours': 11112.0, 'unstructured': 30672.0}
+-> /home/user/sj3006/process_window/experiments/../results/final/bounds.csv
+{'n': 16, 'T_size': 122, 'edge_points': 24, 'LB_ordered': 2902, 'LB_unordered': 8572, 'ours': 19008.0, 'unstructured': 58240.0}
+-> /home/user/sj3006/process_window/experiments/../results/final/bounds.csv
+{'n': 24, 'T_size': 287, 'edge_points': 34, 'LB_ordered': 6158, 'LB_unordered': 21901, 'ours': 55344.0, 'unstructured': 159456.0}
+-> /home/user/sj3006/process_window/experiments/../results/final/bounds.csv

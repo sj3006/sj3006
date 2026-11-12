@@ -10,12 +10,13 @@ writes CSVs to results/final/; `plot` turns whatever CSVs exist into figures.
     python3 experiments/final.py plot
 
 Methods (all adaptive ones share allocation, re-check and futility code):
-- ours: cone rule, ensemble weights, frontier allocation with optimism,
-  simulator prior.
+- ours: cone rule, ensemble weights, edge allocation aimed at rates below
+  0.7 eps (re-check and futility included), simulator prior.
 - ours, no simulator: the same after a pilot plate (pilot.py) learns a
   simulator; pilot coupons are counted.
 - unstructured: per-setting betting tests with Bonferroni weights, no
-  ordering, same allocation and simulator prior.
+  ordering, same (edge) allocation and simulator prior. Edge allocation is
+  also its best rule (it beats frontier allocation for both methods).
 - unstructured, no simulator: the same with a flat prior.
 - grid DoE: current practice, equal coupons everywhere, Clopper-Pearson +
   Bonferroni.
@@ -60,7 +61,7 @@ METHODS = ["ours", "ours, no simulator", "unstructured", "unstructured, no simul
 def build(method, scen, n, rng, **over):
     """Return (certifier, scenario) for one run."""
     mk = SCENARIOS[scen]
-    base = dict(alloc="frontier", target_q=1.0, batch=2 * n, rng=rng)
+    base = dict(alloc="edge", target_q=0.7, batch=2 * n, rng=rng)
     base.update(over)
     if method == "ours":
         sc = mk(n)
@@ -111,15 +112,16 @@ def cmd_validity(args):
             for rule, weights in (("cone", "ensemble"), ("max", "ensemble"), ("none", "uniform")):
                 t0, any_err = time.time(), 0
                 for r in range(args.reps):
-                    c = ConeCertifier(sc, rule=rule, weights=weights, alloc="frontier", target_q=1.0,
+                    tq = 1.0 if args.alloc == "frontier" else 0.7
+                    c = ConeCertifier(sc, rule=rule, weights=weights, alloc=args.alloc, target_q=tq,
                                       batch=16, rng=np.random.default_rng(100_000 + r))
                     c.run(4000)
                     any_err += int(c.certified.any())
                 rate = any_err / args.reps
-                rows.append(dict(grid=grid, simulator=sim, rule=rule, runs=args.reps,
+                rows.append(dict(grid=grid, simulator=sim, rule=rule, alloc=args.alloc, runs=args.reps,
                                  fwer=round(rate, 4), se=round(np.sqrt(rate * (1 - rate) / args.reps), 4)))
                 print(rows[-1], f"({time.time() - t0:.0f}s)", flush=True)
-    write(rows, "validity.csv")
+    write(rows, "validity.csv" if args.alloc == "frontier" else f"validity_{args.alloc}.csv")
 
 
 # -- 2. certified area vs coupons --------------------------------------------------
@@ -246,13 +248,14 @@ def cmd_bounds(args):
 
 ABLATIONS = {
     "ours": {},
+    "frontier allocation": dict(alloc="frontier", target_q=1.0),
+    "edge allocation aimed at the full window": dict(target_q=1.0),
     "Bonferroni + spreading (max rule)": dict(rule="max"),
     "no ordering (unstructured)": dict(rule="none", weights="uniform"),
     "uniform weights": dict(weights="uniform"),
     "no optimism": dict(optimism=0.0),
     "no simulator prior in bets": dict(use_sim_prior=False),
     "fixed bet instead of hedge": dict(strategy="fixed"),
-    "edge allocation": dict(alloc="edge", target_q=0.7),
 }
 
 
@@ -264,7 +267,7 @@ def cmd_ablation(args):
         for r in range(args.reps):
             mk = SCENARIOS[args.scen]
             sc = mk(n)
-            kw = dict(rule="cone", weights="ensemble", alloc="frontier", target_q=1.0, batch=2 * n,
+            kw = dict(rule="cone", weights="ensemble", alloc="edge", target_q=0.7, batch=2 * n,
                       rng=np.random.default_rng(r))
             kw.update(over)
             c = ConeCertifier(sc, **kw)
@@ -446,6 +449,7 @@ def main():
     ap.add_argument("--budget", type=int, default=0)
     ap.add_argument("--sizes", default="8,12,16,24,32,48")
     ap.add_argument("--frac", type=float, default=0.5)
+    ap.add_argument("--alloc", default="frontier", choices=["frontier", "edge"])
     args = ap.parse_args()
     globals()["cmd_" + args.cmd](args)
 

@@ -1,0 +1,4 @@
+{'scen': 'toy-good', 'n': 8, 'method': 'ours', 'frac': 0.5, 'median': 2576.0, 'costs': '4016;2032;2400;2576;2656'} (8s)
+{'scen': 'toy-good', 'n': 8, 'method': 'unstructured', 'frac': 0.5, 'median': 4944.0, 'costs': '4944;4880;4960;5072;4688'} (7s)
+{'scen': 'toy-good', 'n': 8, 'method': 'grid DoE', 'frac': 0.5, 'median': 17536.0, 'costs': '17536'}
+-> /home/user/sj3006/process_window/experiments/../results/final/scaling_toy-good.csv

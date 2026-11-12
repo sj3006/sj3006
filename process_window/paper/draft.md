@@ -150,15 +150,18 @@ points in each perturbed world, and use the frequency with which each setting
 is an edge point, mixed 50/50 with uniform weights. The uniform half caps
 the loss from a wrong simulator at ln 2 nats per certification.
 
-**Allocation.** *Frontier* (for "certify as much as possible"): build
-coupons at settings with the largest estimated new certified area per
-expected coupon, using optimistic rate estimates (estimate minus one
-standard error) so unexplored settings are tried and settings just below
-the tolerance do not absorb the budget. *Edge* (for "certify all settings
-with rate <= q eps"): build at the riskiest uncertified settings of the
-estimated target, which are the binding constraints of the lower bound,
-then re-check settings whose lower confidence bound still admits
-membership.
+**Allocation (edge rule).** Estimate a target region, the settings whose
+estimated rates are all below q' eps with a slack q' < 1 (we use 0.7). For
+each mode, build at the riskiest uncertified settings of that region, which
+are exactly the binding constraints of the lower bound (Theorem 2a), filling
+a plate with each setting's expected remaining coupons, cheapest first. When
+the estimated region is covered, re-check uncertified settings whose lower
+confidence bound still admits membership (optimism), and stop spending on
+settings that are confidently unsafe. Aiming slightly inside the window
+matters: aiming at q' = 1 chases settings whose rates are barely below eps,
+whose certification cost blows up like 1/KL. A greedy alternative
+("frontier": most new certified area per expected coupon) is 1.3-2.5x
+worse in our experiments (ablation, Section 5).
 
 **No simulator.** A pilot plate (4 coupons on every other setting in each
 direction) and a 2D isotonic fit of pooled counts give a monotone

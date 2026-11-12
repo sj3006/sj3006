@@ -1,0 +1,9 @@
+scen,n,variant,frac,median,costs
+dose-bliss,16,ours,0.5,16992.0,14848;21760;17760;14752;13152;20384;20736;16224
+dose-bliss,16,Bonferroni + spreading (max rule),0.5,15872.0,16224;17280;15520;14560;13248;17568;21536;15040
+dose-bliss,16,no ordering (unstructured),0.5,20448.0,20704;19296;23200;19392;21504;24160;20192;17952
+dose-bliss,16,uniform weights,0.5,19920.0,20448;18304;23296;16736;20000;24832;19840;11520
+dose-bliss,16,no optimism,0.5,11344.0,12256;11616;11072;12128;10816;12416;8864;7840
+dose-bliss,16,no simulator prior in bets,0.5,18736.0,16576;20000;17952;16352;21632;20480;19520;14720
+dose-bliss,16,fixed bet instead of hedge,0.5,inf,inf;inf;inf;inf;inf;inf;inf;inf
+dose-bliss,16,edge allocation,0.5,10432.0,10336;14496;10528;18208;10208;12352;9376;10336
