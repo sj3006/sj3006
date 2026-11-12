@@ -17,8 +17,6 @@ from math import exp, lgamma, log
 
 import numpy as np
 
-from .synthetic import MODES
-
 
 def binom_cdf(k, n, p):
     """P(Bin(n, p) <= k), computed in log space. Scalars only."""
@@ -51,13 +49,14 @@ def grid_doe(scenario, n_per_point, alpha=0.05, correction="bonferroni", rng=Non
     the certified window).
     """
     rng = np.random.default_rng() if rng is None else rng
-    truth = np.stack([scenario.truth[m] for m in MODES])           # (M, nP, nV)
-    eps = np.array([scenario.eps[m] for m in MODES])[:, None, None]
+    modes = scenario.modes
+    truth = np.stack([scenario.truth[m] for m in modes])           # (M, nP, nV)
+    eps = np.array([scenario.eps[m] for m in modes])[:, None, None]
     n_tests = truth.size
     level = alpha / n_tests if correction == "bonferroni" else alpha
     k = rng.binomial(n_per_point, truth)
     cert = np.stack([cp_certifies(k[m], n_per_point, float(eps[m, 0, 0]), level)
-                     for m in range(len(MODES))])
+                     for m in range(len(modes))])
     window = cert.all(axis=0)
     unsafe = (truth >= eps).any(axis=0)
     return window, n_per_point * truth[0].size, int((window & unsafe).sum())

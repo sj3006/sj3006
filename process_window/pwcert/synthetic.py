@@ -74,9 +74,13 @@ class Scenario:
     # mode SAFER. Must match the physics of the ground truth (Assumption A).
     directions: dict = field(default_factory=lambda: dict(SAFER_DIRECTION))
 
+    @property
+    def modes(self):
+        return tuple(self.truth)
+
     def true_window(self):
-        ok = np.ones_like(self.truth[MODES[0]], dtype=bool)
-        for m in MODES:
+        ok = np.ones_like(next(iter(self.truth.values())), dtype=bool)
+        for m in self.modes:
             ok &= self.truth[m] < self.eps[m]   # null is p >= eps
         return ok
 
