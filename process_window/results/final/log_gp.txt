@@ -2,3 +2,4 @@
 {'scen': 'toy-good', 'n': 16, 'method': 'GP level set', 'beta': 2.0, 'lengthscale': 0.2, 'runs': 40, 'fwer': 0.95, 'correct_area_frac': np.float64(0.979)} (104s)
 {'scen': 'toy-good', 'n': 16, 'method': 'GP level set', 'beta': 2.0, 'lengthscale': 0.3, 'runs': 40, 'fwer': 0.8, 'correct_area_frac': np.float64(0.974)} (66s)
 {'scen': 'toy-good', 'n': 16, 'method': 'GP level set', 'beta': 3.0, 'lengthscale': 0.1, 'runs': 40, 'fwer': 0.025, 'correct_area_frac': np.float64(0.004)} (302s)
+{'scen': 'toy-good', 'n': 16, 'method': 'GP level set', 'beta': 3.0, 'lengthscale': 0.2, 'runs': 40, 'fwer': 0.6, 'correct_area_frac': np.float64(0.518)} (126s)

@@ -2,3 +2,8 @@
 {'scen': 'toy-good', 'n': 8, 'method': 'unstructured', 'frac': 0.5, 'median': 4944.0, 'costs': '4944;4880;4960;5072;4688'} (7s)
 {'scen': 'toy-good', 'n': 8, 'method': 'grid DoE', 'frac': 0.5, 'median': 17536.0, 'costs': '17536'}
 -> /home/user/sj3006/process_window/experiments/../results/final/scaling_toy-good.csv
+{'scen': 'toy-good', 'n': 12, 'method': 'ours', 'frac': 0.5, 'median': 3840.0, 'costs': '3840;3216;3096;5160;4080'} (15s)
+{'scen': 'toy-good', 'n': 12, 'method': 'unstructured', 'frac': 0.5, 'median': 12288.0, 'costs': '13224;12504;12288;12072;12288'} (14s)
+{'scen': 'toy-good', 'n': 12, 'method': 'grid DoE', 'frac': 0.5, 'median': 39456.0, 'costs': '39456'}
+-> /home/user/sj3006/process_window/experiments/../results/final/scaling_toy-good.csv
+{'scen': 'toy-good', 'n': 16, 'method': 'ours', 'frac': 0.5, 'median': 7616.0, 'costs': '8544;5312;6176;7616;8032'} (29s)

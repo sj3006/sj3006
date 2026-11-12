@@ -2,3 +2,6 @@ scen,n,method,frac,median,costs
 toy-good,8,ours,0.5,2576.0,4016;2032;2400;2576;2656
 toy-good,8,unstructured,0.5,4944.0,4944;4880;4960;5072;4688
 toy-good,8,grid DoE,0.5,17536.0,17536
+toy-good,12,ours,0.5,3840.0,3840;3216;3096;5160;4080
+toy-good,12,unstructured,0.5,12288.0,13224;12504;12288;12072;12288
+toy-good,12,grid DoE,0.5,39456.0,39456
