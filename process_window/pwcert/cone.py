@@ -144,7 +144,7 @@ class ConeCertifier:
     def __init__(self, scenario, alpha=0.05, rule="cone", weights="ensemble", weight_mix=0.5,
                  weight_q=0.5, weight_sigma=1.0, strategy="hedge", prior_weight=10.0, use_sim_prior=True,
                  cap=0.8, batch=24, alloc="edge", target_q=0.5, futility_n=60,
-                 smooth=False, oracle=False, coupons0=0, rng=None):
+                 smooth=False, oracle=False, optimism=1.0, coupons0=0, rng=None):
         if rule not in ("cone", "max", "none"):
             raise ValueError("rule must be 'cone', 'max' or 'none'")
         if alloc not in ("edge", "frontier"):
@@ -152,6 +152,11 @@ class ConeCertifier:
         self.sc, self.alpha, self.rule, self.alloc = scenario, alpha, rule, alloc
         self.batch, self.target_q, self.futility_n = batch, target_q, futility_n
         self.smooth, self.oracle = smooth, oracle
+        # Allocation scores use an optimistic rate, p_hat - optimism * se, so
+        # settings that have not been explored look promising and a heavily
+        # sampled setting just below eps (a "sink") loses priority. Standard
+        # optimism in the face of uncertainty; allocation only.
+        self.optimism = optimism
         self.rng = np.random.default_rng() if rng is None else rng
 
         self.modes = scenario.modes
@@ -230,10 +235,17 @@ class ConeCertifier:
         need = np.where(self.w > 0, np.maximum(need, 0.0), np.inf)
         return need
 
+    def _optimistic(self, p_hat):
+        if self.oracle or self.optimism <= 0:
+            return p_hat
+        w = self.ep.n + self.ep.prior_weight
+        se = np.sqrt(np.maximum(p_hat * (1 - p_hat), self.eps * (1 - self.eps) / 4) / w)
+        return np.clip(p_hat - self.optimism * se, 1e-6, 1.0)
+
     def choose_plate(self):
         p_hat = self._estimates()
         if self.alloc == "frontier":
-            return self._frontier_plate(p_hat)
+            return self._frontier_plate(self._optimistic(p_hat))
         plate = self._edge_plate(p_hat)
         return plate if plate else self._recheck_plate(p_hat)
 
