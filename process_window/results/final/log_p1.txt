@@ -1,0 +1,8 @@
+{'grid': 'toy', 'simulator': 'good', 'rule': 'cone', 'runs': 400, 'fwer': 0.0025, 'se': np.float64(0.0025)} (118s)
+{'grid': 'toy', 'simulator': 'good', 'rule': 'max', 'runs': 400, 'fwer': 0.0025, 'se': np.float64(0.0025)} (119s)
+{'grid': 'toy', 'simulator': 'good', 'rule': 'none', 'runs': 400, 'fwer': 0.0, 'se': np.float64(0.0)} (122s)
+{'grid': 'toy', 'simulator': 'adversarial', 'rule': 'cone', 'runs': 400, 'fwer': 0.01, 'se': np.float64(0.005)} (149s)
+{'grid': 'toy', 'simulator': 'adversarial', 'rule': 'max', 'runs': 400, 'fwer': 0.01, 'se': np.float64(0.005)} (139s)
+{'grid': 'toy', 'simulator': 'adversarial', 'rule': 'none', 'runs': 400, 'fwer': 0.0, 'se': np.float64(0.0)} (84s)
+{'grid': 'dose', 'simulator': 'good', 'rule': 'cone', 'runs': 400, 'fwer': 0.0075, 'se': np.float64(0.0043)} (93s)
+{'grid': 'dose', 'simulator': 'good', 'rule': 'max', 'runs': 400, 'fwer': 0.01, 'se': np.float64(0.005)} (90s)

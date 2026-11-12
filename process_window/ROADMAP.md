@@ -34,8 +34,14 @@ assuming only that each failure mode is monotone in known directions
    single-variable and GP-based).
 3. Theory: sample complexity scales with the window boundary, not the grid
    size, with a matching lower bound.
-4. Simulator: steers bets, chain starting points and sampling, never
-   validity.
+4. Simulator: sets fixed weights and steers sampling, never validity.
+
+**Current method (since 2026-11-12):** the cone rule in `pwcert/cone.py`.
+Certify a setting for a mode when the weighted betting wealth in its riskier
+cone reaches 1/alpha (closed testing with e-values; notes/06). Ensemble
+weights from the simulator, frontier allocation with optimism, pilot plate
+when there is no simulator. The chain-based certifier in `pwcert/certify.py`
+is kept for the earlier experiments. Paper draft: `paper/draft.md`.
 
 ## Phases and milestones
 
@@ -67,9 +73,12 @@ below alpha in every configuration, including adversarial simulators).
 
 - [~] Theorem 1 (validity of the certified window). Draft proof in
       `notes/02_problem_statement.md`; needs independent checking.
+- [~] Cone-rule validity (Theorem 5, notes/06): three-line proof via Ville
+      on the true-null set; needs checking.
 - [ ] Theorem 2 (spreading to the continuous region under monotonicity).
-- [ ] Error-budget passing between chains (graphical procedure with
-      e-processes); prove it keeps Theorem 1.
+- [x] Error-budget passing between chains: no longer needed. The cone rule
+      is closed testing, which reuses the weight of logically certified
+      hypotheses automatically (notes/06, section 3).
 - [ ] Batched build plates: confirm the proof covers a plate of coupons
       decided before any of them are measured.
 - [ ] Monotonicity check: sequential test that flags violations in the data.
@@ -83,10 +92,11 @@ Exit criterion: Theorems 1-2 written out in full, checked line by line.
 - [x] Analytical melt-pool simulator: Rosenthal pool + Tang lack of fusion,
       King keyhole, length/width balling (`pwcert/physics.py`). Thresholds
       are placeholder calibrations until we have data.
-- [ ] Second domain for generality: two-drug dose-combination scenarios.
-- [ ] Baselines: grid + Clopper-Pearson + Bonferroni; bandit e-BH without
-      structure (Xu, Wang & Ramdas); GP level-set estimation; M-SafeUCB;
-      BO feasibility search (BEAM-style).
+- [x] Second domain for generality: two-drug combination screen with a
+      Bliss-independence simulator (`pwcert/dose.py`).
+- [~] Baselines: grid DoE + Clopper-Pearson + Bonferroni [x]; adaptive
+      betting tests without the ordering, same allocation and re-check [x];
+      GP level-set estimation [ ]; M-SafeUCB [ ]; BEAM-style BO search [ ].
 
 ### Phase 3: adaptive sampling and sample-complexity theory (weeks 5-6)
 
@@ -105,9 +115,12 @@ Exit criterion: Theorems 1-2 written out in full, checked line by line.
 - [x] Bounds next to practice (`experiments/exp05_bounds.py`).
 - [~] Theorem 4a/4b lower bounds drafted (`notes/05_lower_bound.md`); need
       checking.
-- [ ] Theorem 3: upper bound in terms of the weighted cover C*(T)
-      (note 4, section 4).
-- [ ] Theorem 4: matching lower bound by change of measure.
+- [x] Theorem 3a: rigorous oracle upper bound via Wald's identity
+      (notes/07); 3b (learned allocation, with slack) still a conjecture.
+- [~] Theorem 4: lower bounds drafted (notes/05); computed next to practice
+      in `experiments/final.py bounds`.
+- [x] No-simulator mode: pilot plate + monotone fit (`pwcert/pilot.py`) and
+      optimistic allocation.
 - [ ] **Week 6 go/no-go.** If the 2D bounds hold, stay on ICML. Otherwise
       retarget to an applied venue.
 
@@ -119,11 +132,17 @@ Exit criterion: Theorems 1-2 written out in full, checked line by line.
 
 ### Phase 5: full experiments (week 8)
 
-- [ ] All baselines, simulator-bias sweeps, ablations, error-rate tables.
+- [~] `experiments/final.py`: validity, area-vs-budget curves on five
+      scenarios, scaling to 48x48, bounds, ablations. Figures in
+      `results/final/`.
+- [ ] GP level-set and safe-BO baselines (to show their guarantees fail
+      under misspecification).
+- [ ] Robustness when monotonicity is violated (and a detection test).
 
 ### Phase 6: writing (weeks 9-10)
 
-- [ ] Full draft, theory appendix, internal adversarial review, code release.
+- [~] Draft v0 (`paper/draft.md`).
+- [ ] Theory appendix, internal adversarial review, code release.
 
 ## Open questions for Amit
 
@@ -159,3 +178,9 @@ These change the method, so they need your answer before Phase 2:
   target-membership cost; Theorem 3 to be stated with slack (notes/04).
   Next without Amit's input: slack version of Theorem 3, no-sim chain
   starts, give the unstructured baseline the re-check step, budget passing.
+- 2026-11-12 (overnight): Cone rule replaces chains (closed testing with
+  e-values; validity in three lines; spreading and pooling built in).
+  Ensemble weights from perturbed simulators. Optimistic allocation fixes a
+  no-simulator stall (one near-threshold setting absorbed 40k coupons).
+  Pilot-learned simulator. Two-drug dose scenario. Rigorous oracle upper
+  bound (Wald). Consolidated benchmark and paper draft v0.
