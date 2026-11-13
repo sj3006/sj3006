@@ -314,6 +314,8 @@ def cmd_gp(args):
     setting? Ours on the same scenario for comparison (same budget)."""
     from pwcert.gp_baseline import GPLevelSet
     n, budget = args.n, args.budget or 60 * args.n * args.n
+    mono = args.monotone
+    label = "GP level set + monotone" if mono else "GP level set"
     rows = []
     for scen in ("toy-good", "lpbf-good", "dose-bliss"):
         sc = SCENARIOS[scen](n)
@@ -323,14 +325,17 @@ def cmd_gp(args):
                 t0, errs, areas = time.time(), 0, []
                 for r in range(args.reps):
                     g = GPLevelSet(sc, beta=beta, lengthscale=ls, batch=2 * n,
-                                   rng=np.random.default_rng(r))
+                                   rng=np.random.default_rng(r), monotone=mono)
                     h = g.run(budget)
                     errs += int(max(x["errors"] for x in h) > 0)
                     areas.append(h[-1]["area"] - h[-1]["errors"])
-                rows.append(dict(scen=scen, n=n, method="GP level set", beta=beta, lengthscale=ls,
+                rows.append(dict(scen=scen, n=n, method=label, beta=beta, lengthscale=ls,
                                  runs=args.reps, fwer=round(errs / args.reps, 3),
                                  correct_area_frac=round(float(np.mean(areas)) / A, 3)))
                 print(rows[-1], f"({time.time() - t0:.0f}s)", flush=True)
+        if mono:      # ours is unchanged; its rows are in gp_baseline.csv
+            write(rows, "gp_baseline_monotone.csv")
+            continue
         errs, areas = 0, []
         for r in range(args.reps):
             c, _ = build("ours", scen, n, np.random.default_rng(r))
@@ -476,6 +481,7 @@ def main():
     ap.add_argument("--reps", type=int, default=5)
     ap.add_argument("--budget", type=int, default=0)
     ap.add_argument("--sizes", default="8,12,16,24,32,48")
+    ap.add_argument("--monotone", action="store_true", help="gp: add the monotone closure")
     ap.add_argument("--frac", type=float, default=0.5)
     ap.add_argument("--alloc", default="frontier", choices=["frontier", "edge"])
     ap.add_argument("--scens", default="toy-good,rosenthal")

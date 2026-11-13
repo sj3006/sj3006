@@ -40,7 +40,7 @@ pwcert/
   bounds.py       lower bounds: ordered (joint LP, Theorem 2) and unordered
   baselines.py    full grid with Bonferroni; full grid with fixed-sequence
                   testing (Learn-then-Test for a monotone risk)
-  gp_baseline.py  GP level-set baseline
+  gp_baseline.py  GP level-set baseline, optionally with the monotone closure
   synthetic.py    synthetic process window with controllable simulator error
   physics.py      Rosenthal melt-pool model of 316L (lack of fusion,
                   keyhole, balling)
@@ -60,7 +60,7 @@ notes/            study notes and earlier proof drafts
 ```bash
 pip install -r requirements.txt          # core: numpy, scipy, matplotlib, pytest
 pip install -r requirements-lm.txt       # only for measuring the LM surface
-python3 -m pytest -q tests               # 52 tests, about 1 minute
+python3 -m pytest -q tests               # 54 tests, about 1 minute
 ```
 
 Tested with Python 3.13, numpy 2.5, scipy 1.18, matplotlib 3.11, torch 2.15
@@ -82,6 +82,7 @@ step needs torch.
 | Table 2, Figure 3 (fixed confidence) | `python3 experiments/exp_search.py` | `results/final/fixed_confidence*.csv` | several hours |
 | Validity (worst case) | `python3 experiments/final.py validity` | `results/final/validity.csv` | 30 min |
 | GP baseline | `python3 experiments/final.py gp --n 16` | `results/final/gp_baseline.csv` | 1 h |
+| GP baseline with the ordering | `python3 experiments/final.py gp --n 16 --monotone` and `exp_lm.py --parts gpmono` | `results/final/gp_baseline_monotone.csv`, `results/lm/lm_gp_monotone.csv` | 1 h |
 | Ablations | `python3 experiments/final.py ablation --scen toy-good` | `results/final/ablation_*.csv` | 1 h |
 | Monotonicity violations | `python3 experiments/violation.py` | `results/final/violation.csv` | 30 min |
 | Paper figures from the CSVs | `python3 experiments/paper_figs.py` | `paper/latex/figs/*.pdf` | 1 min |

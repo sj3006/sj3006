@@ -11,7 +11,8 @@ Uses the measured failure-rate surface (pwcert/lm_scenario.py). Three parts:
    every setting gets the same number of generations;
 2. fixed confidence: SearchCertifier vs a per-setting two-sided test, with
    lower bounds;
-3. the GP level-set baseline's error rate on this surface.
+3. the GP level-set baseline's error rate on this surface, plain and with
+   the monotone closure ("gpmono").
 
 Run from process_window/:  python3 experiments/exp_lm.py [--reps 8]
 """
@@ -155,7 +156,7 @@ def fixed_confidence(reps):
     write([row], "lm_fixed_confidence.csv")
 
 
-def gp(reps, budget):
+def gp(reps, budget, monotone=False):
     sc = make_lm_scenario(EPS, "pilot", **PILOT_KW)
     W = sc.true_window()
     rows = []
@@ -163,14 +164,15 @@ def gp(reps, budget):
         for ls in (0.1, 0.2, 0.3):
             errs, areas = 0, []
             for r in range(reps):
-                g = GPLevelSet(sc, beta=beta, lengthscale=ls, batch=24, rng=np.random.default_rng(r))
+                g = GPLevelSet(sc, beta=beta, lengthscale=ls, batch=24, rng=np.random.default_rng(r),
+                               monotone=monotone)
                 h = g.run(budget)
                 errs += int(max(x["errors"] for x in h) > 0)
                 areas.append(h[-1]["area"] - h[-1]["errors"])
             rows.append(dict(beta=beta, lengthscale=ls, runs=reps, fwer=round(errs / reps, 3),
                              correct_frac=round(float(np.mean(areas)) / W.sum(), 3)))
             print(rows[-1], flush=True)
-    write(rows, "lm_gp.csv")
+    write(rows, "lm_gp_monotone.csv" if monotone else "lm_gp.csv")
 
 
 def main():
@@ -193,8 +195,10 @@ def main():
         fixed_budget(args.reps, args.budget)
     if "confidence" in args.parts:
         fixed_confidence(args.reps)
-    if "gp" in args.parts:
+    if "gp" in args.parts.split(","):
         gp(max(args.reps, 20), args.budget // 2)
+    if "gpmono" in args.parts:
+        gp(max(args.reps, 20), args.budget // 2, monotone=True)
     if "cost" in args.parts:
         for frac in (0.5, 0.7):
             cost_to_fraction(max(args.reps, 5), frac, args.budget)

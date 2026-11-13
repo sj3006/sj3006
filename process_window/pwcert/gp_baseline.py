@@ -14,16 +14,27 @@ empirical rates, RBF kernel on normalized coordinates, binomial noise
 variance, prior mean eps. Sampling follows the LSE "straddle" rule: build at
 settings with the largest beta * sd - |mu - eps|, i.e. most ambiguous.
 
+With monotone=True the baseline also uses the ordering, in the spirit of
+monotone safe exploration (Losalka and Scarlett 2023): a setting certified
+for a mode certifies every setting that is safer for that mode. This is the
+strongest fair model-based competitor: same structure as ours, but the
+certificate rests on the GP model instead of a test.
+
 This exists to measure how often a model-based certificate is wrong when
 the model is misspecified (here: defect rates with sharp transitions).
 """
 
 import numpy as np
 
+from .cone import cone_sum
+
 
 class GPLevelSet:
-    def __init__(self, scenario, beta=2.0, lengthscale=0.2, signal_sd=0.15, batch=24, rng=None):
+    def __init__(self, scenario, beta=2.0, lengthscale=0.2, signal_sd=0.15, batch=24, rng=None,
+                 monotone=False):
         self.sc = scenario
+        self.monotone = monotone
+        self.dirs = [scenario.directions[m] for m in scenario.modes]
         self.modes = scenario.modes
         self.M = len(self.modes)
         self.shape = scenario.truth[self.modes[0]].shape
@@ -76,11 +87,19 @@ class GPLevelSet:
             self.coupons += 1
         mu, sd = self._post = self.posterior()      # one refit per plate
         self.certified |= mu + self.beta * sd < self.eps[:, None]
+        if self.monotone:
+            self._close()
         win = self.certified.all(axis=0)
         bad = (self.truth >= self.eps[:, None]).any(axis=0)
         self.history.append(dict(coupons=self.coupons, area=int(win.sum()),
                                  errors=int((win & bad).sum())))
         return True
+
+    def _close(self):
+        """Certified for mode m at x => certified at every setting safer than x."""
+        for m in range(self.M):
+            c = self.certified[m].reshape(self.shape).astype(float)
+            self.certified[m] = (cone_sum(c, self.dirs[m], riskier=True) > 0.5).ravel()
 
     def run(self, budget):
         while self.coupons < budget:
