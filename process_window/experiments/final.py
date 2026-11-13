@@ -416,7 +416,7 @@ def cmd_plot(args):
         fig.savefig(os.path.join(OUT, "fig_curves.png"), dpi=150)
         print("-> fig_curves.png")
 
-    scal = sorted(glob.glob(os.path.join(OUT, "scaling_*.csv")))
+    scal = sorted(p for p in glob.glob(os.path.join(OUT, "scaling_*.csv")) if "grid_baselines" not in p)
     if scal:
         fig, axes = plt.subplots(1, len(scal), figsize=(4.8 * len(scal), 3.8), squeeze=False)
         for ax, path in zip(axes.ravel(), scal):

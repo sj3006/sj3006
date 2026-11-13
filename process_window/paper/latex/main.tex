@@ -221,8 +221,8 @@ smallest true intersection containing $(m,x)$ a cone, so the closure is a
 cumulative sum. A certificate at $x$ automatically covers every safer
 setting, and evidence from riskier settings is pooled.
 
-\paragraph{Weights.} Certifying $x$ with weight $w$ costs about
-$\ln(1/(\alpha w))/\KL(p\|\eps)$ trials, so weights should sit on
+\paragraph{Weights.} Certifying $x$ with weight $w$ takes about
+$\ln(1/(\alpha w))$ divided by $\KL(p\|\eps)$ trials, so weights should sit on
 likely edge points. We use the frequency with which a setting is an edge
 point of the target under perturbed side information (logit shifts),
 mixed 50/50 with uniform weights.
@@ -237,7 +237,26 @@ first; then re-check uncertified settings whose lower confidence bound
 still admits membership. These are the binding constraints of the lower
 bound (Theorem~\ref{thm:lb}a).
 
-\paragraph{Fixed confidence: search.} For each mode and each row (a chain
+\begin{figure}[t]
+\fbox{\begin{minipage}{0.95\columnwidth}\small
+\textbf{Algorithm 1} (search, fixed confidence)\\[2pt]
+\textbf{Input:} grid, modes and orders, $\eps$, $q$, $\alpha$, $\beta$,
+side information.\\
+\textbf{Probe}$(m,x)$: run trials at $x$ until $S_m(x)\ge1/\alpha$
+(certify $x$ and everything safer for $m$) or $R_{m,x}\ge MN/\beta$
+(reject $x$ and everything riskier for $m$).\\
+\textbf{For} each mode $m$ and row $j$, riskiest rows first:\\
+\hspace*{1em}$s\gets$ edge found in an adjacent row, else predicted edge;\\
+\hspace*{1em}\textbf{gallop}: probe $s$, then $s\pm1,s\pm2,s\pm4,\dots$
+toward the side the outcome points to, until the outcome flips;\\
+\hspace*{1em}\textbf{bisect} the undecided positions of the bracket
+until every position is certified or rejected.\\
+\textbf{Stop} when every (mode, setting) is certified, rejected, or
+excluded (rejected for another mode); output the certified settings.
+\end{minipage}}
+\end{figure}
+
+\paragraph{Fixed confidence: search (Algorithm 1).} For each mode and each row (a chain
 of the order), run a \emph{two-sided probe} at one setting at a time:
 certify it by the cone rule, or reject ``$p_m(x)\le q\eps_m$'' with a
 failure-betting e-process at level $\beta/(MN)$. A certificate spreads to
@@ -263,16 +282,18 @@ value of the convex program: minimize $\sum_y n_y$ over $n\ge0$ subject to
 $\sum_{y\preceqm t} n_y\KL_m(y)\ge K_1$;
 \item[(ii)] for each $m$ and each \emph{boundary point} $z$ ($z\notin T$
 only because of mode $m$, and every setting strictly safer than $z$ for $m$
-is in $T$ for $m$): $(A_z,B_z)\in R=\{(A,B):\exists\pi,\ A\ge f(\pi),\
-B\ge g(\pi)\}$, where $A_z=n_z\KL(p_m(z)\|q\eps_m)$ and
-$B_z=\sum_{y\preceqm z}n_y\KL_m(y)$.
+is in $T$ for $m$): $(A_z,B_z)\in R$, where
+\[
+R=\{(A,B):\ \exists\pi\ \ A\ge f(\pi),\ B\ge g(\pi)\},
+\]
+$A_z=n_z\KL(p_m(z)\|q\eps_m)$ and $B_z=\sum_{y\preceqm z}n_y\KL_m(y)$.
 \end{itemize}
 Without the ordering, every setting must be resolved on its own and the
 bound is a sum of per-setting terms over all of $\cX$.
 \end{theorem}
 The binding points of (i) form an antichain (at most $\min(n_1,n_2)$ per
 mode), and so do those of (ii): with the ordering the bound involves
-$O(M\min(n_1,n_2))$ settings, without it all $N$.
+at most $2M\min(n_1,n_2)$ settings, without it all $N$.
 
 \begin{theorem}[oracle upper bound]\label{thm:oracle}
 Running trials only at a cover of $T$ costs at most
@@ -288,9 +309,11 @@ $\sum_{m,j} P_{m,j}(C^*+B)$, where
 P_{m,j}\le 2\lceil\log_2(d_{m,j}+1)\rceil+2
 \]
 is the number of probes in row $j$ for mode $m$ when the first probe is
-$d_{m,j}$ positions from the edge,
-$C^*=\max_p\min(T_c(p),T_r(p))<\infty$ is the largest expected
-two-sided probe length, and $B$ is the batch size.
+$d_{m,j}$ positions from the edge, $B$ is the batch size, and
+\[
+C^*=\max_p\min(T_c(p),T_r(p))<\infty
+\]
+is the largest expected two-sided probe length.
 \end{theorem}
 
 \begin{corollary}[edge vs.\ area]
@@ -355,7 +378,18 @@ LM        & $12^2$ & \TBD{} & \TBD{} & \TBD{} & \TBD{} \\
 \end{tabular}
 \end{table}
 
-\paragraph{Fixed budget.} Table~\ref{tab:scaling}. The gap to the
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figs/fig_scaling.pdf}
+\caption{Trials to certify half of the safe region as the grid is refined
+(fixed budget, log--log). With the ordering the cost grows roughly like
+the region's edge (slope 1); without it, and for full grids, like its area
+(slope 2).}
+\label{fig:scaling}
+\end{figure*}
+
+\paragraph{Fixed budget.} Table~\ref{tab:scaling} and
+Figure~\ref{fig:scaling}. The gap to the
 unordered method grows with resolution (synthetic: 3.2$\times$ at $16^2$,
 9.1$\times$ at $48^2$), as the edge-vs-area bounds predict. The full grids
 pay for the whole area; fixed-sequence testing helps them by only
@@ -385,7 +419,16 @@ LM $12^2$ & \TBD{} & \TBD{} & \TBD{} & \TBD{} & \TBD{} \\
 \end{tabular}
 \end{table}
 
-\paragraph{Fixed confidence.} Table~\ref{tab:fc}. The ordered bound grows
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figs/fig_fixed_conf.pdf}
+\caption{Fixed confidence on the synthetic window: cost at the stopping
+time and the lower bounds of Theorem~\ref{thm:lb}.}
+\label{fig:fc}
+\end{figure}
+
+\paragraph{Fixed confidence.} Table~\ref{tab:fc} and
+Figure~\ref{fig:fc}. The ordered bound grows
 roughly linearly in $n$ and the unordered one quadratically, as
 Theorem~\ref{thm:lb} predicts. Both methods pay a similar multiple-testing
 price over their own bound (per-setting: 4.8--5.9$\times$;
