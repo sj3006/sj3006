@@ -8,15 +8,16 @@
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{xcolor}
-\usepackage{natbib}
 \usepackage{hyperref}
 \emergencystretch=1.5em
 
 \newif\ificmlstyle
 \IfFileExists{icml2027.sty}{\usepackage{icml2027}\icmlstyletrue}{%
   \IfFileExists{icml2026.sty}{\usepackage{icml2026}\icmlstyletrue}{%
+    \usepackage{natbib}%
     \usepackage[letterpaper,top=1in,bottom=1in,left=0.75in,right=0.75in,columnsep=0.25in]{geometry}%
     \usepackage{times}}}
+\ificmlstyle\icmltitlerunning{Certifying Safe Operating Regions under Monotone Failure Modes}\fi
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
@@ -397,7 +398,10 @@ deviation from the monotone fit is 1.8 standard errors (repetition) and
 0.6 (incoherence), and 1 of 264 neighbouring pairs is reversed by more
 than two standard errors. 78 of the 144 settings are safe
 (Figure~\ref{fig:lm}). Benchmark runs draw fresh outcomes from the fitted
-surface.
+surface. As a check, one live run queried the model directly: with 8.0k
+real generations it certified 64 of the 78 safe settings and no unsafe
+one (judged against the measured surface), in line with the 65 certified
+on average by benchmark runs at the same budget.
 \emph{Additive manufacturing.} A Rosenthal melt-pool model
 \citep{rosenthal1946} of 316L with lack-of-fusion \citep{tang2017lof},
 keyhole \citep{king2014keyhole} and balling criteria, and a synthetic
@@ -421,6 +425,7 @@ surrogate with a confidence-bound certificate.
 generations, with the 2.3k-generation pilot counted for ours and no
 order.}
 \label{tab:scaling}
+\setlength{\tabcolsep}{4.5pt}
 \begin{tabular}{llrrrr}
 \toprule
  & grid & ours & no order & grid FST & grid Bonf. \\
@@ -585,7 +590,7 @@ to the lower bound; the language-model study uses a small model and
 automatic judges; the manufacturing studies are simulated with placeholder
 calibrations.
 
-\bibliographystyle{plainnat}
+\ificmlstyle\bibliographystyle{icml2026}\else\bibliographystyle{plainnat}\fi
 \bibliography{references}
 
 % =====================================================================
