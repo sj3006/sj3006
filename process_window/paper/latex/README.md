@@ -16,6 +16,6 @@ on page 6; references and the proofs appendix follow.
 
 References: every entry in `references.bib` was checked on 2026-11-13
 against the publisher, proceedings or an indexing record (volume, pages, DOI
-where one exists). One detail is open: the volume and pages of
-`waudbysmith2024betting` (JRSS B 2024), because the publisher page could not
-be reached from the build machine.
+where one exists). One detail is open: the page range of
+`waudbysmith2024betting` (JRSS B 86(1), 2024; volume and issue confirmed),
+because the publisher page could not be reached from the build machine.
