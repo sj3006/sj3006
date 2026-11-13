@@ -10,6 +10,7 @@
 \usepackage{xcolor}
 \usepackage{natbib}
 \usepackage{hyperref}
+\emergencystretch=1.5em
 
 \newif\ificmlstyle
 \IfFileExists{icml2027.sty}{\usepackage{icml2027}\icmlstyletrue}{%
@@ -20,6 +21,7 @@
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
 \newtheorem{corollary}{Corollary}
+\newtheorem{proposition}{Proposition}
 \newtheorem{definition}{Definition}
 \newtheorem{assumption}{Assumption}
 \renewcommand{\theassumption}{A}
@@ -70,18 +72,38 @@ on its own once the target region is certified; (iii) lower bounds showing
 that with the ordering the cost is governed by the region's \emph{edge} and
 without it by its \emph{area}, and an upper bound for the search within
 logarithmic and multiple-testing factors of the ordered lower bound. On
-sampling settings of a language model \TBD{LM numbers}, on additive
-manufacturing process windows and on a drug-combination screen, the method
-needs 1.3--9$\times$ fewer trials than adaptive testing without the
-ordering and, on $48\times48$ grids, 19--26$\times$ fewer than a full grid
-with Learn-then-Test fixed-sequence testing, with no unsafe setting
-certified in any run,
+the sampling settings of a language model, where repetition and
+incoherence rates are measured from real generations, the method
+certifies half of the safe region with 2.1$\times$ fewer generations than
+testing without the ordering and 3.1$\times$ fewer than full-grid
+Learn-then-Test, pilot study included. Across this, additive
+manufacturing process windows and a drug-combination screen it needs
+1.3--9$\times$ fewer trials than adaptive testing without the ordering
+and, on $48\times48$ grids, 19--26$\times$ fewer than a full grid with
+fixed-sequence testing, with no unsafe setting certified in any run,
 while a Gaussian-process level-set baseline certifies unsafe settings in
 7.5--100\% of runs unless it certifies almost nothing.
 \end{abstract}
 
 % =====================================================================
 \section{Introduction}
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figs/fig_lm_surface.pdf}
+\caption{Which sampling settings of a language model are safe? Left and
+middle: repetition and incoherence rates of SmolLM2-135M, measured from
+generations over temperature and top-$p$, with the 10\% tolerance (line).
+Each failure mode is monotone, in opposite directions. Right: the settings
+our method certifies after 8k generations (about 55 per setting,
+pilot included), with a 95\% guarantee that every certified setting has
+both rates below 10\%. None of them is unsafe. With the same 8k
+generations, testing without the ordering certifies 50\% of the safe
+region on average and both full-grid baselines certify nothing (55
+generations per setting are too few at their per-test levels); ours
+certifies 83\%.}
+\label{fig:lm}
+\end{figure*}
+
 
 A team deploying a language model must choose sampling settings
 (temperature, top-$p$). Too low, and outputs repeat themselves; too high,
@@ -215,15 +237,30 @@ a nonnegative supermartingale starting at most 1; apply Ville's inequality.
 Full proof in Appendix~\ref{app:valid}.
 \end{proof}
 
-This is closed testing \citep{marcus1976closed} with the weighted
-e-value intersection test \citep{vovk2021evalues}: monotonicity makes the
-smallest true intersection containing $(m,x)$ a cone, so the closure is a
-cumulative sum. A certificate at $x$ automatically covers every safer
-setting, and evidence from riskier settings is pooled.
+A certificate at $x$ automatically covers every safer setting, and
+evidence from riskier settings is pooled. The rule is not an ad hoc
+pooling scheme: it is exactly closed testing \citep{marcus1976closed}
+restricted to the intersections that monotonicity allows
+\citep{shaffer1986modified}, with the weighted e-value intersection test
+\citep{vovk2021evalues}.
 
-\paragraph{Weights.} Certifying $x$ with weight $w$ takes about
-$\ln(1/(\alpha w))$ divided by $\KL(p\|\eps)$ trials, so weights should sit on
-likely edge points. We use the frequency with which a setting is an edge
+\begin{proposition}[closed testing]\label{prop:closed}
+Call $I\subseteq[M]\times\cX$ admissible if each section
+$I_m=\{x:(m,x)\in I\}$ is closed toward risk. Under Assumption~A the
+admissible sets are exactly the possible sets of unsafe pairs. Testing each
+admissible intersection by $\sum_{i\in I}w_iK_i\ge1/\alpha$ and applying
+closed testing certifies $(m,x)$ at time $t$ if and only if
+$S_m(x,t)\ge1/\alpha$.
+\end{proposition}
+The smallest admissible set containing $(m,x)$ is
+$\{m\}\times\Cone_m(x)$, and the intersection statistic grows with $I$;
+the proof is in Appendix~\ref{app:valid}. Under monotonicity, then, the
+closure of $MN$ hypotheses costs two cumulative sums instead of a search
+over $2^{MN}$ intersections.
+
+\paragraph{Weights.} A setting with weight $w$ and rate $p$ is certified
+after about $\ln(1/(\alpha w))\,/\allowbreak\,\KL(p\|\eps)$ trials, so
+the weights should sit on likely edge points. We use the frequency with which a setting is an edge
 point of the target under perturbed side information (logit shifts),
 mixed 50/50 with uniform weights.
 
@@ -286,14 +323,15 @@ is in $T$ for $m$): $(A_z,B_z)\in R$, where
 \[
 R=\{(A,B):\ \exists\pi\ \ A\ge f(\pi),\ B\ge g(\pi)\},
 \]
-$A_z=n_z\KL(p_m(z)\|q\eps_m)$ and $B_z=\sum_{y\preceqm z}n_y\KL_m(y)$.
+$A_z=n_z\KL(p_m(z)\|q\eps_m)$ and\\
+$B_z=\sum_{y\preceqm z}n_y\KL_m(y)$.
 \end{itemize}
 Without the ordering, every setting must be resolved on its own and the
 bound is a sum of per-setting terms over all of $\cX$.
 \end{theorem}
-The binding points of (i) form an antichain (at most $\min(n_1,n_2)$ per
-mode), and so do those of (ii): with the ordering the bound involves
-at most $2M\min(n_1,n_2)$ settings, without it all $N$.
+The binding points of (i) form an antichain, at most $\min(n_1,n_2)$ per
+mode, and so do those of (ii). So with the ordering the bound involves at
+most $2M\min(n_1,n_2)$ settings, and without it all $N$.
 
 \begin{theorem}[oracle upper bound]\label{thm:oracle}
 Running trials only at a cover of $T$ costs at most
@@ -303,7 +341,8 @@ $g(p)$ is the best growth rate of the fixed bets; $\KL(p\|\eps)/g(p)\in
 \end{theorem}
 
 \begin{theorem}[search]\label{thm:search}
-The search is $(\alpha,\beta)$-correct. If each mode's evidence at $x$ uses
+Assume the growth condition (T) below. The search is
+$(\alpha,\beta)$-correct. If each mode's evidence at $x$ uses
 only the trials of that mode's probes, its expected cost is at most
 \[
 (C^*+B)\Bigl(\textstyle\sum_{m,j}P_{m,j}+(\alpha+\beta)MN\Bigr),
@@ -314,11 +353,19 @@ from the first probe in row $j$ to the far end of mode $m$'s slack band
 $C^*=\max_p\min(T_c(p),T_r(p))<\infty$ is the largest expected
 two-sided probe length.
 \end{theorem}
+Condition (T) asks that at every rate $p$ some fixed certification bet or
+some fixed rejection bet has positive expected log-growth. It is a
+property of the bet grids, checked numerically: for ours it holds at every
+tolerance we use (5--50\%) and fails only below about 2\%, where adding a
+smaller rejection bet restores it. The implementation also caps each
+probe's length (a time-out moves the search on without certifying
+anything). Time-outs keep validity, make the search stop surely, and cost
+completeness only through the probability that a target probe times out.
 
 \begin{corollary}[edge vs.\ area]
-On an $n\times n$ grid the ordered bound involves $O(Mn)$ settings and the
-unordered bound $O(n^2)$; the search is within $O(\log n)$, the ratio
-$C^*/C(p_{\text{boundary}})$, and the multiple-testing factor
+On an $n\times n$ grid the ordered bound involves $O(Mn)$ settings and
+the unordered bound $O(n^2)$. The search is within a factor $O(\log n)$,
+the ratio $C^*/C(p_{\text{boundary}})$, and the multiple-testing factor
 $\ln(16MN/(\alpha w))/K_1$ of the ordered lower bound.
 \end{corollary}
 Whether the $\ln N$ in the multiple-testing factor is necessary for a
@@ -337,9 +384,14 @@ Proofs are in Appendix~\ref{app:theory}.
 \citep{merity2017wikitext}; \emph{degenerate} = more than 20\% of 4-grams
 repeated \citep{welleck2020unlikelihood}, \emph{incoherent} = mean token
 NLL under the unmodified model above 3.5 nats; $\eps = 10\%$ for both.
-Ground truth from 160 generations per setting (monotone fit); side
+Ground truth from 144 generations per setting (monotone fit); side
 information is a pilot of 16 separate generations per setting, counted in
-the budget.
+the budget. The raw rates are consistent with Assumption~A: the largest
+deviation from the monotone fit is 1.8 standard errors (repetition) and
+0.6 (incoherence), and 1 of 264 neighbouring pairs is reversed by more
+than two standard errors. 78 of the 144 settings are safe
+(Figure~\ref{fig:lm}). Benchmark runs draw fresh outcomes from the fitted
+surface.
 \emph{Additive manufacturing.} A Rosenthal melt-pool model
 \citep{rosenthal1946} of 316L with lack-of-fusion \citep{tang2017lof},
 keyhole \citep{king2014keyhole} and balling criteria, and a synthetic
@@ -359,7 +411,9 @@ surrogate with a confidence-bound certificate.
 \begin{table}[t]
 \centering\small
 \caption{Trials to certify 50\% of the safe region (fixed budget, median of
-5 runs; full grids: smallest budget reaching 50\% on average).}
+5 runs, LM 8; full grids: smallest budget reaching 50\% on average). LM:
+generations, with the 2.3k-generation pilot counted for ours and no
+order.}
 \label{tab:scaling}
 \begin{tabular}{llrrrr}
 \toprule
@@ -372,7 +426,7 @@ Rosenthal & $16^2$ & 5.3k & 7.7k & 112k & 135k \\
 316L      & $32^2$ & 19.5k & 38.0k & 493k & 653k \\
           & $48^2$ & 42.5k & 93.5k & 1.11M & 1.77M \\
 \midrule
-LM        & $12^2$ & \TBD{} & \TBD{} & \TBD{} & \TBD{} \\
+LM        & $12^2$ & 3.8k & 8.0k & 11.7k & 18.6k \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -395,13 +449,19 @@ pay for the whole area; fixed-sequence testing helps them by only
 20--40\%. At $24\times24$, to certify 70\% of the region, ours needs
 5.0$\times$ fewer trials than no ordering on the synthetic window,
 1.5--1.7$\times$ on Rosenthal 316L and 1.3$\times$ on the drug screen.
+On the language model, to certify 70\% of the safe region, ours needs
+4.8k generations (pilot included) against 12.7k without the ordering,
+20.4k for full-grid fixed-sequence testing and 39.5k for full-grid
+Bonferroni. Without the pilot it needs 5.3k, so on this small grid the
+ordering, not the side information, does most of the work.
 
 \begin{table}[t]
 \centering\small
 \caption{Fixed confidence on the synthetic window (good side information;
-median of 4 runs). LB: Theorem~\ref{thm:lb}. The target was fully
-certified in 23 of 24 runs (the exception, at $32^2$, hit a probe
-time-out, a heuristic outside Theorem~\ref{thm:search}).}
+median of 4 runs) and the language model (median of 8 runs, pilot
+counted). LB: Theorem~\ref{thm:lb}. The target was fully certified in 23
+of 24 synthetic runs (the exception, at $32^2$, hit a probe time-out) and
+in 8 of 8 LM runs.}
 \label{tab:fc}
 \begin{tabular}{lrrrrr}
 \toprule
@@ -413,7 +473,7 @@ $16^2$ & 50.3k & 8.8k & 5.7 & 100.0k & 18.7k \\
 $32^2$ & 165.6k & 19.4k & 8.5 & 457.7k & 77.0k \\
 $48^2$ & 334.6k & 24.8k & 13.5 & --- & 174.4k \\
 \midrule
-LM $12^2$ & \TBD{} & \TBD{} & \TBD{} & \TBD{} & \TBD{} \\
+LM $12^2$ & 19.7k & 2.1k & 9.4 & 31.8k & 6.9k \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -434,6 +494,10 @@ price over their own bound (per-setting: 4.8--5.9$\times$;
 $\ln(16MN/(\alpha w))/K_1\approx5$ at $32^2$); the search's extra growth
 with $n$ is the $O(\log n)$ probe factor. With optimistic side information
 at $32^2$ the search needs 215k trials against 458k without the ordering.
+On the language model the search stops after 19.7k generations, against
+31.8k for the per-setting test, at 9.4 times the ordered lower bound
+(4.2--5.7 on synthetic grids of similar size), so on this grid the gap
+to the bound is larger than the gap to the unordered method.
 
 \paragraph{Validity.} With every setting exactly at the tolerance (the
 worst case), the false-certification rate is 0--2.75\% across
@@ -443,8 +507,11 @@ certified in any efficiency run.
 \paragraph{Model-based baseline.} The GP level-set certificate certifies an
 unsafe setting in 40--100\% of runs at confidence parameter 2 and still
 7.5--20\% at 4, where it certifies at most 69\% (drug screen) and typically
-under 25\% of the region; ours: 0\% and 54--84\%. Language model:
-\TBD{}.
+under 25\% of the region; ours: 0\% and 54--84\%. On the language
+model (20k generations, 20 runs) the GP certifies an unsafe setting in
+95--100\% of runs at confidence parameter 2 and 15--60\% at 3; at 4 it is
+at 0--10\% but certifies 0--78\% of the region. Ours, at 40k: 0 of 8
+runs, 95\% of the region.
 
 \paragraph{Ablations.} The ordering and the allocation rule matter most
 (no ordering +69 to +213\%; greedy allocation +63 to +94\%); weights,
@@ -527,7 +594,10 @@ $\mathcal F_t=\sigma(x_1,Y_1,\dots,x_t,Y_t,U)$, where $U$ is independent side
 information (simulator output, pilot data, internal randomization). The
 allocation $x_t$ is $\mathcal F_{t-1}$-measurable: trials in a batch are
 chosen before any of them is observed, and processing them one at a time
-in a fixed order keeps this property.
+in a fixed order keeps this property. A bet may use earlier trials of the
+same batch. $U$ must be independent of the trials' outcomes given their
+settings, which holds when the pilot is a separate set of trials, as in
+all our experiments.
 
 \begin{lemma}\label{lem:supermart}
 If $p_m(x)\ge\eps_m$ then $K_{m,x}$ is a nonnegative supermartingale with
@@ -554,6 +624,18 @@ supermartingale by Lemma~\ref{lem:supermart} with $E(0)\le1$. A false
 certification of $(m,x)\in D$ at $t$ means $1/\alpha\le S_m(x,t)\le E(t)$.
 By Ville's inequality $\P(\sup_tE(t)\ge1/\alpha)\le\alpha$.
 \end{proof}
+\begin{proof}[Proof of Proposition~\ref{prop:closed}]
+Under A each section of $D$ is closed toward risk (above). Conversely, for
+admissible $I$ set $p_m=\eps_m$ on $I_m$ and $p_m=0$ elsewhere; this
+satisfies A and its unsafe pairs are $I$. Under $H_I$ the statistic
+$\sum_Iw_iK_i$ is a nonnegative supermartingale starting at most 1, so
+each intersection test is valid at every stopping time. Closed testing
+rejects $(m,x)$ when every admissible $I\ni(m,x)$ is rejected. The
+statistic is nondecreasing in $I$ (nonnegative terms), and
+$\{m\}\times\Cone_m(x)$ is admissible (transitivity, other sections empty)
+and contained in every admissible $I\ni(m,x)$. So all of them are rejected
+if and only if $S_m(x,t)\ge1/\alpha$.
+\end{proof}
 Remarks: nothing about the allocation is used beyond predictability;
 certification is sticky, and the bound covers ``ever certified''; with
 uniform weights $S_m(x)\ge\max_{y\in\Cone_m(x)}wK_y$, so the cone rule
@@ -568,11 +650,19 @@ $\P(G^c)\le\beta$. On $G$ no $x\in T$ is rejected or excluded: a spread
 rejection of $x$ for $m$ comes from a direct rejection at some $y$ with
 $x\preceqm y$, but then $p_m(y)\le p_m(x)\le q\eps_m$, contradicting $G$;
 exclusion through another mode is the same argument for that mode.
-Termination: every probe ends almost surely (if $p<\eps$ the certification
-statistic has positive expected log-growth under the hedge's best fixed
-bet; if $p>q\eps$ the rejection process does; since $q<1$ every $p$ is
-covered), each probe decides at least one configuration, and $\cX$ is
-finite. So on $G$, $\tau<\infty$ and $T\subseteq C$.
+Termination: let $g_c(p)=\max_j\E_p\ln(1+\lambda_j(\eps-Y))$ and
+$g_r(p)=\max_k\E_p\ln(1+\mu_k(Y-q\eps))$ over the fixed bets. Condition
+(T) is $\max(g_c(p),g_r(p))>0$ for all $p\in[0,1]$; for our grids at $q=0.5$
+the minimum over $p$ is $1.6\cdot10^{-3}$, $4.6\cdot10^{-3}$,
+$1.6\cdot10^{-2}$ and $3.4\cdot10^{-2}$ at $\eps=5,10,30,50\%$. If
+$g_c(p)>0$, the strong law gives $\tfrac1n\ln K_j\to g_c(p)>0$ for the best
+fixed bet, and $S_m(x)\ge w_{m,x}K_j/16$ crosses $1/\alpha$ a.s.; if
+$g_r(p)>0$, the rejection mixture ($\ge R_k/5$) crosses its level a.s. So
+every probe ends a.s., each decides at least one of the $MN$ pairs, and
+$\tau<\infty$ a.s. So on $G$, $\tau<\infty$ and $T\subseteq C$. A
+time-out marks a pair rejected for the search only; it never certifies,
+so validity holds, and completeness holds on $G$ intersected with the
+event that no target probe times out.
 \end{proof}
 
 \subsection{Expected passage times}
@@ -612,9 +702,13 @@ other case is symmetric.
 \end{proof}
 
 \begin{proof}[Proof of Theorem~\ref{thm:search}, cost]
-Number the probes in the order they start. When probe $k$ starts at
-$(m,x)$, its processes start fresh and the trials it will see at $x$ are
-i.i.d.\ and independent of the past; since $S_m(x)\ge w_{m,x}K_{m,x}$, it
+Number the probes in the order they start. Probes interleave, so use the
+reward-table construction: for each $(m,x)$ draw in advance an i.i.d.\
+sequence from $P_x$, and let the $j$-th trial of a mode-$m$ probe at $x$
+read its $j$-th entry. This has the procedure's law. In this variant each
+pair is probed at most once (a probe ends only when its pair is decided).
+So when probe $k$ starts at $(m,x)$, its processes start fresh and the
+trials it will see at $x$ are i.i.d.\ and independent of the past; since $S_m(x)\ge w_{m,x}K_{m,x}$, it
 ends no later than the first of the two passage times of
 Lemma~\ref{lem:wald}, so its conditional expected length is at most
 $\min(T_c,T_r)+B\le C^*+B$ ($B$ for checking once per batch). Whether probe
@@ -628,6 +722,8 @@ good event, and at most $MN$ otherwise.
 We use the transportation lemma \citep[Lemma~1]{kaufmann2016complexity}: for
 instances $\nu,\nu'$, a stopping time $\tau$ and $E\in\mathcal F_\tau$,
 $\sum_x\E_\nu[N_x(\tau)]\KL(\nu_x,\nu'_x)\ge\kl(\P_\nu(E),\P_{\nu'}(E))$.
+We need $\nu_x\ll\nu'_x$ for every $x$ (both our alternatives keep this,
+including at $p=0$) and $E\subseteq\{\tau<\infty\}$ (true of our events).
 It needs only $\E_\nu[\tau]<\infty$ (otherwise there is nothing to prove):
 then $\tau<\infty$ $\nu$-a.s., the restriction of $\P_\nu$ to
 $\mathcal F_\tau$ is absolutely continuous with respect to that of
@@ -665,19 +761,19 @@ $wA+(1-w)B\ge\min_\pi[wf(\pi)+(1-w)g(\pi)]$ gives a linear program with a
 smaller value, which is what we report.
 
 Without the ordering, alternatives may change a single setting $x$, so the
-constraints decouple: for $x\in T$, $n_x\ge K_1/\min_m\KL(p_m(x)\|\eps_m)$;
-for safe $x\notin T$, $n_x\ge\min_\pi\max(f(\pi)/R_x, g(\pi)/C_x)$ with
-$R_x=\sum_{m:p_m(x)>q\eps_m}\KL(p_m(x)\|q\eps_m)$ and
-$C_x=\min_m\KL(p_m(x)\|\eps_m)$; for unsafe $x$,
-$n_x\ge\kl(\alpha,1-\beta)/R_x$.
+constraints decouple. With
+\[
+R_x=\sum_{m:\,p_m(x)>q\eps_m}\KL(p_m(x)\|q\eps_m),\qquad
+C_x=\min_m\KL(p_m(x)\|\eps_m),
+\]
+\[
+n_x\ \ge\ \begin{cases}
+K_1/C_x, & x\in T,\\
+\min_\pi\max\bigl(f(\pi)/R_x,\ g(\pi)/C_x\bigr), & x\notin T,\ x\text{ safe},\\
+\kl(\alpha,1-\beta)/R_x, & x\text{ unsafe}.
+\end{cases}
+\]
 \end{proof}
 
-\paragraph{Points to check.} (1) Lemma~\ref{lem:supermart} with batched
-allocation; (2) the closed-testing interpretation of the cone rule;
-(3) that no target configuration is rejected by spreading or exclusion on
-$G$; (4) the transportation lemma when $\tau$ may be infinite under the
-alternative; (5) that the alternatives keep Assumption~A, and the sharing
-of trials across modes; (6) convexity of $R$; (7) Lemma~\ref{lem:probes} with
-spreading from other rows.
 
 \end{document}

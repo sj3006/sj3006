@@ -91,6 +91,41 @@ def fixed_budget(reps, budget):
     write(rows, "lm_fixed_budget.csv")
 
 
+def cost_to_fraction(reps, frac=0.5, budget=40_000):
+    """Table 1's LM row: generations to certify `frac` of the safe region.
+    Adaptive methods: median over runs of the first crossing (pilot counted
+    where used). Full grids: smallest per-setting budget whose mean certified
+    area reaches the target, on the same geometric grid as final.py."""
+    pilot = make_lm_scenario(EPS, "pilot")
+    n = pilot.truth["degenerate"].shape[0]
+    W = pilot.true_window()
+    target = int(np.ceil(frac * W.sum()))
+    rows = []
+    flat = make_lm_scenario(EPS, "none")
+    variants = (("ours", pilot, "cone", "ensemble"), ("no ordering", pilot, "none", "uniform"),
+                ("ours, no simulator", flat, "cone", "uniform"), ("no ordering, no simulator", flat, "none", "uniform"))
+    for name, sc, rule, wts in variants:
+        costs = []
+        for r in range(reps):
+            c = ConeCertifier(sc, rule=rule, weights=wts, alloc="edge", target_q=0.7, batch=2 * n,
+                              coupons0=sc.meta.get("pilot_coupons", 0), rng=np.random.default_rng(r))
+            hist = c.run(budget)
+            costs.append(next((h["coupons"] for h in hist if h["area"] >= target), np.inf))
+        rows.append(dict(method=name, frac=frac, median=float(np.median(costs)),
+                         costs=";".join(f"{x:.0f}" for x in costs)))
+        print(rows[-1], flush=True)
+    for name, fn in (("grid FST", grid_fst), ("grid Bonferroni", grid_doe)):
+        cost = np.inf
+        for n_per in np.unique(np.geomspace(20, 5000, 60).astype(int)):
+            a = np.mean([fn(pilot, int(n_per), 0.05, rng=np.random.default_rng(s))[0].sum() for s in range(3)])
+            if a >= target:
+                cost = float(n_per * W.size)
+                break
+        rows.append(dict(method=name, frac=frac, median=cost, costs=f"{cost:.0f}"))
+        print(rows[-1], flush=True)
+    write(rows, f"lm_cost_{int(100 * frac)}.csv")
+
+
 def fixed_confidence(reps):
     sc = make_lm_scenario(EPS, "pilot")
     n = sc.truth["degenerate"].shape[0]
@@ -146,6 +181,9 @@ def main():
         fixed_confidence(args.reps)
     if "gp" in args.parts:
         gp(max(args.reps, 20), args.budget // 2)
+    if "cost" in args.parts:
+        for frac in (0.5, 0.7):
+            cost_to_fraction(max(args.reps, 5), frac, args.budget)
 
 
 if __name__ == "__main__":

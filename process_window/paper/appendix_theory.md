@@ -1,9 +1,15 @@
 # Appendix: theory (consolidated)
 
-*Draft for checking (revised 2026-11-13: Theorem 2 is now one joint
-program; the earlier sum of two terms double-counted). Collects the results of notes 2, 5, 6, 7 and 9 in one
-notation. Steps marked **[check]** are the ones a careful reader should
-verify first.*
+*Revised 2026-11-13. Theorem 2 is now one joint program; the earlier sum
+of two terms double-counted. Second pass the same day: the closed-testing
+remark is now Proposition 1 with a proof; termination of the search needs
+a growth condition (T) on the fixed bets, now stated (it holds at every
+tolerance used in the experiments); time-outs are covered explicitly; the
+transportation lemma's conditions are spelled out; and the Theorem 4 proof
+says why interleaved probes still see i.i.d. trials. Collects the results
+of notes 2, 5, 6, 7 and 9 in one notation. A.9 lists where each
+previously flagged step is resolved. The one open question is marked
+**[open]**.*
 
 ## A.1 Setup
 
@@ -38,6 +44,16 @@ E[K(t) | F_{t-1}] = K(t-1)(1 + lam_t (eps - p_m(x))) <= K(t-1), since lam_t
 and x_t are F_{t-1}-measurable and Y_t's conditional law given F_{t-1}
 and x_t = x is P_x. On {x_t != x}, K(t) = K(t-1). ∎
 
+*Batches.* Trials in a batch are chosen before any of them is observed and
+then processed one at a time in a fixed order. Trial t's setting was fixed
+at the start of its batch, so it is F_{t-1}-measurable. Its bet may use the
+outcomes of earlier trials in the same batch: the plug-in bet is updated
+after each trial, and that is still F_{t-1}-measurable. So the proof
+applies as is. The side information U (simulator, pilot data) must be
+independent of the trials' outcomes given their settings. That holds when
+the pilot is a separate set of trials, as in all our experiments: the LM
+pilot uses generations that the benchmark never reuses.
+
 A fixed-weight average of such processes (the hedge: half a plug-in bet,
 half eight fixed bets with weight 1/16 each) is again a nonnegative
 supermartingale under the same null.
@@ -58,9 +74,9 @@ the first t with S_m(x, t) = sum_{y in C_m(x)} w_{m,y} K_{m,y}(t) >= 1/alpha.
 **Theorem 1.** Under Assumption A,
 P(there exist t and (m, x) with p_m(x) >= eps_m certified by time t) <= alpha.
 
-*Proof.* Let D = {(m, y) : p_m(y) >= eps_m}. **[check]** Under A, if
-(m, x) is in D and y ⪯_m x then p_m(y) >= p_m(x) >= eps_m, so
-{m} x C_m(x) ⊆ D. Define E(t) = sum_{(m,y) in D} w_{m,y} K_{m,y}(t). By
+*Proof.* Let D = {(m, y) : p_m(y) >= eps_m}, the true nulls. If (m, x) is
+in D and y is in C_m(x), then y ⪯_m x: x is at least as safe as y. By A,
+p_m(x) <= p_m(y), so p_m(y) >= eps_m. Hence {m} x C_m(x) ⊆ D. Define E(t) = sum_{(m,y) in D} w_{m,y} K_{m,y}(t). By
 Lemma 1 each term is a nonnegative supermartingale, hence so is E, with
 E(0) = sum_D w <= 1. A false certification of (m, x) in D at time t means
 1/alpha <= S_m(x, t) <= E(t). By Ville, P(sup_t E(t) >= 1/alpha) <= alpha. ∎
@@ -69,10 +85,32 @@ Remarks. (i) Nothing about the allocation is used beyond predictability.
 (ii) Certification is sticky; the bound covers "ever certified".
 (iii) With w uniform, S_m(x) >= max_{y in C_m(x)} w K_y, so the cone rule
 certifies everything Bonferroni + spreading certifies.
-(iv) **[check]** Interpretation as closed testing: for any family I of
-nulls the intersection test sum_{i in I} w_i K_i is an e-process under
-H_I; under A the only intersections that can be true are riskier-closed
-sets, and the smallest such set containing (m, x) is {m} x C_m(x).
+(iv) The cone rule is closed testing; see Proposition 1.
+
+**Proposition 1 (closed testing).** Call a set I ⊆ [M] x X *admissible*
+if, for each m, its m-section I_m = {x : (m, x) in I} is riskier-closed
+(x in I_m and y ⪯_m x imply y in I_m). For admissible I, test the
+intersection null H_I = "every (m, x) in I is unsafe for m" by rejecting
+at the first time phi_I(t) = sum_{i in I} w_i K_i(t) >= 1/alpha. Then:
+(a) the admissible sets are exactly the possible sets of true nulls under
+A; (b) each phi_I is a time-uniform level-alpha test of H_I; (c) closed
+testing over the admissible family, with these local tests, rejects
+(m, x) at time t if and only if S_m(x, t) >= 1/alpha. So the cone rule is
+closed testing with Shaffer-type restricted combinations, and Theorem 1 is
+its usual family-wise guarantee, made time-uniform.
+
+*Proof.* (a) Under A the m-section of D is riskier-closed (the argument in
+the proof of Theorem 1). Conversely, given an admissible I, put
+p_m = eps_m on I_m and p_m = 0 elsewhere. This satisfies A: if x ⪯_m y and
+y is in I_m, then x is in I_m. And its set of true nulls is I. (b) Under
+H_I each K_i with i in I is a nonnegative supermartingale (Lemma 1), so
+phi_I is one too, with phi_I(0) = sum_I w <= 1; apply Ville. (c) Closed
+testing rejects (m, x) when every admissible I containing (m, x) is
+rejected. phi_I is nondecreasing in I, because every term is nonnegative.
+And {m} x C_m(x) is the smallest admissible set containing (m, x): it is
+riskier-closed by transitivity, its other sections are empty, and every
+riskier-closed set containing x contains C_m(x). So all admissible
+I ∋ (m, x) are rejected iff phi_{{m} x C_m(x)} = S_m(x) >= 1/alpha. ∎
 
 ## A.4 Correctness of the search (fixed confidence)
 
@@ -82,20 +120,53 @@ every y ⪯_m x as rejected for m; a configuration rejected for some mode is
 not searched for the other modes. It stops when every configuration is, for
 every mode, certified, rejected, or excluded.
 
-**Theorem 6.** Under Assumption A the search is (alpha, beta)-correct:
-validity at level alpha and P(tau < inf, T ⊆ C) >= 1 - beta.
+**Growth condition (T).** Write g_c(p) = max_j E_p ln(1 + lam_j (eps - Y))
+over the hedge's fixed certification bets and g_r(p) = max_k E_p ln(1 +
+mu_k (Y - q eps)) over the fixed rejection bets. Condition (T): for every
+p in [0, 1], g_c(p) > 0 or g_r(p) > 0. It is a property of the two bet
+grids and (eps, q), and it can be checked numerically. For our grids
+(certification: fractions 0.05-1 of 0.8/(1 - eps); rejection: fractions
+0.025-0.4 of 1/(q eps)) and q = 0.5, min_p max(g_c, g_r) is 1.6e-3, 4.6e-3,
+1.6e-2 and 3.4e-2 at eps = 5%, 10%, 30% and 50%: every tolerance in our
+experiments. The worst p is near 0.75 eps. (T) fails only for small
+tolerances: at eps = 2% no bet grows on p in (0.980, 0.996) eps. Adding a
+smaller rejection bet fixes that. Under (T), C* = max_p min(T_c(p), T_r(p))
+is finite.
+
+**Theorem 6.** Under Assumption A and (T), the search without time-outs is
+(alpha, beta)-correct: validity at level alpha and
+P(tau < inf, T ⊆ C) >= 1 - beta. With time-outs, validity still holds,
+tau < inf surely, and P(T ⊆ C) >= 1 - beta - P(a probe at some (m, x)
+with x in T times out).
 
 *Proof.* Validity: Theorem 1. Completeness: let G = {no (m, x) with
 p_m(x) <= q eps_m is rejected directly}. By Lemma 1 (rejection version),
-Ville and a union bound over M N pairs, P(G^c) <= beta. **[check]** On G,
-no x in T is ever rejected or excluded: a spread rejection of x for m comes
-from some direct rejection at y with x ⪯_m y, but p_m(y) <= p_m(x) <=
-q eps_m, contradicting G; exclusion through another mode m' is the same
-argument for m'. Termination: every probe ends a.s. (if p < eps the cone
-statistic at the probe has positive expected log-growth under the hedge's
-best fixed bet, so it crosses 1/alpha a.s.; if p > q eps the rejection
-process does), each probe decides at least one configuration, and X is
-finite. So on G, tau < inf and every x in T is certified. ∎
+Ville and a union bound over M N pairs (each R_{m,x} starts at 1 and
+rejects at M N / beta), P(G^c) <= beta.
+
+*No target configuration is lost on G.* Spreading marks y rejected for m
+when some directly rejected z has y ⪯_m z: z is at least as safe as y.
+Suppose x in T were rejected for m. Either directly, which contradicts G
+because p_m(x) <= q eps_m. Or by spreading from a direct rejection at z
+with x ⪯_m z. Then by A, p_m(z) <= p_m(x) <= q eps_m, and (m, z) is a
+target pair that was rejected directly, which again contradicts G. A
+configuration is *excluded* (not searched for other modes) only when it is
+rejected for some mode m'; for x in T that is impossible on G by the same
+argument with m' in place of m.
+
+*Termination.* Fix a probe at (m, x) with rate p = p_m(x). By (T), one of
+two cases holds. If g_c(p) > 0, the best fixed certification bet's wealth
+satisfies (1/n) ln K_j -> g_c(p) > 0 a.s. along the trials at x (strong
+law). The cone statistic is at least w_{m,x} (1/16) K_j, so it crosses
+1/alpha a.s. If g_r(p) > 0, the same holds for the rejection mixture,
+which is at least (1/5) R_k. So each probe ends a.s. Each probe decides at
+least one (mode, configuration) pair, and there are M N pairs, so tau < inf
+a.s. Hence on G, tau < inf and T ⊆ C.
+
+*Time-outs.* A time-out marks the probe's pair as rejected for the search.
+That never certifies anything, so validity is untouched. It caps every
+probe's length, so tau < inf surely. The completeness argument above goes
+through on G ∩ {no probe at a target pair times out}. ∎
 
 ## A.5 Expected certification and rejection times
 
@@ -128,7 +199,7 @@ B per (m, z) when certification is checked once per batch of size B.
 
 **Theorem 4 (search).** Let C(p) = min(T_c(p), T_r(p)) with T_c, T_r the
 two Corollary 1 bounds (infinite outside p < eps, p > q eps respectively),
-and C* = max_p C(p) < inf (since q < 1). For the analysed variant below,
+and C* = max_p C(p), finite under (T). For the analysed variant below,
 the expected cost of the search is at most
 (C* + B) (sum over (m, j) of P_{m,j} + (alpha + beta) M N), where
 P_{m,j} <= 2 ceil(log2 d_{m,j}) + 2 and d_{m,j} is the distance from the
@@ -160,8 +231,15 @@ earlier in practice but makes the accounting below messier.
 
 *Proof of Theorem 4 (cost), for the analysed variant.* Number the probes
 k = 1, 2, ... in the order they start, and let L_k be the trials probe k
-uses. When probe k starts at (m, x), the trials it will see at x are i.i.d.
-and independent of everything before, and its own processes start fresh;
+uses. Probes run concurrently, so their trials interleave. Use the
+standard "reward table" construction: for each pair (m, x), draw in
+advance an i.i.d. sequence of outcome vectors from P_x, and let the j-th
+trial of a mode-m probe at x read the j-th entry. This has the same law as
+the procedure, because each trial's outcome given the past is P_x. In the
+analysed variant (m, x) is probed at most once: a probe ends only when its
+pair is decided. So the trials probe k sees are the first entries of its
+own table, independent of everything before it started, and its
+processes start fresh;
 the cone statistic is at least w K_{m,x}, so probe k ends no later than the
 first of the two passage times of Lemma 2. Hence
 E[L_k | start of probe k] <= min(T_c, T_r) + B <= C* + B, the B for checking
@@ -182,9 +260,10 @@ it is at most (alpha + beta) times the cost of probing everything. ∎
 
 **Transportation lemma** (Kaufmann, Cappe & Garivier 2016, Lemma 1; for
 procedures that may not stop under the alternative use the
-general-event version, Garivier, Menard & Stoltz 2019). **[check: which
-version is needed and its exact conditions]** For instances nu, nu', a
-stopping time tau and an event E in F_tau,
+general-event version, Garivier, Menard & Stoltz 2019). Conditions used
+here: nu_x is absolutely continuous with respect to nu'_x for every x; tau
+is a stopping time with E_nu[tau] < inf; E is in F_tau and E ⊆ {tau < inf}.
+Then
 sum_x E_nu[N_x(tau)] KL(nu_x, nu'_x) >= kl(P_nu(E), P_nu'(E)).
 We use kl(a, b) >= a ln(1/b) - ln 2.
 
@@ -203,11 +282,17 @@ pi and increasing above it).
 **Using the lemma when the procedure may not stop.** If E_nu[tau] = inf
 there is nothing to prove. Otherwise tau < inf nu-a.s.; on F_tau the
 restriction of P_nu is absolutely continuous with respect to that of P_nu'
-(arms are mutually absolutely continuous and P_nu(tau = inf) = 0), with
-density the likelihood ratio at tau, whose nu-expectation of the log is
-sum_x E_nu[N_x(tau)] KL(nu_x, nu'_x) by Wald's identity. The data-processing
-inequality for KL applied to the indicator of E gives the lemma. Nothing
-requires tau < inf under nu'. **[check]**
+(nu_x ≪ nu'_x for every x, and P_nu(tau = inf) = 0), with density the
+likelihood ratio at tau. Its nu-expectation of the log is
+sum_x E_nu[N_x(tau)] KL(nu_x, nu'_x) by Wald's identity. The
+data-processing inequality for KL, applied to the indicator of E, gives
+the lemma. Nothing requires tau < inf under nu'. That matters, because a
+correct procedure need not stop on an instance it cannot resolve.
+Absolute continuity is needed only in the direction nu ≪ nu'. Raising a
+rate from p >= 0 to eps + eta and lowering it from p > q eps to q eps
+both keep it, including at p = 0. The events used below,
+{tau < inf, T ⊆ C} and {tau < inf, z in C}, are subsets of {tau < inf}
+by definition.
 
 **Theorem 2 (lower bound, fixed confidence).** Any (alpha, beta)-correct
 procedure has E[tau] >= OPT, the value of
@@ -271,18 +356,26 @@ bound; whether a ln N term is necessary here is open (in unstructured
 pure exploration such terms are known to be necessary in moderate
 confidence regimes; Simchowitz, Jamieson & Recht 2017). **[open]**
 
-## A.9 Checklist for the reader
+## A.9 Previously flagged steps and where they are resolved
 
-1. Lemma 1's filtration argument with batched allocation.
-2. Theorem 1's inclusion {m} x C_m(x) ⊆ D under A, and the closed-testing
-   interpretation.
-3. Theorem 6's claim that no target configuration is rejected by spreading
-   or exclusion on G.
+1. Lemma 1 with batched allocation: the "Batches" paragraph after Lemma 1.
+2. Theorem 1's inclusion {m} x C_m(x) ⊆ D: its proof. The closed-testing
+   interpretation: Proposition 1.
+3. Theorem 6, no target pair lost to spreading or exclusion on G: its
+   proof. Termination now assumes (T), which is checked numerically for
+   every tolerance used. Time-outs are covered in the statement.
 4. The transportation lemma when tau may be infinite under the
-   alternative (argument above).
-5. Both alternatives of Theorem 2 keep A, and the LP sharing across modes
-   (a trial at y serves all modes).
-6. Convexity of R and the supporting half-planes (replaces the earlier,
-   incorrect claim that the certification and boundary terms add).
-7. Lemma 3 with spreading from other rows, and the conditional-expectation
-   step in the proof of Theorem 4 (analysed variant).
+   alternative: the conditions and argument in A.7.
+5. Both alternatives of Theorem 2 keep A: the proof of Theorem 2. Sharing
+   across modes: a trial at y yields all M outcomes, and the alternatives
+   change one mode at a time on instances with independent modes, so
+   KL(nu_y, nu'_y) = KL_m(y) and the constraint is on the total n_y.
+6. Convexity of R: f is decreasing and convex on [0, 1 - beta) and g is
+   increasing and convex on (alpha, 1], so the lower boundary
+   B = g(f^{-1}(A)) is convex. Validity of the half-planes does not even
+   need convexity: w f(pi) + (1 - w) g(pi) >= c(w) for every pi.
+7. Lemma 3 with spreading from other rows: decisions made elsewhere only
+   shrink the bracket. The conditional-expectation step in Theorem 4: the
+   reward-table paragraph in its proof.
+
+Open: whether the ln N in the multiple-testing factor is necessary (A.8).

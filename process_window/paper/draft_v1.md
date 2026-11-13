@@ -2,7 +2,8 @@
 
 *Draft v1, 2026-11-13 (supersedes draft.md). Working draft for ICML 2027.
 Theorems are drafts that need independent checking; citations need
-verification. Numbers marked TBD come from runs in progress.*
+verification. The LaTeX version (paper/latex/main.tex) is now the primary
+copy; this file is kept in sync for easy reading.*
 
 ## Abstract
 
@@ -24,12 +25,15 @@ sums; (ii) a **search algorithm** for the fixed-confidence version that
 stops on its own once the target region is certified; (iii) **lower bounds**
 showing that with the ordering the cost is governed by the region's
 *edge*, without it by its *area*, and **upper bounds** within logarithmic
-factors of the ordered bound. On sampling settings of a language model
-(TBD), on additive-manufacturing process windows and on a two-drug
-combination screen, the method needs [TBD] fewer trials than adaptive
-testing without the ordering and [TBD] fewer than evaluating every setting
-with a Learn-then-Test style full grid, with no unsafe setting certified in
-any run, while a Gaussian-process level-set baseline certifies unsafe
+factors of the ordered bound. On the sampling settings of a language
+model, with repetition and incoherence rates measured from real
+generations, the method certifies half of the safe region with 2.1x fewer
+generations than testing without the ordering and 3.1x fewer than a
+full-grid Learn-then-Test, pilot study included. Across this, additive-
+manufacturing process windows and a two-drug combination screen it needs
+1.3-9x fewer trials than adaptive testing without the ordering and, on
+48x48 grids, 19-26x fewer than a full grid with fixed-sequence testing,
+with no unsafe setting certified in any run, while a Gaussian-process level-set baseline certifies unsafe
 settings in 7.5-100% of runs unless it certifies almost nothing.
 
 ## 1. Introduction
@@ -191,9 +195,12 @@ multiple-testing factor ln(MN/alpha)/L of the ordered lower bound.
 - *Language model sampling.* SmolLM2-135M; 12 temperatures (0.2-2.0) x 12
   top-p values (0.5-1.0); prompts from WikiText-2; degenerate = more than
   20% of 4-grams repeated, incoherent = mean token NLL above 3.5 nats;
-  eps = 10% for both. Ground truth from 160 generations per setting
-  (monotone fit); side information = a pilot of 16 generations per setting
-  (counted in the budget). [TBD]
+  eps = 10% for both. Ground truth from 144 generations per setting
+  (monotone fit); side information = a pilot of 16 separate generations per
+  setting (counted in the budget). The raw rates fit Assumption A: largest
+  deviation from the monotone fit 1.8 SE (repetition) and 0.6 SE
+  (incoherence); 1 of 264 neighbouring pairs reversed by more than 2 SE.
+  78 of 144 settings are safe.
 - *Additive manufacturing.* A Rosenthal melt-pool model of 316L with
   Tang et al. lack-of-fusion, King et al. keyhole and length/width balling
   criteria; a synthetic window with controllable simulator error.
@@ -204,7 +211,11 @@ multiple-testing factor ln(MN/alpha)/L of the ordered lower bound.
 certify 70% of the safe region: ours vs. no ordering 5.0x fewer (synthetic
 window), 1.5-1.7x (Rosenthal 316L), 1.3x (drug screen). Scaling to 48x48:
 9.1x (synthetic) and 2.2x (Rosenthal) fewer than no ordering; 26x and 42x
-fewer than a full grid with Bonferroni. Language model: [TBD].
+fewer than a full grid with Bonferroni. Language model (12x12, 8 runs,
+pilot counted): to certify 50% of the safe region, ours 3.8k generations,
+no ordering 8.0k, full grid with fixed-sequence testing 11.7k, full grid
+with Bonferroni 18.6k; at 70%, 4.8k / 12.7k / 20.4k / 39.5k. Without the
+pilot ours needs 4.0k (50%) and 5.3k (70%).
 
 **Fixed confidence** (synthetic window, good side information; the search
 stops on its own and certified the full target in 23 of 24 runs; the
@@ -220,7 +231,9 @@ program (appendix, Theorem 2):
 
 Both methods pay a similar multiple-testing price over their own bound
 (per-setting 4.8-5.9x); the search's extra growth is the O(log n) probe
-factor. Language model: [TBD].
+factor. Language model: the search stops after 19.7k generations (8 of 8
+runs complete, none unsafe), per-setting 31.8k; ordered lower bound 2.1k
+(ratio 9.4), unordered 6.9k.
 
 **Validity.** Worst case (every setting at the tolerance): 0-2.75%
 false certification across configurations at alpha = 5% (400 runs each);
@@ -229,7 +242,10 @@ no unsafe setting certified in any efficiency run.
 **Model-based baseline.** GP level-set certification certifies an unsafe
 setting in 40-100% of runs at beta = 2 and still 7.5-20% at beta = 4,
 where it certifies at most 69% (drug screen) and typically under 25% of
-the region; ours: 0% and 54-84%. Language model: [TBD].
+the region; ours: 0% and 54-84%. Language model (20k generations, 20
+runs): GP certifies an unsafe setting in 95-100% of runs at beta = 2,
+15-60% at 3, 0-10% at 4 (then certifying 0-78% of the region); ours at
+40k: 0 of 8 runs, 95% of the region.
 
 **Ablations.** The ordering and the allocation rule matter most (no
 ordering +69 to +213%; greedy allocation +63 to +94%); weights, pooling and
