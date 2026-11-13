@@ -225,3 +225,17 @@ These change the method, so they need your answer before Phase 2:
   across all four problems; the tuning that works on one problem fails on
   another. Paper updated. The nested 23 x 23 LM grid is measuring
   (about 350 of 529 settings); its Table 1 row comes next.
+- 2026-11-13 (night): The nested 23 x 23 LM grid is measured (529
+  settings, 160 generations each; the 12 x 12 settings are reused). To
+  certify half the safe region, ours needs 5.8k generations (pilot
+  counted), no ordering 25.0k, full-grid fixed-sequence 47.1k, full-grid
+  Bonferroni 75.1k. From 12 x 12 to 23 x 23 our cost grows 1.5x and the
+  unordered cost 3.1x (edge 1.9x, area 3.7x), so the gap grows from 2.1x
+  to 4.3x, as the theory predicts. At 70%: 8.4k / 41.3k / 75.1k / 132k.
+  Without the pilot ours needs 12.4k (50%) and 14.7k (70%), so on the fine
+  grid the pilot roughly halves the cost. Fixed confidence: the search
+  stops at 51.8k (8 of 8 complete, none unsafe) against 129.7k per-setting
+  (2.5x, up from 1.6x); the ratio to the ordered bound grows from 9.4 to
+  14.8. Table 1, Table 2, Figure 2 (new LM panel) and the abstract are
+  updated. Waudby-Smith volume 86 issue 1 confirmed; only its page range
+  is unchecked.

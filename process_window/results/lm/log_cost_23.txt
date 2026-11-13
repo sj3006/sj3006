@@ -1,0 +1,14 @@
+{'method': 'ours', 'frac': 0.5, 'median': 5823.0, 'costs': '6306;5892;5754;5570;5018;6858;5754;6030'}
+{'method': 'no ordering', 'frac': 0.5, 'median': 24982.0, 'costs': '24384;26178;25258;25764;24798;24798;25166;24568'}
+{'method': 'ours, no simulator', 'frac': 0.5, 'median': 12397.0, 'costs': '12006;8096;11684;11684;12788;15272;13432;14122'}
+{'method': 'no ordering, no simulator', 'frac': 0.5, 'median': 40066.0, 'costs': '36708;43010;36754;39284;39330;40802;42090;44988'}
+{'method': 'grid FST', 'frac': 0.5, 'median': 47081.0, 'costs': '47081'}
+{'method': 'grid Bonferroni', 'frac': 0.5, 'median': 75118.0, 'costs': '75118'}
+-> lm_cost_50_23.csv
+{'method': 'ours', 'frac': 0.7, 'median': 8376.0, 'costs': '9250;7502;8514;9296;8238;8146;9894;6858'}
+{'method': 'no ordering', 'frac': 0.7, 'median': 41312.0, 'costs': '39426;41772;39518;43428;40714;41128;43520;41496'}
+{'method': 'ours, no simulator', 'frac': 0.7, 'median': 14697.0, 'costs': '14260;16284;14168;13524;14214;18492;15134;16238'}
+{'method': 'no ordering, no simulator', 'frac': 0.7, 'median': 52716.0, 'costs': '48392;54234;49082;52808;50784;52716;52716;55062'}
+{'method': 'grid FST', 'frac': 0.7, 'median': 75118.0, 'costs': '75118'}
+{'method': 'grid Bonferroni', 'frac': 0.7, 'median': 132250.0, 'costs': '132250'}
+-> lm_cost_70_23.csv

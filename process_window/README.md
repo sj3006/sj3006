@@ -77,6 +77,8 @@ step needs torch.
 | LM surface (measured) | `HF_HOME=<cache> python3 experiments/lm_surface.py` | `results/lm/surface_scores.npz` | 1.6 h |
 | Figure 1, LM budget curves | `python3 experiments/lm_figure.py` | `results/lm/fig_lm_*.{png,pdf}` | 1 min |
 | LM rows of Tables 1-2, LM GP numbers | `python3 experiments/exp_lm.py --parts budget,confidence,gp,cost` | `results/lm/lm_*.csv` | 20 min |
+| LM 23x23 surface (nested; reuses the 12x12 settings) | `HF_HOME=<cache> python3 experiments/lm_surface.py --n 23` | `results/lm/surface_scores_23.npz` | 4 h |
+| LM 23x23 rows of Tables 1-2 | `python3 experiments/exp_lm.py --parts cost,confidence --surface results/lm/surface_scores_23.npz --pilot-stride 2 --budget 150000` | `results/lm/lm_*_23.csv` | 1 h |
 | Live LM run (certifier queries the model) | `HF_HOME=<cache> python3 experiments/lm_live.py` | `results/lm/lm_live_seed0.json` | 40 min |
 | Table 1, Figure 2 (scaling) | `python3 experiments/final.py scaling --scen toy-good` and `--scen lpbf-good`, then `final.py gridfst` | `results/final/scaling_*.csv` | several hours |
 | Table 2, Figure 3 (fixed confidence) | `python3 experiments/exp_search.py` | `results/final/fixed_confidence*.csv` | several hours |

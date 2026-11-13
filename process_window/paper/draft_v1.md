@@ -28,8 +28,9 @@ showing that with the ordering the cost is governed by the region's
 factors of the ordered bound. On the sampling settings of a language
 model, with repetition and incoherence rates measured from real
 generations, the method certifies half of the safe region with 2.1x fewer
-generations than testing without the ordering and 3.1x fewer than a
-full-grid Learn-then-Test, pilot study included. Across this, additive-
+generations than testing without the ordering on a 12x12 grid and 4.3x
+fewer on a 23x23 grid (3.1x and 8.1x fewer than a full-grid
+Learn-then-Test), pilot study included. Across this, additive-
 manufacturing process windows and a two-drug combination screen it needs
 1.3-9x fewer trials than adaptive testing without the ordering and, on
 48x48 grids, 19-26x fewer than a full grid with fixed-sequence testing,
@@ -216,7 +217,12 @@ fewer than a full grid with Bonferroni. Language model (12x12, 8 runs,
 pilot counted): to certify 50% of the safe region, ours 3.8k generations,
 no ordering 8.0k, full grid with fixed-sequence testing 11.7k, full grid
 with Bonferroni 18.6k; at 70%, 4.8k / 12.7k / 20.4k / 39.5k. Without the
-pilot ours needs 4.0k (50%) and 5.3k (70%). Re-scoring the same
+pilot ours needs 4.0k (50%) and 5.3k (70%). Nested 23x23 grid (the 12x12
+settings plus the midpoints, same 2.3k pilot): at 50%, 5.8k / 25.0k /
+47.1k / 75.1k; at 70%, 8.4k / 41.3k / 75.1k / 132k; without the pilot
+12.4k (50%) and 14.7k (70%). Going from 12x12 to 23x23 multiplies our cost
+by 1.5 and the unordered cost by 3.1 (edge grows 1.9x, area 3.7x), so the
+gap to no ordering grows from 2.1x to 4.3x (results/lm/lm_cost_*_23.csv). Re-scoring the same
 generations with other failure definitions (repetition threshold
 0.15-0.3, NLL threshold 3.0-4.0, tolerance 5-20%; seven settings, 5 runs
 each): 1.6-2.2x fewer than no ordering, 2.2-4.1x fewer than full-grid
@@ -239,7 +245,10 @@ Both methods pay a similar multiple-testing price over their own bound
 (per-setting 4.8-5.9x); the search's extra growth is the O(log n) probe
 factor. Language model: the search stops after 19.7k generations (8 of 8
 runs complete, none unsafe), per-setting 31.8k; ordered lower bound 2.1k
-(ratio 9.4), unordered 6.9k.
+(ratio 9.4), unordered 6.9k. Nested 23x23 grid: search 51.8k (8 of 8
+complete, none unsafe), per-setting 129.7k (2.5x more, up from 1.6x);
+ordered bound 3.5k (ratio 14.8), unordered 24.4k
+(results/lm/lm_fixed_confidence_23.csv).
 
 **Validity.** Worst case (every setting at the tolerance): 0-2.75%
 false certification across configurations at alpha = 5% (400 runs each);

@@ -76,8 +76,9 @@ logarithmic and multiple-testing factors of the ordered lower bound. On
 the sampling settings of a language model, where repetition and
 incoherence rates are measured from real generations, the method
 certifies half of the safe region with 2.1$\times$ fewer generations than
-testing without the ordering and 3.1$\times$ fewer than full-grid
-Learn-then-Test, pilot study included. Across this, additive
+testing without the ordering on a $12\times12$ grid and 4.3$\times$ fewer
+on a $23\times23$ grid (3.1$\times$ and 8.1$\times$ fewer than full-grid
+Learn-then-Test), pilot study included. Across this, additive
 manufacturing process windows and a drug-combination screen it needs
 1.3--9$\times$ fewer trials than adaptive testing without the ordering
 and, on $48\times48$ grids, 19--26$\times$ fewer than a full grid with
@@ -427,7 +428,7 @@ spreads to safer settings, as in monotone safe exploration
 \caption{Trials to certify 50\% of the safe region (fixed budget, median of
 5 runs, LM 8; full grids: smallest budget reaching 50\% on average). LM:
 generations, with the 2.3k-generation pilot counted for ours and no
-order.}
+order; the $23^2$ grid contains the $12^2$ one and uses the same pilot.}
 \label{tab:scaling}
 \setlength{\tabcolsep}{4.5pt}
 \begin{tabular}{llrrrr}
@@ -442,6 +443,7 @@ Rosenthal & $16^2$ & 5.3k & 7.7k & 112k & 135k \\
           & $48^2$ & 42.5k & 93.5k & 1.11M & 1.77M \\
 \midrule
 LM        & $12^2$ & 3.8k & 8.0k & 11.7k & 18.6k \\
+          & $23^2$ & 5.8k & 25.0k & 47.1k & 75.1k \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -450,9 +452,9 @@ LM        & $12^2$ & 3.8k & 8.0k & 11.7k & 18.6k \\
 \centering
 \includegraphics[width=\textwidth]{figs/fig_scaling.pdf}
 \caption{Trials to certify half of the safe region as the grid is refined
-(fixed budget, log--log). With the ordering the cost grows roughly like
-the region's edge (slope 1); without it, and for full grids, like its area
-(slope 2).}
+(fixed budget, log--log; language model: generations, pilot counted). With
+the ordering the cost grows roughly like the region's edge (slope 1);
+without it, and for full grids, like its area (slope 2).}
 \label{fig:scaling}
 \end{figure*}
 
@@ -464,11 +466,19 @@ pay for the whole area; fixed-sequence testing helps them by only
 20--40\%. At $24\times24$, to certify 70\% of the region, ours needs
 5.0$\times$ fewer trials than no ordering on the synthetic window,
 1.5--1.7$\times$ on Rosenthal 316L and 1.3$\times$ on the drug screen.
-On the language model, to certify 70\% of the safe region, ours needs
-4.8k generations (pilot included) against 12.7k without the ordering,
-20.4k for full-grid fixed-sequence testing and 39.5k for full-grid
-Bonferroni. Without the pilot it needs 5.3k, so on this small grid the
-ordering, not the side information, does most of the work. The LM gains
+The language model shows the same trend. Refining its grid from
+$12^2$ to $23^2$ (the old settings plus the midpoints between them, same
+pilot) multiplies our cost by 1.5 and the cost without the ordering by
+3.1 (the edge grows by 1.9, the area by 3.7), so the gap grows from 2.1$\times$
+to 4.3$\times$, and to the full grids from 3.1--4.9$\times$ to
+8.1--13$\times$. To certify 70\% of the safe region, ours needs 4.8k
+generations at $12^2$ and 8.4k at $23^2$ (pilot included), against
+12.7k and 41.3k without the ordering, 20.4k and 75.1k for full-grid
+fixed-sequence testing and 39.5k and 132k for full-grid Bonferroni.
+Without the pilot ours needs 5.3k and 14.7k, against 13.1k and 52.7k
+without the ordering: on the coarse grid the ordering does most of the
+work, and on the fine one the pilot, which covers about a quarter of the
+settings, roughly halves the cost again. The LM gains
 do not depend on the failure definitions: re-scoring the same generations
 with repetition thresholds 0.15--0.3, NLL thresholds 3.0--4.0 nats and
 tolerances 5--20\% (seven settings, 5 runs each) gives 1.6--2.2$\times$
@@ -482,7 +492,7 @@ no unsafe setting certified in any of the 70 runs.
 median of 4 runs) and the language model (median of 8 runs, pilot
 counted). LB: Theorem~\ref{thm:lb}. The target was fully certified in 23
 of 24 synthetic runs (the exception, at $32^2$, hit a probe time-out) and
-in 8 of 8 LM runs.}
+in all 16 LM runs.}
 \label{tab:fc}
 \begin{tabular}{lrrrrr}
 \toprule
@@ -495,6 +505,7 @@ $32^2$ & 165.6k & 19.4k & 8.5 & 457.7k & 77.0k \\
 $48^2$ & 334.6k & 24.8k & 13.5 & --- & 174.4k \\
 \midrule
 LM $12^2$ & 19.7k & 2.1k & 9.4 & 31.8k & 6.9k \\
+LM $23^2$ & 51.8k & 3.5k & 14.8 & 129.7k & 24.4k \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -515,10 +526,13 @@ price over their own bound (per-setting: 4.8--5.9$\times$;
 $\ln(16MN/(\alpha w))/K_1\approx5$ at $32^2$); the search's extra growth
 with $n$ is the $O(\log n)$ probe factor. With optimistic side information
 at $32^2$ the search needs 215k trials against 458k without the ordering.
-On the language model the search stops after 19.7k generations, against
-31.8k for the per-setting test, at 9.4 times the ordered lower bound
-(4.2--5.7 on synthetic grids of similar size), so on this grid the gap
-to the bound is larger than the gap to the unordered method.
+On the language model the search stops after 19.7k generations at
+$12^2$ and 51.8k at $23^2$, against 31.8k and 129.7k for the per-setting
+test (1.6$\times$ and 2.5$\times$ more), at 9.4 and 14.8 times the
+ordered lower bound (4.2--8.5 on synthetic grids of similar size). The
+bounds grow like the edge and the area (ordered 2.1k to 3.5k, unordered
+6.9k to 24.4k); on both grids the gap to the bound is larger than the gap
+to the unordered method.
 
 \paragraph{Validity.} With every setting exactly at the tolerance (the
 worst case), the false-certification rate is 0--2.75\% across
