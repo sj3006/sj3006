@@ -117,7 +117,8 @@ def budget_figure():
             continue
         x = np.array([float(v["generations"]) for v in r]) / 1000
         y = np.array([float(v["frac"]) for v in r])
-        ax.plot(x, y, color=col, lw=2, label=name)
+        # Full grids dashed: a second cue besides color (CVD, print).
+        ax.plot(x, y, color=col, lw=2, label=name, ls="--" if name.startswith("full grid") else "-")
     ax.set_xlabel("generations (thousands; pilot included)")
     ax.set_ylabel("fraction of safe region certified")
     ax.set_ylim(0, 1)

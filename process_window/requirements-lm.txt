@@ -1,0 +1,5 @@
+# Only needed to measure the language-model surface (experiments/lm_surface.py)
+# and for the live run (experiments/lm_live.py). CPU builds are enough.
+torch>=2.3
+transformers>=4.45
+datasets>=2.20

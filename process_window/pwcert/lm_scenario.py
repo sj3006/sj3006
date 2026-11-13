@@ -14,7 +14,11 @@ Axes: axis 0 = temperature (low -> high), axis 1 = top-p (low -> high).
 
 Simulators:
 - "pilot": a monotone fit from the first `pilot_n` generations per setting
-  of a *disjoint* subset of the measurements (a cheap pilot study);
+  of a *disjoint* subset of the measurements (a cheap pilot study). With
+  pilot_stride = s > 1 the pilot runs only at every s-th setting along each
+  axis and is interpolated (bilinearly, which keeps monotonicity) to the
+  rest; on the nested 23 x 23 grid, s = 2 gives the same pilot settings and
+  cost as the 12 x 12 grid;
 - "none": flat prior.
 """
 
@@ -47,8 +51,19 @@ def load_scores(path=PATH):
     return temps, tops, scores
 
 
+def _upsample(sub, n_full, stride):
+    """Bilinear interpolation from the stride grid to the full grid (index
+    coordinates). Coordinatewise monotone input gives monotone output."""
+    from scipy.interpolate import RegularGridInterpolator
+    idx = np.arange(0, n_full, stride)
+    f = RegularGridInterpolator((idx, idx), sub)
+    g = np.arange(n_full)
+    pts = np.stack(np.meshgrid(g, g, indexing="ij"), axis=-1)
+    return f(pts)
+
+
 def make_lm_scenario(eps=0.10, simulator="pilot", pilot_n=16, path=PATH,
-                     rep_thresh=REP_THRESH, nll_thresh=NLL_THRESH):
+                     rep_thresh=REP_THRESH, nll_thresh=NLL_THRESH, pilot_stride=1):
     temps, tops, scores = load_scores(path)
     nT, nP = len(temps), len(tops)
     fails = {"degenerate": np.zeros((nT, nP)), "incoherent": np.zeros((nT, nP))}
@@ -67,9 +82,18 @@ def make_lm_scenario(eps=0.10, simulator="pilot", pilot_n=16, path=PATH,
     truth = {m: _monotone(fails[m], n_main, LM_DIRECTIONS[m]) for m in LM_MODES}
     eps_d = {m: eps for m in LM_MODES}
     if simulator == "pilot":
-        w = np.full((nT, nP), float(pilot_n))
-        sim = {m: _monotone(pil[m], w, LM_DIRECTIONS[m]) for m in LM_MODES}
-        meta = dict(pilot_coupons=int(pilot_n * nT * nP))
+        s_ = pilot_stride
+        if s_ == 1:
+            w = np.full((nT, nP), float(pilot_n))
+            sim = {m: _monotone(pil[m], w, LM_DIRECTIONS[m]) for m in LM_MODES}
+        else:
+            assert nT == nP and (nT - 1) % s_ == 0, "stride must divide the grid"
+            sub = {m: pil[m][::s_, ::s_] for m in LM_MODES}
+            w = np.full(sub["degenerate"].shape, float(pilot_n))
+            sim = {m: np.clip(_upsample(_monotone(sub[m], w, LM_DIRECTIONS[m]), nT, s_), 1e-4, 1 - 1e-4)
+                   for m in LM_MODES}
+        n_pilot = len(range(0, nT, s_)) * len(range(0, nP, s_))
+        meta = dict(pilot_coupons=int(pilot_n * n_pilot))
     elif simulator == "none":
         sim = {m: np.full((nT, nP), eps) for m in LM_MODES}
         meta = {}

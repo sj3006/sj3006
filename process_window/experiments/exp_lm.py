@@ -36,9 +36,14 @@ from pwcert.search import SearchCertifier  # noqa: E402
 
 OUT = os.path.join(os.path.dirname(__file__), "..", "results", "lm")
 EPS, Q = 0.10, 0.5
+# Set from the command line: which measured surface, how sparse the pilot,
+# and a suffix for output files (empty for the 12 x 12 surface).
+PILOT_KW, FLAT_KW, SUFFIX = {}, {}, ""
 
 
 def write(rows, name):
+    if SUFFIX:
+        name = name.replace(".csv", f"{SUFFIX}.csv")
     with open(os.path.join(OUT, name), "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0]))
         w.writeheader()
@@ -47,8 +52,8 @@ def write(rows, name):
 
 
 def fixed_budget(reps, budget):
-    pilot = make_lm_scenario(EPS, "pilot")
-    flat = make_lm_scenario(EPS, "none")
+    pilot = make_lm_scenario(EPS, "pilot", **PILOT_KW)
+    flat = make_lm_scenario(EPS, "none", **FLAT_KW)
     n = pilot.truth["degenerate"].shape[0]
     W = pilot.true_window()
     print("true safe settings:", int(W.sum()), "of", W.size, flush=True)
@@ -96,12 +101,12 @@ def cost_to_fraction(reps, frac=0.5, budget=40_000):
     Adaptive methods: median over runs of the first crossing (pilot counted
     where used). Full grids: smallest per-setting budget whose mean certified
     area reaches the target, on the same geometric grid as final.py."""
-    pilot = make_lm_scenario(EPS, "pilot")
+    pilot = make_lm_scenario(EPS, "pilot", **PILOT_KW)
     n = pilot.truth["degenerate"].shape[0]
     W = pilot.true_window()
     target = int(np.ceil(frac * W.sum()))
     rows = []
-    flat = make_lm_scenario(EPS, "none")
+    flat = make_lm_scenario(EPS, "none", **FLAT_KW)
     variants = (("ours", pilot, "cone", "ensemble"), ("no ordering", pilot, "none", "uniform"),
                 ("ours, no simulator", flat, "cone", "uniform"), ("no ordering, no simulator", flat, "none", "uniform"))
     for name, sc, rule, wts in variants:
@@ -127,7 +132,7 @@ def cost_to_fraction(reps, frac=0.5, budget=40_000):
 
 
 def fixed_confidence(reps):
-    sc = make_lm_scenario(EPS, "pilot")
+    sc = make_lm_scenario(EPS, "pilot", **PILOT_KW)
     n = sc.truth["degenerate"].shape[0]
     T = np.all([sc.truth[m] <= Q * sc.eps[m] for m in sc.modes], axis=0)
     b = ordered_lower_bound(sc, Q)
@@ -151,7 +156,7 @@ def fixed_confidence(reps):
 
 
 def gp(reps, budget):
-    sc = make_lm_scenario(EPS, "pilot")
+    sc = make_lm_scenario(EPS, "pilot", **PILOT_KW)
     W = sc.true_window()
     rows = []
     for beta in (2.0, 3.0, 4.0):
@@ -173,7 +178,16 @@ def main():
     ap.add_argument("--reps", type=int, default=8)
     ap.add_argument("--budget", type=int, default=40_000)
     ap.add_argument("--parts", default="budget,confidence,gp")
+    ap.add_argument("--surface", default=None, help="measured surface .npz (default: the 12 x 12 one)")
+    ap.add_argument("--pilot-stride", type=int, default=1)
     args = ap.parse_args()
+    global SUFFIX
+    if args.surface:
+        PILOT_KW.update(path=args.surface)
+        FLAT_KW.update(path=args.surface)
+        SUFFIX = "_" + os.path.splitext(os.path.basename(args.surface))[0].replace("surface_scores", "").strip("_")
+    if args.pilot_stride > 1:
+        PILOT_KW.update(pilot_stride=args.pilot_stride)
     os.makedirs(OUT, exist_ok=True)
     if "budget" in args.parts:
         fixed_budget(args.reps, args.budget)

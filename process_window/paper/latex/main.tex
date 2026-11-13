@@ -151,21 +151,24 @@ than $x$.
 \item \emph{Problem.} Certification of a safe region under per-mode partial
 orders when each configuration needs its own trials, in a fixed-budget and
 a fixed-confidence version (Section~\ref{sec:problem}).
-\item \emph{Testing.} The cone rule: closed testing with weighted e-values,
-which under monotonicity is a cumulative sum; valid at every time under
-arbitrary adaptive sampling (Section~\ref{sec:cone}).
+\item \emph{Testing.} The cone rule: closed testing with weighted e-values
+over exactly the intersections that monotonicity allows, which reduces to
+a cumulative sum; valid at every time under arbitrary adaptive sampling
+(Section~\ref{sec:cone}).
 \item \emph{Allocation.} For a fixed budget, trials at the riskiest
 uncertified settings of a slightly shrunken target (the lower bound's
 binding constraints). For fixed confidence, a galloping/bisection search
-along the ordering with a two-sided probe that never stalls near a
-threshold (Section~\ref{sec:alloc}).
+along the ordering with a two-sided probe that ends almost surely at
+every failure rate, including rates near the tolerance
+(Section~\ref{sec:alloc}).
 \item \emph{Theory.} Lower bounds with and without the ordering (edge
 vs.\ area); upper bounds by Wald's identity; the search is within
 $O(\log n)$ and multiple-testing factors of the ordered lower bound
 (Section~\ref{sec:theory}).
-\item \emph{Experiments.} Sampling settings of a language model, additive
-manufacturing (a Rosenthal melt-pool model and a synthetic window), and a
-drug-combination screen (Section~\ref{sec:exp}).
+\item \emph{Experiments.} Sampling settings of a language model, with
+failure rates measured from real generations (Figure~\ref{fig:lm}),
+additive manufacturing (a Rosenthal melt-pool model and a synthetic
+window), and a drug-combination screen (Section~\ref{sec:exp}).
 \end{enumerate}
 
 % =====================================================================
@@ -301,7 +304,10 @@ safer settings, a rejection to riskier ones. Start at the edge found in an
 adjacent row (or the side information's predicted edge), gallop until the
 edge is bracketed, then bisect. Stop when every row is decided for every
 mode. Because $q<1$, at every rate at least one side of the probe has
-positive drift, so no probe stalls.
+positive drift; with the fixed bets in our grids this holds at every
+tolerance we use (condition (T), Section~\ref{sec:theory}), so every probe
+ends almost surely. A time-out on probe length is also available; it
+never certifies anything.
 
 % =====================================================================
 \section{Theory}\label{sec:theory}

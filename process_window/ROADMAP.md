@@ -202,3 +202,16 @@ These change the method, so they need your answer before Phase 2:
   than ours at 32-48 grids). LaTeX paper (paper/latex/) with verified
   bibliography and figures. LM surface measurement running (SmolLM2-135M,
   12 x 12 settings x 160 generations).
+- 2026-11-13 (later): LM surface finished (78 of 144 settings safe; raw
+  rates within 1.8 SE of a monotone fit). LM benchmark: to certify half the
+  safe region, ours 3.8k generations with the pilot counted, no ordering
+  8.0k, full-grid fixed-sequence 11.7k, full-grid Bonferroni 18.6k; the
+  fixed-confidence search stops at 19.7k (8 of 8 complete), against 31.8k
+  per-setting; the GP certifies unsafe settings in 95-100% of runs at
+  beta 2. The LM surface is now Figure 1 of the paper. Proofs: no [check]
+  items left. The cone rule is now Proposition 1 (closed testing with
+  restricted combinations). Termination needs an explicit growth condition
+  (T) on the bet grids, which holds at every tolerance we use and fails
+  below about 2%. Time-outs are covered in Theorem 6. Code-release README
+  rewritten. Next: live LM run; a nested 23 x 23 LM grid, to show the gap
+  growing with resolution on real generations.
