@@ -303,17 +303,16 @@ $g(p)$ is the best growth rate of the fixed bets; $\KL(p\|\eps)/g(p)\in
 \end{theorem}
 
 \begin{theorem}[search]\label{thm:search}
-The search is $(\alpha,\beta)$-correct, and its expected cost is at most
-$\sum_{m,j} P_{m,j}(C^*+B)$, where
+The search is $(\alpha,\beta)$-correct. If each mode's evidence at $x$ uses
+only the trials of that mode's probes, its expected cost is at most
 \[
-P_{m,j}\le 2\lceil\log_2(d_{m,j}+1)\rceil+2
+(C^*+B)\Bigl(\textstyle\sum_{m,j}P_{m,j}+(\alpha+\beta)MN\Bigr),
 \]
-is the number of probes in row $j$ for mode $m$ when the first probe is
-$d_{m,j}$ positions from the edge, $B$ is the batch size, and
-\[
-C^*=\max_p\min(T_c(p),T_r(p))<\infty
-\]
-is the largest expected two-sided probe length.
+where $P_{m,j}=2\lceil\log_2 d_{m,j}\rceil+2$, $d_{m,j}$ is the distance
+from the first probe in row $j$ to the far end of mode $m$'s slack band
+(rates between $q\eps_m$ and $\eps_m$), $B$ is the batch size, and
+$C^*=\max_p\min(T_c(p),T_r(p))<\infty$ is the largest expected
+two-sided probe length.
 \end{theorem}
 
 \begin{corollary}[edge vs.\ area]
@@ -576,13 +575,35 @@ within $T_r(p)=(\ln(5MN/\beta)+b')/g_r(p)$. This gives
 Theorem~\ref{thm:oracle} by summing over the cover (plus $B$ per cover
 point when certification is checked once per batch).
 
-\begin{proof}[Proof sketch of Theorem~\ref{thm:search}, cost]
-Galloping brackets the edge in $\lceil\log_2(d+1)\rceil+1$ probes and
-bisection closes the bracket in at most as many; probes elsewhere only
-decide configurations earlier. A probe ends at the first of two passage
-times, so its expected length is at most $\min(T_c,T_r)\le C^*$. Overshoot
-is at most $B$ per probe. Probes for different modes at one configuration
-share trials, which only reduces cost.
+\begin{lemma}[probes per row]\label{lem:probes}
+Fix $m$ and a row ordered safest to riskiest for $m$; let $a$ be the last
+position with $p_m\le q\eps_m$ and $b$ the first with $p_m\ge\eps_m$. On
+the event that no e-process misleads (probability at least
+$1-\alpha-\beta$), a probe at $i$ can certify only if $i<b$ and reject only
+if $i>a$, and if the first probe is at $s$ the row is decided after at most
+$2\lceil\log_2 d\rceil+2$ probes, $d=\max(b-s,s-a,1)$.
+\end{lemma}
+\begin{proof}
+If the first probe certifies, galloping probes $s+1,s+2,s+4,\dots$ and
+cannot certify at or beyond $b$, so it rejects within
+$\lceil\log_2(b-s)\rceil+1$ probes, leaving at most $b-s$ undecided
+positions in the bracket. A probe at the median of the undecided positions
+certifies it and everything safer or rejects it and everything riskier,
+halving them. Positions decided elsewhere only shrink the bracket. The
+other case is symmetric.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{thm:search}, cost]
+Number the probes in the order they start. When probe $k$ starts at
+$(m,x)$, its processes start fresh and the trials it will see at $x$ are
+i.i.d.\ and independent of the past; since $S_m(x)\ge w_{m,x}K_{m,x}$, it
+ends no later than the first of the two passage times of
+Lemma~\ref{lem:wald}, so its conditional expected length is at most
+$\min(T_c,T_r)+B\le C^*+B$ ($B$ for checking once per batch). Whether probe
+$k$ happens is known when it starts, so the expected total is at most
+$(C^*+B)$ times the expected number of probes. By
+Lemma~\ref{lem:probes} that number is at most $\sum_{m,j}P_{m,j}$ on the
+good event, and at most $MN$ otherwise.
 \end{proof}
 
 \subsection{Lower bounds}
@@ -638,7 +659,7 @@ allocation; (2) the closed-testing interpretation of the cone rule;
 (3) that no target configuration is rejected by spreading or exclusion on
 $G$; (4) the transportation lemma when $\tau$ may be infinite under the
 alternative; (5) that the alternatives keep Assumption~A, and the sharing
-of trials across modes; (6) convexity of $R$; (7) the probe count with
+of trials across modes; (6) convexity of $R$; (7) Lemma~\ref{lem:probes} with
 spreading from other rows.
 
 \end{document}

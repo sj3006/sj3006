@@ -128,17 +128,55 @@ B per (m, z) when certification is checked once per batch of size B.
 
 **Theorem 4 (search).** Let C(p) = min(T_c(p), T_r(p)) with T_c, T_r the
 two Corollary 1 bounds (infinite outside p < eps, p > q eps respectively),
-and C* = max_p C(p) < inf (since q < 1). The expected cost of the search is
-at most sum over (m, j) of P_{m,j} (C* + B), where P_{m,j} <=
-2 ceil(log2(d_{m,j} + 1)) + 2 is the number of probes in row j for mode m and
-d_{m,j} the distance from the first probe to the edge.
-*Proof sketch.* **[check]** Galloping brackets the edge in
-ceil(log2(d + 1)) + 1 probes and bisection closes the bracket in at most as
-many; probes elsewhere only decide configurations earlier. A probe's
-duration is the minimum of a certification and a rejection passage time,
-whose expectation is at most the smaller of the two bounds (Lemma 2), hence
-at most C(p) <= C*. Overshoot: at most B per probe. Probes for different
-modes at one configuration share trials, which only reduces cost. ∎
+and C* = max_p C(p) < inf (since q < 1). For the analysed variant below,
+the expected cost of the search is at most
+(C* + B) (sum over (m, j) of P_{m,j} + (alpha + beta) M N), where
+P_{m,j} <= 2 ceil(log2 d_{m,j}) + 2 and d_{m,j} is the distance from the
+first probe in row j to the far end of mode m's slack band (Lemma 3).
+**Lemma 3 (probes per row).** Fix mode m and a row, ordered safest to
+riskiest for m (rates nondecreasing). Let a be the last position with
+p_m <= q eps_m and b the first with p_m >= eps_m (the slack band is the
+positions strictly between). On the event G ∩ V (no wrong direct rejection,
+no wrong certification), a probe at position i can only certify if i < b
+and can only reject if i > a; certified positions form a prefix and
+rejected ones a suffix. If the first probe is at s and
+d = max(b - s, s - a, 1), the row is decided after at most
+2 ceil(log2 d) + 2 probes.
+*Proof.* Say the first probe certifies (the other case is symmetric).
+Galloping probes s + 1, s + 2, s + 4, ...; it cannot certify at or beyond
+b, so the first rejection comes after at most ceil(log2 (b - s)) + 1
+probes, leaving a bracket with at most 2^(k-1) <= b - s undecided
+positions. Each bisection probe at the median of the undecided positions
+certifies it (and everything safer) or rejects it (and everything
+riskier), so it at least halves them: at most ceil(log2 (b - s)) + 1 more
+probes. Positions decided by other rows or modes only shrink the bracket. ∎
+
+**Analysed variant.** For the cost bound, the e-process K_{m,x} (and the
+rejection process R_{m,x}) use only the trials run during probes *for mode
+m*. Which trials enter is decided before they are seen, so these are still
+valid e-processes and Theorems 1 and 6 still apply. The implementation also
+lets a trial at x count for every mode, which can only make decisions
+earlier in practice but makes the accounting below messier.
+
+*Proof of Theorem 4 (cost), for the analysed variant.* Number the probes
+k = 1, 2, ... in the order they start, and let L_k be the trials probe k
+uses. When probe k starts at (m, x), the trials it will see at x are i.i.d.
+and independent of everything before, and its own processes start fresh;
+the cone statistic is at least w K_{m,x}, so probe k ends no later than the
+first of the two passage times of Lemma 2. Hence
+E[L_k | start of probe k] <= min(T_c, T_r) + B <= C* + B, the B for checking
+once per batch. Whether probe k happens is known when it starts, so
+
+    E[total] = sum_k E[ 1{probe k happens} E[L_k | start] ] <= (C* + B) E[number of probes].
+
+On G ∩ V (probability at least 1 - alpha - beta) Lemma 3 gives at most
+sum_{m,j} P_{m,j} probes; off it, at most M N (each probe decides a
+(mode, setting) pair). So
+
+    E[total] <= (C* + B) ( sum_{m,j} (2 ceil(log2 d_{m,j}) + 2) + (alpha + beta) M N ).
+
+The second term is the price of the rare runs where an e-process misleads;
+it is at most (alpha + beta) times the cost of probing everything. ∎
 
 ## A.7 Lower bounds
 
@@ -246,5 +284,5 @@ confidence regimes; Simchowitz, Jamieson & Recht 2017). **[open]**
    (a trial at y serves all modes).
 6. Convexity of R and the supporting half-planes (replaces the earlier,
    incorrect claim that the certification and boundary terms add).
-7. Theorem 4's probe count with spreading from other rows, and the
-   min-of-two-stopping-times bound.
+7. Lemma 3 with spreading from other rows, and the conditional-expectation
+   step in the proof of Theorem 4 (analysed variant).

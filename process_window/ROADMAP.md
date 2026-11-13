@@ -191,3 +191,14 @@ These change the method, so they need your answer before Phase 2:
   ours now wins on every scenario including the thin Rosenthal band
   (2.2x at 48x48). GP baseline, monotonicity audit. Full results in
   notes/08 and paper/draft.md; figures in results/final/.
+- 2026-11-13: Reframed as "certifying safe operating regions under
+  monotone failure modes" with an LLM application first (draft v1).
+  Fixed-confidence search (galloping + bisection, two-sided probes,
+  notes/09). Theory appendix consolidated (paper/appendix_theory.md).
+  Found and fixed an error in the fixed-confidence lower bound (two terms
+  were added that can share trials; now one joint convex program,
+  pwcert/bounds.py): search/bound ratio is 4.2-13.5, not 4-8. Added the
+  Learn-then-Test fixed-sequence full-grid baseline (15-26x more trials
+  than ours at 32-48 grids). LaTeX paper (paper/latex/) with verified
+  bibliography and figures. LM surface measurement running (SmolLM2-135M,
+  12 x 12 settings x 160 generations).
