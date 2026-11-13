@@ -10,14 +10,13 @@ Methods:
   (certify at eps with its own e-process, or reject at q eps) with no
   spreading; stops when every setting is decided.
 
-Lower bounds (computed from the true rates; notes/09):
-- certification term: Theorem 2a's LP, L * LP(T);
-- boundary term: for each mode, the safest settings outside T (and inside T
-  for the other modes) must be resolved: either certified (cost about
-  L / KL(p || eps)) or shown to be outside T (about L / KL(p || q eps)), so
-  each adds L * min of the two inverse rates.
-- unordered: every setting must be resolved on its own: target settings
-  certified for every mode, others certified or shown outside for one mode.
+Lower bounds (computed from the true rates; pwcert/bounds.py, notes/09):
+- LB_target: target points only (Theorem 2a's LP with kl(1-beta, alpha));
+- LB_ordered: one joint LP with the target constraints and the boundary
+  constraints (settings just outside T must be certified or told apart
+  from an alternative where they are in T), so trials that serve both are
+  not counted twice;
+- LB_unordered: every setting resolved on its own.
 
 Run from process_window/:  python3 experiments/exp_search.py [--quick]
 """
@@ -31,13 +30,10 @@ import time
 import numpy as np
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from pwcert.certify import _kl_vec  # noqa: E402
-from pwcert.cone import ConeCertifier, cone_sum  # noqa: E402
+from pwcert.bounds import ordered_lower_bound, unordered_lower_bound  # noqa: E402
+from pwcert.cone import ConeCertifier  # noqa: E402
 from pwcert.search import SearchCertifier  # noqa: E402
 from pwcert.synthetic import make_scenario  # noqa: E402
-
-sys.path.insert(0, os.path.dirname(__file__))
-from final import lower_bounds  # noqa: E402
 
 OUT = os.path.join(os.path.dirname(__file__), "..", "results", "final")
 Q, ALPHA, BETA = 0.5, 0.05, 0.05
@@ -84,49 +80,31 @@ class PerSetting(ConeCertifier):
         return True
 
 
-def boundary_bound(sc, q=Q, beta=BETA):
-    """L * sum over (mode, safest-outside setting) of min(1/KL to eps, 1/KL to q eps)."""
-    modes = sc.modes
-    truth = np.stack([sc.truth[m] for m in modes])
-    eps = np.array([sc.eps[m] for m in modes])[:, None, None]
-    inT = truth <= q * eps                           # per mode
-    L = (1 - beta) * np.log(1 / ALPHA) - np.log(2)
-    total, pts = 0.0, set()
-    for a, m in enumerate(modes):
-        others = np.all([inT[b] for b in range(len(modes)) if b != a], axis=0)
-        outside = ~inT[a] & others
-        # safest points of `outside` for mode a: no other outside point is safer.
-        safer_count = cone_sum(outside.astype(float), sc.directions[m], riskier=False)
-        boundary = outside & (safer_count < 1.5)
-        p = truth[a][boundary]
-        cert = np.where(p < eps[a].ravel()[0], 1.0 / np.maximum(_kl_vec(p, eps[a].ravel()[0]), 1e-12), np.inf)
-        p_rej = np.clip(p, 1e-9, 1 - 1e-9)
-        qe = q * eps[a].ravel()[0]
-        kl_rej = p_rej * np.log(p_rej / qe) + (1 - p_rej) * np.log((1 - p_rej) / (1 - qe))
-        total += float(np.sum(np.minimum(cert, 1.0 / np.maximum(kl_rej, 1e-12))))
-        pts |= set(zip(*np.nonzero(boundary)))
-    return L * total, len(pts)
+def bound_columns(sc):
+    T = np.all([sc.truth[m] <= Q * sc.eps[m] for m in sc.modes], axis=0)
+    b = ordered_lower_bound(sc, Q, ALPHA, BETA)
+    return dict(T_size=int(T.sum()), target_points=b["n_target_pts"], boundary_points=b["n_boundary_pts"],
+                LB_target=round(b["lb_target_only"]), LB_ordered=round(b["lb"]),
+                LB_unordered=round(unordered_lower_bound(sc, Q, ALPHA, BETA)))
 
 
-def unordered_bound(sc, q=Q, beta=BETA):
-    """Without the ordering every setting must be resolved on its own:
-    target settings certified for every mode; others either certified (if in
-    the window) or shown outside the target for some mode."""
-    modes = sc.modes
-    truth = np.stack([sc.truth[m].ravel() for m in modes])
-    eps = np.array([sc.eps[m] for m in modes])[:, None]
-    L = (1 - beta) * np.log(1 / ALPHA) - np.log(2)
-
-    def inv_kl(p, t):
-        p = np.clip(p, 1e-9, 1 - 1e-9)
-        kl = p * np.log(p / t) + (1 - p) * np.log((1 - p) / (1 - t))
-        return 1.0 / np.maximum(kl, 1e-12)
-
-    cert = np.where(truth < eps, inv_kl(truth, eps), np.inf).max(axis=0)       # certify all modes
-    rej = np.where(truth > q * eps, inv_kl(truth, q * eps), np.inf).min(axis=0)  # show one mode outside
-    inT = (truth <= q * eps).all(axis=0)
-    per = np.where(inT, cert, np.minimum(cert, rej))
-    return L * float(per[np.isfinite(per)].sum())
+def recompute_bounds(paths):
+    """Rewrite the lower-bound columns of existing result files (the bounds
+    depend only on the true rates, so the runs need not be repeated)."""
+    old = ("edge_points", "LB_cert", "LB_boundary", "LB_total")
+    for path in paths:
+        rows = list(csv.DictReader(open(path)))
+        out = []
+        for r in rows:
+            sc = make_scenario(int(r["n"]), int(r["n"]), simulator=r["sim"])
+            new = dict(sim=r["sim"], n=r["n"], **bound_columns(sc))
+            new.update({k: v for k, v in r.items() if k not in new and k not in old})
+            out.append(new)
+        with open(path, "w", newline="") as f:
+            w = csv.DictWriter(f, fieldnames=list(out[0]))
+            w.writeheader()
+            w.writerows(out)
+        print("rewrote", path, flush=True)
 
 
 def run(method, sc, n, r):
@@ -151,18 +129,19 @@ def main():
     ap.add_argument("--sims", default="good,biased")
     ap.add_argument("--sizes", default="8,12,16,24,32,48")
     ap.add_argument("--out", default="fixed_confidence.csv")
+    ap.add_argument("--recompute-bounds", nargs="*", default=None,
+                    help="rewrite the bound columns of these result files and exit")
     args = ap.parse_args()
+    if args.recompute_bounds is not None:
+        recompute_bounds(args.recompute_bounds)
+        return
     sizes = (8, 16) if args.quick else tuple(int(s) for s in args.sizes.split(","))
     reps = 2 if args.quick else 4
     rows = []
     for sim in args.sims.split(","):
         for n in sizes:
             sc = make_scenario(n, n, simulator=sim)
-            T, lb_a, lb_u, n_edge = lower_bounds(sc, Q)
-            lb_b, n_bd = boundary_bound(sc)
-            row = dict(sim=sim, n=n, T_size=int(T.sum()), edge_points=n_edge, boundary_points=n_bd,
-                       LB_cert=round(lb_a), LB_boundary=round(lb_b), LB_total=round(lb_a + lb_b),
-                       LB_unordered=round(unordered_bound(sc)))
+            row = dict(sim=sim, n=n, **bound_columns(sc))
             for method in ("search", "per-setting"):
                 if method == "per-setting" and n > 32:
                     row[method] = np.nan

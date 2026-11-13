@@ -207,18 +207,20 @@ window), 1.5-1.7x (Rosenthal 316L), 1.3x (drug screen). Scaling to 48x48:
 fewer than a full grid with Bonferroni. Language model: [TBD].
 
 **Fixed confidence** (synthetic window, good side information; the search
-stops on its own and certified the full target in every run):
+stops on its own and certified the full target in 23 of 24 runs; the
+exception hit a probe time-out). Lower bounds from the corrected joint
+program (appendix, Theorem 2):
 
-| grid | search | ordered lower bound | ratio | no ordering |
-|---|---|---|---|---|
-| 8x8 | 14.2k | 3.5k | 4.0 | 21.9k |
-| 16x16 | 50.3k | 13.1k | 3.8 | 100.0k |
-| 32x32 | 165.6k | 32.8k | 5.1 | (optimistic side info: 458k vs 215k) |
-| 48x48 | 334.6k | 40.4k | 8.3 | not run |
+| grid | search | ordered lower bound | ratio | no ordering | unordered bound |
+|---|---|---|---|---|---|
+| 8x8 | 14.2k | 3.4k | 4.2 | 21.9k | 4.5k |
+| 16x16 | 50.3k | 8.8k | 5.7 | 100.0k | 18.7k |
+| 32x32 | 165.6k | 19.4k | 8.5 | 457.7k | 77.0k |
+| 48x48 | 334.6k | 24.8k | 13.5 | not run | 174.4k |
 
-Most of the ratio is the multiple-testing price (ln(16MN/(alpha w)) vs L,
-about 6x at 32x32); the search uses about 1.6 probes per lower-bound point.
-Language model: [TBD].
+Both methods pay a similar multiple-testing price over their own bound
+(per-setting 4.8-5.9x); the search's extra growth is the O(log n) probe
+factor. Language model: [TBD].
 
 **Validity.** Worst case (every setting at the tolerance): 0-2.75%
 false certification across configurations at alpha = 5% (400 runs each);

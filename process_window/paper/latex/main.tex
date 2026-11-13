@@ -250,18 +250,29 @@ positive drift, so no probe stalls.
 % =====================================================================
 \section{Theory}\label{sec:theory}
 
-Let $L = (1-\beta)\ln(1/\alpha)-\ln 2$.
+Let $K_1=\kl(1-\beta,\alpha)$, and for $\pi\in[0,1]$ let
+$f(\pi)=\kl(\pi,1-\beta)$ for $\pi<1-\beta$ (else 0) and
+$g(\pi)=\kl(\pi,\alpha)$ for $\pi>\alpha$ (else 0). Write
+$\KL_m(y)=\KL(p_m(y)\|\eps_m)$ when $p_m(y)<\eps_m$ and 0 otherwise.
 
-\begin{theorem}[lower bounds]\label{thm:lb}
-(a) With the ordering, any $(\alpha,\beta)$-correct procedure uses at least
-$L\cdot\mathrm{LP}(T)$ trials in expectation, where the LP's binding
-constraints are $T$'s riskiest points for each mode (at most
-$\min(n_1,n_2)$ per mode), plus, in the fixed-confidence problem, a
-boundary term over the settings $z$ just outside $T$ of
-$\min\{L/\KL(p(z)\|\eps),\ L_\beta/\KL(p(z)\|q\eps)\}$.
-(b) Without the ordering, every setting must be resolved individually,
-giving a sum over all of $\cX$.
+\begin{theorem}[lower bound]\label{thm:lb}
+Any $(\alpha,\beta)$-correct procedure has $\E[\tau]\ge\mathrm{OPT}$, the
+value of the convex program: minimize $\sum_y n_y$ over $n\ge0$ subject to
+\begin{itemize}
+\item[(i)] for each $m$ and each riskiest point $t$ of $T$ (for $\preceqm$):
+$\sum_{y\preceqm t} n_y\KL_m(y)\ge K_1$;
+\item[(ii)] for each $m$ and each \emph{boundary point} $z$ ($z\notin T$
+only because of mode $m$, and every setting strictly safer than $z$ for $m$
+is in $T$ for $m$): $(A_z,B_z)\in R=\{(A,B):\exists\pi,\ A\ge f(\pi),\
+B\ge g(\pi)\}$, where $A_z=n_z\KL(p_m(z)\|q\eps_m)$ and
+$B_z=\sum_{y\preceqm z}n_y\KL_m(y)$.
+\end{itemize}
+Without the ordering, every setting must be resolved on its own and the
+bound is a sum of per-setting terms over all of $\cX$.
 \end{theorem}
+The binding points of (i) form an antichain (at most $\min(n_1,n_2)$ per
+mode), and so do those of (ii): with the ordering the bound involves
+$O(M\min(n_1,n_2))$ settings, without it all $N$.
 
 \begin{theorem}[oracle upper bound]\label{thm:oracle}
 Running trials only at a cover of $T$ costs at most
@@ -283,11 +294,14 @@ two-sided probe length, and $B$ is the batch size.
 \end{theorem}
 
 \begin{corollary}[edge vs.\ area]
-On an $n\times n$ grid the ordered bounds involve $O(Mn)$ settings and the
+On an $n\times n$ grid the ordered bound involves $O(Mn)$ settings and the
 unordered bound $O(n^2)$; the search is within $O(\log n)$, the ratio
 $C^*/C(p_{\text{boundary}})$, and the multiple-testing factor
-$\ln(16MN/(\alpha w))/L$ of the ordered lower bound.
+$\ln(16MN/(\alpha w))/K_1$ of the ordered lower bound.
 \end{corollary}
+Whether the $\ln N$ in the multiple-testing factor is necessary for a
+family-wise guarantee is open; in unstructured pure exploration such terms
+are necessary in moderate-confidence regimes \citep{simchowitz2017simulator}.
 
 Proofs are in Appendix~\ref{app:theory}.
 
@@ -352,28 +366,32 @@ pay for the whole area; fixed-sequence testing helps them by only
 \begin{table}[t]
 \centering\small
 \caption{Fixed confidence on the synthetic window (good side information;
-median of 4 runs). The search stopped on its own and certified the whole
-target in every run.}
+median of 4 runs). LB: Theorem~\ref{thm:lb}. The target was fully
+certified in 23 of 24 runs (the exception, at $32^2$, hit a probe
+time-out, a heuristic outside Theorem~\ref{thm:search}).}
 \label{tab:fc}
-\begin{tabular}{lrrrr}
+\begin{tabular}{lrrrrr}
 \toprule
-grid & search & ordered LB & ratio & no ordering \\
+ & \multicolumn{3}{c}{with the ordering} & \multicolumn{2}{c}{without} \\
+grid & search & LB & ratio & per-setting & LB \\
 \midrule
-$8^2$  & 14.2k & 3.5k & 4.0 & 21.9k \\
-$16^2$ & 50.3k & 13.1k & 3.8 & 100.0k \\
-$32^2$ & 165.6k & 32.8k & 5.1 & --- \\
-$48^2$ & 334.6k & 40.4k & 8.3 & --- \\
+$8^2$  & 14.2k & 3.4k & 4.2 & 21.9k & 4.5k \\
+$16^2$ & 50.3k & 8.8k & 5.7 & 100.0k & 18.7k \\
+$32^2$ & 165.6k & 19.4k & 8.5 & 457.7k & 77.0k \\
+$48^2$ & 334.6k & 24.8k & 13.5 & --- & 174.4k \\
 \midrule
-LM $12^2$ & \TBD{} & \TBD{} & \TBD{} & \TBD{} \\
+LM $12^2$ & \TBD{} & \TBD{} & \TBD{} & \TBD{} & \TBD{} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\paragraph{Fixed confidence.} Table~\ref{tab:fc}. Most of the ratio to the
-lower bound is the multiple-testing price, $\ln(16MN/(\alpha w))$ against
-$L$ (about 6$\times$ at $32^2$); the search uses about 1.6 probes per
-lower-bound point. With optimistic side information at $32^2$ the search
-needs 215k trials against 458k without the ordering.
+\paragraph{Fixed confidence.} Table~\ref{tab:fc}. The ordered bound grows
+roughly linearly in $n$ and the unordered one quadratically, as
+Theorem~\ref{thm:lb} predicts. Both methods pay a similar multiple-testing
+price over their own bound (per-setting: 4.8--5.9$\times$;
+$\ln(16MN/(\alpha w))/K_1\approx5$ at $32^2$); the search's extra growth
+with $n$ is the $O(\log n)$ probe factor. With optimistic side information
+at $32^2$ the search needs 215k trials against 458k without the ordering.
 
 \paragraph{Validity.} With every setting exactly at the tolerance (the
 worst case), the false-certification rate is 0--2.75\% across
@@ -525,46 +543,59 @@ share trials, which only reduces cost.
 \end{proof}
 
 \subsection{Lower bounds}
-We use the transportation lemma \citep[Lemma~1]{kaufmann2016complexity}
-in the general form of \citet{garivier2019explore}: for instances
-$\nu,\nu'$, a stopping time $\tau$ and $E\in\mathcal F_\tau$,
-$\sum_x\E_\nu[N_x(\tau)]\KL(\nu_x,\nu'_x)\ge\kl(\P_\nu(E),\P_{\nu'}(E))$,
-and $\kl(a,b)\ge a\ln(1/b)-\ln2$. We restrict to instances with independent
-modes (a lower bound on a subclass is a lower bound).
+We use the transportation lemma \citep[Lemma~1]{kaufmann2016complexity}: for
+instances $\nu,\nu'$, a stopping time $\tau$ and $E\in\mathcal F_\tau$,
+$\sum_x\E_\nu[N_x(\tau)]\KL(\nu_x,\nu'_x)\ge\kl(\P_\nu(E),\P_{\nu'}(E))$.
+It needs only $\E_\nu[\tau]<\infty$ (otherwise there is nothing to prove):
+then $\tau<\infty$ $\nu$-a.s., the restriction of $\P_\nu$ to
+$\mathcal F_\tau$ is absolutely continuous with respect to that of
+$\P_{\nu'}$ with density the likelihood ratio at $\tau$, Wald's identity
+gives the left side as the expected log-likelihood ratio, and the
+data-processing inequality gives the right side; $\tau$ may be infinite
+under $\nu'$. If $\P_{\nu'}(E)\le\alpha$ the right side is at least
+$g(\P_\nu(E))$, and if $\P_{\nu'}(E)\ge1-\beta$ it is at least
+$f(\P_\nu(E))$. We restrict to instances with independent modes (a lower
+bound on a subclass is a lower bound), so KL adds over modes, and a trial
+at $y$ counts once in every constraint that involves $y$.
 
 \begin{proof}[Proof of Theorem~\ref{thm:lb}]
-(a) For each $m$ and $z\in T$, let $\nu'$ set
-$p'_m(y)=\max(p_m(y),\eps_m+\eta)$ for all $y\preceqm z$ and leave
-everything else unchanged. $\nu'$ satisfies Assumption~A: raising the
-rates on a riskier-closed set to at least a common value keeps every
-chain monotone. In $\nu'$, $z$ is unsafe, so a valid procedure certifies
-$T$ with probability at most $\alpha$; under $\nu$ it does so with
-probability at least $1-\beta$. Letting $\eta\to0$,
-$\sum_{y\preceqm z,\ p_m(y)<\eps_m}\E[N_y]\KL(p_m(y)\|\eps_m)\ge L$.
-Minimizing the total over these constraints gives $L\cdot\mathrm{LP}(T)$;
-only the $\preceqm$-minimal points of $T$ bind, and an antichain of a
-product order on a grid has at most one point per row and column.
+(i) For $m$ and $t$, let $\nu'$ set $p'_m(y)=\max(p_m(y),\eps_m+\eta)$ for
+$y\preceqm t$ and leave everything else unchanged. $\nu'$ satisfies
+Assumption~A: the riskier cone of $t$ is closed toward risk, and raising a
+monotone function to at least a constant on such a set keeps it monotone
+(check the three cases of a comparable pair). In $\nu'$, $t$ is unsafe, so
+$\P_{\nu'}(T\subseteq C)\le\alpha$, while
+$\P_\nu(\tau<\infty,T\subseteq C)\ge1-\beta$; apply the lemma and let
+$\eta\to0$.
 
-Boundary term: for $z$ just outside $T$ for mode $m$ (every setting safer
-than $z$ for $m$ is in $T$ for $m$, and $z$ is in $T$ for the other modes),
-lower $p_m(z)$ to $q\eps_m-\eta$. This keeps Assumption~A, because every
-setting safer than $z$ has $p_m\le q\eps_m$. In the alternative $z\in T$
-must be certified with probability at least $1-\beta$, so the procedure
-either certifies $z$ in the real instance (cost $\ge L/\KL(p_m(z)\|\eps_m)$,
-infinite if $p_m(z)\ge\eps_m$) or distinguishes the two instances at $z$
-(cost $\ge L_\beta/\KL(p_m(z)\|q\eps_m)$, $L_\beta=(1-\beta)\ln(1/\beta)-\ln2$).
+(ii) Lowering alternative: $p''_m(z)=q\eps_m$, everything else unchanged.
+This keeps Assumption~A because every setting strictly safer than $z$ has
+$p_m\le q\eps_m$ and every riskier one has $p_m\ge p_m(z)>q\eps_m$. In
+$\nu''$, $z\in T$, so $\P_{\nu''}(z\in C)\ge1-\beta$, giving
+$A_z\ge f(\pi)$ with $\pi=\P_\nu(z\in C)$. Raising alternative: as in (i)
+with $t$ replaced by $z$; $z$ is unsafe there, giving $B_z\ge g(\pi)$ for
+the same $\pi$.
 
-(b) Without Assumption~A the alternatives may change a single
-configuration, so every configuration contributes its own term.
+$R$ is convex: its lower-left boundary is $B=g(f^{-1}(A))$ on the range
+of $f$, an increasing convex function composed with a decreasing convex
+one. Replacing $R$ by finitely many supporting half-planes
+$wA+(1-w)B\ge\min_\pi[wf(\pi)+(1-w)g(\pi)]$ gives a linear program with a
+smaller value, which is what we report.
+
+Without the ordering, alternatives may change a single setting $x$, so the
+constraints decouple: for $x\in T$, $n_x\ge K_1/\min_m\KL(p_m(x)\|\eps_m)$;
+for safe $x\notin T$, $n_x\ge\min_\pi\max(f(\pi)/R_x, g(\pi)/C_x)$ with
+$R_x=\sum_{m:p_m(x)>q\eps_m}\KL(p_m(x)\|q\eps_m)$ and
+$C_x=\min_m\KL(p_m(x)\|\eps_m)$; for unsafe $x$,
+$n_x\ge\kl(\alpha,1-\beta)/R_x$.
 \end{proof}
 
 \paragraph{Points to check.} (1) Lemma~\ref{lem:supermart} with batched
 allocation; (2) the closed-testing interpretation of the cone rule;
 (3) that no target configuration is rejected by spreading or exclusion on
-$G$; (4) the exact form of the transportation lemma for procedures that
-may not stop under the alternative; (5) that the alternatives keep
-Assumption~A, and the LP sharing across modes; (6) that the certification
-and boundary terms add; (7) the probe count with spreading from other
-rows.
+$G$; (4) the transportation lemma when $\tau$ may be infinite under the
+alternative; (5) that the alternatives keep Assumption~A, and the sharing
+of trials across modes; (6) convexity of $R$; (7) the probe count with
+spreading from other rows.
 
 \end{document}

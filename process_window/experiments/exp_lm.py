@@ -26,9 +26,9 @@ import numpy as np
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.dirname(__file__))
-from exp_search import PerSetting, boundary_bound, unordered_bound  # noqa: E402
-from final import lower_bounds  # noqa: E402
+from exp_search import PerSetting  # noqa: E402
 from pwcert.baselines import grid_doe, grid_fst  # noqa: E402
+from pwcert.bounds import ordered_lower_bound, unordered_lower_bound  # noqa: E402
 from pwcert.cone import ConeCertifier  # noqa: E402
 from pwcert.gp_baseline import GPLevelSet  # noqa: E402
 from pwcert.lm_scenario import make_lm_scenario  # noqa: E402
@@ -94,9 +94,10 @@ def fixed_budget(reps, budget):
 def fixed_confidence(reps):
     sc = make_lm_scenario(EPS, "pilot")
     n = sc.truth["degenerate"].shape[0]
-    T, lb_a, _, n_edge = lower_bounds(sc, Q)
-    lb_b, n_bd = boundary_bound(sc, Q)
-    row = dict(target_size=int(T.sum()), LB_ordered=round(lb_a + lb_b), LB_unordered=round(unordered_bound(sc, Q)))
+    T = np.all([sc.truth[m] <= Q * sc.eps[m] for m in sc.modes], axis=0)
+    b = ordered_lower_bound(sc, Q)
+    row = dict(target_size=int(T.sum()), LB_target=round(b["lb_target_only"]), LB_ordered=round(b["lb"]),
+               LB_unordered=round(unordered_lower_bound(sc, Q)))
     for name, mk in (("search", lambda r: SearchCertifier(sc, q=Q, batch=2 * n, rng=np.random.default_rng(r))),
                      ("per-setting", lambda r: PerSetting(sc, q=Q, batch=2 * n, rng=np.random.default_rng(r)))):
         cs, comp, uns = [], 0, 0

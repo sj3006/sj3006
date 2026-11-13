@@ -1,6 +1,7 @@
 # Appendix: theory (consolidated)
 
-*Draft for checking. Collects the results of notes 2, 5, 6, 7 and 9 in one
+*Draft for checking (revised 2026-11-13: Theorem 2 is now one joint
+program; the earlier sum of two terms double-counted). Collects the results of notes 2, 5, 6, 7 and 9 in one
 notation. Steps marked **[check]** are the ones a careful reader should
 verify first.*
 
@@ -150,47 +151,87 @@ sum_x E_nu[N_x(tau)] KL(nu_x, nu'_x) >= kl(P_nu(E), P_nu'(E)).
 We use kl(a, b) >= a ln(1/b) - ln 2.
 
 Restrict to instances with independent modes (a lower bound on a subclass
-is a lower bound). L = (1 - beta) ln(1/alpha) - ln 2.
+is a lower bound). Let K_1 = kl(1 - beta, alpha) (2.65 at
+alpha = beta = 0.05; the cruder L = (1 - beta) ln(1/alpha) - ln 2 = 2.15 is
+also valid). For an event E with pi = P_nu(E), write
 
-**Theorem 2a (certification term).** For each m and each z in T, define
-nu' by p'_m(y) = max(p_m(y), eps_m + eta) for all y ⪯_m z, everything else
-unchanged. **[check]** nu' satisfies A (case analysis in note 5, section 3).
-In nu', z is unsafe, so an alpha-valid procedure certifies T with
-probability at most alpha; under nu it does with probability >= 1 - beta.
-Letting eta -> 0:
+    f(pi) = kl(pi, 1 - beta) if pi < 1 - beta, else 0,
+    g(pi) = kl(pi, alpha)    if pi > alpha,    else 0.
 
-    sum over y ⪯_m z with p_m(y) < eps_m of  E[N_y] KL(p_m(y) || eps_m)  >=  L.
+If P_nu'(E) <= alpha the transportation lemma gives at least g(pi); if
+P_nu'(E) >= 1 - beta it gives at least f(pi) (kl(pi, .) is decreasing below
+pi and increasing above it).
 
-Hence E[tau] >= L * LP(T), LP(T) = min sum_y n_y subject to these
-constraints for all (m, z). Only the ⪯_m-minimal points of T bind, and
-there are at most min(n_1, n_2) of them per mode (an antichain of a product
-order on a grid has at most one point per row and per column).
+**Using the lemma when the procedure may not stop.** If E_nu[tau] = inf
+there is nothing to prove. Otherwise tau < inf nu-a.s.; on F_tau the
+restriction of P_nu is absolutely continuous with respect to that of P_nu'
+(arms are mutually absolutely continuous and P_nu(tau = inf) = 0), with
+density the likelihood ratio at tau, whose nu-expectation of the log is
+sum_x E_nu[N_x(tau)] KL(nu_x, nu'_x) by Wald's identity. The data-processing
+inequality for KL applied to the indicator of E gives the lemma. Nothing
+requires tau < inf under nu'. **[check]**
 
-**Theorem 2b (boundary term, fixed confidence).** For each m and each
-configuration z just outside T for m (p_m(z) > q eps_m, every
-configuration safer than z for m is in T for m, and z is in T for the other
-modes), lower p_m(z) to q eps_m - eta. **[check]** This keeps A, because
-every configuration safer than z has p_m <= q eps_m. In the alternative z is
-in T and must be certified with probability >= 1 - beta. So the procedure
-either certifies z (cost >= L / KL(p_m(z) || eps_m), infinite if
-p_m(z) >= eps_m) or distinguishes the instances at z (cost >=
-L_beta / KL(p_m(z) || q eps_m), L_beta = (1 - beta) ln(1/beta) - ln 2). The
-boundary points are distinct from the minimal points of T, so the two terms
-add (up to the sharing allowed by the LP).
+**Theorem 2 (lower bound, fixed confidence).** Any (alpha, beta)-correct
+procedure has E[tau] >= OPT, the value of
+
+    minimize sum_y n_y  over n >= 0, subject to
+    (i)  for each m and each riskiest point t of T (for ⪯_m):
+             sum_{y ⪯_m t, p_m(y) < eps_m} n_y KL(p_m(y) || eps_m) >= K_1;
+    (ii) for each m and each boundary point z (z is outside T only because
+         of mode m, and every setting strictly safer than z for m is in T
+         for m), with
+             A_z = n_z KL(p_m(z) || q eps_m),
+             B_z = sum_{y ⪯_m z, p_m(y) < eps_m} n_y KL(p_m(y) || eps_m):
+         (A_z, B_z) in R = {(A, B) : A >= f(pi), B >= g(pi) for some pi}.
+
+R is convex (its lower-left boundary is B = g(f^{-1}(A)), an increasing
+convex function of a decreasing convex function), so this is a convex
+program; replacing R by finitely many supporting half-planes
+w A + (1 - w) B >= c(w) = min_pi [w f(pi) + (1 - w) g(pi)] gives an LP whose
+value is a valid (slightly smaller) bound. That is what `pwcert/bounds.py`
+computes. If p_m(z) >= eps_m then B_z = 0 and pi <= alpha, so
+A_z >= kl(alpha, 1 - beta).
+
+*Proof.* (i) For each m and t, define nu' by p'_m(y) = max(p_m(y),
+eps_m + eta) for y ⪯_m t, everything else unchanged. **nu' satisfies A**:
+the riskier cone of t is riskier-closed (y1 ⪯ y2 ⪯ t implies y1 ⪯ t), and
+for y1 ⪯ y2: both in the cone, max(p(y2), c) <= max(p(y1), c); y1 in, y2
+out, p'(y2) = p(y2) <= p(y1) <= p'(y1); y2 in forces y1 in. In nu', t is
+unsafe, so P_nu'(T ⊆ C) <= alpha, while P_nu(tau < inf, T ⊆ C) >= 1 - beta;
+apply the lemma with E = {tau < inf, T ⊆ C}, then let eta -> 0.
+(ii) Lowering alternative: set p''_m(z) = q eps_m, everything else
+unchanged. This keeps A, because every setting strictly safer than z has
+p_m <= q eps_m and every riskier one has p_m >= p_m(z) > q eps_m. In nu'',
+z is in T, so P_nu''(z in C) >= 1 - beta: the lemma with E = {z in C} gives
+A_z >= f(pi), pi = P_nu(z in C). Raising alternative: as in (i) with t
+replaced by z; z is unsafe in it, so P(z in C) <= alpha there, and the lemma
+gives B_z >= g(pi) for the same pi. ∎
+
+**Why one joint program.** An earlier version added the value of (i) to a
+separate sum of boundary terms. That double-counts: trials just outside T
+appear in both (i) (if their rate is below eps) and (ii). The joint program
+counts each trial once. On the synthetic window this lowers the bound at
+48x48 from 40.4k to 24.8k.
 
 **Theorem 2c (without the ordering).** If the procedure must be correct on
-all instances, perturbations at a single configuration are allowed, so
-every configuration contributes its own term: certification for x in T,
-the cheaper of certification and rejection otherwise. The bound is a sum
-over all of X.
+all instances, alternatives may change a single configuration, so each
+configuration is resolved on its own and the bound is a sum over X: for
+x in T, K_1 / min_m KL(p_m(x) || eps_m); for x outside T and safe,
+min_pi max(f(pi) / R_x, g(pi) / C_x) with R_x = sum over modes with
+p_m > q eps_m of KL(p_m || q eps_m) and C_x = min_m KL(p_m || eps_m); for x
+unsafe, kl(alpha, 1 - beta) / R_x.
 
 ## A.8 Corollary (edge vs. area)
 
-Theorems 2a/2b involve O(M min(n_1, n_2)) configurations; Theorem 2c
-involves all N. Theorem 4 matches 2a/2b up to: the probe count O(log n)
-(O(1) per row in practice with neighbour warm starts), the ratio
+Theorem 2 involves O(M min(n_1, n_2)) configurations; Theorem 2c involves
+all N. Theorem 4 matches Theorem 2 up to: the probe count O(log n) (O(1)
+per row in practice with neighbour warm starts), the ratio
 C* / C(p_boundary), and the multiple-testing factor
-ln(16 M N / (alpha w)) / L.
+ln(16 M N / (alpha w)) / K_1. The last factor is the price of a
+family-wise guarantee over MN hypotheses with a single-hypothesis lower
+bound; whether a ln N term is necessary here is open (in unstructured
+pure exploration such terms are known to be necessary in moderate
+confidence regimes; Simchowitz, Jamieson & Recht 2017). **[open]**
 
 ## A.9 Checklist for the reader
 
@@ -199,10 +240,11 @@ ln(16 M N / (alpha w)) / L.
    interpretation.
 3. Theorem 6's claim that no target configuration is rejected by spreading
    or exclusion on G.
-4. The transportation lemma version (stopping not guaranteed under the
-   alternative).
-5. Theorem 2a's alternative keeps A (note 5, section 3), and the LP
-   sharing across modes (a trial at y serves all modes).
-6. Theorem 2b's alternative keeps A, and the claim that the two terms add.
+4. The transportation lemma when tau may be infinite under the
+   alternative (argument above).
+5. Both alternatives of Theorem 2 keep A, and the LP sharing across modes
+   (a trial at y serves all modes).
+6. Convexity of R and the supporting half-planes (replaces the earlier,
+   incorrect claim that the certification and boundary terms add).
 7. Theorem 4's probe count with spreading from other rows, and the
    min-of-two-stopping-times bound.

@@ -3,6 +3,16 @@
 Status: **draft proofs, need independent checking.** Prerequisites: notes 5,
 6, 7. Code: `pwcert/search.py`; experiment: `experiments/exp_search.py`.
 
+> **Correction (2026-11-13).** Section 6 below added the certification LP
+> and a separate boundary sum, and used L in the boundary term. Both are
+> wrong: trials just outside the target can count toward both terms, and
+> the disjunction "certify z or tell it apart" only gives the constant
+> min over pi of the two kl's, not L. The corrected bound is one convex
+> program (paper/appendix_theory.md, Theorem 2; code `pwcert/bounds.py`).
+> It is smaller at large grids (48x48: 24.8k instead of 40.4k), so the
+> search's ratio to the bound is 4.2-13.5, not 4-8. Section 7's table is
+> updated; section 6 is kept for the record.
+
 ## 1. Two problems, not one
 
 - **Fixed budget:** given N coupons, certify as much of the window as
@@ -160,19 +170,22 @@ match up to:
 Toy LPBF window, good simulator; the search stops on its own and was
 complete in every run:
 
-| grid | search | lower bound (8a) | ratio | no ordering | lower bound (8b) |
+| grid | search | lower bound (Thm 2) | ratio | no ordering | unordered bound |
 |---|---|---|---|---|---|
-| 8x8 | 14.2k | 3.5k | 4.0 | 21.9k | 4.4k |
-| 12x12 | 27.2k | 6.7k | 4.1 | 46.1k | 9.9k |
-| 16x16 | 50.3k | 13.1k | 3.8 | 100.0k | 19.9k |
-| 24x24 | 101.5k | 20.3k | 5.0 | 238.5k | 40.7k |
-| 32x32 | 165.6k | 32.8k | 5.1 | n/a | 75.8k |
-| 48x48 | 334.6k | 40.4k | 8.3 | n/a | 169.0k |
+| 8x8 | 14.2k | 3.4k | 4.2 | 21.9k | 4.5k |
+| 12x12 | 27.2k | 5.7k | 4.8 | 46.1k | 9.9k |
+| 16x16 | 50.3k | 8.8k | 5.7 | 100.0k | 18.7k |
+| 24x24 | 101.5k | 14.8k | 6.8 | 238.5k | 42.9k |
+| 32x32 | 165.6k | 19.4k | 8.5 | 457.7k | 77.0k |
+| 48x48 | 334.6k | 24.8k | 13.5 | n/a | 174.4k |
 
-The ratio grows slowly (4 -> 8 over a 6x larger grid), consistent with the
-O(log n) factor; the unordered lower bound grows about twice as fast as
-the ordered one, and the per-setting method's cost with it. Optimistic
-simulator, 32x32: search 214.8k vs 458.0k without the ordering.
+(Corrected bounds. Complete in 23 of 24 runs; the exception at 32x32 hit a
+probe time-out, which the experiments leave on.) The ratio grows like the
+product of the two log factors in the upper bound (probes, O(log n); the
+multiple-testing price, O(log MN)); the per-setting method sits 4.8-5.9x
+above its own bound, the same multiple-testing price without the probe
+factor. Optimistic simulator, 32x32: search 214.8k vs 458.0k without the
+ordering.
 
 **Where the remaining gap is.** Starting each row's search at the edge
 found in an adjacent row (`warm_start="both"`, now the default) cuts probes
@@ -181,8 +194,8 @@ optimistic one) but total coupons only slightly (0% and -9%). At 32x32
 the search uses about 142 probes for 88 lower-bound points (1.6x), so the
 search itself is close to tight. Most of the ratio to the lower bound is
 the multiple-testing price per decision: ln(16 M N / (alpha w)) is about
-13.8 nats against L = 2.15 in the single-hypothesis lower bound, a factor
-of about 6. That price is shared by every method that certifies many
+13.8 nats against K_1 = kl(0.95, 0.05) = 2.65 in the single-hypothesis
+lower bound, a factor of about 5. That price is shared by every method that certifies many
 settings with a family-wise guarantee.
 
 ## 8. Open points
