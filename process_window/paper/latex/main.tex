@@ -459,6 +459,24 @@ violations (96--100\%) but rarely mild ones (4--9\%).
 % =====================================================================
 \section{Related work}
 
+\paragraph{Closest work.} Three lines come closest. \emph{Closed testing
+for monotone dose--response designs} \citep{hellmich2005closure} exploits
+the same two-factor order, but with p-values from a fixed design: no
+adaptive allocation, no optional stopping, no cost analysis.
+\emph{Learn-then-Test with fixed-sequence testing}
+\citep{angelopoulos2025ltt} uses monotonicity along one parameter on a
+shared calibration set; on a grid where each setting needs its own trials
+it is a full-grid method (Table~\ref{tab:scaling}). \emph{Structured
+thresholding bandits} \citep{garivier2017dose, cheshire2020shape,
+cheshire2021problem} show that monotonicity changes the sample complexity
+of classifying arms against a threshold, in one dimension and for a single
+constraint, with error measured per arm rather than as a family-wise
+guarantee at any stopping time. We combine the order with e-processes so
+that validity survives adaptive allocation and stopping, and give bounds
+showing the edge-versus-area separation for partial orders with several
+opposing failure modes.
+
+
 \emph{Anytime-valid inference and e-values:} \citet{ville1939,
 shafer2021, ramdas2023savi, vovk2021evalues, wang2022ebh,
 waudbysmith2024betting}. \emph{Multiple testing with structure:} closed
