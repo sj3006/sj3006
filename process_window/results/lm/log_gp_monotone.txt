@@ -6,3 +6,5 @@
 {'beta': 3.0, 'lengthscale': 0.3, 'runs': 20, 'fwer': 0.55, 'correct_frac': np.float64(0.927)}
 {'beta': 4.0, 'lengthscale': 0.1, 'runs': 20, 'fwer': 0.0, 'correct_frac': np.float64(0.017)}
 {'beta': 4.0, 'lengthscale': 0.2, 'runs': 20, 'fwer': 0.05, 'correct_frac': np.float64(0.8)}
+{'beta': 4.0, 'lengthscale': 0.3, 'runs': 20, 'fwer': 0.15, 'correct_frac': np.float64(0.86)}
+-> lm_gp_monotone.csv
