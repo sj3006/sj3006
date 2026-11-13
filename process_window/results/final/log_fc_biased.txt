@@ -1,0 +1,15 @@
+biased 8x8 search       median     14372  complete 4/4  unsafe certified 0  (4s)
+biased 8x8 per-setting  median     22816  complete 4/4  unsafe certified 0  (7s)
+{'sim': 'biased', 'n': 8, 'T_size': 28, 'edge_points': 13, 'boundary_points': 11, 'LB_cert': 987, 'LB_boundary': 2528, 'LB_total': 3515, 'LB_unordered': 4368, 'search': 14372.0, 'search_complete': '4/4', 'search_unsafe': 0, 'per-setting': 22816.0, 'per-setting_complete': '4/4', 'per-setting_unsafe': 0}
+biased 12x12 search       median     30164  complete 4/4  unsafe certified 0  (8s)
+biased 12x12 per-setting  median     47280  complete 4/4  unsafe certified 0  (13s)
+{'sim': 'biased', 'n': 12, 'T_size': 69, 'edge_points': 18, 'boundary_points': 16, 'LB_cert': 2142, 'LB_boundary': 4544, 'LB_total': 6686, 'LB_unordered': 9851, 'search': 30164.0, 'search_complete': '4/4', 'search_unsafe': 0, 'per-setting': 47280.0, 'per-setting_complete': '4/4', 'per-setting_unsafe': 0}
+biased 16x16 search       median     60356  complete 4/4  unsafe certified 0  (18s)
+biased 16x16 per-setting  median    101849  complete 4/4  unsafe certified 0  (28s)
+{'sim': 'biased', 'n': 16, 'T_size': 122, 'edge_points': 24, 'boundary_points': 22, 'LB_cert': 2902, 'LB_boundary': 10241, 'LB_total': 13142, 'LB_unordered': 19872, 'search': 60355.5, 'search_complete': '4/4', 'search_unsafe': 0, 'per-setting': 101849.0, 'per-setting_complete': '4/4', 'per-setting_unsafe': 0}
+biased 24x24 search       median    120738  complete 4/4  unsafe certified 0  (41s)
+biased 24x24 per-setting  median    234944  complete 4/4  unsafe certified 0  (69s)
+{'sim': 'biased', 'n': 24, 'T_size': 287, 'edge_points': 34, 'boundary_points': 32, 'LB_cert': 6158, 'LB_boundary': 14131, 'LB_total': 20290, 'LB_unordered': 40669, 'search': 120738.0, 'search_complete': '4/4', 'search_unsafe': 0, 'per-setting': 234944.0, 'per-setting_complete': '4/4', 'per-setting_unsafe': 0}
+biased 32x32 search       median    214833  complete 4/4  unsafe certified 0  (74s)
+biased 32x32 per-setting  median    458036  complete 4/4  unsafe certified 0  (148s)
+{'sim': 'biased', 'n': 32, 'T_size': 513, 'edge_points': 45, 'boundary_points': 43, 'LB_cert': 8821, 'LB_boundary': 23947, 'LB_total': 32768, 'LB_unordered': 75846, 'search': 214833.0, 'search_complete': '4/4', 'search_unsafe': 0, 'per-setting': 458035.5, 'per-setting_complete': '4/4', 'per-setting_unsafe': 0}

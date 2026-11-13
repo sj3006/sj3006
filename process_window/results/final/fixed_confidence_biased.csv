@@ -1,0 +1,6 @@
+sim,n,T_size,edge_points,boundary_points,LB_cert,LB_boundary,LB_total,LB_unordered,search,search_complete,search_unsafe,per-setting,per-setting_complete,per-setting_unsafe
+biased,8,28,13,11,987,2528,3515,4368,14372.0,4/4,0,22816.0,4/4,0
+biased,12,69,18,16,2142,4544,6686,9851,30164.0,4/4,0,47280.0,4/4,0
+biased,16,122,24,22,2902,10241,13142,19872,60355.5,4/4,0,101849.0,4/4,0
+biased,24,287,34,32,6158,14131,20290,40669,120738.0,4/4,0,234944.0,4/4,0
+biased,32,513,45,43,8821,23947,32768,75846,214833.0,4/4,0,458035.5,4/4,0

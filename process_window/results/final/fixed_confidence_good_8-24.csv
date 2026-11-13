@@ -1,0 +1,5 @@
+sim,n,T_size,edge_points,boundary_points,LB_cert,LB_boundary,LB_total,LB_unordered,search,search_complete,search_unsafe,per-setting,per-setting_complete,per-setting_unsafe
+good,8,28,13,11,987,2528,3515,4368,14196.0,4/4,0,21896.0,4/4,0
+good,12,69,18,16,2142,4544,6686,9851,27248.0,4/4,0,46104.0,4/4,0
+good,16,122,24,22,2902,10241,13142,19872,50318.0,4/4,0,99979.5,4/4,0
+good,24,287,34,32,6158,14131,20290,40669,101472.0,4/4,0,238493.0,4/4,0

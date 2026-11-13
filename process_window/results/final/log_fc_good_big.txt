@@ -1,0 +1,5 @@
+good 32x32 search       median    165638  complete 3/4  unsafe certified 0  (55s)
+good 32x32 per-setting  median    457728  complete 4/4  unsafe certified 0  (136s)
+{'sim': 'good', 'n': 32, 'T_size': 513, 'edge_points': 45, 'boundary_points': 43, 'LB_cert': 8821, 'LB_boundary': 23947, 'LB_total': 32768, 'LB_unordered': 75846, 'search': 165638.0, 'search_complete': '3/4', 'search_unsafe': 0, 'per-setting': 457728.0, 'per-setting_complete': '4/4', 'per-setting_unsafe': 0}
+good 48x48 search       median    334562  complete 4/4  unsafe certified 0  (130s)
+{'sim': 'good', 'n': 48, 'T_size': 1154, 'edge_points': 67, 'boundary_points': 65, 'LB_cert': 12646, 'LB_boundary': 27752, 'LB_total': 40398, 'LB_unordered': 169040, 'search': 334562.0, 'search_complete': '4/4', 'search_unsafe': 0, 'per-setting': nan}
