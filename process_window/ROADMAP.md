@@ -215,3 +215,13 @@ These change the method, so they need your answer before Phase 2:
   below about 2%. Time-outs are covered in Theorem 6. Code-release README
   rewritten. Next: live LM run; a nested 23 x 23 LM grid, to show the gap
   growing with resolution on real generations.
+- 2026-11-13 (evening): References checked against publisher, proceedings
+  or indexing records (volumes, pages, DOIs); BEAM author list found
+  (Fadhel et al., AAAI 2026). Only the volume and pages of Waudby-Smith and
+  Ramdas (JRSS B 2024) are unchecked. New baseline: GP level set with the
+  monotone closure (as in monotone safe exploration). It certifies more of
+  the region than the plain GP, but at confidence parameter 4 still
+  certifies an unsafe setting in 2.5-27.5% of runs where it covers 23-87%,
+  across all four problems; the tuning that works on one problem fails on
+  another. Paper updated. The nested 23 x 23 LM grid is measuring
+  (about 350 of 529 settings); its Table 1 row comes next.
