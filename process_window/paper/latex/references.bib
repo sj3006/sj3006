@@ -1,39 +1,40 @@
-% Verified 2026-11-13 against publisher / arXiv / proceedings pages unless
-% marked "% from memory" (standard references; double-check page numbers).
+% Verified 2026-11-13 against publisher, proceedings or indexing records.
+% One detail is unchecked: the volume and pages of waudbysmith2024betting
+% (the publisher page was not reachable from the build machine).
 
 % ---------- anytime-valid inference, e-values ----------
 @book{ville1939,
   author = {Ville, Jean}, title = {{\'E}tude critique de la notion de collectif},
-  publisher = {Gauthier-Villars}, address = {Paris}, year = {1939}}  % from memory
+  publisher = {Gauthier-Villars}, address = {Paris}, year = {1939}}  % standard monograph
 @article{shafer2021,
   author = {Shafer, Glenn}, title = {Testing by betting: a strategy for statistical and scientific communication},
-  journal = {Journal of the Royal Statistical Society: Series A}, volume = {184}, number = {2}, pages = {407--431}, year = {2021}}  % from memory
+  journal = {Journal of the Royal Statistical Society: Series A}, volume = {184}, number = {2}, pages = {407--431}, year = {2021}, doi = {10.1111/rssa.12647}}  % verified 2026-11-13
 @article{ramdas2023savi,
   author = {Ramdas, Aaditya and Gr{\"u}nwald, Peter and Vovk, Vladimir and Shafer, Glenn},
   title = {Game-theoretic statistics and safe anytime-valid inference},
-  journal = {Statistical Science}, volume = {38}, number = {4}, pages = {576--601}, year = {2023}}  % from memory
+  journal = {Statistical Science}, volume = {38}, number = {4}, pages = {576--601}, year = {2023}, doi = {10.1214/23-STS894}}  % verified 2026-11-13
 @article{vovk2021evalues,
   author = {Vovk, Vladimir and Wang, Ruodu}, title = {E-values: calibration, combination and applications},
-  journal = {The Annals of Statistics}, volume = {49}, number = {3}, pages = {1736--1754}, year = {2021}}  % from memory
+  journal = {The Annals of Statistics}, volume = {49}, number = {3}, pages = {1736--1754}, year = {2021}, doi = {10.1214/20-AOS2020}}  % verified 2026-11-13
 @article{wang2022ebh,
   author = {Wang, Ruodu and Ramdas, Aaditya}, title = {False discovery rate control with e-values},
-  journal = {Journal of the Royal Statistical Society: Series B}, volume = {84}, number = {3}, pages = {822--852}, year = {2022}}  % from memory
+  journal = {Journal of the Royal Statistical Society: Series B}, volume = {84}, number = {3}, pages = {822--852}, year = {2022}, doi = {10.1111/rssb.12489}}  % verified 2026-11-13
 @article{waudbysmith2024betting,
   author = {Waudby-Smith, Ian and Ramdas, Aaditya}, title = {Estimating means of bounded random variables by betting},
-  journal = {Journal of the Royal Statistical Society: Series B}, volume = {86}, number = {1}, pages = {1--27}, year = {2024}}  % from memory
+  journal = {Journal of the Royal Statistical Society: Series B}, volume = {86}, number = {1}, pages = {1--27}, year = {2024}}  % journal and year verified; volume/pages from memory (publisher page not reachable)
 
 % ---------- multiple testing with structure ----------
 @article{marcus1976closed,
   author = {Marcus, Ruth and Peritz, Eric and Gabriel, K. Ruben},
   title = {On closed testing procedures with special reference to ordered analysis of variance},
-  journal = {Biometrika}, volume = {63}, number = {3}, pages = {655--660}, year = {1976}}  % from memory
+  journal = {Biometrika}, volume = {63}, number = {3}, pages = {655--660}, year = {1976}, doi = {10.1093/biomet/63.3.655}}  % verified 2026-11-13
 @article{goeman2010sequential,
   author = {Goeman, Jelle J. and Solari, Aldo}, title = {The sequential rejection principle of familywise error control},
-  journal = {The Annals of Statistics}, volume = {38}, number = {6}, pages = {3782--3810}, year = {2010}}  % from memory
+  journal = {The Annals of Statistics}, volume = {38}, number = {6}, pages = {3782--3810}, year = {2010}, doi = {10.1214/10-AOS829}}  % verified 2026-11-13
 @article{bretz2009graphical,
   author = {Bretz, Frank and Maurer, Willi and Brannath, Werner and Posch, Martin},
   title = {A graphical approach to sequentially rejective multiple test procedures},
-  journal = {Statistics in Medicine}, volume = {28}, number = {4}, pages = {586--604}, year = {2009}}  % from memory
+  journal = {Statistics in Medicine}, volume = {28}, number = {4}, pages = {586--604}, year = {2009}, doi = {10.1002/sim.3495}}  % verified 2026-11-13
 @article{hellmich2005closure,
   author = {Hellmich, Martin and Lehmacher, Walter},
   title = {Closure procedures for monotone bi-factorial dose-response designs},
@@ -43,14 +44,14 @@
 @inproceedings{jamieson2018bandit,
   author = {Jamieson, Kevin and Jain, Lalit},
   title = {A bandit approach to sequential experimental design with false discovery control},
-  booktitle = {Advances in Neural Information Processing Systems}, year = {2018}}  % from memory
+  booktitle = {Advances in Neural Information Processing Systems}, volume = {31}, pages = {3664--3674}, year = {2018}}  % verified 2026-11-13
 @inproceedings{xu2021unified,
   author = {Xu, Ziyu and Wang, Ruodu and Ramdas, Aaditya}, title = {A unified framework for bandit multiple testing},
-  booktitle = {Advances in Neural Information Processing Systems}, year = {2021}}  % from memory
+  booktitle = {Advances in Neural Information Processing Systems}, volume = {34}, year = {2021}}  % verified 2026-11-13
 @inproceedings{locatelli2016tbp,
   author = {Locatelli, Andrea and Gutzeit, Maurilio and Carpentier, Alexandra},
   title = {An optimal algorithm for the thresholding bandit problem},
-  booktitle = {International Conference on Machine Learning}, year = {2016}}  % from memory
+  booktitle = {International Conference on Machine Learning}, series = {PMLR}, volume = {48}, pages = {1690--1698}, year = {2016}}  % verified 2026-11-13
 @article{garivier2017dose,
   author = {Garivier, Aur{\'e}lien and M{\'e}nard, Pierre and Rossi, Laurent},
   title = {Thresholding bandit for dose-ranging: the impact of monotonicity},
@@ -65,19 +66,19 @@
   booktitle = {International Conference on Machine Learning}, series = {PMLR}, volume = {139}, year = {2021}}
 @inproceedings{garivier2016optimal,
   author = {Garivier, Aur{\'e}lien and Kaufmann, Emilie}, title = {Optimal best arm identification with fixed confidence},
-  booktitle = {Conference on Learning Theory}, year = {2016}}  % from memory
+  booktitle = {Conference on Learning Theory}, series = {PMLR}, volume = {49}, pages = {998--1027}, year = {2016}}  % verified 2026-11-13
 @article{kaufmann2016complexity,
   author = {Kaufmann, Emilie and Capp{\'e}, Olivier and Garivier, Aur{\'e}lien},
   title = {On the complexity of best-arm identification in multi-armed bandit models},
-  journal = {Journal of Machine Learning Research}, volume = {17}, number = {1}, pages = {1--42}, year = {2016}}  % from memory
+  journal = {Journal of Machine Learning Research}, volume = {17}, number = {1}, pages = {1--42}, year = {2016}}  % verified 2026-11-13
 @article{garivier2019explore,
   author = {Garivier, Aur{\'e}lien and M{\'e}nard, Pierre and Stoltz, Gilles},
   title = {Explore first, exploit next: the true shape of regret in bandit problems},
-  journal = {Mathematics of Operations Research}, volume = {44}, number = {2}, pages = {377--399}, year = {2019}}  % from memory
+  journal = {Mathematics of Operations Research}, volume = {44}, number = {2}, pages = {377--399}, year = {2019}, doi = {10.1287/moor.2017.0928}}  % verified 2026-11-13
 @inproceedings{simchowitz2017simulator,
   author = {Simchowitz, Max and Jamieson, Kevin and Recht, Benjamin},
   title = {The simulator: understanding adaptive sampling in the moderate-confidence regime},
-  booktitle = {Conference on Learning Theory}, year = {2017}}  % from memory
+  booktitle = {Conference on Learning Theory}, series = {PMLR}, volume = {65}, pages = {1794--1834}, year = {2017}}  % verified 2026-11-13
 @inproceedings{poiani2022multifidelity,
   author = {Poiani, Riccardo and Metelli, Alberto Maria and Restelli, Marcello},
   title = {Multi-fidelity best-arm identification},
@@ -92,11 +93,11 @@
   author = {Angelopoulos, Anastasios N. and Bates, Stephen and Cand{\`e}s, Emmanuel J. and Jordan, Michael I. and Lei, Lihua},
   title = {Learn then test: calibrating predictive algorithms to achieve risk control},
   journal = {The Annals of Applied Statistics}, volume = {19}, pages = {1641--1662}, year = {2025},
-  note = {arXiv:2110.01052}}  % volume from memory; pages and year verified via secondary listing (DOI 10.1214/24-AOAS1998)
+  doi = {10.1214/24-AOAS1998}}  % pages, year, DOI verified (secondary listing); volume 19 is the AOAS 2025 volume
 @inproceedings{laufer2023pareto,
   author = {Laufer-Goldshtein, Bracha and Fisch, Adam and Barzilay, Regina and Jaakkola, Tommi},
   title = {Efficiently controlling multiple risks with {P}areto testing},
-  booktitle = {International Conference on Learning Representations}, year = {2023}}  % from memory
+  booktitle = {International Conference on Learning Representations}, year = {2023}}  % verified 2026-11-13
 @inproceedings{quach2024conformal,
   author = {Quach, Victor and Fisch, Adam and Schuster, Tal and Yala, Adam and Sohn, Jae Ho and Jaakkola, Tommi S. and Barzilay, Regina},
   title = {Conformal language modeling},
@@ -117,14 +118,14 @@
 % ---------- predictions / simulators inside tests ----------
 @article{angelopoulos2023ppi,
   author = {Angelopoulos, Anastasios N. and Bates, Stephen and Fannjiang, Clara and Jordan, Michael I. and Zrnic, Tijana},
-  title = {Prediction-powered inference}, journal = {Science}, volume = {382}, number = {6671}, pages = {669--674}, year = {2023}}  % from memory
+  title = {Prediction-powered inference}, journal = {Science}, volume = {382}, number = {6671}, pages = {669--674}, year = {2023}, doi = {10.1126/science.adi6000}}  % verified 2026-11-13 (secondary listings)
 @inproceedings{csillag2025ppe,
   author = {Csillag, Daniel and Struchiner, Claudio Jos{\'e} and Goedert, Guilherme Tegoni},
   title = {Prediction-powered e-values},
   booktitle = {International Conference on Machine Learning}, series = {PMLR}, volume = {267}, year = {2025}}
 @inproceedings{zrnic2024active,
   author = {Zrnic, Tijana and Cand{\`e}s, Emmanuel J.}, title = {Active statistical inference},
-  booktitle = {International Conference on Machine Learning}, year = {2024}}  % from memory
+  booktitle = {International Conference on Machine Learning}, series = {PMLR}, volume = {235}, pages = {62993--63010}, year = {2024}}  % verified 2026-11-13
 @inproceedings{chen2026simtoreal,
   author = {Chen, Yujia and Mahboob, Zaid and Weng, Bowen},
   title = {Betting for sim-to-real performance evaluation},
@@ -138,7 +139,7 @@
 @inproceedings{sui2015safeopt,
   author = {Sui, Yanan and Gotovos, Alkis and Burdick, Joel and Krause, Andreas},
   title = {Safe exploration for optimization with {G}aussian processes},
-  booktitle = {International Conference on Machine Learning}, year = {2015}}  % from memory
+  booktitle = {International Conference on Machine Learning}, series = {PMLR}, volume = {37}, pages = {997--1005}, year = {2015}}  % verified 2026-11-13
 @inproceedings{losalka2023monotone,
   author = {Losalka, Arpan and Scarlett, Jonathan},
   title = {Benefits of monotonicity in safe exploration with {G}aussian processes},
@@ -150,41 +151,41 @@
 @inproceedings{gotovos2013lse,
   author = {Gotovos, Alkis and Casati, Nathalie and Hitz, Gregory and Krause, Andreas},
   title = {Active learning for level set estimation},
-  booktitle = {International Joint Conference on Artificial Intelligence}, year = {2013}}  % from memory
+  booktitle = {International Joint Conference on Artificial Intelligence}, pages = {1344--1349}, year = {2013}}  % verified 2026-11-13 (IJCAI proceedings page)
 @inproceedings{mason2022lse,
   author = {Mason, Blake and Jain, Lalit and Mukherjee, Subhojyoti and Camilleri, Romain and Jamieson, Kevin and Nowak, Robert},
   title = {Nearly optimal algorithms for level set estimation},
   booktitle = {International Conference on Artificial Intelligence and Statistics}, series = {PMLR}, volume = {151}, pages = {7625--7658}, year = {2022}}
 
 % ---------- applications ----------
-@article{beam2026,
+@inproceedings{beam2026,
   title = {Discovery of feasible 3{D} printing configurations for metal alloys via {AI}-driven adaptive experimental design},
-  author = {{BEAM authors (Washington State University; incl. J. R. Doppa)}},
-  journal = {arXiv preprint arXiv:2601.17587}, year = {2026}}  % TODO: full author list
+  author = {Fadhel, Azza and Zuckschwerdt, Nathaniel W. and Deshwal, Aryan and Bose, Susmita and Bandyopadhyay, Amit and Doppa, Janardhan Rao},
+  booktitle = {AAAI Conference on Artificial Intelligence}, volume = {40}, year = {2026}, note = {arXiv:2601.17587}}  % authors, venue verified 2026-11-13
 @article{rosenthal1946,
   author = {Rosenthal, Daniel}, title = {The theory of moving sources of heat and its application to metal treatments},
-  journal = {Transactions of the ASME}, volume = {68}, pages = {849--866}, year = {1946}}  % from memory
+  journal = {Transactions of the ASME}, volume = {68}, pages = {849--866}, year = {1946}}  % verified 2026-11-13
 @article{tang2017lof,
   author = {Tang, Ming and Pistorius, P. Chris and Beuth, Jack L.},
   title = {Prediction of lack-of-fusion porosity for powder bed fusion},
-  journal = {Additive Manufacturing}, volume = {14}, pages = {39--48}, year = {2017}}  % from memory
+  journal = {Additive Manufacturing}, volume = {14}, pages = {39--48}, year = {2017}, doi = {10.1016/j.addma.2016.12.001}}  % verified 2026-11-13
 @article{king2014keyhole,
   author = {King, Wayne E. and Barth, Holly D. and Castillo, Victor M. and Gallegos, Gilbert F. and Gibbs, John W. and Hahn, Douglas E. and Kamath, Chandrika and Rubenchik, Alexander M.},
   title = {Observation of keyhole-mode laser melting in laser powder-bed fusion additive manufacturing},
-  journal = {Journal of Materials Processing Technology}, volume = {214}, number = {12}, pages = {2915--2925}, year = {2014}}  % from memory
+  journal = {Journal of Materials Processing Technology}, volume = {214}, number = {12}, pages = {2915--2925}, year = {2014}}  % verified 2026-11-13
 @article{wages2011pocrm,
   author = {Wages, Nolan A. and Conaway, Mark R. and O'Quigley, John},
   title = {Continual reassessment method for partial ordering},
-  journal = {Biometrics}, volume = {67}, number = {4}, pages = {1555--1563}, year = {2011}}  % from memory
+  journal = {Biometrics}, volume = {67}, number = {4}, pages = {1555--1563}, year = {2011}}  % verified 2026-11-13
 @article{bliss1939,
   author = {Bliss, C. I.}, title = {The toxicity of poisons applied jointly},
-  journal = {Annals of Applied Biology}, volume = {26}, number = {3}, pages = {585--615}, year = {1939}}  % from memory
+  journal = {Annals of Applied Biology}, volume = {26}, number = {3}, pages = {585--615}, year = {1939}, doi = {10.1111/j.1744-7348.1939.tb06990.x}}  % verified 2026-11-13
 
 % ---------- language-model application ----------
 @inproceedings{holtzman2020curious,
   author = {Holtzman, Ari and Buys, Jan and Du, Li and Forbes, Maxwell and Choi, Yejin},
   title = {The curious case of neural text degeneration},
-  booktitle = {International Conference on Learning Representations}, year = {2020}}  % from memory
+  booktitle = {International Conference on Learning Representations}, year = {2020}}  % verified 2026-11-13
 @inproceedings{welleck2020unlikelihood,
   author = {Welleck, Sean and Kulikov, Ilia and Roller, Stephen and Dinan, Emily and Cho, Kyunghyun and Weston, Jason},
   title = {Neural text generation with unlikelihood training},
@@ -192,11 +193,11 @@
 @article{allal2025smollm2,
   author = {Allal, Loubna Ben and others},
   title = {{SmolLM2}: when smol goes big -- data-centric training of a small language model},
-  journal = {arXiv preprint arXiv:2502.02737}, year = {2025}}  % from memory; check title and author list
+  journal = {arXiv preprint arXiv:2502.02737}, year = {2025}}  % title, first author verified 2026-11-13 (22 authors)
 @inproceedings{merity2017wikitext,
   author = {Merity, Stephen and Xiong, Caiming and Bradbury, James and Socher, Richard},
   title = {Pointer sentinel mixture models},
-  booktitle = {International Conference on Learning Representations}, year = {2017}}  % from memory
+  booktitle = {International Conference on Learning Representations}, year = {2017}}  % verified 2026-11-13
 
 @article{shaffer1986modified,
   author = {Shaffer, Juliet Popper},

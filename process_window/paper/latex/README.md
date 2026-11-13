@@ -14,6 +14,8 @@ draft falls back to a two-column layout with ICML-like margins.
 Page budget: ICML allows 8 pages of main text. The main text currently ends
 on page 6; references and the proofs appendix follow.
 
-Open items in `references.bib`: one entry (`beam2026`, arXiv 2601.17587)
-still needs its author list checked. Entries marked "from memory" are
-standard references not yet checked against the publisher's record.
+References: every entry in `references.bib` was checked on 2026-11-13
+against the publisher, proceedings or an indexing record (volume, pages, DOI
+where one exists). One detail is open: the volume and pages of
+`waudbysmith2024betting` (JRSS B 2024), because the publisher page could not
+be reached from the build machine.
