@@ -40,7 +40,7 @@ REJECT_FRACTIONS = np.array([0.025, 0.05, 0.1, 0.2, 0.4])   # bets as fractions 
 
 
 class SearchCertifier(ConeCertifier):
-    def __init__(self, scenario, q=0.5, beta=0.05, per_probe=8, warm_start=True,
+    def __init__(self, scenario, q=0.5, beta=0.05, per_probe=8, warm_start="both",
                  concurrent_rows=2, timeout=2.0, **kw):
         kw.setdefault("alloc", "edge")       # parent's allocation is not used
         kw.setdefault("target_q", q)
@@ -127,14 +127,34 @@ class SearchCertifier(ConeCertifier):
                 self.timed_out[m, x] = True
                 self.rejected[m, x] = True          # for the search: move safer
 
+    def _neighbor_edge(self, m, j):
+        """Position (row index along axis 0) of the edge found in an adjacent,
+        already-searched row for mode m, or None."""
+        for jj in (j - 1, j + 1):
+            if 0 <= jj < self.nV and (m, jj) in self.state:
+                row = list(self._row(m, jj))
+                cert = [k for k, x in enumerate(row) if self.certified[m, x]]
+                if cert:
+                    return row[max(cert)] // self.nV      # power index of riskiest certified
+        return None
+
     def _first_probe(self, m, row, und):
-        if self.warm_start and self._sim_informative:
+        if self.warm_start in ("neighbor", "both"):
+            j = row[0] % self.nV
+            e = self._neighbor_edge(m, j)
+            if e is not None:
+                # undecided setting in this row closest in power to the neighbour's edge
+                return min(und, key=lambda x: abs(x // self.nV - e))
+        if self.warm_start in (True, "sim", "both") and self._sim_informative:
             g = self._sim[m, row]
             ok = [x for x, gx in zip(row, g) if gx <= self.q * self.eps[m, x] and x in und]
             if ok:
                 return ok[-1]                   # riskiest predicted-in-target setting
             return und[0]
         return und[len(und) // 2]
+    # warm_start: True / "sim" (simulator's predicted edge), "neighbor" (edge
+    # found in an adjacent row), "both" (neighbour if available, else
+    # simulator), False (middle of the row).
 
     def choose_plate(self):
         excluded = self.rejected.any(axis=0)
