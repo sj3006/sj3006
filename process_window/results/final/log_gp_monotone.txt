@@ -1,0 +1,1 @@
+{'scen': 'toy-good', 'n': 16, 'method': 'GP level set + monotone', 'beta': 2.0, 'lengthscale': 0.1, 'runs': 40, 'fwer': 1.0, 'correct_area_frac': np.float64(0.99)} (150s)
