@@ -464,7 +464,13 @@ On the language model, to certify 70\% of the safe region, ours needs
 4.8k generations (pilot included) against 12.7k without the ordering,
 20.4k for full-grid fixed-sequence testing and 39.5k for full-grid
 Bonferroni. Without the pilot it needs 5.3k, so on this small grid the
-ordering, not the side information, does most of the work.
+ordering, not the side information, does most of the work. The LM gains
+do not depend on the failure definitions: re-scoring the same generations
+with repetition thresholds 0.15--0.3, NLL thresholds 3.0--4.0 nats and
+tolerances 5--20\% (seven settings, 5 runs each) gives 1.6--2.2$\times$
+fewer generations than no ordering and 2.2--4.1$\times$ fewer than
+full-grid fixed-sequence testing to certify half of the safe region, with
+no unsafe setting certified in any of the 70 runs.
 
 \begin{table}[t]
 \centering\small

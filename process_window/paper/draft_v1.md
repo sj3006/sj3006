@@ -215,7 +215,12 @@ fewer than a full grid with Bonferroni. Language model (12x12, 8 runs,
 pilot counted): to certify 50% of the safe region, ours 3.8k generations,
 no ordering 8.0k, full grid with fixed-sequence testing 11.7k, full grid
 with Bonferroni 18.6k; at 70%, 4.8k / 12.7k / 20.4k / 39.5k. Without the
-pilot ours needs 4.0k (50%) and 5.3k (70%).
+pilot ours needs 4.0k (50%) and 5.3k (70%). Re-scoring the same
+generations with other failure definitions (repetition threshold
+0.15-0.3, NLL threshold 3.0-4.0, tolerance 5-20%; seven settings, 5 runs
+each): 1.6-2.2x fewer than no ordering, 2.2-4.1x fewer than full-grid
+fixed-sequence testing, no false certificate in 70 runs
+(results/lm/lm_sensitivity.csv).
 
 **Fixed confidence** (synthetic window, good side information; the search
 stops on its own and certified the full target in 23 of 24 runs; the
