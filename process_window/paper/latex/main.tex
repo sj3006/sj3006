@@ -82,8 +82,9 @@ manufacturing process windows and a drug-combination screen it needs
 1.3--9$\times$ fewer trials than adaptive testing without the ordering
 and, on $48\times48$ grids, 19--26$\times$ fewer than a full grid with
 fixed-sequence testing, with no unsafe setting certified in any run,
-while a Gaussian-process level-set baseline certifies unsafe settings in
-7.5--100\% of runs unless it certifies almost nothing.
+while Gaussian-process level-set baselines, with or without the ordering,
+certify unsafe settings in 2.5--27.5\% of runs even at their most cautious
+setting, whenever they certify a fifth of the region or more.
 \end{abstract}
 
 % =====================================================================
@@ -415,8 +416,11 @@ grid, Bonferroni}: equal trials everywhere, exact binomial bounds at level
 $\alpha/(MN)$. \emph{Full grid, fixed sequence}: equal trials everywhere,
 fixed-sequence testing along each row from the safest end at level
 $\alpha/(M n)$, certificates spread to safer settings; this is how
-Learn-then-Test uses a monotone risk. \emph{GP level set}: a GP classifier
-surrogate with a confidence-bound certificate.
+Learn-then-Test uses a monotone risk. \emph{GP level set}: GP regression
+on the observed failure rates, certifying where the upper confidence bound
+is below the tolerance, without and with the ordering (a certificate
+spreads to safer settings, as in monotone safe exploration
+\citep{losalka2023monotone}).
 
 \begin{table}[t]
 \centering\small
@@ -527,8 +531,14 @@ unsafe setting in 40--100\% of runs at confidence parameter 2 and still
 under 25\% of the region; ours: 0\% and 54--84\%. On the language
 model (20k generations, 20 runs) the GP certifies an unsafe setting in
 95--100\% of runs at confidence parameter 2 and 15--60\% at 3; at 4 it is
-at 0--10\% but certifies 0--78\% of the region. Ours, at 40k: 0 of 8
-runs, 95\% of the region.
+at 0--10\% but certifies 0--78\% of the region. Ours at the same budget:
+90\% of the region, no unsafe setting in 8 runs. \emph{With the ordering}
+the GP certifies more but is no more reliable: at confidence parameter 4
+(lengthscales 0.2 and 0.3, all four problems) it certifies 23--87\% of the
+region and an unsafe setting in 2.5--27.5\% of runs. The tuning that
+works on one problem fails on another (lengthscale 0.2: 5\% on the
+language model, 27.5\% on the synthetic grid), and nothing in the data
+says which tuning to trust.
 
 \paragraph{Ablations.} The ordering and the allocation rule matter most
 (no ordering +69 to +213\%; greedy allocation +63 to +94\%); weights,

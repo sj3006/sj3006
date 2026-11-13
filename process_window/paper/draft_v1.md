@@ -33,8 +33,9 @@ full-grid Learn-then-Test, pilot study included. Across this, additive-
 manufacturing process windows and a two-drug combination screen it needs
 1.3-9x fewer trials than adaptive testing without the ordering and, on
 48x48 grids, 19-26x fewer than a full grid with fixed-sequence testing,
-with no unsafe setting certified in any run, while a Gaussian-process level-set baseline certifies unsafe
-settings in 7.5-100% of runs unless it certifies almost nothing.
+with no unsafe setting certified in any run, while Gaussian-process level-set baselines, with or without
+the ordering, certify unsafe settings in 2.5-27.5% of runs even at their most cautious setting, whenever
+they certify a fifth of the region or more.
 
 ## 1. Introduction
 
@@ -250,7 +251,12 @@ where it certifies at most 69% (drug screen) and typically under 25% of
 the region; ours: 0% and 54-84%. Language model (20k generations, 20
 runs): GP certifies an unsafe setting in 95-100% of runs at beta = 2,
 15-60% at 3, 0-10% at 4 (then certifying 0-78% of the region); ours at
-40k: 0 of 8 runs, 95% of the region.
+the same budget: 90% of the region, no unsafe setting in 8 runs. With the
+ordering added (certificates spread to safer settings, as in monotone safe
+exploration), the GP at beta = 4 (lengthscales 0.2, 0.3, all four
+problems) certifies 23-87% of the region and an unsafe setting in
+2.5-27.5% of runs; the tuning that works on one problem fails on another
+(lengthscale 0.2: 5% on the LM, 27.5% on the synthetic grid).
 
 **Ablations.** The ordering and the allocation rule matter most (no
 ordering +69 to +213%; greedy allocation +63 to +94%); weights, pooling and
