@@ -147,8 +147,8 @@ class ConeCertifier:
                  smooth=False, oracle=False, optimism=1.0, coupons0=0, rng=None):
         if rule not in ("cone", "max", "none"):
             raise ValueError("rule must be 'cone', 'max' or 'none'")
-        if alloc not in ("edge", "frontier"):
-            raise ValueError("alloc must be 'edge' or 'frontier'")
+        if alloc not in ("edge", "frontier", "uniform"):
+            raise ValueError("alloc must be 'edge', 'frontier' or 'uniform'")
         self.sc, self.alpha, self.rule, self.alloc = scenario, alpha, rule, alloc
         self.batch, self.target_q, self.futility_n = batch, target_q, futility_n
         self.smooth, self.oracle = smooth, oracle
@@ -185,6 +185,7 @@ class ConeCertifier:
         self.coupons = coupons0
         self.history = []
         self.log_thresh = -np.log(alpha)
+        self._rr = 0          # round-robin pointer for alloc="uniform"
 
     # -- testing --------------------------------------------------------------
 
@@ -243,6 +244,11 @@ class ConeCertifier:
         return np.clip(p_hat - self.optimism * se, 1e-6, 1.0)
 
     def choose_plate(self):
+        if self.alloc == "uniform":
+            # Non-adaptive: every setting in turn (a full grid built over time).
+            plate = [(self._rr + i) % self.N for i in range(self.batch)]
+            self._rr = (self._rr + self.batch) % self.N
+            return plate
         p_hat = self._estimates()
         if self.alloc == "frontier":
             return self._frontier_plate(self._optimistic(p_hat))

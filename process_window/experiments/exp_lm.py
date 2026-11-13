@@ -5,9 +5,10 @@ Uses the measured failure-rate surface (pwcert/lm_scenario.py). Three parts:
 1. fixed budget: certified fraction of the true safe region vs generations,
    for ours (cone rule + edge allocation, pilot-study simulator, pilot cost
    counted), ours without a simulator, the same tests without the ordering,
-   and a full-grid evaluation with exact binomial bounds and Bonferroni
-   (the non-adaptive, Learn-then-Test-style approach: every setting gets
-   the same number of generations);
+   a full-grid evaluation with exact binomial bounds and Bonferroni,
+   and a full grid with fixed-sequence testing along each row (the
+   Learn-then-Test approach for monotone risks); both are non-adaptive:
+   every setting gets the same number of generations;
 2. fixed confidence: SearchCertifier vs a per-setting two-sided test, with
    lower bounds;
 3. the GP level-set baseline's error rate on this surface.
@@ -27,7 +28,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.dirname(__file__))
 from exp_search import PerSetting, boundary_bound, unordered_bound  # noqa: E402
 from final import lower_bounds  # noqa: E402
-from pwcert.baselines import grid_doe  # noqa: E402
+from pwcert.baselines import grid_doe, grid_fst  # noqa: E402
 from pwcert.cone import ConeCertifier  # noqa: E402
 from pwcert.gp_baseline import GPLevelSet  # noqa: E402
 from pwcert.lm_scenario import make_lm_scenario  # noqa: E402
@@ -83,10 +84,10 @@ def fixed_budget(reps, budget):
               f"  ({time.time() - t0:.0f}s)", flush=True)
     for cp in checkpoints:
         n_per = cp / W.size
-        a = np.mean([grid_doe(pilot, int(n_per), 0.05, rng=np.random.default_rng(s))[0].sum()
-                     for s in range(5)]) / W.sum() if n_per >= 1 else 0.0
-        rows.append(dict(method="full grid (Bonferroni)", generations=int(cp), frac=round(a, 4),
-                         runs_with_errors=0))
+        for name, fn in (("full grid (Bonferroni)", grid_doe), ("full grid (fixed sequence)", grid_fst)):
+            a = np.mean([fn(pilot, int(n_per), 0.05, rng=np.random.default_rng(s))[0].sum()
+                         for s in range(5)]) / W.sum() if n_per >= 1 else 0.0
+            rows.append(dict(method=name, generations=int(cp), frac=round(a, 4), runs_with_errors=0))
     write(rows, "lm_fixed_budget.csv")
 
 

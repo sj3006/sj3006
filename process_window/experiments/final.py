@@ -31,7 +31,7 @@ import time
 import numpy as np
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from pwcert.baselines import grid_doe  # noqa: E402
+from pwcert.baselines import grid_doe, grid_fst  # noqa: E402
 from pwcert.cone import ConeCertifier, cone_sum  # noqa: E402
 from pwcert.dose import make_dose_scenario  # noqa: E402
 from pwcert.physics import make_physics_scenario  # noqa: E402
@@ -94,6 +94,20 @@ def doe_area(sc, n_per, reps, seed=0):
                           for r in range(reps)]))
 
 
+def fst_area(sc, n_per, reps, seed=0):
+    return float(np.mean([grid_fst(sc, int(n_per), ALPHA, rng=np.random.default_rng(seed + r))[0].sum()
+                          for r in range(reps)]))
+
+
+def grid_cost(area_fn, sc, n, target, reps=3):
+    """Smallest full-grid budget (trials per setting x settings) whose mean
+    certified area reaches `target`, searched on a geometric grid."""
+    for n_per in np.unique(np.geomspace(20, 5000, 60).astype(int)):
+        if area_fn(sc, n_per, reps) >= target:
+            return float(n_per * n * n)
+    return np.inf
+
+
 # -- 1. validity ----------------------------------------------------------------
 
 def cmd_validity(args):
@@ -154,9 +168,10 @@ def cmd_curves(args):
     A = sc.true_window().sum()
     for cp in checkpoints:
         n_per = cp / (n * n)
-        a = doe_area(sc, n_per, 5) / A if n_per >= 1 else 0.0
-        rows.append(dict(scen=scen, n=n, method="grid DoE", coupons=int(cp), frac=round(a, 4),
-                         se=0.0, runs_with_errors=0, reps=5))
+        for name, fn in (("grid DoE", doe_area), ("grid FST", fst_area)):
+            a = fn(sc, n_per, 5) / A if n_per >= 1 else 0.0
+            rows.append(dict(scen=scen, n=n, method=name, coupons=int(cp), frac=round(a, 4),
+                             se=0.0, runs_with_errors=0, reps=5))
     write(rows, f"curves_{scen}_{n}.csv")
 
 
@@ -178,15 +193,27 @@ def cmd_scaling(args):
             rows.append(dict(scen=args.scen, n=n, method=method, frac=args.frac,
                              median=float(np.median(costs)), costs=";".join(f"{x:.0f}" for x in costs)))
             print(rows[-1], f"({time.time() - t0:.0f}s)", flush=True)
-        cost = np.inf
-        for n_per in np.unique(np.geomspace(20, 5000, 60).astype(int)):
-            if doe_area(sc, n_per, 3) >= target:
-                cost = n_per * n * n
-                break
-        rows.append(dict(scen=args.scen, n=n, method="grid DoE", frac=args.frac, median=float(cost),
-                         costs=f"{cost:.0f}"))
-        print(rows[-1], flush=True)
+        for name, fn in (("grid DoE", doe_area), ("grid FST", fst_area)):
+            cost = grid_cost(fn, sc, n, target)
+            rows.append(dict(scen=args.scen, n=n, method=name, frac=args.frac, median=cost,
+                             costs=f"{cost:.0f}"))
+            print(rows[-1], flush=True)
         write(rows, f"scaling_{args.scen}.csv")
+
+
+def cmd_gridfst(args):
+    """Add the fixed-sequence (Learn-then-Test style) full-grid baseline to
+    existing scaling results without rerunning the adaptive methods."""
+    rows = []
+    for scen in args.scens.split(","):
+        for n in [int(s) for s in args.sizes.split(",")]:
+            sc = SCENARIOS[scen](n)
+            target = int(np.ceil(args.frac * sc.true_window().sum()))
+            for name, fn in (("grid DoE", doe_area), ("grid FST", fst_area)):
+                rows.append(dict(scen=scen, n=n, method=name, frac=args.frac,
+                                 median=grid_cost(fn, sc, n, target)))
+                print(rows[-1], flush=True)
+    write(rows, "scaling_grid_baselines.csv")
 
 
 # -- 4. bounds next to practice -----------------------------------------------------
@@ -442,7 +469,8 @@ def cmd_plot(args):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["validity", "curves", "scaling", "bounds", "ablation", "gp", "plot"])
+    ap.add_argument("cmd", choices=["validity", "curves", "scaling", "bounds", "ablation", "gp", "plot",
+                                        "gridfst"])
     ap.add_argument("--scen", default="toy-good", choices=list(SCENARIOS))
     ap.add_argument("--n", type=int, default=24)
     ap.add_argument("--reps", type=int, default=5)
@@ -450,6 +478,7 @@ def main():
     ap.add_argument("--sizes", default="8,12,16,24,32,48")
     ap.add_argument("--frac", type=float, default=0.5)
     ap.add_argument("--alloc", default="frontier", choices=["frontier", "edge"])
+    ap.add_argument("--scens", default="toy-good,rosenthal")
     args = ap.parse_args()
     globals()["cmd_" + args.cmd](args)
 

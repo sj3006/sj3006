@@ -85,3 +85,32 @@ def test_pilot_simulator_is_monotone_and_counted():
 def test_grid_doe_handles_two_modes():
     w, c, e = grid_doe(make_dose_scenario(6, 6), 100, rng=np.random.default_rng(0))
     assert w.shape == (6, 6) and c == 3600
+
+
+def test_grid_fst_is_valid_and_uses_the_ordering():
+    from pwcert.baselines import grid_fst
+    sc = make_scenario(10, 10, simulator="good")
+    w_fst = w_bon = 0
+    for r in range(5):
+        w, c, e = grid_fst(sc, 200, rng=np.random.default_rng(r))
+        assert e == 0 and c == 200 * 100
+        w_fst += w.sum()
+        w_bon += grid_doe(sc, 200, rng=np.random.default_rng(r))[0].sum()
+    assert w_fst >= w_bon
+
+
+def test_grid_fst_worst_case_null():
+    from pwcert.baselines import grid_fst
+    base = make_scenario(6, 6)
+    truth = {m: np.full((6, 6), 0.05) for m in MODES}
+    sc = Scenario(base.power, base.speed, base.eps, truth, base.sim, directions=base.directions)
+    errors = sum(int(grid_fst(sc, 400, rng=np.random.default_rng(r))[0].any()) for r in range(200))
+    assert errors <= 20
+
+
+def test_uniform_allocation_cycles_the_grid():
+    sc = make_scenario(6, 6)
+    c = ConeCertifier(sc, alloc="uniform", batch=12, rng=np.random.default_rng(0))
+    c.run(36 * 5)
+    assert (c.n_at == 5).all()
+    assert not (c.window() & ~sc.true_window()).any()

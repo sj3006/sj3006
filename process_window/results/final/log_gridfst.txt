@@ -1,0 +1,25 @@
+{'scen': 'toy-good', 'n': 8, 'method': 'grid DoE', 'frac': 0.5, 'median': 17536.0}
+{'scen': 'toy-good', 'n': 8, 'method': 'grid FST', 'frac': 0.5, 'median': 11008.0}
+{'scen': 'toy-good', 'n': 12, 'method': 'grid DoE', 'frac': 0.5, 'median': 39456.0}
+{'scen': 'toy-good', 'n': 12, 'method': 'grid FST', 'frac': 0.5, 'median': 32688.0}
+{'scen': 'toy-good', 'n': 16, 'method': 'grid DoE', 'frac': 0.5, 'median': 77056.0}
+{'scen': 'toy-good', 'n': 16, 'method': 'grid FST', 'frac': 0.5, 'median': 58112.0}
+{'scen': 'toy-good', 'n': 24, 'method': 'grid DoE', 'frac': 0.5, 'median': 173376.0}
+{'scen': 'toy-good', 'n': 24, 'method': 'grid FST', 'frac': 0.5, 'median': 144000.0}
+{'scen': 'toy-good', 'n': 32, 'method': 'grid DoE', 'frac': 0.5, 'median': 338944.0}
+{'scen': 'toy-good', 'n': 32, 'method': 'grid FST', 'frac': 0.5, 'median': 256000.0}
+{'scen': 'toy-good', 'n': 48, 'method': 'grid DoE', 'frac': 0.5, 'median': 762624.0}
+{'scen': 'toy-good', 'n': 48, 'method': 'grid FST', 'frac': 0.5, 'median': 576000.0}
+{'scen': 'lpbf-good', 'n': 8, 'method': 'grid DoE', 'frac': 0.5, 'median': 44800.0}
+{'scen': 'lpbf-good', 'n': 8, 'method': 'grid FST', 'frac': 0.5, 'median': 30784.0}
+{'scen': 'lpbf-good', 'n': 12, 'method': 'grid DoE', 'frac': 0.5, 'median': 69264.0}
+{'scen': 'lpbf-good', 'n': 12, 'method': 'grid FST', 'frac': 0.5, 'median': 52272.0}
+{'scen': 'lpbf-good', 'n': 16, 'method': 'grid DoE', 'frac': 0.5, 'median': 135424.0}
+{'scen': 'lpbf-good', 'n': 16, 'method': 'grid FST', 'frac': 0.5, 'median': 112128.0}
+{'scen': 'lpbf-good', 'n': 24, 'method': 'grid DoE', 'frac': 0.5, 'median': 367488.0}
+{'scen': 'lpbf-good', 'n': 24, 'method': 'grid FST', 'frac': 0.5, 'median': 252288.0}
+{'scen': 'lpbf-good', 'n': 32, 'method': 'grid DoE', 'frac': 0.5, 'median': 653312.0}
+{'scen': 'lpbf-good', 'n': 32, 'method': 'grid FST', 'frac': 0.5, 'median': 492544.0}
+{'scen': 'lpbf-good', 'n': 48, 'method': 'grid DoE', 'frac': 0.5, 'median': 1771776.0}
+{'scen': 'lpbf-good', 'n': 48, 'method': 'grid FST', 'frac': 0.5, 'median': 1108224.0}
+-> /home/user/sj3006/process_window/experiments/../results/final/scaling_grid_baselines.csv

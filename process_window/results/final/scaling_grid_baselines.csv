@@ -1,0 +1,25 @@
+scen,n,method,frac,median
+toy-good,8,grid DoE,0.5,17536.0
+toy-good,8,grid FST,0.5,11008.0
+toy-good,12,grid DoE,0.5,39456.0
+toy-good,12,grid FST,0.5,32688.0
+toy-good,16,grid DoE,0.5,77056.0
+toy-good,16,grid FST,0.5,58112.0
+toy-good,24,grid DoE,0.5,173376.0
+toy-good,24,grid FST,0.5,144000.0
+toy-good,32,grid DoE,0.5,338944.0
+toy-good,32,grid FST,0.5,256000.0
+toy-good,48,grid DoE,0.5,762624.0
+toy-good,48,grid FST,0.5,576000.0
+lpbf-good,8,grid DoE,0.5,44800.0
+lpbf-good,8,grid FST,0.5,30784.0
+lpbf-good,12,grid DoE,0.5,69264.0
+lpbf-good,12,grid FST,0.5,52272.0
+lpbf-good,16,grid DoE,0.5,135424.0
+lpbf-good,16,grid FST,0.5,112128.0
+lpbf-good,24,grid DoE,0.5,367488.0
+lpbf-good,24,grid FST,0.5,252288.0
+lpbf-good,32,grid DoE,0.5,653312.0
+lpbf-good,32,grid FST,0.5,492544.0
+lpbf-good,48,grid DoE,0.5,1771776.0
+lpbf-good,48,grid FST,0.5,1108224.0
