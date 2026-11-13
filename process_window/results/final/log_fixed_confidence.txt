@@ -1,0 +1,13 @@
+good 8x8 search       median     14196  complete 4/4  unsafe certified 0  (4s)
+good 8x8 per-setting  median     21896  complete 4/4  unsafe certified 0  (6s)
+{'sim': 'good', 'n': 8, 'T_size': 28, 'edge_points': 13, 'boundary_points': 11, 'LB_cert': 987, 'LB_boundary': 2528, 'LB_total': 3515, 'LB_unordered': 4368, 'search': 14196.0, 'search_complete': '4/4', 'search_unsafe': 0, 'per-setting': 21896.0, 'per-setting_complete': '4/4', 'per-setting_unsafe': 0}
+good 12x12 search       median     27248  complete 4/4  unsafe certified 0  (8s)
+good 12x12 per-setting  median     46104  complete 4/4  unsafe certified 0  (13s)
+{'sim': 'good', 'n': 12, 'T_size': 69, 'edge_points': 18, 'boundary_points': 16, 'LB_cert': 2142, 'LB_boundary': 4544, 'LB_total': 6686, 'LB_unordered': 9851, 'search': 27248.0, 'search_complete': '4/4', 'search_unsafe': 0, 'per-setting': 46104.0, 'per-setting_complete': '4/4', 'per-setting_unsafe': 0}
+good 16x16 search       median     50318  complete 4/4  unsafe certified 0  (16s)
+good 16x16 per-setting  median     99980  complete 4/4  unsafe certified 0  (28s)
+{'sim': 'good', 'n': 16, 'T_size': 122, 'edge_points': 24, 'boundary_points': 22, 'LB_cert': 2902, 'LB_boundary': 10241, 'LB_total': 13142, 'LB_unordered': 19872, 'search': 50318.0, 'search_complete': '4/4', 'search_unsafe': 0, 'per-setting': 99979.5, 'per-setting_complete': '4/4', 'per-setting_unsafe': 0}
+good 24x24 search       median    101472  complete 4/4  unsafe certified 0  (35s)
+good 24x24 per-setting  median    238493  complete 4/4  unsafe certified 0  (71s)
+{'sim': 'good', 'n': 24, 'T_size': 287, 'edge_points': 34, 'boundary_points': 32, 'LB_cert': 6158, 'LB_boundary': 14131, 'LB_total': 20290, 'LB_unordered': 40669, 'search': 101472.0, 'search_complete': '4/4', 'search_unsafe': 0, 'per-setting': 238493.0, 'per-setting_complete': '4/4', 'per-setting_unsafe': 0}
+good 32x32 search       median    165638  complete 3/4  unsafe certified 0  (55s)
