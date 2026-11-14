@@ -11,3 +11,4 @@ toy,active_search,False,4.0,0.3,400,0.0,0.0
 dose,straddle,False,4.0,0.1,400,0.0,0.0
 dose,straddle,False,4.0,0.2,400,0.005,0.0035
 dose,straddle,False,4.0,0.3,400,0.025,0.0078
+dose,straddle,True,4.0,0.1,400,0.01,0.005

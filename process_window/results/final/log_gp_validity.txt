@@ -22,3 +22,5 @@
 -> /home/user/sj3006/process_window/experiments/../results/final/gp_validity.csv
 {'grid': 'dose', 'acquisition': 'straddle', 'monotone': False, 'beta': 4.0, 'lengthscale': 0.3, 'runs': 400, 'fwer': 0.025, 'se': np.float64(0.0078)} (45s)
 -> /home/user/sj3006/process_window/experiments/../results/final/gp_validity.csv
+{'grid': 'dose', 'acquisition': 'straddle', 'monotone': True, 'beta': 4.0, 'lengthscale': 0.1, 'runs': 400, 'fwer': 0.01, 'se': np.float64(0.005)} (51s)
+-> /home/user/sj3006/process_window/experiments/../results/final/gp_validity.csv
