@@ -131,3 +131,4 @@ Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF
 [127/144] T=1.836 top_p=0.773 rep4>0.2: 0.000  NLL>3.5: 0.062  (8435s)
 [128/144] T=1.836 top_p=0.818 rep4>0.2: 0.000  NLL>3.5: 0.163  (8513s)
 [129/144] T=1.836 top_p=0.864 rep4>0.2: 0.000  NLL>3.5: 0.325  (8592s)
+[130/144] T=1.836 top_p=0.909 rep4>0.2: 0.000  NLL>3.5: 0.444  (8669s)
