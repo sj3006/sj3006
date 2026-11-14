@@ -1,0 +1,24 @@
+{'grid': 'toy', 'acquisition': 'straddle', 'monotone': False, 'beta': 4.0, 'lengthscale': 0.1, 'runs': 400, 'fwer': 0.0, 'se': np.float64(0.0)} (68s)
+-> /home/user/sj3006/process_window/experiments/../results/final/gp_validity.csv
+{'grid': 'toy', 'acquisition': 'straddle', 'monotone': False, 'beta': 4.0, 'lengthscale': 0.2, 'runs': 400, 'fwer': 0.0, 'se': np.float64(0.0)} (70s)
+-> /home/user/sj3006/process_window/experiments/../results/final/gp_validity.csv
+{'grid': 'toy', 'acquisition': 'straddle', 'monotone': False, 'beta': 4.0, 'lengthscale': 0.3, 'runs': 400, 'fwer': 0.0, 'se': np.float64(0.0)} (64s)
+-> /home/user/sj3006/process_window/experiments/../results/final/gp_validity.csv
+{'grid': 'toy', 'acquisition': 'straddle', 'monotone': True, 'beta': 4.0, 'lengthscale': 0.1, 'runs': 400, 'fwer': 0.0, 'se': np.float64(0.0)} (68s)
+-> /home/user/sj3006/process_window/experiments/../results/final/gp_validity.csv
+{'grid': 'toy', 'acquisition': 'straddle', 'monotone': True, 'beta': 4.0, 'lengthscale': 0.2, 'runs': 400, 'fwer': 0.0025, 'se': np.float64(0.0025)} (73s)
+-> /home/user/sj3006/process_window/experiments/../results/final/gp_validity.csv
+{'grid': 'toy', 'acquisition': 'straddle', 'monotone': True, 'beta': 4.0, 'lengthscale': 0.3, 'runs': 400, 'fwer': 0.0025, 'se': np.float64(0.0025)} (72s)
+-> /home/user/sj3006/process_window/experiments/../results/final/gp_validity.csv
+{'grid': 'toy', 'acquisition': 'active_search', 'monotone': False, 'beta': 4.0, 'lengthscale': 0.1, 'runs': 400, 'fwer': 0.0, 'se': np.float64(0.0)} (52s)
+-> /home/user/sj3006/process_window/experiments/../results/final/gp_validity.csv
+{'grid': 'toy', 'acquisition': 'active_search', 'monotone': False, 'beta': 4.0, 'lengthscale': 0.2, 'runs': 400, 'fwer': 0.0, 'se': np.float64(0.0)} (48s)
+-> /home/user/sj3006/process_window/experiments/../results/final/gp_validity.csv
+{'grid': 'toy', 'acquisition': 'active_search', 'monotone': False, 'beta': 4.0, 'lengthscale': 0.3, 'runs': 400, 'fwer': 0.0, 'se': np.float64(0.0)} (46s)
+-> /home/user/sj3006/process_window/experiments/../results/final/gp_validity.csv
+{'grid': 'dose', 'acquisition': 'straddle', 'monotone': False, 'beta': 4.0, 'lengthscale': 0.1, 'runs': 400, 'fwer': 0.0, 'se': np.float64(0.0)} (51s)
+-> /home/user/sj3006/process_window/experiments/../results/final/gp_validity.csv
+{'grid': 'dose', 'acquisition': 'straddle', 'monotone': False, 'beta': 4.0, 'lengthscale': 0.2, 'runs': 400, 'fwer': 0.005, 'se': np.float64(0.0035)} (49s)
+-> /home/user/sj3006/process_window/experiments/../results/final/gp_validity.csv
+{'grid': 'dose', 'acquisition': 'straddle', 'monotone': False, 'beta': 4.0, 'lengthscale': 0.3, 'runs': 400, 'fwer': 0.025, 'se': np.float64(0.0078)} (45s)
+-> /home/user/sj3006/process_window/experiments/../results/final/gp_validity.csv

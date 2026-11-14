@@ -1,0 +1,13 @@
+grid,acquisition,monotone,beta,lengthscale,runs,fwer,se
+toy,straddle,False,4.0,0.1,400,0.0,0.0
+toy,straddle,False,4.0,0.2,400,0.0,0.0
+toy,straddle,False,4.0,0.3,400,0.0,0.0
+toy,straddle,True,4.0,0.1,400,0.0,0.0
+toy,straddle,True,4.0,0.2,400,0.0025,0.0025
+toy,straddle,True,4.0,0.3,400,0.0025,0.0025
+toy,active_search,False,4.0,0.1,400,0.0,0.0
+toy,active_search,False,4.0,0.2,400,0.0,0.0
+toy,active_search,False,4.0,0.3,400,0.0,0.0
+dose,straddle,False,4.0,0.1,400,0.0,0.0
+dose,straddle,False,4.0,0.2,400,0.005,0.0035
+dose,straddle,False,4.0,0.3,400,0.025,0.0078
