@@ -12,7 +12,16 @@ Ubuntu, `apt-get install texlive-latex-extra`. Without the style files the
 draft falls back to a two-column layout with ICML-like margins.
 
 Page budget: ICML allows 8 pages of main text. The main text currently ends
-on page 6; references and the proofs appendix follow.
+on page 7; the Impact Statement (outside the limit), references, the proofs
+(Appendix A) and the experiment details (Appendix B) follow.
+
+Supplementary material: `python3 scripts/make_supplement.py` (from
+`process_window/`) writes `dist/supplement.zip`, an anonymous copy of the
+code, tests and result files with its own README and an MIT licence
+(placeholder holder "Anonymous authors"). It leaves out ROADMAP.md, notes/,
+paper drafts, logs and early exploratory scripts, and refuses to write the
+archive if a name, local path, e-mail address or tool name is left in any
+text file.
 
 References: every entry in `references.bib` was checked on 2026-11-13
 against the publisher, proceedings or an indexing record (volume, pages, DOI

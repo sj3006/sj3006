@@ -10,7 +10,7 @@ Methods:
   (certify at eps with its own e-process, or reject at q eps) with no
   spreading; stops when every setting is decided.
 
-Lower bounds (computed from the true rates; pwcert/bounds.py, notes/09):
+Lower bounds (computed from the true rates; pwcert/bounds.py, paper Theorem 2):
 - LB_target: target points only (Theorem 2a's LP with kl(1-beta, alpha));
 - LB_ordered: one joint LP with the target constraints and the boundary
   constraints (settings just outside T must be certified or told apart

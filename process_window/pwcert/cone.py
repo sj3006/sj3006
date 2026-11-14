@@ -10,7 +10,7 @@ mode m at time t when its *riskier cone* has enough weighted wealth:
 
 Certification is sticky (once certified, always certified).
 
-Validity (notes/06_cone_rule.md). Under Assumption A, the set D of truly
+Validity (paper: Theorem 1, proof in Appendix A). Under Assumption A, the set D of truly
 unsafe (mode, setting) pairs is closed toward risk: if k is unsafe for m, so
 is everything riskier. A false certification of k means S_m(k, t) >= 1/alpha
 with k's whole riskier cone inside D, so E_D(t) = sum_{i in D} w_i K_i(t) >=
@@ -27,7 +27,7 @@ k is certified only by its own e-process, and nothing spreads.
 Allocation rules (which settings go on the next plate) never affect validity.
 - "edge": for each mode, the riskiest uncertified settings of the estimated
   target T_hat (every estimated rate below target_q * eps), i.e. the binding
-  constraints of the lower bound (notes/05). Plates are filled with each
+  constraints of the lower bound (paper, Theorem 2). Plates are filled with each
   setting's expected remaining coupons, cheapest first. When T_hat is
   covered, re-check the uncertified settings with the lowest lower
   confidence bound (optimism), skipping ones that are confidently unsafe.
@@ -76,7 +76,7 @@ def make_weights(sc, kind="uniform", mix=0.5, q=0.5, width=0.7, sigma=1.0,
       sigma says how far you trust the simulator. Rationale: certifying an
       edge point with weight w costs about ln(1 / (alpha w)) / KL coupons, so
       the best fixed weights spread the budget over the settings likely to
-      be edge points (notes/06).
+      be edge points (paper, Section 3).
     The uniform floor keeps every setting certifiable if the simulator is wrong.
     """
     modes = sc.modes

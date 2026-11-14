@@ -17,7 +17,7 @@ Procedure (structure="monotone"), for each failure mode m:
 5. Chains share the error budget by Bonferroni: alpha_chain = alpha / (M * C).
 
 The certified window is the set of settings certified for every mode.
-Validity (Theorem 1 in notes/02_problem_statement.md): if each mode is
+Validity (a union bound over chains): if each mode is
 monotone in the stated directions, then with probability >= 1 - alpha no
 setting in the certified window is truly unsafe, whatever the simulator and
 however coupons are allocated.
@@ -26,8 +26,8 @@ structure="spread": every (mode, setting) is its own one-point chain (so
 alpha is split over all M * N of them, a log factor more than chains), but
 certificates still spread. This lets the allocation rule jump straight to
 the riskiest certifiable setting in a region instead of walking a chain
-through the expensive transition band. Theorem 1 covers it (it is the
-special case where every chain has length one).
+through the expensive transition band. The same union bound covers it (it
+is the special case where every chain has length one).
 
 structure="hybrid": the "monotone" chains AND the "spread" one-point
 chains, with the error budget split equally between the two families. Costs
@@ -48,7 +48,7 @@ Allocation (which settings go on the next plate):
 - alloc="edge": estimate the target region T_hat (every estimated rate below
   target_q * eps), and for each mode take the riskiest uncertified points
   of T_hat (its minimal elements). These are exactly the binding constraints
-  of the lower bound (notes/05): any cover of T_hat must certify them or
+  of the lower bound (paper, Theorem 2): any cover of T_hat must certify them or
   something riskier, and certifying them covers the rest by spreading.
   Plates are filled with each such point's expected remaining coupons,
   cheapest first, instead of one coupon each. Once T_hat is covered, it
@@ -166,7 +166,7 @@ class WindowCertifier:
                     row = None if margin is None else margin[:, j]
                     if self.start == "boundary":
                         # One chain per aggressiveness level q. Overlapping
-                        # chains are fine for Theorem 1 (union bound).
+                        # chains are fine for the union bound.
                         g = guess[m].reshape(self.nP, self.nV)[:, j]
                         safest_first = np.arange(self.nP)[::-1] if d_p > 0 else np.arange(self.nP)
                         starts = set()
@@ -363,7 +363,7 @@ class WindowCertifier:
             return False
         # A point may be current in several chains (overlapping chains, or
         # hybrid). It is certified as soon as its wealth beats the threshold
-        # of ANY of them; the union bound in Theorem 1 covers this.
+        # of ANY of them; the union bound covers this.
         alpha_ok = np.full((self.M, self.N), 0.0)
         for m, x, c in self.current_points():
             alpha_ok[m, x] = max(alpha_ok[m, x], self.alpha_c[m][c])

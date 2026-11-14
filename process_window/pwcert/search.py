@@ -26,7 +26,7 @@ bracketed, then bisect. That is O(log distance) probes with a good
 simulator and O(log n) without. Certificates and rejections from every row
 spread through the 2D ordering, so other rows' searches shrink too.
 
-Validity of certificates is unchanged (cone rule, Theorem 5): allocation and
+Validity of certificates is unchanged (cone rule, paper Theorem 1): allocation and
 rejections never certify anything. Rejections can only make the procedure
 miss target settings, with probability at most beta overall (they use level
 beta / (M N) each).
