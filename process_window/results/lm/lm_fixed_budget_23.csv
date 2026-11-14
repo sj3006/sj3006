@@ -1,0 +1,201 @@
+method,generations,frac,runs_with_errors
+ours,1000,0.0,0
+ours,2000,0.0,0
+ours,3000,0.0039,0
+ours,4000,0.0133,0
+ours,5000,0.1259,0
+ours,6000,0.4782,0
+ours,7000,0.6336,0
+ours,8000,0.6738,0
+ours,9000,0.7158,0
+ours,10000,0.7517,0
+ours,11000,0.7787,0
+ours,12000,0.7924,0
+ours,13000,0.8104,0
+ours,14000,0.8176,0
+ours,15000,0.8253,0
+ours,16000,0.8335,0
+ours,17000,0.839,0
+ours,18000,0.842,0
+ours,19000,0.8467,0
+ours,20000,0.854,0
+ours,21000,0.8545,0
+ours,22000,0.8592,0
+ours,23000,0.8613,0
+ours,24000,0.8639,0
+ours,25000,0.8656,0
+ours,26000,0.8699,0
+ours,27000,0.8711,0
+ours,28000,0.8754,0
+ours,29000,0.8776,0
+ours,30000,0.8789,0
+ours,31000,0.8818,0
+ours,32000,0.884,0
+ours,33000,0.8861,0
+ours,34000,0.8891,0
+ours,35000,0.8904,0
+ours,36000,0.8917,0
+ours,37000,0.8938,0
+ours,38000,0.8955,0
+ours,39000,0.8985,0
+ours,40000,0.899,0
+"ours, no simulator",1000,0.0,0
+"ours, no simulator",2000,0.0034,0
+"ours, no simulator",3000,0.0458,0
+"ours, no simulator",4000,0.1323,0
+"ours, no simulator",5000,0.1935,0
+"ours, no simulator",6000,0.28,0
+"ours, no simulator",7000,0.3104,0
+"ours, no simulator",8000,0.3223,0
+"ours, no simulator",9000,0.3416,0
+"ours, no simulator",10000,0.3476,0
+"ours, no simulator",11000,0.372,0
+"ours, no simulator",12000,0.4264,0
+"ours, no simulator",13000,0.503,0
+"ours, no simulator",14000,0.5997,0
+"ours, no simulator",15000,0.6682,0
+"ours, no simulator",16000,0.7312,0
+"ours, no simulator",17000,0.765,0
+"ours, no simulator",18000,0.8001,0
+"ours, no simulator",19000,0.8176,0
+"ours, no simulator",20000,0.8322,0
+"ours, no simulator",21000,0.8403,0
+"ours, no simulator",22000,0.8467,0
+"ours, no simulator",23000,0.851,0
+"ours, no simulator",24000,0.854,0
+"ours, no simulator",25000,0.8562,0
+"ours, no simulator",26000,0.8583,0
+"ours, no simulator",27000,0.8613,0
+"ours, no simulator",28000,0.8643,0
+"ours, no simulator",29000,0.8686,0
+"ours, no simulator",30000,0.8694,0
+"ours, no simulator",31000,0.8741,0
+"ours, no simulator",32000,0.875,0
+"ours, no simulator",33000,0.8784,0
+"ours, no simulator",34000,0.8797,0
+"ours, no simulator",35000,0.8827,0
+"ours, no simulator",36000,0.8831,0
+"ours, no simulator",37000,0.8874,0
+"ours, no simulator",38000,0.8896,0
+"ours, no simulator",39000,0.8908,0
+"ours, no simulator",40000,0.8921,0
+no ordering,1000,0.0,0
+no ordering,2000,0.0,0
+no ordering,3000,0.0064,0
+no ordering,4000,0.0257,0
+no ordering,5000,0.0458,0
+no ordering,6000,0.0668,0
+no ordering,7000,0.0895,0
+no ordering,8000,0.1134,0
+no ordering,9000,0.1374,0
+no ordering,10000,0.1622,0
+no ordering,11000,0.1875,0
+no ordering,12000,0.2115,0
+no ordering,13000,0.2363,0
+no ordering,14000,0.2581,0
+no ordering,15000,0.2808,0
+no ordering,16000,0.3052,0
+no ordering,17000,0.3296,0
+no ordering,18000,0.3519,0
+no ordering,19000,0.3737,0
+no ordering,20000,0.3951,0
+no ordering,21000,0.4152,0
+no ordering,22000,0.4341,0
+no ordering,23000,0.4555,0
+no ordering,24000,0.4777,0
+no ordering,25000,0.4979,0
+no ordering,26000,0.5141,0
+no ordering,27000,0.5295,0
+no ordering,28000,0.5462,0
+no ordering,29000,0.5625,0
+no ordering,30000,0.5775,0
+no ordering,31000,0.5938,0
+no ordering,32000,0.6087,0
+no ordering,33000,0.6216,0
+no ordering,34000,0.6318,0
+no ordering,35000,0.6426,0
+no ordering,36000,0.6528,0
+no ordering,37000,0.6648,0
+no ordering,38000,0.6742,0
+no ordering,39000,0.6845,0
+no ordering,40000,0.6926,0
+full grid (Bonferroni),1000,0.0,0
+full grid (fixed sequence),1000,0.0,0
+full grid (Bonferroni),2000,0.0,0
+full grid (fixed sequence),2000,0.0,0
+full grid (Bonferroni),3000,0.0,0
+full grid (fixed sequence),3000,0.0,0
+full grid (Bonferroni),4000,0.0,0
+full grid (fixed sequence),4000,0.0,0
+full grid (Bonferroni),5000,0.0,0
+full grid (fixed sequence),5000,0.0,0
+full grid (Bonferroni),6000,0.0,0
+full grid (fixed sequence),6000,0.0,0
+full grid (Bonferroni),7000,0.0,0
+full grid (fixed sequence),7000,0.0,0
+full grid (Bonferroni),8000,0.0,0
+full grid (fixed sequence),8000,0.0,0
+full grid (Bonferroni),9000,0.0,0
+full grid (fixed sequence),9000,0.0,0
+full grid (Bonferroni),10000,0.0,0
+full grid (fixed sequence),10000,0.0,0
+full grid (Bonferroni),11000,0.0,0
+full grid (fixed sequence),11000,0.0,0
+full grid (Bonferroni),12000,0.0,0
+full grid (fixed sequence),12000,0.0,0
+full grid (Bonferroni),13000,0.0,0
+full grid (fixed sequence),13000,0.0,0
+full grid (Bonferroni),14000,0.0,0
+full grid (fixed sequence),14000,0.0,0
+full grid (Bonferroni),15000,0.0,0
+full grid (fixed sequence),15000,0.0,0
+full grid (Bonferroni),16000,0.0,0
+full grid (fixed sequence),16000,0.0,0
+full grid (Bonferroni),17000,0.0,0
+full grid (fixed sequence),17000,0.0,0
+full grid (Bonferroni),18000,0.0,0
+full grid (fixed sequence),18000,0.0,0
+full grid (Bonferroni),19000,0.0,0
+full grid (fixed sequence),19000,0.0,0
+full grid (Bonferroni),20000,0.0,0
+full grid (fixed sequence),20000,0.0,0
+full grid (Bonferroni),21000,0.0,0
+full grid (fixed sequence),21000,0.0,0
+full grid (Bonferroni),22000,0.0,0
+full grid (fixed sequence),22000,0.0,0
+full grid (Bonferroni),23000,0.0,0
+full grid (fixed sequence),23000,0.0,0
+full grid (Bonferroni),24000,0.0,0
+full grid (fixed sequence),24000,0.0,0
+full grid (Bonferroni),25000,0.0,0
+full grid (fixed sequence),25000,0.0,0
+full grid (Bonferroni),26000,0.0,0
+full grid (fixed sequence),26000,0.0,0
+full grid (Bonferroni),27000,0.0,0
+full grid (fixed sequence),27000,0.0,0
+full grid (Bonferroni),28000,0.0,0
+full grid (fixed sequence),28000,0.0,0
+full grid (Bonferroni),29000,0.0,0
+full grid (fixed sequence),29000,0.0,0
+full grid (Bonferroni),30000,0.0,0
+full grid (fixed sequence),30000,0.0,0
+full grid (Bonferroni),31000,0.0,0
+full grid (fixed sequence),31000,0.0,0
+full grid (Bonferroni),32000,0.0,0
+full grid (fixed sequence),32000,0.0,0
+full grid (Bonferroni),33000,0.0,0
+full grid (fixed sequence),33000,0.0,0
+full grid (Bonferroni),34000,0.0,0
+full grid (fixed sequence),34000,0.0,0
+full grid (Bonferroni),35000,0.0,0
+full grid (fixed sequence),35000,0.3781,0
+full grid (Bonferroni),36000,0.0,0
+full grid (fixed sequence),36000,0.4034,0
+full grid (Bonferroni),37000,0.0,0
+full grid (fixed sequence),37000,0.4096,0
+full grid (Bonferroni),38000,0.0,0
+full grid (fixed sequence),38000,0.3747,0
+full grid (Bonferroni),39000,0.0,0
+full grid (fixed sequence),39000,0.3705,0
+full grid (Bonferroni),40000,0.0,0
+full grid (fixed sequence),40000,0.3637,0

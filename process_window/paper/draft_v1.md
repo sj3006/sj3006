@@ -34,9 +34,10 @@ Learn-then-Test), pilot study included. Across this, additive-
 manufacturing process windows and a two-drug combination screen it needs
 1.3-9x fewer trials than adaptive testing without the ordering and, on
 48x48 grids, 19-26x fewer than a full grid with fixed-sequence testing,
-with no unsafe setting certified in any run, while Gaussian-process level-set baselines, with or without
-the ordering, certify unsafe settings in 2.5-27.5% of runs even at their most cautious setting, whenever
-they certify a fifth of the region or more.
+with no unsafe setting certified in any run, while Gaussian-process baselines (level-set estimation,
+BEAM-style active search, safe expansion) carry no such guarantee: a tuning whose error rate stays near 5%
+on one problem certifies unsafe settings in up to 42.5% of runs on another, and the data do not say which
+tuning to trust.
 
 ## 1. Introduction
 
@@ -288,7 +289,12 @@ set) stalls at its seed on the synthetic, 316L and LM problems (0.7-3.7%
 of the region) or, at the longest lengthscales, errs in every run; on the
 drug screen its three error-free tunings certify 2-55% and the other nine
 err in 37.5-100% of runs (results/final/gp_baseline_active_search.csv,
-gp_baseline_safe_expand_monotone.csv, results/lm/lm_gp_*.csv).
+gp_baseline_safe_expand_monotone.csv, results/lm/lm_gp_*.csv). In the
+worst case of our validity check (every setting at the tolerance, 400
+runs, beta = 4) BEAM-style search errs in at most 1.25% of runs and the GP
+with the ordering in up to 12.5% (results/final/gp_validity.csv): the GP
+errors come mainly from the shape of the surface (sharp transitions the
+kernel smooths over), which a test-based certificate does not depend on.
 
 **Ablations** (16x16, 8 runs, cost to certify half the region). The
 ordering and the allocation rule matter most (no ordering +69 to +213%;

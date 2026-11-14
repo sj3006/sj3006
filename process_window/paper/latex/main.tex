@@ -83,9 +83,10 @@ manufacturing process windows and a drug-combination screen it needs
 1.3--9$\times$ fewer trials than adaptive testing without the ordering
 and, on $48\times48$ grids, 19--26$\times$ fewer than a full grid with
 fixed-sequence testing, with no unsafe setting certified in any run,
-while Gaussian-process level-set baselines, with or without the ordering,
-certify unsafe settings in 2.5--27.5\% of runs even at their most cautious
-setting, whenever they certify a fifth of the region or more.
+while Gaussian-process baselines (level-set estimation, BEAM-style active
+search, safe expansion) carry no such guarantee: a tuning whose error rate
+stays near 5\% on one problem certifies unsafe settings in up to 42.5\%
+of runs on another, and the data do not say which tuning to trust.
 \end{abstract}
 
 % =====================================================================
@@ -95,15 +96,15 @@ setting, whenever they certify a fifth of the region or more.
 \includegraphics[width=\textwidth]{figs/fig_lm_surface.pdf}
 \caption{Which sampling settings of a language model are safe? Left and
 middle: repetition and incoherence rates of SmolLM2-135M, measured from
-generations over temperature and top-$p$, with the 10\% tolerance (line).
-Each failure mode is monotone, in opposite directions. Right: the settings
-our method certifies after 8k generations (about 55 per setting,
-pilot included), with a 95\% guarantee that every certified setting has
-both rates below 10\%. None of them is unsafe. With the same 8k
-generations, testing without the ordering certifies 50\% of the safe
-region on average and both full-grid baselines certify nothing (55
-generations per setting are too few at their per-test levels); ours
-certifies 83\%.}
+generations on a $23\times23$ grid of temperature and top-$p$, with the
+10\% tolerance (line). Each failure mode is monotone, in opposite
+directions. Right: the settings our method certifies after 10k
+generations (19 per setting, pilot included), with a 95\% guarantee that
+every certified setting has both rates below 10\%: 213 of the 292 safe
+settings, none unsafe. With the same 10k generations, testing without
+the ordering certifies 16\% of the safe region on average and both
+full-grid baselines certify nothing (19 generations per setting are too
+few at their per-test levels); ours certifies 75\%.}
 \label{fig:lm}
 \end{figure*}
 
@@ -406,8 +407,8 @@ the budget. The raw rates are consistent with Assumption~A: no setting
 differs from the monotone fit at the 1\% level (exact binomial test), and
 1 of 264 neighbouring pairs is reversed by more than two standard errors
 (8 of 1012 on a finer grid, below), fewer than noise alone reverses
-between equal rates. 78 of the 144 settings are safe
-(Figure~\ref{fig:lm}). Benchmark runs draw fresh outcomes from the fitted
+between equal rates. 78 of the 144 settings are safe, and 292 of the 529
+on the finer grid (Figure~\ref{fig:lm}). Benchmark runs draw fresh outcomes from the fitted
 surface. As a check, one live run queried the model directly: with 8.0k
 real generations it certified 64 of the 78 safe settings and no unsafe
 one (judged against the measured surface), in line with the 65 certified
@@ -586,7 +587,12 @@ language-model problems it either stalls at its seed (0.7--3.7\% of the
 region: the GP cannot extrapolate one grid step at the tolerance) or, at
 the longest lengthscales, certifies an unsafe setting in every run; on
 the drug screen its three error-free tunings certify 2--55\% and the
-other nine err in 37.5--100\% of runs.
+other nine err in 37.5--100\% of runs. The worst case of our validity
+check is not what breaks the GPs: with every setting at the tolerance
+(400 runs each, confidence parameter 4) BEAM-style search errs in at most
+1.25\% of runs, the GP with the ordering in up to 12.5\%. Their errors
+come mainly from the shape of the surface, sharp transitions that the
+kernel smooths over, and a test-based certificate does not depend on it.
 
 \paragraph{Ablations.} Cost to certify half the region at $16\times16$
 (8 runs; synthetic window with good and optimistic side information, drug

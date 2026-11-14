@@ -1,0 +1,5 @@
+true safe settings: 292 of 529
+ours                 final 0.899  runs with an unsafe setting certified: 0/8  (16s)
+ours, no simulator   final 0.892  runs with an unsafe setting certified: 0/8  (17s)
+no ordering          final 0.693  runs with an unsafe setting certified: 0/8  (16s)
+-> lm_fixed_budget_23.csv

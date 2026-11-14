@@ -75,14 +75,16 @@ step needs torch.
 | Paper item | Command | Output | Time |
 |---|---|---|---|
 | LM surface (measured) | `HF_HOME=<cache> python3 experiments/lm_surface.py` | `results/lm/surface_scores.npz` | 1.6 h |
-| Figure 1, LM budget curves | `python3 experiments/lm_figure.py` | `results/lm/fig_lm_*.{png,pdf}` | 1 min |
+| LM 12x12 surface figure and budget curves (not in the paper) | `python3 experiments/lm_figure.py` | `results/lm/fig_lm_*.{png,pdf}` | 1 min |
 | LM rows of Tables 1-2, LM GP numbers, monotonicity check | `python3 experiments/exp_lm.py --parts budget,confidence,gp,cost,check` | `results/lm/lm_*.csv` | 20 min |
 | LM 23x23 surface (nested; reuses the 12x12 settings) | `HF_HOME=<cache> python3 experiments/lm_surface.py --n 23` | `results/lm/surface_scores_23.npz` | 4 h |
 | LM 23x23 rows of Tables 1-2 | `python3 experiments/exp_lm.py --parts cost,confidence --surface results/lm/surface_scores_23.npz --pilot-stride 2 --budget 150000` | `results/lm/lm_*_23.csv` | 1 h |
+| Figure 1 and its caption numbers (23x23, 10k generations) | `python3 experiments/exp_lm.py --parts budget --surface results/lm/surface_scores_23.npz --pilot-stride 2`, then `python3 experiments/lm_figure.py --path results/lm/surface_scores_23.npz --pilot-stride 2 --budget 10000` | `results/lm/lm_fixed_budget_23.csv`, `results/lm/fig_lm_surface_23.{png,pdf}` | 5 min |
 | Live LM run (certifier queries the model) | `HF_HOME=<cache> python3 experiments/lm_live.py` | `results/lm/lm_live_seed0.json` | 40 min |
 | Table 1, Figure 2 (scaling) | `python3 experiments/final.py scaling --scen toy-good` and `--scen lpbf-good`, then `final.py gridfst` | `results/final/scaling_*.csv` | several hours |
 | Table 2, Figure 3 (fixed confidence) | `python3 experiments/exp_search.py` | `results/final/fixed_confidence*.csv` | several hours |
 | Validity (worst case) | `python3 experiments/final.py validity` | `results/final/validity.csv` | 30 min |
+| GP certificates in the same worst case | `python3 experiments/final.py gpvalidity --reps 400` | `results/final/gp_validity.csv` | 20 min |
 | GP baseline | `python3 experiments/final.py gp --n 16` | `results/final/gp_baseline.csv` | 1 h |
 | GP baseline with the ordering | `python3 experiments/final.py gp --n 16 --monotone` and `exp_lm.py --parts gpmono` | `results/final/gp_baseline_monotone.csv`, `results/lm/lm_gp_monotone.csv` | 1 h |
 | GP with BEAM-style active search / safe expansion | `python3 experiments/final.py gp --n 16 --acq active_search` and `--acq safe_expand --monotone --lengthscales 0.1,0.2,0.3,0.5`; `exp_lm.py --parts gpbeam,gpsafe` | `results/final/gp_baseline_{active_search,safe_expand_monotone}.csv`, `results/lm/lm_gp_*.csv` | 2 h |
