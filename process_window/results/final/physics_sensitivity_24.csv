@@ -1,0 +1,10 @@
+setting,n,safe,ours,no_ordering,grid_fst,runs_with_false_certificate,ratio_no_ordering,ratio_grid_fst
+paper,24,63,12960.0,21072.0,252288.0,0,1.63,19.47
+absorptivity 0.30,24,67,11136.0,19104.0,229824.0,0,1.72,20.64
+absorptivity 0.40,24,55,12816.0,17424.0,252288.0,0,1.36,19.69
+LoF threshold -10%,24,42,12912.0,18960.0,334656.0,0,1.47,25.92
+LoF threshold +10%,24,81,12048.0,19968.0,173376.0,0,1.66,14.39
+keyhole threshold -20%,24,14,8640.0,14064.0,533952.0,0,1.63,61.8
+keyhole threshold +20%,24,106,8880.0,21840.0,157824.0,0,2.46,17.77
+balling threshold -20%,24,45,6624.0,12960.0,229824.0,0,1.96,34.7
+balling threshold +20%,24,69,16272.0,27408.0,277056.0,0,1.68,17.03

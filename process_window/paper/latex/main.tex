@@ -430,7 +430,9 @@ Learn-then-Test uses a monotone risk. \emph{GP level set}: GP regression
 on the observed failure rates, certifying where the upper confidence bound
 is below the tolerance, without and with the ordering (a certificate
 spreads to safer settings, as in monotone safe exploration
-\citep{losalka2023monotone}).
+\citep{losalka2023monotone}), and with two other sampling rules:
+active search for the safe set as in BEAM \citep{beam2026}, and safe
+expansion from a seed as in SafeOpt \citep{sui2015safeopt}.
 
 \begin{table}[t]
 \centering\small
@@ -493,7 +495,14 @@ with repetition thresholds 0.15--0.3, NLL thresholds 3.0--4.0 nats and
 tolerances 5--20\% (seven settings, 5 runs each) gives 1.6--2.2$\times$
 fewer generations than no ordering and 2.2--4.1$\times$ fewer than
 full-grid fixed-sequence testing to certify half of the safe region, with
-no unsafe setting certified in any of the 70 adaptive runs.
+no unsafe setting certified in any of the 70 adaptive runs. Nor do the
+316L gains depend on the placeholder calibration: moving the absorptivity
+to 0.30 or 0.40, the lack-of-fusion threshold by $\pm10\%$ or the keyhole
+or balling threshold by $\pm20\%$ (one at a time; safe regions of 14 to
+106 of the 576 settings at $24^2$, 5 runs each) gives 1.4--2.5$\times$
+fewer trials than no ordering and 14--62$\times$ fewer than full-grid
+fixed-sequence testing (1.6$\times$ and 19$\times$ at the paper's
+values), with no unsafe setting certified.
 
 \begin{table}[t]
 \centering\small
@@ -563,7 +572,20 @@ the GP certifies more but is no more reliable: at confidence parameter 4
 region and an unsafe setting in 2.5--27.5\% of runs. The tuning that
 works on one problem fails on another (lengthscale 0.2: 5\% on the
 language model, 27.5\% on the synthetic grid), and nothing in the data
-says which tuning to trust.
+says which tuning to trust. Changing the sampling rule does not change
+this. \emph{BEAM-style active search} certifies more but errs in
+70--100\% of runs at confidence parameter 2 and 20--72.5\% at 3. At 4
+with lengthscale 0.1 it erred in 1 of 40 runs on each simulated problem
+and certified 66--79\% of the region (ours 54--84\%), the best GP
+result we found; with lengthscale 0.3 the same setting errs in 42.5\% of
+runs on the drug screen, and 1 error in 40 runs only bounds the error rate
+by 13\% (95\% upper bound). \emph{Safe expansion} with the ordering
+samples only at the edge of what it has certified. On the synthetic and
+316L problems it either stalls at its seed (0.7--3.7\% of the region:
+the GP cannot extrapolate one grid step at a 5\% tolerance) or, at
+lengthscale 0.5 and confidence parameter 2, certifies an unsafe setting
+in every run; on the drug screen its three error-free tunings certify
+2--55\% and the other nine err in 37.5--100\% of runs.
 
 \paragraph{Ablations.} Cost to certify half the region at $16\times16$
 (8 runs; synthetic window with good and optimistic side information, drug
@@ -636,7 +658,8 @@ the grid (the multiple-testing and probe factors), reaching 13.5--14.8
 at about 500--2300 settings; the language-model benchmark draws outcomes from
 a measured surface (one live run agrees with it), with a small model and
 automatic judges; the manufacturing studies are simulated with
-placeholder calibrations.
+placeholder calibrations (the gains hold when each is moved by 10--20\%,
+but a real process map may differ more).
 
 \section*{Impact Statement}
 
@@ -918,9 +941,17 @@ $\beta_{\mathrm{GP}}\in\{2,3,4\}$; certificates are kept. Each batch puts
 4 trials at each of the 6 settings with the largest
 $\beta_{\mathrm{GP}}\sigma-|\mu-\eps|$ (the straddle rule of level-set
 estimation). With the ordering, after each batch a certificate for mode
-$m$ also certifies every setting safer for $m$. Budget: $60N$ trials on
-the simulated problems ($16\times16$, 40 runs per tuning) and 20k
-generations on the language model (20 runs per tuning).
+$m$ also certifies every setting safer for $m$. \emph{BEAM-style active
+search} (no ordering): the first batch is a Latin hypercube over the grid;
+later batches go to the uncertified settings with the largest posterior
+probability $\prod_m\Phi((\eps_m-\mu_m)/\sigma_m)$ of being safe.
+\emph{Safe expansion} (with the ordering): the safe set starts as the
+setting the side information rates safest; each batch goes to settings in
+the safe set that are uncertified or border an uncertified setting, largest
+$\max_m\sigma_m/\eps_m$ first; lengthscales $\{0.1,0.2,0.3,0.5\}$.
+Budget: $60N$ trials on the simulated problems ($16\times16$, 40 runs
+per tuning) and 20k generations on the language model (20 runs per
+tuning).
 
 \subsection{Problems}
 
@@ -943,7 +974,8 @@ normalized enthalpy ($I_0=9$, $s=0.6$) and $L/W$ ($I_0=6.5$, $s=0.3$);
 $\eps=5\%$. These thresholds are placeholder calibrations, chosen so
 that a window is visible in this range; the literature values (about 30
 and $\pi$) assume real melt pools, which the Rosenthal model does not
-give. The monotone directions are checked numerically on the truth.
+give. The sensitivity study rebuilds the problem with one change at a
+time and keeps the side information's offsets relative to the new truth. The monotone directions are checked numerically on the truth.
 Side information: absorptivity $+0.01$ and thresholds shifted by $-0.03$,
 $+0.3$, $+0.2$.
 

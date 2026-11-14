@@ -85,7 +85,9 @@ step needs torch.
 | Validity (worst case) | `python3 experiments/final.py validity` | `results/final/validity.csv` | 30 min |
 | GP baseline | `python3 experiments/final.py gp --n 16` | `results/final/gp_baseline.csv` | 1 h |
 | GP baseline with the ordering | `python3 experiments/final.py gp --n 16 --monotone` and `exp_lm.py --parts gpmono` | `results/final/gp_baseline_monotone.csv`, `results/lm/lm_gp_monotone.csv` | 1 h |
+| GP with BEAM-style active search / safe expansion | `python3 experiments/final.py gp --n 16 --acq active_search` and `--acq safe_expand --monotone --lengthscales 0.1,0.2,0.3,0.5`; `exp_lm.py --parts gpbeam,gpsafe` | `results/final/gp_baseline_{active_search,safe_expand_monotone}.csv`, `results/lm/lm_gp_*.csv` | 2 h |
 | Ablations | `python3 experiments/final.py ablation --scen toy-good` | `results/final/ablation_*.csv` | 1 h |
+| 316L calibration sensitivity | `python3 experiments/physics_sensitivity.py --n 24 --reps 5` | `results/final/physics_sensitivity_24.csv` | 20 min |
 | Monotonicity violations | `python3 experiments/violation.py` | `results/final/violation.csv` | 30 min |
 | Paper figures from the CSVs | `python3 experiments/paper_figs.py` | `paper/latex/figs/*.pdf` | 1 min |
 

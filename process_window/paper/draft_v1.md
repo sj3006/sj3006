@@ -230,7 +230,13 @@ generations with other failure definitions (repetition threshold
 0.15-0.3, NLL threshold 3.0-4.0, tolerance 5-20%; seven settings, 5 runs
 each): 1.6-2.2x fewer than no ordering, 2.2-4.1x fewer than full-grid
 fixed-sequence testing, no false certificate in 70 runs
-(results/lm/lm_sensitivity.csv).
+(results/lm/lm_sensitivity.csv). The 316L gains do not hinge on the
+placeholder calibration: absorptivity 0.30 / 0.40, lack-of-fusion
+threshold +-10%, keyhole or balling threshold +-20% (one at a time; safe
+regions of 14-106 of 576 settings at 24x24, 5 runs each) give 1.4-2.5x
+fewer trials than no ordering and 14-62x fewer than full-grid
+fixed-sequence testing (1.6x and 19x at the paper's values), no false
+certificate (results/final/physics_sensitivity_24.csv).
 
 **Fixed confidence** (synthetic window, good side information; the search
 stops on its own and certified the full target in 23 of 24 runs; the
@@ -269,7 +275,20 @@ ordering added (certificates spread to safer settings, as in monotone safe
 exploration), the GP at beta = 4 (lengthscales 0.2, 0.3, all four
 problems) certifies 23-87% of the region and an unsafe setting in
 2.5-27.5% of runs; the tuning that works on one problem fails on another
-(lengthscale 0.2: 5% on the LM, 27.5% on the synthetic grid).
+(lengthscale 0.2: 5% on the LM, 27.5% on the synthetic grid). Other
+sampling rules do not change this. BEAM-style active search (Latin
+hypercube, then the settings most likely safe) errs in 70-100% of runs at
+beta = 2 and 20-72.5% at 3; at beta = 4, lengthscale 0.1, it erred in 1 of
+40 runs on each simulated problem and certified 66-79% (ours 54-84%), the
+best GP result we found, but at lengthscale 0.3 it errs in 42.5% of runs
+on the drug screen, and 1 in 40 only bounds the error rate by 13% (95%).
+Safe expansion with the ordering (SafeOpt / M-SafeUCB style, samples only
+at the edge of the certified set) stalls at its seed on the synthetic and
+316L problems (0.7-3.7% of the region) or, at lengthscale 0.5 and beta =
+2, errs in every run; on the drug screen its three error-free tunings
+certify 2-55% and the other nine err in 37.5-100% of runs
+(results/final/gp_baseline_active_search.csv,
+gp_baseline_safe_expand_monotone.csv).
 
 **Ablations** (16x16, 8 runs, cost to certify half the region). The
 ordering and the allocation rule matter most (no ordering +69 to +213%;
@@ -296,4 +315,6 @@ evaluation of a single system.)
 Assumption A is load-bearing (Section 6); thin regions gain less at coarse
 resolution; the multiple-testing factor dominates the gap to the lower
 bound; the language-model study uses a small model and automatic judges;
-the manufacturing studies are simulated with placeholder calibrations.
+the manufacturing studies are simulated with placeholder calibrations
+(the gains hold when each is moved by 10-20%, but a real process map may
+differ more).

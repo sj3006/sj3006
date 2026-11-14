@@ -247,3 +247,24 @@ These change the method, so they need your answer before Phase 2:
   14.8. Table 1, Table 2, Figure 2 (new LM panel) and the abstract are
   updated. Waudby-Smith volume 86 issue 1 confirmed; only its page range
   is unchecked.
+- 2026-11-14: Submission pieces: Impact Statement, Appendix B (experiment
+  details), and an anonymous supplement builder (scripts/make_supplement.py;
+  refuses to write the zip if a name, path, e-mail or tool name is left).
+  Number audit against the result files; fixes: fixed-sequence testing
+  helps full grids by 17-37%; GP sentence; ablation signs; the LM
+  monotonicity check is now an exact binomial test (no setting outside 99%
+  on either grid). Table 2 did not reproduce because the search's start
+  rule had changed after the runs; the old rule (start at the edge the side
+  information predicts) is 6-14% cheaper, so it is the default again and
+  the 23 x 23 LM search figure is 52.1k (not 51.8k). New baselines at
+  16 x 16 (40 runs per tuning): BEAM-style active search errs in 70-100% of
+  runs at beta 2; at beta 4, lengthscale 0.1, it erred in 1 of 40 runs on
+  each problem and certified 66-79% (ours 54-84%), but at lengthscale 0.3
+  it errs in 42.5% on the drug screen. Safe expansion (SafeOpt/M-SafeUCB
+  style) stalls at its seed or overshoots. 316L sensitivity: moving the
+  absorptivity and each threshold by 10-20% leaves ours 1.4-2.5x cheaper
+  than no ordering and 14-62x cheaper than full-grid FST, no false
+  certificate. Search tightening: no gain found (weight mix within 2%; the
+  bracket probe rule makes no difference at 16 x 16; at 32 x 32 the
+  midpoint rule has the cheaper median, 165.6k vs 175.0k, but it is the
+  one with the probe time-out). Qwen2.5-0.5B surface measuring.
