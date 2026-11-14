@@ -2,3 +2,6 @@
 {'beta': 2.0, 'lengthscale': 0.2, 'runs': 20, 'fwer': 1.0, 'correct_frac': np.float64(0.985)}
 {'beta': 2.0, 'lengthscale': 0.3, 'runs': 20, 'fwer': 0.9, 'correct_frac': np.float64(0.991)}
 {'beta': 3.0, 'lengthscale': 0.1, 'runs': 20, 'fwer': 0.3, 'correct_frac': np.float64(0.963)}
+{'beta': 3.0, 'lengthscale': 0.2, 'runs': 20, 'fwer': 0.5, 'correct_frac': np.float64(0.968)}
+{'beta': 3.0, 'lengthscale': 0.3, 'runs': 20, 'fwer': 0.8, 'correct_frac': np.float64(0.972)}
+{'beta': 4.0, 'lengthscale': 0.1, 'runs': 20, 'fwer': 0.05, 'correct_frac': np.float64(0.94)}
