@@ -1012,13 +1012,17 @@ interpolated bilinearly, which keeps it monotone. The live run (seed 0,
 Validity: $8\times8$ grids with every rate equal to its tolerance
 (synthetic and drug screen), good and adversarial side information
 (predicting 0.1\% and 1\% everywhere), the cone, max and no-ordering
-rules, 4{,}000 trials per run, batches of 16, 400 runs each. Fixed budget:
+rules, 4{,}000 trials per run, batches of 16, 400 runs each; the GP
+certificates on the same worst case at confidence parameter 4 and
+lengthscales 0.1--0.3 (good side information). Fixed budget:
 5 runs per point (language model 8). Fixed confidence: 4 runs per grid
 (language model 8). Monotonicity violations: $16\times16$ synthetic
 window with a $1\times1$ or $2\times2$ pocket of lack-of-fusion rate 8\%
 or 15\% inside the safe region, 30k trials, 60 runs; the audit gives each
 certified setting up to 300 further trials. Threshold sensitivity on the
-language model: seven definitions, 5 runs each. All benchmark runs are
+language model: seven definitions, 5 runs each. 316L sensitivity: one
+change at a time at $24\times24$, 5 runs per method, budget $300N$.
+All benchmark runs are
 single-threaded NumPy on a 4-core CPU; the full benchmark takes about a
 day. Measuring the language-model surfaces took 1.6\,h ($12\times12$) and
 about 4\,h (the 385 new settings of the $23\times23$ grid).
