@@ -5,3 +5,7 @@ Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF
 [3/144] T=0.2 top_p=0.591 rep4>0.2: 0.275  NLL>3.5: 0.000  (215s)
 [4/144] T=0.2 top_p=0.636 rep4>0.2: 0.281  NLL>3.5: 0.000  (288s)
 [5/144] T=0.2 top_p=0.682 rep4>0.2: 0.281  NLL>3.5: 0.000  (358s)
+[6/144] T=0.2 top_p=0.727 rep4>0.2: 0.263  NLL>3.5: 0.000  (440s)
+[7/144] T=0.2 top_p=0.773 rep4>0.2: 0.344  NLL>3.5: 0.000  (512s)
+[8/144] T=0.2 top_p=0.818 rep4>0.2: 0.256  NLL>3.5: 0.000  (583s)
+[9/144] T=0.2 top_p=0.864 rep4>0.2: 0.325  NLL>3.5: 0.000  (653s)

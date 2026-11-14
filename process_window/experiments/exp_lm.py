@@ -12,7 +12,9 @@ Uses the measured failure-rate surface (pwcert/lm_scenario.py). Three parts:
 2. fixed confidence: SearchCertifier vs a per-setting two-sided test, with
    lower bounds;
 3. the GP level-set baseline's error rate on this surface, plain and with
-   the monotone closure ("gpmono").
+   the monotone closure ("gpmono");
+4. "check": how far the raw measured rates are from the monotone fit used
+   as ground truth (Assumption A on real generations).
 
 Run from process_window/:  python3 experiments/exp_lm.py [--reps 8]
 """
@@ -32,7 +34,7 @@ from pwcert.baselines import grid_doe, grid_fst  # noqa: E402
 from pwcert.bounds import ordered_lower_bound, unordered_lower_bound  # noqa: E402
 from pwcert.cone import ConeCertifier  # noqa: E402
 from pwcert.gp_baseline import GPLevelSet  # noqa: E402
-from pwcert.lm_scenario import make_lm_scenario  # noqa: E402
+from pwcert.lm_scenario import LM_DIRECTIONS, NLL_THRESH, PATH, REP_THRESH, load_scores, make_lm_scenario  # noqa: E402
 from pwcert.search import SearchCertifier  # noqa: E402
 
 OUT = os.path.join(os.path.dirname(__file__), "..", "results", "lm")
@@ -95,6 +97,46 @@ def fixed_budget(reps, budget):
                          for s in range(5)]) / W.sum() if n_per >= 1 else 0.0
             rows.append(dict(method=name, generations=int(cp), frac=round(a, 4), runs_with_errors=0))
     write(rows, "lm_fixed_budget.csv")
+
+
+def monotone_check(pilot_n=16):
+    """Raw rates (the generations after the pilot) vs the monotone fit.
+    Per setting: an exact two-sided binomial test of the raw count against
+    the fitted rate (standard errors are meaningless at rates near 0); we
+    count settings with p < 0.01 (about 1% expected from noise alone) and
+    report the largest absolute gap. A neighbouring pair is reversed if the
+    raw rate rises by more than two standard errors of the difference when
+    moving one step safer (about 2% expected between equal rates)."""
+    from scipy.stats import binom
+    sc = make_lm_scenario(EPS, "none", pilot_n=pilot_n, **FLAT_KW)
+    _, _, scores = load_scores(FLAT_KW.get("path", PATH))
+    nT, nP = sc.truth["degenerate"].shape
+    rows = []
+    for m, k, thr in (("degenerate", 0, REP_THRESH), ("incoherent", 1, NLL_THRESH)):
+        fails = [[scores[i][j][k][pilot_n:] > thr for j in range(nP)] for i in range(nT)]
+        N = np.array([[len(f) for f in r] for r in fails], float)
+        raw = np.array([[f.mean() for f in r] for r in fails])
+        fit = sc.truth[m]
+        k = np.rint(raw * N)
+        pval = np.minimum(1.0, 2 * np.minimum(binom.cdf(k, N, fit), binom.sf(k - 1, N, fit)))
+        gap = np.abs(raw - fit)
+        i, j = np.unravel_index(np.argmax(gap), gap.shape)
+        d = LM_DIRECTIONS[m]
+        pairs = reversed_ = 0
+        for ax in (0, 1):
+            if ax == 0:
+                a, b, na, nb = raw[:-1], raw[1:], N[:-1], N[1:]
+            else:
+                a, b, na, nb = raw[:, :-1], raw[:, 1:], N[:, :-1], N[:, 1:]
+            se = np.sqrt(a * (1 - a) / na + b * (1 - b) / nb)
+            rise = (b - a) * d[ax]          # > 0: riskier after a step toward safer
+            pairs += a.size
+            reversed_ += int((rise > 2 * se + 1e-12).sum())
+        rows.append(dict(mode=m, settings=raw.size, outside_99=int((pval < 0.01).sum()),
+                         max_gap=round(float(gap.max()), 4), at_raw=f"{int(k[i, j])}/{int(N[i, j])}",
+                         at_fit=round(float(fit[i, j]), 4), pairs=pairs, reversed_2se=reversed_))
+        print(rows[-1], flush=True)
+    write(rows, "lm_monotone_check.csv")
 
 
 def cost_to_fraction(reps, frac=0.5, budget=40_000):
@@ -199,6 +241,8 @@ def main():
         gp(max(args.reps, 20), args.budget // 2)
     if "gpmono" in args.parts:
         gp(max(args.reps, 20), args.budget // 2, monotone=True)
+    if "check" in args.parts:
+        monotone_check()
     if "cost" in args.parts:
         for frac in (0.5, 0.7):
             cost_to_fraction(max(args.reps, 5), frac, args.budget)

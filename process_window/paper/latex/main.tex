@@ -162,8 +162,8 @@ a cumulative sum; valid at every time under arbitrary adaptive sampling
 uncertified settings of a slightly shrunken target (the lower bound's
 binding constraints). For fixed confidence, a galloping/bisection search
 along the ordering with a two-sided probe that ends almost surely at
-every failure rate, including rates near the tolerance
-(Section~\ref{sec:alloc}).
+every failure rate, including rates near the tolerance, under a
+checkable condition on the bets (Section~\ref{sec:alloc}).
 \item \emph{Theory.} Lower bounds with and without the ordering (edge
 vs.\ area); upper bounds by Wald's identity; the search is within
 $O(\log n)$ and multiple-testing factors of the ordered lower bound
@@ -344,9 +344,12 @@ most $2M\min(n_1,n_2)$ settings, and without it all $N$.
 
 \begin{theorem}[oracle upper bound]\label{thm:oracle}
 Running trials only at a cover of $T$ costs at most
-$\sum_{\text{cover}}(\ln(16/(\alpha w))+b)/g(p)$ in expectation, where
-$g(p)$ is the best growth rate of the fixed bets; $\KL(p\|\eps)/g(p)\in
-[1.00,1.05]$ for $p\in[0.5\%,4\%]$ at $\eps=5\%$.
+$\sum_{\text{cover}}T_c(p)$ in expectation (plus one batch per cover
+point), where $T_c(p)=(\ln(16/(\alpha w))+\ln(1+\lambda^*\eps))/g_c(p)$,
+$g_c(p)=\max_j\E_p\ln(1+\lambda_j(\eps-Y))$ is the best growth rate of
+the fixed bets $\lambda_j$, and $\lambda^*$ attains it;
+$\KL(p\|\eps)/g_c(p)\in[1.00,1.05]$ for $p\in[0.5\%,4\%]$ at
+$\eps=5\%$.
 \end{theorem}
 
 \begin{theorem}[search]\label{thm:search}
@@ -360,7 +363,8 @@ where $P_{m,j}=2\lceil\log_2 d_{m,j}\rceil+2$, $d_{m,j}$ is the distance
 from the first probe in row $j$ to the far end of mode $m$'s slack band
 (rates between $q\eps_m$ and $\eps_m$), $B$ is the batch size, and
 $C^*=\max_p\min(T_c(p),T_r(p))<\infty$ is the largest expected
-two-sided probe length.
+two-sided probe length ($T_r(p)$: the expected time to reject at rate $p$,
+defined like $T_c$ with the rejection bets).
 \end{theorem}
 Condition (T) asks that at every rate $p$ some fixed certification bet or
 some fixed rejection bet has positive expected log-growth. It is a
@@ -374,7 +378,8 @@ completeness only through the probability that a target probe times out.
 \begin{corollary}[edge vs.\ area]
 On an $n\times n$ grid the ordered bound involves $O(Mn)$ settings and
 the unordered bound $O(n^2)$. The search is within a factor $O(\log n)$,
-the ratio $C^*/C(p_{\text{boundary}})$, and the multiple-testing factor
+the ratio of $C^*$ to $T_c$ at the rates on the target's edge, and the
+multiple-testing factor
 $\ln(16MN/(\alpha w))/K_1$ of the ordered lower bound.
 \end{corollary}
 Whether the $\ln N$ in the multiple-testing factor is necessary for a
@@ -395,10 +400,11 @@ repeated \citep{welleck2020unlikelihood}, \emph{incoherent} = mean token
 NLL under the unmodified model above 3.5 nats; $\eps = 10\%$ for both.
 Ground truth from 144 generations per setting (monotone fit); side
 information is a pilot of 16 separate generations per setting, counted in
-the budget. The raw rates are consistent with Assumption~A: the largest
-deviation from the monotone fit is 1.8 standard errors (repetition) and
-0.6 (incoherence), and 1 of 264 neighbouring pairs is reversed by more
-than two standard errors. 78 of the 144 settings are safe
+the budget. The raw rates are consistent with Assumption~A: no setting
+differs from the monotone fit at the 1\% level (exact binomial test), and
+1 of 264 neighbouring pairs is reversed by more than two standard errors
+(8 of 1012 on a finer grid, below), fewer than noise alone reverses
+between equal rates. 78 of the 144 settings are safe
 (Figure~\ref{fig:lm}). Benchmark runs draw fresh outcomes from the fitted
 surface. As a check, one live run queried the model directly: with 8.0k
 real generations it certified 64 of the 78 safe settings and no unsafe
@@ -464,7 +470,7 @@ Figure~\ref{fig:scaling}. The gap to the
 unordered method grows with resolution (synthetic: 3.2$\times$ at $16^2$,
 9.1$\times$ at $48^2$), as the edge-vs-area bounds predict. The full grids
 pay for the whole area; fixed-sequence testing helps them by only
-20--40\%. At $24\times24$, to certify 70\% of the region, ours needs
+17--37\%. At $24\times24$, to certify 70\% of the region, ours needs
 5.0$\times$ fewer trials than no ordering on the synthetic window,
 1.5--1.7$\times$ on Rosenthal 316L and 1.3$\times$ on the drug screen.
 The language model shows the same trend. Refining its grid from
@@ -485,7 +491,7 @@ with repetition thresholds 0.15--0.3, NLL thresholds 3.0--4.0 nats and
 tolerances 5--20\% (seven settings, 5 runs each) gives 1.6--2.2$\times$
 fewer generations than no ordering and 2.2--4.1$\times$ fewer than
 full-grid fixed-sequence testing to certify half of the safe region, with
-no unsafe setting certified in any of the 70 runs.
+no unsafe setting certified in any of the 70 adaptive runs.
 
 \begin{table}[t]
 \centering\small
@@ -523,7 +529,7 @@ time and the lower bounds of Theorem~\ref{thm:lb}.}
 Figure~\ref{fig:fc}. The ordered bound grows
 roughly linearly in $n$ and the unordered one quadratically, as
 Theorem~\ref{thm:lb} predicts. Both methods pay a similar multiple-testing
-price over their own bound (per-setting: 4.8--5.9$\times$;
+price over their own bound (per-setting: 4.6--5.9$\times$, language model included;
 $\ln(16MN/(\alpha w))/K_1\approx5$ at $32^2$); the search's extra growth
 with $n$ is the $O(\log n)$ probe factor. With optimistic side information
 at $32^2$ the search needs 215k trials against 458k without the ordering.
@@ -541,9 +547,11 @@ configurations at $\alpha=5\%$ (400 runs each); no unsafe setting was
 certified in any efficiency run.
 
 \paragraph{Model-based baseline.} The GP level-set certificate certifies an
-unsafe setting in 40--100\% of runs at confidence parameter 2 and still
-7.5--20\% at 4, where it certifies at most 69\% (drug screen) and typically
-under 25\% of the region; ours: 0\% and 54--84\%. On the language
+unsafe setting in 40--100\% of runs at confidence parameter 2. At 4 it
+still does so in 7.5--20\% of runs whenever it certifies more than a
+tenth of the region (15--69\%); the tunings with no error certify at most
+8\%. Ours: 0\% and 54--84\% (simulated problems, $16\times16$, 40 runs
+per tuning). On the language
 model (20k generations, 20 runs) the GP certifies an unsafe setting in
 95--100\% of runs at confidence parameter 2 and 15--60\% at 3; at 4 it is
 at 0--10\% but certifies 0--78\% of the region. Ours at the same budget:
@@ -555,10 +563,15 @@ works on one problem fails on another (lengthscale 0.2: 5\% on the
 language model, 27.5\% on the synthetic grid), and nothing in the data
 says which tuning to trust.
 
-\paragraph{Ablations.} The ordering and the allocation rule matter most
-(no ordering +69 to +213\%; greedy allocation +63 to +94\%); weights,
-pooling and bet seeding give smaller gains; a fixed maximum bet fails when
-relevant rates are near the tolerance.
+\paragraph{Ablations.} Cost to certify half the region at $16\times16$
+(8 runs; synthetic window with good and optimistic side information, drug
+screen). The ordering and the allocation rule matter most: without the
+ordering the cost rises by 69--213\%, with greedy area-per-trial
+allocation by 63--94\%. Edge-point weights, pooling across the cone and
+seeding bets with side information matter less ($-7$ to $+41\%$ when
+removed) and each helps on at least one problem. A fixed maximum bet is
+16\% cheaper on the easy synthetic problem but never reaches half the
+region on the drug screen, where relevant rates are near the tolerance.
 
 \paragraph{When monotonicity fails.} A pocket of unsafe settings inside the
 region is certified by spreading in 75--92\% of runs; an audit re-testing
@@ -616,10 +629,12 @@ parameters \citep{beam2026}; dose finding for combinations
 \section{Limitations}
 
 Assumption~A is load-bearing (Section~\ref{sec:exp}); thin regions gain
-less at coarse resolution; the multiple-testing factor dominates the gap
-to the lower bound; the language-model study uses a small model and
-automatic judges; the manufacturing studies are simulated with placeholder
-calibrations.
+less at coarse resolution; the search's gap to the lower bound grows with
+the grid (the multiple-testing and probe factors), reaching 13.5--14.8
+at about 500--2300 settings; the language-model benchmark draws outcomes from
+a measured surface (one live run agrees with it), with a small model and
+automatic judges; the manufacturing studies are simulated with
+placeholder calibrations.
 
 \section*{Impact Statement}
 

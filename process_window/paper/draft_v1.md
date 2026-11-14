@@ -199,9 +199,11 @@ multiple-testing factor ln(MN/alpha)/L of the ordered lower bound.
   20% of 4-grams repeated, incoherent = mean token NLL above 3.5 nats;
   eps = 10% for both. Ground truth from 144 generations per setting
   (monotone fit); side information = a pilot of 16 separate generations per
-  setting (counted in the budget). The raw rates fit Assumption A: largest
-  deviation from the monotone fit 1.8 SE (repetition) and 0.6 SE
-  (incoherence); 1 of 264 neighbouring pairs reversed by more than 2 SE.
+  setting (counted in the budget). The raw rates fit Assumption A: no setting
+  differs from the monotone fit at the 1% level (exact binomial test); 1 of
+  264 neighbouring pairs reversed by more than 2 SE (8 of 1012 on 23x23),
+  fewer than noise reverses between equal rates
+  (results/lm/lm_monotone_check*.csv).
   78 of 144 settings are safe.
 - *Additive manufacturing.* A Rosenthal melt-pool model of 316L with
   Tang et al. lack-of-fusion, King et al. keyhole and length/width balling
@@ -255,9 +257,10 @@ false certification across configurations at alpha = 5% (400 runs each);
 no unsafe setting certified in any efficiency run.
 
 **Model-based baseline.** GP level-set certification certifies an unsafe
-setting in 40-100% of runs at beta = 2 and still 7.5-20% at beta = 4,
-where it certifies at most 69% (drug screen) and typically under 25% of
-the region; ours: 0% and 54-84%. Language model (20k generations, 20
+setting in 40-100% of runs at beta = 2. At beta = 4 it still does so in
+7.5-20% of runs whenever it certifies more than a tenth of the region
+(15-69%); the tunings with no error certify at most 8%. Ours: 0% and
+54-84%. Language model (20k generations, 20
 runs): GP certifies an unsafe setting in 95-100% of runs at beta = 2,
 15-60% at 3, 0-10% at 4 (then certifying 0-78% of the region); ours at
 the same budget: 90% of the region, no unsafe setting in 8 runs. With the
@@ -267,10 +270,12 @@ problems) certifies 23-87% of the region and an unsafe setting in
 2.5-27.5% of runs; the tuning that works on one problem fails on another
 (lengthscale 0.2: 5% on the LM, 27.5% on the synthetic grid).
 
-**Ablations.** The ordering and the allocation rule matter most (no
-ordering +69 to +213%; greedy allocation +63 to +94%); weights, pooling and
-bet seeding give smaller gains; a fixed maximum bet fails when relevant
-rates are near the tolerance.
+**Ablations** (16x16, 8 runs, cost to certify half the region). The
+ordering and the allocation rule matter most (no ordering +69 to +213%;
+greedy allocation +63 to +94%). Edge-point weights, cone pooling and bet
+seeding matter less (-7 to +41% when removed), each helping on at least
+one problem. A fixed maximum bet is 16% cheaper on the easy synthetic
+problem but never reaches half the region on the drug screen.
 
 **When monotonicity fails.** A pocket of unsafe settings inside the region
 is certified by spreading in 75-92% of runs; an audit re-testing every
