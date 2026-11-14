@@ -409,7 +409,8 @@ on average by benchmark runs at the same budget.
 keyhole \citep{king2014keyhole} and balling criteria, and a synthetic
 window with controllable simulator error.
 \emph{Drug combinations.} Toxicity and non-response surfaces with a synergy
-term; Bliss independence \citep{bliss1939} as side information.
+term; Bliss independence \citep{bliss1939} as side information. All
+parameters are in Appendix~\ref{app:exp}.
 
 \paragraph{Baselines.} \emph{No ordering}: the same e-processes, weights
 and allocation, without the cone (each setting on its own). \emph{Full
@@ -620,6 +621,25 @@ to the lower bound; the language-model study uses a small model and
 automatic judges; the manufacturing studies are simulated with placeholder
 calibrations.
 
+\section*{Impact Statement}
+
+This paper gives a way to certify which settings of a system keep every
+failure mode rare, with fewer trials than testing each setting on its own.
+Fewer trials means less material and machine time in process
+qualification, less compute when choosing sampling settings for a deployed
+language model, and, in dose-combination screening, fewer subjects exposed;
+any clinical use would need validation well beyond this paper. The
+guarantee is only as good as its assumptions: trials at a setting must be
+independent, each failure mode must be monotone in the declared
+direction, and the failure judges must measure what matters. A wrong
+ordering or a poor judge can turn a certificate into false confidence.
+We report how the method degrades when monotonicity is violated and give
+an audit that flags gross violations, but a certificate should be one
+input to a qualification decision, not a substitute for domain review. In
+the language-model study the judges are automatic proxies (repeated
+4-grams and the model's own token NLL); a certified region says nothing
+about factual accuracy or harmful content.
+
 \ificmlstyle\bibliographystyle{icml2026}\else\bibliographystyle{plainnat}\fi
 \bibliography{references}
 
@@ -816,5 +836,135 @@ K_1/C_x, & x\in T,\\
 \]
 \end{proof}
 
+
+\section{Experiment details}\label{app:exp}
+
+Code to reproduce every number, table and figure is in the supplementary
+material; each table and figure has one command.
+
+\subsection{Common settings}
+All methods target family-wise error $\alpha=5\%$. Adaptive methods choose
+a batch of $2n$ trials on an $n\times n$ grid, then see all its outcomes.
+Every run has a fixed random seed. In fixed-budget runs, the cost to certify a
+fraction $f$ of the safe region $W$ is the number of trials (pilot
+included where used) at the first batch after which at least
+$\lceil f|W|\rceil$ safe settings are certified; we report the median over
+runs. Full-grid baselines put the same number of trials at every setting;
+their cost is the smallest per-setting count, on 60 geometrically spaced
+values from 20 to 5000, at which the mean certified area over 3 seeds
+reaches the target, times $N$.
+
+\paragraph{E-processes.} Bets are capped at $\lambda_{\max}=0.8/(1-\eps)$.
+The hedge averages two e-processes: a plug-in bet
+$\lambda=(\eps-\hat\mu)/(\hat\sigma^2+(\eps-\hat\mu)^2)$, clipped to
+$[0,\lambda_{\max}]$, with running moments seeded by a prior worth 10
+trials at the rate the side information predicts (4 trials when the
+side information is a pilot fit on the simulated problems); and a uniform
+mixture of fixed bets at $\{0.05,0.1,0.2,0.35,0.5,0.7,0.85,1\}\,
+\lambda_{\max}$.
+
+\paragraph{Weights.} Ours: half uniform ($1/(MN)$ each), half the
+frequency with which a setting is a riskiest element of the target
+$\{x: p_m(x)\le q'\eps_m\ \forall m\}$ for that mode, over 400 draws of
+independent per-mode logit shifts $\mathcal N(0,1)$ of the side
+information and $q'\in\{0.5,0.6,0.7\}$. No ordering: uniform weights and
+no cone (each setting certified by its own e-process only).
+
+\paragraph{Edge allocation.} Rate estimates are the running means seeded
+by the side-information prior above. The estimated target is the set of
+settings with every estimate below $0.7\eps$. For each mode, the batch
+goes to the riskiest uncertified settings of the estimated target, each
+given its expected remaining trials (log-wealth still missing over the
+estimated KL rate), cheapest first. When the estimated target is covered,
+trials go to uncertified settings with the smallest lower confidence
+bound. A setting with at least 60 trials whose estimate exceeds $\eps$ by
+two standard errors gets no further trials. Allocation never affects
+validity (Theorem~\ref{thm:valid}).
+
+\paragraph{Search and per-setting test (fixed confidence).} $q=0.5$,
+$\beta=5\%$. The rejection e-process is a uniform mixture of bets on
+failures, $\lambda\in\{0.025,0.05,0.1,0.2,0.4\}/(q\eps)$, with threshold
+$MN/\beta$. Each probe gets at least 8 trials per batch; two rows per mode
+are searched at a time. A probe that runs past twice the expected cost of
+certifying a setting at rate exactly $q\eps$ times out; time-outs never
+certify. The per-setting baseline runs the same two-sided test at every
+undecided setting, with uniform weights and no cone, splitting each batch
+evenly (at least 8 trials per setting).
+
+\paragraph{GP level set.} One GP per mode on the empirical rates at
+observed settings; coordinates scaled to $[0,1]^2$; RBF kernel with signal
+standard deviation 0.15 and lengthscale $\ell\in\{0.1,0.2,0.3\}$; prior
+mean $\eps$; noise variance $\max(r(1-r),\eps(1-\eps)/4)/n_x$ at a setting
+with $n_x$ trials and empirical rate $r$. $(m,x)$ is certified once
+$\mu_m(x)+\beta_{\mathrm{GP}}\sigma_m(x)<\eps_m$, with
+$\beta_{\mathrm{GP}}\in\{2,3,4\}$; certificates are kept. Each batch puts
+4 trials at each of the 6 settings with the largest
+$\beta_{\mathrm{GP}}\sigma-|\mu-\eps|$ (the straddle rule of level-set
+estimation). With the ordering, after each batch a certificate for mode
+$m$ also certifies every setting safer for $m$. Budget: $60N$ trials on
+the simulated problems ($16\times16$, 40 runs per tuning) and 20k
+generations on the language model (20 runs per tuning).
+
+\subsection{Problems}
+
+\paragraph{Synthetic window.} Power 120--380\,W, speed 400--2000\,mm/s,
+hatch 0.1\,mm, layer 0.03\,mm, $\mathrm{VED}=P/(vht)$ in J/mm$^3$. Each
+rate is $0.002+0.998\,\sigma(z)$ with $z=(38-\mathrm{VED})/4$ (lack of
+fusion), $(P/\sqrt v-12)/0.5$ (keyhole) and $(v/P-11)/0.8$ (balling);
+$\eps=5\%$ for each. Side information: the same model with thresholds
+shifted by $-2$, $+0.3$, $+0.3$ (good) or $-10$, $+1.5$, $+1.5$
+(optimistic).
+
+\paragraph{Rosenthal 316L.} Conductivity 20\,W/(m\,K), density
+7900\,kg/m$^3$, specific heat 500\,J/(kg\,K), melting point 1700\,K,
+absorptivity 0.35, ambient 300\,K, beam radius 50\,\textmu m, hatch
+100\,\textmu m, layer 30\,\textmu m; power 80--400\,W, speed
+300--2400\,mm/s. Melt-pool width, depth and length come from the
+Rosenthal solution. Each rate is $0.002+0.998\,\sigma((I-I_0)/s)$ for the
+lack-of-fusion index $(h/W)^2+(t/D)^2$ ($I_0=1$, $s=0.05$), the
+normalized enthalpy ($I_0=9$, $s=0.6$) and $L/W$ ($I_0=6.5$, $s=0.3$);
+$\eps=5\%$. These thresholds are placeholder calibrations, chosen so
+that a window is visible in this range; the literature values (about 30
+and $\pi$) assume real melt pools, which the Rosenthal model does not
+give. The monotone directions are checked numerically on the truth.
+Side information: absorptivity $+0.01$ and thresholds shifted by $-0.03$,
+$+0.3$, $+0.2$.
+
+\paragraph{Drug combinations.} Doses 0.05--20 for each drug, spaced
+geometrically. Single agents are log-logistic: toxicity EC$_{50}$ 8 and 12,
+slopes 1.6 and 1.4; response EC$_{50}$ 1.5 and 2.5, slopes 1.2 and 1.0.
+Combinations follow Bliss independence plus an interaction
+$4\ln(1+a)\ln(1+b)/\ln(21)^2$ on the logit scale, with weight 0.6 for
+toxicity and 1.2 for response. $\eps$ is 30\% for toxicity and 50\% for
+non-response. Side information: Bliss independence alone (no interaction).
+
+\paragraph{Language model.} SmolLM2-135M (base model) on CPU with PyTorch
+and Hugging Face Transformers. Prompts are the first 12 words of 400
+randomly chosen WikiText-2 test paragraphs with more than 40 words
+(headings excluded); each generation draws a prompt at random and samples
+48 new tokens. Repetition is $1-{}$(distinct 4-grams)/(4-grams) of the
+continuation; incoherence is the continuation's mean token NLL under the
+model at temperature 1 with no truncation. 160 generations per setting:
+the first 16 form the pilot, the other 144 the ground truth (a 2D
+isotonic fit per mode). The $23\times23$ grid uses 23 equally spaced
+values on the same ranges and contains the $12\times12$ grid; its pilot
+uses only the $12\times12$ settings (2{,}304 generations) and is
+interpolated bilinearly, which keeps it monotone. The live run (seed 0,
+8.0k generations) generates every requested trial with the model.
+
+\subsection{Runs and compute}
+Validity: $8\times8$ grids with every rate equal to its tolerance
+(synthetic and drug screen), good and adversarial side information
+(predicting 0.1\% and 1\% everywhere), the cone, max and no-ordering
+rules, 4{,}000 trials per run, batches of 16, 400 runs each. Fixed budget:
+5 runs per point (language model 8). Fixed confidence: 4 runs per grid
+(language model 8). Monotonicity violations: $16\times16$ synthetic
+window with a $1\times1$ or $2\times2$ pocket of lack-of-fusion rate 8\%
+or 15\% inside the safe region, 30k trials, 60 runs; the audit gives each
+certified setting up to 300 further trials. Threshold sensitivity on the
+language model: seven definitions, 5 runs each. All benchmark runs are
+single-threaded NumPy on a 4-core CPU; the full benchmark takes about a
+day. Measuring the language-model surfaces took 1.6\,h ($12\times12$) and
+about 4\,h (the 385 new settings of the $23\times23$ grid).
 
 \end{document}

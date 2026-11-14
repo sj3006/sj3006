@@ -12,6 +12,9 @@ Run from process_window/:
 --n 23 measures the finer grid linspace(.., 23), which contains the 12 x 12
 grid at even indices; those 144 settings are copied from surface_scores.npz
 instead of being generated again (output: surface_scores_23.npz).
+
+--model NAME --tag TAG measures another model on the 12 x 12 grid (output:
+surface_scores_TAG.npz); the NLL judge is then that model's own NLL.
 """
 
 import argparse
@@ -22,7 +25,7 @@ import time
 import numpy as np
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from pwcert.lm import generate_and_score, load, wikitext_prompts  # noqa: E402
+from pwcert.lm import MODEL, generate_and_score, load, wikitext_prompts  # noqa: E402
 
 OUT = os.path.join(os.path.dirname(__file__), "..", "results", "lm")
 
@@ -39,10 +42,16 @@ def main():
     ap.add_argument("--per-setting", type=int, default=160)
     ap.add_argument("--batch", type=int, default=32)
     ap.add_argument("--n", type=int, default=12)
+    ap.add_argument("--model", default=MODEL)
+    ap.add_argument("--tag", default=None, help="output suffix for a model other than the default")
     args = ap.parse_args()
     os.makedirs(OUT, exist_ok=True)
     temps, tops = grid(args.n)
-    path = os.path.join(OUT, "surface_scores.npz" if args.n == 12 else f"surface_scores_{args.n}.npz")
+    if args.model != MODEL:
+        assert args.tag and args.n == 12, "another model needs --tag and the 12 x 12 grid"
+        path = os.path.join(OUT, f"surface_scores_{args.tag}.npz")
+    else:
+        path = os.path.join(OUT, "surface_scores.npz" if args.n == 12 else f"surface_scores_{args.n}.npz")
     done = dict(np.load(path, allow_pickle=True)) if os.path.exists(path) else {}
     done.pop("temps", None)
     done.pop("tops", None)
@@ -52,7 +61,7 @@ def main():
         for i in range(12):
             for j in range(12):
                 done.setdefault(f"{2 * i}_{2 * j}", base[f"{i}_{j}"])
-    tok, model = load()
+    tok, model = load(args.model)
     prompts = wikitext_prompts(400)
     t0 = time.time()
     for i, T in enumerate(temps):
