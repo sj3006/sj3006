@@ -8,6 +8,9 @@ every method in results/lm/lm_fixed_budget.csv.
 
 Run from process_window/ after experiments/exp_lm.py:
     python3 experiments/lm_figure.py [--budget 8000] [--path results/lm/surface_scores.npz]
+For the nested 23 x 23 grid (pilot at the 12 x 12 settings):
+    python3 experiments/lm_figure.py --path results/lm/surface_scores_23.npz --pilot-stride 2
+(outputs get the surface file's suffix, e.g. fig_lm_surface_23.pdf).
 """
 
 import argparse
@@ -55,8 +58,8 @@ def _extent(sc):
     return [t[0] - dt, t[-1] + dt, p[0] - dp, p[-1] + dp]
 
 
-def surface_figure(path, budget, seed=0):
-    sc = make_lm_scenario(0.10, "pilot", path=path)
+def surface_figure(path, budget, seed=0, pilot_stride=1, suffix=""):
+    sc = make_lm_scenario(0.10, "pilot", path=path, pilot_stride=pilot_stride)
     n = sc.truth["degenerate"].shape[0]
     c = ConeCertifier(sc, rule="cone", weights="ensemble", alloc="edge", target_q=0.7, batch=2 * n,
                       coupons0=sc.meta["pilot_coupons"], rng=np.random.default_rng(seed))
@@ -79,12 +82,13 @@ def surface_figure(path, budget, seed=0):
     reg = np.where(C, 2, np.where(W, 1, 0)).T
     axes[2].imshow(reg, origin="lower", extent=ext, aspect="auto",
                    cmap=ListedColormap([SURFACE, SAFE_FILL, CERT_FILL]), vmin=0, vmax=2)
-    # 2px surface gaps between cells keep the grid readable.
+    # Surface gaps between cells keep the grid readable (thinner on fine grids).
     t, p = sc.power, sc.speed
+    gap = 1.0 if n <= 12 else 0.5
     for x in (t[:-1] + t[1:]) / 2:
-        axes[2].axvline(x, color=SURFACE, lw=1.0)
+        axes[2].axvline(x, color=SURFACE, lw=gap)
     for y in (p[:-1] + p[1:]) / 2:
-        axes[2].axhline(y, color=SURFACE, lw=1.0)
+        axes[2].axhline(y, color=SURFACE, lw=gap)
     axes[2].set_title(f"Certified after {c.coupons / 1000:.1f}k generations", fontsize=9)
     _style(axes[2])
     from matplotlib.patches import Patch
@@ -96,7 +100,7 @@ def surface_figure(path, budget, seed=0):
         ax.set_xlabel("temperature")
     axes[0].set_ylabel("top-p")
     for ext_ in ("png", "pdf"):
-        fig.savefig(os.path.join(OUT, f"fig_lm_surface.{ext_}"), dpi=200, facecolor=SURFACE)
+        fig.savefig(os.path.join(OUT, f"fig_lm_surface{suffix}.{ext_}"), dpi=200, facecolor=SURFACE)
     plt.close(fig)
     print("certified", int(C.sum()), "of", int(W.sum()), "safe; unsafe certified:", int((C & ~W).sum()))
 
@@ -133,10 +137,14 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--budget", type=int, default=8000)
     ap.add_argument("--path", default=PATH)
+    ap.add_argument("--pilot-stride", type=int, default=1)
     args = ap.parse_args()
     os.makedirs(OUT, exist_ok=True)
-    surface_figure(args.path, args.budget)
-    budget_figure()
+    stem = os.path.splitext(os.path.basename(args.path))[0]
+    suffix = stem.replace("surface_scores", "")
+    surface_figure(args.path, args.budget, pilot_stride=args.pilot_stride, suffix=suffix)
+    if not suffix:
+        budget_figure()
 
 
 if __name__ == "__main__":

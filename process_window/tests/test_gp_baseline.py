@@ -34,3 +34,34 @@ def test_monotone_gp_runs():
     sc = make_scenario(8, 8)
     h = GPLevelSet(sc, beta=2.0, batch=16, rng=np.random.default_rng(0), monotone=True).run(2000)
     assert h[-1]["coupons"] >= 2000 and h[-1]["area"] > 0
+
+
+def test_latin_hypercube_hits_distinct_strata():
+    sc = make_scenario(12, 12)
+    g = GPLevelSet(sc, rng=np.random.default_rng(3), acquisition="active_search")
+    idx = g._latin_hypercube(6)
+    r, c = np.unravel_index(idx, g.shape)
+    assert len(set(r // 2)) == 6 and len(set(c // 2)) == 6     # one per stratum of 2 rows / 2 cols
+
+
+def test_active_search_runs_and_starts_with_lhs():
+    sc = make_scenario(8, 8)
+    g = GPLevelSet(sc, beta=2.0, batch=16, rng=np.random.default_rng(0), acquisition="active_search")
+    g.run_plate()
+    assert (g.n > 0).sum() == 4          # first batch: 4 LHS settings x 4 trials
+    h = g.run(2000)
+    assert h[-1]["coupons"] >= 2000
+
+
+def test_safe_expand_samples_only_inside_the_safe_set():
+    """Every trial goes to the seed or to a setting certified before the batch."""
+    sc = make_scenario(8, 8)
+    g = GPLevelSet(sc, beta=2.0, batch=16, rng=np.random.default_rng(0), acquisition="safe_expand",
+                   monotone=True)
+    seed = g._seed()
+    for _ in range(30):
+        allowed = g.certified.all(axis=0).copy()
+        allowed[seed] = True
+        n_before = g.n.copy()
+        g.run_plate()
+        assert allowed[g.n > n_before].all()

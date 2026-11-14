@@ -12,7 +12,8 @@ Uses the measured failure-rate surface (pwcert/lm_scenario.py). Three parts:
 2. fixed confidence: SearchCertifier vs a per-setting two-sided test, with
    lower bounds;
 3. the GP level-set baseline's error rate on this surface, plain and with
-   the monotone closure ("gpmono");
+   the monotone closure ("gpmono"), and with BEAM-style active search
+   ("gpbeam") or safe expansion with the closure ("gpsafe") as sampling rule;
 4. "check": how far the raw measured rates are from the monotone fit used
    as ground truth (Assumption A on real generations).
 
@@ -198,23 +199,26 @@ def fixed_confidence(reps):
     write([row], "lm_fixed_confidence.csv")
 
 
-def gp(reps, budget, monotone=False):
+def gp(reps, budget, monotone=False, acquisition="straddle", lengthscales=(0.1, 0.2, 0.3)):
     sc = make_lm_scenario(EPS, "pilot", **PILOT_KW)
     W = sc.true_window()
     rows = []
     for beta in (2.0, 3.0, 4.0):
-        for ls in (0.1, 0.2, 0.3):
+        for ls in lengthscales:
             errs, areas = 0, []
             for r in range(reps):
                 g = GPLevelSet(sc, beta=beta, lengthscale=ls, batch=24, rng=np.random.default_rng(r),
-                               monotone=monotone)
+                               monotone=monotone, acquisition=acquisition)
                 h = g.run(budget)
                 errs += int(max(x["errors"] for x in h) > 0)
                 areas.append(h[-1]["area"] - h[-1]["errors"])
             rows.append(dict(beta=beta, lengthscale=ls, runs=reps, fwer=round(errs / reps, 3),
                              correct_frac=round(float(np.mean(areas)) / W.sum(), 3)))
             print(rows[-1], flush=True)
-    write(rows, "lm_gp_monotone.csv" if monotone else "lm_gp.csv")
+    if acquisition == "straddle":
+        write(rows, "lm_gp_monotone.csv" if monotone else "lm_gp.csv")
+    else:
+        write(rows, f"lm_gp_{acquisition}{'_monotone' if monotone else ''}.csv")
 
 
 def main():
@@ -241,6 +245,11 @@ def main():
         gp(max(args.reps, 20), args.budget // 2)
     if "gpmono" in args.parts:
         gp(max(args.reps, 20), args.budget // 2, monotone=True)
+    if "gpbeam" in args.parts:
+        gp(max(args.reps, 20), args.budget // 2, acquisition="active_search")
+    if "gpsafe" in args.parts:
+        gp(max(args.reps, 20), args.budget // 2, monotone=True, acquisition="safe_expand",
+           lengthscales=(0.1, 0.2, 0.3, 0.5))
     if "check" in args.parts:
         monotone_check()
     if "cost" in args.parts:
