@@ -40,12 +40,18 @@ REJECT_FRACTIONS = np.array([0.025, 0.05, 0.1, 0.2, 0.4])   # bets as fractions 
 
 
 class SearchCertifier(ConeCertifier):
-    def __init__(self, scenario, q=0.5, beta=0.05, per_probe=8, warm_start="both",
-                 concurrent_rows=2, timeout=2.0, **kw):
+    def __init__(self, scenario, q=0.5, beta=0.05, per_probe=8, warm_start="sim",
+                 concurrent_rows=2, timeout=2.0, bracket_probe="mid", **kw):
         kw.setdefault("alloc", "edge")       # parent's allocation is not used
         kw.setdefault("target_q", q)
         super().__init__(scenario, **kw)
         self.q, self.per_probe, self.warm_start = q, per_probe, warm_start
+        # Where to probe once a row's edge is bracketed: "mid" (bisection),
+        # "walk" (the safest undecided setting, next to the certified ones)
+        # or "quarter" (a quarter of the way from the certified side).
+        if bracket_probe not in ("mid", "walk", "quarter"):
+            raise ValueError("bracket_probe must be 'mid', 'walk' or 'quarter'")
+        self.bracket_probe = bracket_probe
         # Rows are searched riskiest first (in the across-row direction), a
         # few at a time per mode: a certificate in a risky row covers a
         # quadrant that spans the safer rows, so searching them later is
@@ -152,9 +158,20 @@ class SearchCertifier(ConeCertifier):
                 return ok[-1]                   # riskiest predicted-in-target setting
             return und[0]
         return und[len(und) // 2]
-    # warm_start: True / "sim" (simulator's predicted edge), "neighbor" (edge
-    # found in an adjacent row), "both" (neighbour if available, else
-    # simulator), False (middle of the row).
+    # warm_start: True / "sim" (simulator's predicted edge; the default),
+    # "neighbor" (edge found in an adjacent row), "both" (neighbour if
+    # available, else simulator), False (middle of the row). On the synthetic
+    # window "sim" is 6-14% cheaper than "both" with good side information
+    # (16x16 to 48x48) and costs the same with optimistic side information,
+    # where "both" needs fewer probes.
+
+    def _bracket_choice(self, und):
+        """Probe inside a bracket; und is ordered safest first."""
+        if self.bracket_probe == "walk":
+            return und[0]
+        if self.bracket_probe == "quarter":
+            return und[len(und) // 4]
+        return und[len(und) // 2]
 
     def choose_plate(self):
         excluded = self.rejected.any(axis=0)
@@ -197,9 +214,9 @@ class SearchCertifier(ConeCertifier):
                         x = row[min(und_pos, key=lambda k: abs(k - target))]
                     else:
                         st["bracketed"] = True
-                        x = und[len(und) // 2]
+                        x = self._bracket_choice(und)
                 else:
-                    x = und[len(und) // 2]
+                    x = self._bracket_choice(und)
                 st["probe"] = x
                 self._probe_start[(m, j, x)] = self.n_at[x]
                 probes.append(x)

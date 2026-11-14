@@ -129,6 +129,7 @@ def main():
     ap.add_argument("--sims", default="good,biased")
     ap.add_argument("--sizes", default="8,12,16,24,32,48")
     ap.add_argument("--out", default="fixed_confidence.csv")
+    ap.add_argument("--methods", default="search,per-setting")
     ap.add_argument("--recompute-bounds", nargs="*", default=None,
                     help="rewrite the bound columns of these result files and exit")
     args = ap.parse_args()
@@ -142,7 +143,7 @@ def main():
         for n in sizes:
             sc = make_scenario(n, n, simulator=sim)
             row = dict(sim=sim, n=n, **bound_columns(sc))
-            for method in ("search", "per-setting"):
+            for method in args.methods.split(","):
                 if method == "per-setting" and n > 32:
                     row[method] = np.nan
                     continue

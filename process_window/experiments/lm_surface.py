@@ -44,6 +44,7 @@ def main():
     ap.add_argument("--n", type=int, default=12)
     ap.add_argument("--model", default=MODEL)
     ap.add_argument("--tag", default=None, help="output suffix for a model other than the default")
+    ap.add_argument("--threads", type=int, default=4, help="torch threads (leave cores for other jobs)")
     args = ap.parse_args()
     os.makedirs(OUT, exist_ok=True)
     temps, tops = grid(args.n)
@@ -61,7 +62,7 @@ def main():
         for i in range(12):
             for j in range(12):
                 done.setdefault(f"{2 * i}_{2 * j}", base[f"{i}_{j}"])
-    tok, model = load(args.model)
+    tok, model = load(args.model, threads=args.threads)
     prompts = wikitext_prompts(400)
     t0 = time.time()
     for i, T in enumerate(temps):

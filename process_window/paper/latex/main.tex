@@ -289,7 +289,7 @@ side information.\\
 (certify $x$ and everything safer for $m$) or $R_{m,x}\ge MN/\beta$
 (reject $x$ and everything riskier for $m$).\\
 \textbf{For} each mode $m$ and row $j$, riskiest rows first:\\
-\hspace*{1em}$s\gets$ edge found in an adjacent row, else predicted edge;\\
+\hspace*{1em}$s\gets$ edge predicted by the side information, else the middle;\\
 \hspace*{1em}\textbf{gallop}: probe $s$, then $s\pm1,s\pm2,s\pm4,\dots$
 toward the side the outcome points to, until the outcome flips;\\
 \hspace*{1em}\textbf{bisect} the undecided positions of the bracket
@@ -303,9 +303,11 @@ excluded (rejected for another mode); output the certified settings.
 of the order), run a \emph{two-sided probe} at one setting at a time:
 certify it by the cone rule, or reject ``$p_m(x)\le q\eps_m$'' with a
 failure-betting e-process at level $\beta/(MN)$. A certificate spreads to
-safer settings, a rejection to riskier ones. Start at the edge found in an
-adjacent row (or the side information's predicted edge), gallop until the
-edge is bracketed, then bisect. Stop when every row is decided for every
+safer settings, a rejection to riskier ones. Start at the edge the side
+information predicts (the riskiest setting it puts in the target), gallop
+until the edge is bracketed, then bisect. Starting instead from the edge
+found in an adjacent row saves probes when the side information is poor
+but cost 6--14\% more trials with good side information in our runs. Stop when every row is decided for every
 mode. Because $q<1$, at every rate at least one side of the probe has
 positive drift; with the fixed bets in our grids this holds at every
 tolerance we use (condition (T), Section~\ref{sec:theory}), so every probe
@@ -512,7 +514,7 @@ $32^2$ & 165.6k & 19.4k & 8.5 & 457.7k & 77.0k \\
 $48^2$ & 334.6k & 24.8k & 13.5 & --- & 174.4k \\
 \midrule
 LM $12^2$ & 19.7k & 2.1k & 9.4 & 31.8k & 6.9k \\
-LM $23^2$ & 51.8k & 3.5k & 14.8 & 129.7k & 24.4k \\
+LM $23^2$ & 52.1k & 3.5k & 14.8 & 129.7k & 24.4k \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -534,7 +536,7 @@ $\ln(16MN/(\alpha w))/K_1\approx5$ at $32^2$); the search's extra growth
 with $n$ is the $O(\log n)$ probe factor. With optimistic side information
 at $32^2$ the search needs 215k trials against 458k without the ordering.
 On the language model the search stops after 19.7k generations at
-$12^2$ and 51.8k at $23^2$, against 31.8k and 129.7k for the per-setting
+$12^2$ and 52.1k at $23^2$, against 31.8k and 129.7k for the per-setting
 test (1.6$\times$ and 2.5$\times$ more), at 9.4 and 14.8 times the
 ordered lower bound (4.2--8.5 on synthetic grids of similar size). The
 bounds grow like the edge and the area (ordered 2.1k to 3.5k, unordered

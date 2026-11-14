@@ -14,3 +14,16 @@ Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF
 [12/144] T=0.2 top_p=1.0 rep4>0.2: 0.169  NLL>3.5: 0.000  (883s)
 [13/144] T=0.364 top_p=0.5 rep4>0.2: 0.331  NLL>3.5: 0.000  (949s)
 [14/144] T=0.364 top_p=0.545 rep4>0.2: 0.275  NLL>3.5: 0.000  (1024s)
+[15/144] T=0.364 top_p=0.591 rep4>0.2: 0.231  NLL>3.5: 0.000  (1093s)
+[16/144] T=0.364 top_p=0.636 rep4>0.2: 0.231  NLL>3.5: 0.000  (1288s)
+[17/144] T=0.364 top_p=0.682 rep4>0.2: 0.275  NLL>3.5: 0.000  (1436s)
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 4417.98it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[18/144] T=0.364 top_p=0.727 rep4>0.2: 0.269  NLL>3.5: 0.000  (77s)
+[19/144] T=0.364 top_p=0.773 rep4>0.2: 0.194  NLL>3.5: 0.000  (152s)
+[20/144] T=0.364 top_p=0.818 rep4>0.2: 0.219  NLL>3.5: 0.000  (227s)
+[21/144] T=0.364 top_p=0.864 rep4>0.2: 0.169  NLL>3.5: 0.000  (306s)
+[22/144] T=0.364 top_p=0.909 rep4>0.2: 0.194  NLL>3.5: 0.000  (382s)
+[23/144] T=0.364 top_p=0.955 rep4>0.2: 0.119  NLL>3.5: 0.000  (459s)
+[24/144] T=0.364 top_p=1.0 rep4>0.2: 0.163  NLL>3.5: 0.000  (525s)
+[25/144] T=0.527 top_p=0.5 rep4>0.2: 0.312  NLL>3.5: 0.000  (605s)

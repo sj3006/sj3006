@@ -160,9 +160,10 @@ whose lower confidence bound still admits membership.
 **Fixed confidence: search.** Per mode and row, run a two-sided probe at
 one setting at a time: certify it (cone rule), or reject "p <= q eps" with
 a defect-betting e-process at level beta/(MN). A certificate spreads to
-safer settings, a rejection to riskier ones. Start at the edge found in an
-adjacent row (or the side information's predicted edge), gallop until the
-edge is bracketed, then bisect. Stop when every row is decided.
+safer settings, a rejection to riskier ones. Start at the edge the side
+information predicts, gallop until the edge is bracketed, then bisect
+(starting from an adjacent row's edge saves probes with poor side
+information but costs 6-14% more trials with good side information). Stop when every row is decided.
 
 ## 5. Theory
 
@@ -247,7 +248,7 @@ Both methods pay a similar multiple-testing price over their own bound
 (per-setting 4.8-5.9x); the search's extra growth is the O(log n) probe
 factor. Language model: the search stops after 19.7k generations (8 of 8
 runs complete, none unsafe), per-setting 31.8k; ordered lower bound 2.1k
-(ratio 9.4), unordered 6.9k. Nested 23x23 grid: search 51.8k (8 of 8
+(ratio 9.4), unordered 6.9k. Nested 23x23 grid: search 52.1k (8 of 8
 complete, none unsafe), per-setting 129.7k (2.5x more, up from 1.6x);
 ordered bound 3.5k (ratio 14.8), unordered 24.4k
 (results/lm/lm_fixed_confidence_23.csv).

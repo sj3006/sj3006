@@ -1,0 +1,2 @@
+{'target_size': 62, 'LB_target': 836, 'LB_ordered': 2096, 'LB_unordered': 6898, 'search': 19736.0, 'search_complete': '8/8', 'search_unsafe': 0, 'per-setting': 31812.0, 'per-setting_complete': '8/8', 'per-setting_unsafe': 0}
+-> lm_fixed_confidence.csv
