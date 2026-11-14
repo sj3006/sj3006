@@ -73,12 +73,13 @@ on its own once the target region is certified; (iii) lower bounds showing
 that with the ordering the cost is governed by the region's \emph{edge} and
 without it by its \emph{area}, and an upper bound for the search within
 logarithmic and multiple-testing factors of the ordered lower bound. On
-the sampling settings of a language model, where repetition and
+the sampling settings of language models, where repetition and
 incoherence rates are measured from real generations, the method
 certifies half of the safe region with 2.1$\times$ fewer generations than
 testing without the ordering on a $12\times12$ grid and 4.3$\times$ fewer
 on a $23\times23$ grid (3.1$\times$ and 8.1$\times$ fewer than full-grid
-Learn-then-Test), pilot study included. Across this, additive
+Learn-then-Test), pilot study included, and 2.0$\times$ fewer on a
+second, larger model. Across this, additive
 manufacturing process windows and a drug-combination screen it needs
 1.3--9$\times$ fewer trials than adaptive testing without the ordering
 and, on $48\times48$ grids, 19--26$\times$ fewer than a full grid with
@@ -169,7 +170,7 @@ checkable condition on the bets (Section~\ref{sec:alloc}).
 vs.\ area); upper bounds by Wald's identity; the search is within
 $O(\log n)$ and multiple-testing factors of the ordered lower bound
 (Section~\ref{sec:theory}).
-\item \emph{Experiments.} Sampling settings of a language model, with
+\item \emph{Experiments.} Sampling settings of two language models, with
 failure rates measured from real generations (Figure~\ref{fig:lm}),
 additive manufacturing (a Rosenthal melt-pool model and a synthetic
 window), and a drug-combination screen (Section~\ref{sec:exp}).
@@ -395,7 +396,8 @@ Proofs are in Appendix~\ref{app:theory}.
 \section{Experiments}\label{sec:exp}
 
 \paragraph{Applications.}
-\emph{Language model sampling.} SmolLM2-135M \citep{allal2025smollm2};
+\emph{Language model sampling.} SmolLM2-135M \citep{allal2025smollm2}
+and, as a second model, Qwen2.5-0.5B \citep{qwen2024qwen25};
 12 temperatures (0.2--2.0) $\times$ 12 top-$p$ values (0.5--1.0)
 \citep{holtzman2020curious}; prompts from WikiText-2
 \citep{merity2017wikitext}; \emph{degenerate} = more than 20\% of 4-grams
@@ -407,8 +409,9 @@ the budget. The raw rates are consistent with Assumption~A: no setting
 differs from the monotone fit at the 1\% level (exact binomial test), and
 1 of 264 neighbouring pairs is reversed by more than two standard errors
 (8 of 1012 on a finer grid, below), fewer than noise alone reverses
-between equal rates. 78 of the 144 settings are safe, and 292 of the 529
-on the finer grid (Figure~\ref{fig:lm}). Benchmark runs draw fresh outcomes from the fitted
+between equal rates; the second model gives the same counts (no setting,
+1 of 264 pairs). 78 of the 144 settings are safe (Qwen: 86), and 292 of
+the 529 on the finer grid (Figure~\ref{fig:lm}). Benchmark runs draw fresh outcomes from the fitted
 surface. As a check, one live run queried the model directly: with 8.0k
 real generations it certified 64 of the 78 safe settings and no unsafe
 one (judged against the measured surface), in line with the 65 certified
@@ -440,7 +443,8 @@ expansion from a seed as in SafeOpt \citep{sui2015safeopt}.
 \caption{Trials to certify 50\% of the safe region (fixed budget, median of
 5 runs, LM 8; full grids: smallest budget reaching 50\% on average). LM:
 generations, with the 2.3k-generation pilot counted for ours and no
-order; the $23^2$ grid contains the $12^2$ one and uses the same pilot.}
+order; the $23^2$ grid contains the $12^2$ one and uses the same pilot.
+LM: SmolLM2-135M; Qwen: Qwen2.5-0.5B.}
 \label{tab:scaling}
 \setlength{\tabcolsep}{4.5pt}
 \begin{tabular}{llrrrr}
@@ -456,6 +460,7 @@ Rosenthal & $16^2$ & 5.3k & 7.7k & 112k & 135k \\
 \midrule
 LM        & $12^2$ & 3.8k & 8.0k & 11.7k & 18.6k \\
           & $23^2$ & 5.8k & 25.0k & 47.1k & 75.1k \\
+Qwen      & $12^2$ & 4.6k & 9.2k & 17.0k & 24.8k \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -490,7 +495,10 @@ fixed-sequence testing and 39.5k and 132k for full-grid Bonferroni.
 Without the pilot ours needs 5.3k and 14.7k, against 13.1k and 52.7k
 without the ordering: on the coarse grid the ordering does most of the
 work, and on the fine one the pilot, which covers about a quarter of the
-settings, roughly halves the cost again. The LM gains
+settings, roughly halves the cost again. The second model gives the same
+picture: to certify half of the safe region ours needs 4.6k generations
+against 9.2k without the ordering and 17.0k and 24.8k for the full grids
+(70\%: 8.9k, 18.9k, 39.5k and 76.2k). The LM gains
 do not depend on the failure definitions: re-scoring the same generations
 with repetition thresholds 0.15--0.3, NLL thresholds 3.0--4.0 nats and
 tolerances 5--20\% (seven settings, 5 runs each) gives 1.6--2.2$\times$
@@ -511,7 +519,7 @@ values), with no unsafe setting certified.
 median of 4 runs) and the language model (median of 8 runs, pilot
 counted). LB: Theorem~\ref{thm:lb}. The target was fully certified in 23
 of 24 synthetic runs (the exception, at $32^2$, hit a probe time-out) and
-in all 16 LM runs.}
+in all 24 language-model runs.}
 \label{tab:fc}
 \begin{tabular}{lrrrrr}
 \toprule
@@ -525,6 +533,7 @@ $48^2$ & 334.6k & 24.8k & 13.5 & --- & 174.4k \\
 \midrule
 LM $12^2$ & 19.7k & 2.1k & 9.4 & 31.8k & 6.9k \\
 LM $23^2$ & 52.1k & 3.5k & 14.8 & 129.7k & 24.4k \\
+Qwen $12^2$ & 22.9k & 2.2k & 10.5 & 39.0k & 8.6k \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -541,7 +550,7 @@ time and the lower bounds of Theorem~\ref{thm:lb}.}
 Figure~\ref{fig:fc}. The ordered bound grows
 roughly linearly in $n$ and the unordered one quadratically, as
 Theorem~\ref{thm:lb} predicts. Both methods pay a similar multiple-testing
-price over their own bound (per-setting: 4.6--5.9$\times$, language model included;
+price over their own bound (per-setting: 4.5--5.9$\times$, language models included;
 $\ln(16MN/(\alpha w))/K_1\approx5$ at $32^2$); the search's extra growth
 with $n$ is the $O(\log n)$ probe factor. With optimistic side information
 at $32^2$ the search needs 215k trials against 458k without the ordering.
@@ -551,7 +560,9 @@ test (1.6$\times$ and 2.5$\times$ more), at 9.4 and 14.8 times the
 ordered lower bound (4.2--8.5 on synthetic grids of similar size). The
 bounds grow like the edge and the area (ordered 2.1k to 3.5k, unordered
 6.9k to 24.4k); on both grids the gap to the bound is larger than the gap
-to the unordered method.
+to the unordered method. On the second model the search stops after
+22.9k generations against 39.0k (1.7$\times$), at 10.5 times the
+ordered bound.
 
 \paragraph{Validity.} With every setting exactly at the tolerance (the
 worst case), the false-certification rate is 0--2.75\% across
@@ -567,7 +578,9 @@ per tuning). On the language
 model (20k generations, 20 runs) the GP certifies an unsafe setting in
 95--100\% of runs at confidence parameter 2 and 15--60\% at 3; at 4 it is
 at 0--10\% but certifies 0--78\% of the region. Ours at the same budget:
-90\% of the region, no unsafe setting in 8 runs. \emph{With the ordering}
+90\% of the region, no unsafe setting in 8 runs. On the second model the
+GP errs in every run at 2 and in 15--55\% at 3, and at 4 certifies at
+most 54\% (ours 76\%). \emph{With the ordering}
 the GP certifies more but is no more reliable: at confidence parameter 4
 (lengthscales 0.2 and 0.3, all four problems) it certifies 23--87\% of the
 region and an unsafe setting in 2.5--27.5\% of runs. The tuning that
@@ -663,7 +676,7 @@ Assumption~A is load-bearing (Section~\ref{sec:exp}); thin regions gain
 less at coarse resolution; the search's gap to the lower bound grows with
 the grid (the multiple-testing and probe factors), reaching 13.5--14.8
 at about 500--2300 settings; the language-model benchmark draws outcomes from
-a measured surface (one live run agrees with it), with a small model and
+a measured surface (one live run agrees with it), with two small models and
 automatic judges; the manufacturing studies are simulated with
 placeholder calibrations (the gains hold when each is moved by 10--20\%,
 but a real process map may differ more).
@@ -1005,8 +1018,11 @@ the first 16 form the pilot, the other 144 the ground truth (a 2D
 isotonic fit per mode). The $23\times23$ grid uses 23 equally spaced
 values on the same ranges and contains the $12\times12$ grid; its pilot
 uses only the $12\times12$ settings (2{,}304 generations) and is
-interpolated bilinearly, which keeps it monotone. The live run (seed 0,
-8.0k generations) generates every requested trial with the model.
+interpolated bilinearly, which keeps it monotone. The second model,
+Qwen2.5-0.5B (base), is measured the same way on the $12\times12$ grid,
+with the same prompts and the same judges (its own NLL for incoherence).
+The live run (seed 0, 8.0k generations) generates every requested trial
+with the model.
 
 \subsection{Runs and compute}
 Validity: $8\times8$ grids with every rate equal to its tolerance
@@ -1024,7 +1040,8 @@ language model: seven definitions, 5 runs each. 316L sensitivity: one
 change at a time at $24\times24$, 5 runs per method, budget $300N$.
 All benchmark runs are
 single-threaded NumPy on a 4-core CPU; the full benchmark takes about a
-day. Measuring the language-model surfaces took 1.6\,h ($12\times12$) and
-about 4\,h (the 385 new settings of the $23\times23$ grid).
+day. Measuring the language-model surfaces took 1.6\,h ($12\times12$),
+about 4\,h (the 385 new settings of the $23\times23$ grid) and about
+3\,h (Qwen2.5-0.5B, three threads).
 
 \end{document}

@@ -1,0 +1,10 @@
+{'beta': 2.0, 'lengthscale': 0.1, 'runs': 20, 'fwer': 1.0, 'correct_frac': np.float64(0.954)}
+{'beta': 2.0, 'lengthscale': 0.2, 'runs': 20, 'fwer': 1.0, 'correct_frac': np.float64(0.98)}
+{'beta': 2.0, 'lengthscale': 0.3, 'runs': 20, 'fwer': 1.0, 'correct_frac': np.float64(0.978)}
+{'beta': 3.0, 'lengthscale': 0.1, 'runs': 20, 'fwer': 0.15, 'correct_frac': np.float64(0.036)}
+{'beta': 3.0, 'lengthscale': 0.2, 'runs': 20, 'fwer': 0.55, 'correct_frac': np.float64(0.706)}
+{'beta': 3.0, 'lengthscale': 0.3, 'runs': 20, 'fwer': 0.35, 'correct_frac': np.float64(0.867)}
+{'beta': 4.0, 'lengthscale': 0.1, 'runs': 20, 'fwer': 0.0, 'correct_frac': np.float64(0.0)}
+{'beta': 4.0, 'lengthscale': 0.2, 'runs': 20, 'fwer': 0.05, 'correct_frac': np.float64(0.172)}
+{'beta': 4.0, 'lengthscale': 0.3, 'runs': 20, 'fwer': 0.05, 'correct_frac': np.float64(0.544)}
+-> lm_gp_qwen05b.csv

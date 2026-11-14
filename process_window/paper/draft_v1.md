@@ -25,12 +25,13 @@ sums; (ii) a **search algorithm** for the fixed-confidence version that
 stops on its own once the target region is certified; (iii) **lower bounds**
 showing that with the ordering the cost is governed by the region's
 *edge*, without it by its *area*, and **upper bounds** within logarithmic
-factors of the ordered bound. On the sampling settings of a language
-model, with repetition and incoherence rates measured from real
+factors of the ordered bound. On the sampling settings of language
+models, with repetition and incoherence rates measured from real
 generations, the method certifies half of the safe region with 2.1x fewer
 generations than testing without the ordering on a 12x12 grid and 4.3x
 fewer on a 23x23 grid (3.1x and 8.1x fewer than a full-grid
-Learn-then-Test), pilot study included. Across this, additive-
+Learn-then-Test), pilot study included, and 2.0x fewer on a second,
+larger model (Qwen2.5-0.5B). Across this, additive-
 manufacturing process windows and a two-drug combination screen it needs
 1.3-9x fewer trials than adaptive testing without the ordering and, on
 48x48 grids, 19-26x fewer than a full grid with fixed-sequence testing,
@@ -196,7 +197,8 @@ multiple-testing factor ln(MN/alpha)/L of the ordered lower bound.
 ## 6. Experiments
 
 **Applications.**
-- *Language model sampling.* SmolLM2-135M; 12 temperatures (0.2-2.0) x 12
+- *Language model sampling.* SmolLM2-135M and, as a second model,
+  Qwen2.5-0.5B (86 of 144 settings safe; same monotonicity check result); 12 temperatures (0.2-2.0) x 12
   top-p values (0.5-1.0); prompts from WikiText-2; degenerate = more than
   20% of 4-grams repeated, incoherent = mean token NLL above 3.5 nats;
   eps = 10% for both. Ground truth from 144 generations per setting
@@ -226,7 +228,8 @@ settings plus the midpoints, same 2.3k pilot): at 50%, 5.8k / 25.0k /
 47.1k / 75.1k; at 70%, 8.4k / 41.3k / 75.1k / 132k; without the pilot
 12.4k (50%) and 14.7k (70%). Going from 12x12 to 23x23 multiplies our cost
 by 1.5 and the unordered cost by 3.1 (edge grows 1.9x, area 3.7x), so the
-gap to no ordering grows from 2.1x to 4.3x (results/lm/lm_cost_*_23.csv). Re-scoring the same
+gap to no ordering grows from 2.1x to 4.3x (results/lm/lm_cost_*_23.csv). Qwen2.5-0.5B (12x12, same pilot size): at 50%, 4.6k / 9.2k / 17.0k /
+24.8k; at 70%, 8.9k / 18.9k / 39.5k / 76.2k (results/lm/lm_cost_*_qwen05b.csv). Re-scoring the same
 generations with other failure definitions (repetition threshold
 0.15-0.3, NLL threshold 3.0-4.0, tolerance 5-20%; seven settings, 5 runs
 each): 1.6-2.2x fewer than no ordering, 2.2-4.1x fewer than full-grid
@@ -252,13 +255,16 @@ program (appendix, Theorem 2):
 | 48x48 | 334.6k | 24.8k | 13.5 | not run | 174.4k |
 
 Both methods pay a similar multiple-testing price over their own bound
-(per-setting 4.8-5.9x); the search's extra growth is the O(log n) probe
+(per-setting 4.5-5.9x); the search's extra growth is the O(log n) probe
 factor. Language model: the search stops after 19.7k generations (8 of 8
 runs complete, none unsafe), per-setting 31.8k; ordered lower bound 2.1k
 (ratio 9.4), unordered 6.9k. Nested 23x23 grid: search 52.1k (8 of 8
 complete, none unsafe), per-setting 129.7k (2.5x more, up from 1.6x);
 ordered bound 3.5k (ratio 14.8), unordered 24.4k
-(results/lm/lm_fixed_confidence_23.csv).
+(results/lm/lm_fixed_confidence_23.csv). Qwen2.5-0.5B (12x12): search
+22.9k (8 of 8 complete, none unsafe), per-setting 39.0k (1.7x); ordered
+bound 2.2k (ratio 10.5), unordered 8.6k
+(results/lm/lm_fixed_confidence_qwen05b.csv).
 
 **Validity.** Worst case (every setting at the tolerance): 0-2.75%
 false certification across configurations at alpha = 5% (400 runs each);
@@ -271,7 +277,8 @@ setting in 40-100% of runs at beta = 2. At beta = 4 it still does so in
 54-84%. Language model (20k generations, 20
 runs): GP certifies an unsafe setting in 95-100% of runs at beta = 2,
 15-60% at 3, 0-10% at 4 (then certifying 0-78% of the region); ours at
-the same budget: 90% of the region, no unsafe setting in 8 runs. With the
+the same budget: 90% of the region, no unsafe setting in 8 runs. Qwen2.5-0.5B: the GP errs in every run at beta = 2, 15-55% at
+3, and at 4 certifies at most 54% (ours 76%; results/lm/lm_gp_qwen05b.csv). With the
 ordering added (certificates spread to safer settings, as in monotone safe
 exploration), the GP at beta = 4 (lengthscales 0.2, 0.3, all four
 problems) certifies 23-87% of the region and an unsafe setting in
@@ -320,7 +327,7 @@ evaluation of a single system.)
 
 Assumption A is load-bearing (Section 6); thin regions gain less at coarse
 resolution; the multiple-testing factor dominates the gap to the lower
-bound; the language-model study uses a small model and automatic judges;
+bound; the language-model study uses two small models and automatic judges;
 the manufacturing studies are simulated with placeholder calibrations
 (the gains hold when each is moved by 10-20%, but a real process map may
 differ more).

@@ -268,3 +268,21 @@ These change the method, so they need your answer before Phase 2:
   bracket probe rule makes no difference at 16 x 16; at 32 x 32 the
   midpoint rule has the cheaper median, 165.6k vs 175.0k, but it is the
   one with the probe time-out). Qwen2.5-0.5B surface measuring.
+- 2026-11-14 (later): Second language model measured: Qwen2.5-0.5B on the
+  12 x 12 grid (86 of 144 settings safe; no setting off the monotone fit at
+  the 1% level, 1 of 264 pairs reversed). To certify half the safe region:
+  ours 4.6k generations (pilot counted), no ordering 9.2k (2.0x), full-grid
+  fixed-sequence 17.0k, full-grid Bonferroni 24.8k; fixed confidence: search
+  22.9k (8 of 8 complete) vs 39.0k per-setting, 10.5x the ordered bound.
+  Added to Tables 1-2, the abstract and the text (Qwen2.5 report cited,
+  arXiv 2412.15115). Figure 1 now uses the 23 x 23 grid: at 10k
+  generations ours certifies 75% of the safe region on average (213 of
+  292 in the pictured run, none unsafe), no ordering 16%, full grids 0%.
+  GP baselines on the language model: BEAM-style at beta 4, lengthscale
+  0.1-0.2 erred in 1 of 20 runs and certified 94-95% (ours 90%), but 35%
+  errors at lengthscale 0.3; safe expansion stalls or overshoots. GP
+  certificates in the all-at-tolerance worst case: 0-1.25% errors
+  (BEAM-style), up to 12.5% (with the closure), so their failures come
+  from the surface's shape. Abstract GP sentence rewritten to cover all
+  three GP baselines. Supplement: full test suite passes from the unpacked
+  archive (57 tests).

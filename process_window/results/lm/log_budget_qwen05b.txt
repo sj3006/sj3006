@@ -1,1 +1,8 @@
 true safe settings: 86 of 144
+ours                 final 0.805  runs with an unsafe setting certified: 0/8  (16s)
+ours, no simulator   final 0.814  runs with an unsafe setting certified: 0/8  (17s)
+no ordering          final 0.783  runs with an unsafe setting certified: 0/8  (15s)
+-> lm_fixed_budget_qwen05b.csv
+{'mode': 'degenerate', 'settings': 144, 'outside_99': 0, 'max_gap': 0.0434, 'at_raw': '4/144', 'at_fit': 0.0712, 'pairs': 264, 'reversed_2se': 1}
+{'mode': 'incoherent', 'settings': 144, 'outside_99': 0, 'max_gap': 0.0035, 'at_raw': '1/144', 'at_fit': 0.0035, 'pairs': 264, 'reversed_2se': 0}
+-> lm_monotone_check_qwen05b.csv
