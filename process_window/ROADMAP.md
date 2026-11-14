@@ -45,7 +45,7 @@ is kept for the earlier experiments. Paper draft: `paper/draft.md`.
 
 ## Phases and milestones
 
-Status key: [x] done, [~] in progress, [ ] not started.
+Status key: [x] done, [~] in progress, [ ] not started, [-] dropped.
 
 ### Phase 0: foundations (week 1)
 
@@ -71,17 +71,20 @@ below alpha in every configuration, including adversarial simulators).
 
 ### Phase 1: validity theory and method v1 (weeks 2-3)
 
-- [~] Theorem 1 (validity of the certified window). Draft proof in
-      `notes/02_problem_statement.md`; needs independent checking.
-- [~] Cone-rule validity (Theorem 5, notes/06): three-line proof via Ville
-      on the true-null set; needs checking.
-- [ ] Theorem 2 (spreading to the continuous region under monotonicity).
+- [x] Validity of the certified region: now the cone rule's Theorem 1 in
+      the paper, full proof in Appendix A (the chain version in notes/02
+      is superseded).
+- [x] Cone-rule validity and the closed-testing characterization
+      (Theorem 1 and Proposition 1 in the paper).
+- [-] Theorem 2 (spreading to the continuous region): dropped; the paper
+      stays on grids.
 - [x] Error-budget passing between chains: no longer needed. The cone rule
       is closed testing, which reuses the weight of logically certified
       hypotheses automatically (notes/06, section 3).
-- [ ] Batched build plates: confirm the proof covers a plate of coupons
-      decided before any of them are measured.
-- [ ] Monotonicity check: sequential test that flags violations in the data.
+- [x] Batched build plates: covered (Appendix A setup: a batch is chosen
+      before any of its outcomes is seen).
+- [x] Monotonicity check: audit (`pwcert/audit.py`, `experiments/violation.py`)
+      and a test of the raw LM rates (`exp_lm.py --parts check`).
 
 Exit criterion: Theorems 1-2 written out in full, checked line by line.
 
@@ -96,7 +99,10 @@ Exit criterion: Theorems 1-2 written out in full, checked line by line.
       Bliss-independence simulator (`pwcert/dose.py`).
 - [~] Baselines: grid DoE + Clopper-Pearson + Bonferroni [x]; adaptive
       betting tests without the ordering, same allocation and re-check [x];
-      GP level-set estimation [ ]; M-SafeUCB [ ]; BEAM-style BO search [ ].
+      full grid with fixed-sequence testing (Learn-then-Test) [x]; GP
+      level-set estimation, plain and with the monotone closure [x];
+      safe expansion (M-SafeUCB-style) and BEAM-style active search
+      [implemented; full runs pending].
 
 ### Phase 3: adaptive sampling and sample-complexity theory (weeks 5-6)
 
@@ -113,16 +119,14 @@ Exit criterion: Theorems 1-2 written out in full, checked line by line.
       when rates are known; learned overhead grows slowly (1.1x-2.2x of UB
       from 8x8 to 24x24). Shrinking it is the open learning term.
 - [x] Bounds next to practice (`experiments/exp05_bounds.py`).
-- [~] Theorem 4a/4b lower bounds drafted (`notes/05_lower_bound.md`); need
-      checking.
-- [x] Theorem 3a: rigorous oracle upper bound via Wald's identity
-      (notes/07); 3b (learned allocation, with slack) still a conjecture.
-- [~] Theorem 4: lower bounds drafted (notes/05); computed next to practice
-      in `experiments/final.py bounds`.
+- [x] Lower bounds with and without the ordering (Theorem 2 in the paper,
+      proof in Appendix A).
+- [x] Oracle upper bound via Wald's identity (Theorem 3). The learned-
+      allocation conjecture is superseded by the search and its bound
+      (Theorem 4).
 - [x] No-simulator mode: pilot plate + monotone fit (`pwcert/pilot.py`) and
       optimistic allocation.
-- [ ] **Week 6 go/no-go.** If the 2D bounds hold, stay on ICML. Otherwise
-      retarget to an applied venue.
+- [x] **Week 6 go/no-go.** The bounds held; staying on ICML.
 
 ### Phase 4: extensions and real data (week 7)
 
@@ -132,19 +136,23 @@ Exit criterion: Theorems 1-2 written out in full, checked line by line.
 
 ### Phase 5: full experiments (week 8)
 
-- [~] `experiments/final.py`: validity, area-vs-budget curves on five
+- [x] `experiments/final.py`: validity, area-vs-budget curves on five
       scenarios, scaling to 48x48, bounds, ablations. Figures in
       `results/final/`.
 - [x] GP level-set baseline: 7.5-100% false-certification rates unless
       nearly useless (`pwcert/gp_baseline.py`, `final.py gp`).
-- [ ] Safe-BO (M-SafeUCB) and BEAM-style baselines.
+- [~] Safe-BO (M-SafeUCB-style) and BEAM-style baselines: implemented as
+      sampling rules of the GP baseline; full runs pending.
 - [x] Robustness when monotonicity is violated, plus an audit that detects
       gross violations (`pwcert/audit.py`, `experiments/violation.py`).
 
 ### Phase 6: writing (weeks 9-10)
 
-- [~] Draft v0 (`paper/draft.md`).
-- [ ] Theory appendix, internal adversarial review, code release.
+- [x] Draft v0 (`paper/draft.md`), v1 (`paper/draft_v1.md`), LaTeX
+      (`paper/latex/main.tex`).
+- [x] Theory appendix (A), experiment-details appendix (B), Impact
+      Statement, internal adversarial review with a number audit, anonymous
+      code archive (`scripts/make_supplement.py`).
 
 ## Open questions for Amit
 
