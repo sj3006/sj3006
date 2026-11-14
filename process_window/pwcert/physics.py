@@ -170,13 +170,14 @@ PHYSICS_ERRORS = {
 
 def make_physics_scenario(n_power=16, n_speed=16, eps=0.05, simulator="good",
                           mat=SS316L, machine=Machine(), power=(80.0, 400.0),
-                          speed=(300.0, 2400.0)):
+                          speed=(300.0, 2400.0), crit=None):
     """Scenario whose truth and simulator both come from the physics model.
 
     The simulator differs from the truth by PHYSICS_ERRORS[simulator]
     (wrong absorptivity, wrong criterion thresholds), or is "none" / an
     "adversarial" flat 0.1% prediction. Monotone directions are measured
-    from the truth, not assumed.
+    from the truth, not assumed. crit overrides the (placeholder) criteria
+    of the truth; the simulator's errors are applied on top of it.
     """
     from dataclasses import replace
 
@@ -184,7 +185,8 @@ def make_physics_scenario(n_power=16, n_speed=16, eps=0.05, simulator="good",
 
     P = np.linspace(*power, n_power)
     V = np.linspace(*speed, n_speed)
-    truth = defect_rates(P, V, mat, machine)
+    c0 = Criteria() if crit is None else crit
+    truth = defect_rates(P, V, mat, machine, c0)
     dirs = {}
     for m, (sp, sv, frac) in check_monotone_directions(truth).items():
         if frac < 1.0:
@@ -196,9 +198,8 @@ def make_physics_scenario(n_power=16, n_speed=16, eps=0.05, simulator="good",
         sim = {m: np.full_like(truth[m], 0.001) for m in MODES}
     else:
         e = PHYSICS_ERRORS[simulator]
-        c0 = Criteria()
-        crit = Criteria(lof_thresh=c0.lof_thresh - e["lof"], kh_thresh=c0.kh_thresh + e["kh"],
-                        ball_thresh=c0.ball_thresh + e["ball"])
-        sim = defect_rates(P, V, replace(mat, A=mat.A + e["dA"]), machine, crit)
+        crit_sim = replace(c0, lof_thresh=c0.lof_thresh - e["lof"], kh_thresh=c0.kh_thresh + e["kh"],
+                           ball_thresh=c0.ball_thresh + e["ball"])
+        sim = defect_rates(P, V, replace(mat, A=mat.A + e["dA"]), machine, crit_sim)
     return Scenario(P, V, {m: eps for m in MODES}, truth, sim,
                     name=f"physics-{mat.name}/{simulator}", directions=dirs)
