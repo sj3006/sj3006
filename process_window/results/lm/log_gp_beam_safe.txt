@@ -5,3 +5,19 @@
 {'beta': 3.0, 'lengthscale': 0.2, 'runs': 20, 'fwer': 0.5, 'correct_frac': np.float64(0.968)}
 {'beta': 3.0, 'lengthscale': 0.3, 'runs': 20, 'fwer': 0.8, 'correct_frac': np.float64(0.972)}
 {'beta': 4.0, 'lengthscale': 0.1, 'runs': 20, 'fwer': 0.05, 'correct_frac': np.float64(0.94)}
+{'beta': 4.0, 'lengthscale': 0.2, 'runs': 20, 'fwer': 0.05, 'correct_frac': np.float64(0.951)}
+{'beta': 4.0, 'lengthscale': 0.3, 'runs': 20, 'fwer': 0.35, 'correct_frac': np.float64(0.951)}
+-> lm_gp_active_search.csv
+{'beta': 2.0, 'lengthscale': 0.1, 'runs': 20, 'fwer': 0.0, 'correct_frac': np.float64(0.013)}
+{'beta': 2.0, 'lengthscale': 0.2, 'runs': 20, 'fwer': 0.0, 'correct_frac': np.float64(0.013)}
+{'beta': 2.0, 'lengthscale': 0.3, 'runs': 20, 'fwer': 1.0, 'correct_frac': np.float64(0.973)}
+{'beta': 2.0, 'lengthscale': 0.5, 'runs': 20, 'fwer': 1.0, 'correct_frac': np.float64(0.999)}
+{'beta': 3.0, 'lengthscale': 0.1, 'runs': 20, 'fwer': 0.0, 'correct_frac': np.float64(0.013)}
+{'beta': 3.0, 'lengthscale': 0.2, 'runs': 20, 'fwer': 0.0, 'correct_frac': np.float64(0.013)}
+{'beta': 3.0, 'lengthscale': 0.3, 'runs': 20, 'fwer': 0.0, 'correct_frac': np.float64(0.013)}
+{'beta': 3.0, 'lengthscale': 0.5, 'runs': 20, 'fwer': 1.0, 'correct_frac': np.float64(0.985)}
+{'beta': 4.0, 'lengthscale': 0.1, 'runs': 20, 'fwer': 0.0, 'correct_frac': np.float64(0.013)}
+{'beta': 4.0, 'lengthscale': 0.2, 'runs': 20, 'fwer': 0.0, 'correct_frac': np.float64(0.013)}
+{'beta': 4.0, 'lengthscale': 0.3, 'runs': 20, 'fwer': 0.0, 'correct_frac': np.float64(0.013)}
+{'beta': 4.0, 'lengthscale': 0.5, 'runs': 20, 'fwer': 0.0, 'correct_frac': np.float64(0.013)}
+-> lm_gp_safe_expand_monotone.csv

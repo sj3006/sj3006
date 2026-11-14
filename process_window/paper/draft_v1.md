@@ -278,17 +278,17 @@ problems) certifies 23-87% of the region and an unsafe setting in
 (lengthscale 0.2: 5% on the LM, 27.5% on the synthetic grid). Other
 sampling rules do not change this. BEAM-style active search (Latin
 hypercube, then the settings most likely safe) errs in 70-100% of runs at
-beta = 2 and 20-72.5% at 3; at beta = 4, lengthscale 0.1, it erred in 1 of
-40 runs on each simulated problem and certified 66-79% (ours 54-84%), the
-best GP result we found, but at lengthscale 0.3 it errs in 42.5% of runs
-on the drug screen, and 1 in 40 only bounds the error rate by 13% (95%).
-Safe expansion with the ordering (SafeOpt / M-SafeUCB style, samples only
-at the edge of the certified set) stalls at its seed on the synthetic and
-316L problems (0.7-3.7% of the region) or, at lengthscale 0.5 and beta =
-2, errs in every run; on the drug screen its three error-free tunings
-certify 2-55% and the other nine err in 37.5-100% of runs
-(results/final/gp_baseline_active_search.csv,
-gp_baseline_safe_expand_monotone.csv).
+beta = 2 and 20-80% at 3; at beta = 4, lengthscale 0.1, it erred in 1 of
+40 runs on each simulated problem and 1 of 20 on the LM, certifying
+66-94% (ours 54-90%), the best GP result we found, but at lengthscale 0.3
+it errs in 35-42.5% of runs on the LM and the drug screen, and 1 in 40
+only bounds the error rate by 13% (95%). Safe expansion with the ordering
+(SafeOpt / M-SafeUCB style, samples only at the edge of the certified
+set) stalls at its seed on the synthetic, 316L and LM problems (0.7-3.7%
+of the region) or, at the longest lengthscales, errs in every run; on the
+drug screen its three error-free tunings certify 2-55% and the other nine
+err in 37.5-100% of runs (results/final/gp_baseline_active_search.csv,
+gp_baseline_safe_expand_monotone.csv, results/lm/lm_gp_*.csv).
 
 **Ablations** (16x16, 8 runs, cost to certify half the region). The
 ordering and the allocation rule matter most (no ordering +69 to +213%;

@@ -7,6 +7,7 @@ writes CSVs to results/final/; `plot` turns whatever CSVs exist into figures.
     python3 experiments/final.py bounds [--reps 3]
     python3 experiments/final.py ablation --scen toy-good [--reps 8]
     python3 experiments/final.py gp --n 16 [--reps 40]
+    python3 experiments/final.py gpvalidity [--reps 400]
     python3 experiments/final.py plot
 
 Methods (all adaptive ones share allocation, re-check and futility code):
@@ -136,6 +137,34 @@ def cmd_validity(args):
                                  fwer=round(rate, 4), se=round(np.sqrt(rate * (1 - rate) / args.reps), 4)))
                 print(rows[-1], f"({time.time() - t0:.0f}s)", flush=True)
     write(rows, "validity.csv" if args.alloc == "frontier" else f"validity_{args.alloc}.csv")
+
+
+def cmd_gpvalidity(args):
+    """The worst case of cmd_validity (every setting exactly at the tolerance,
+    8 x 8, 4000 trials, batch 16) for the GP certificates at their most
+    conservative confidence parameter. Any certified setting is an error."""
+    from pwcert.gp_baseline import GPLevelSet
+    configs = [("straddle", False), ("straddle", True), ("active_search", False)]
+    lengthscales = [float(x) for x in args.lengthscales.split(",")]
+    rows = []
+    for grid in ("toy", "dose"):
+        base = make_scenario(8, 8, simulator="good") if grid == "toy" else make_dose_scenario(8, 8, simulator="good")
+        truth = {m: np.full((8, 8), base.eps[m]) for m in base.modes}
+        sc = Scenario(base.power, base.speed, base.eps, truth, base.sim, directions=base.directions)
+        for acq, mono in configs:
+            for ls in lengthscales:
+                t0, any_err = time.time(), 0
+                for r in range(args.reps):
+                    g = GPLevelSet(sc, beta=4.0, lengthscale=ls, batch=16, rng=np.random.default_rng(100_000 + r),
+                                   monotone=mono, acquisition=acq)
+                    h = g.run(4000)
+                    any_err += int(max(x["errors"] for x in h) > 0)
+                rate = any_err / args.reps
+                rows.append(dict(grid=grid, acquisition=acq, monotone=mono, beta=4.0, lengthscale=ls,
+                                 runs=args.reps, fwer=round(rate, 4),
+                                 se=round(np.sqrt(rate * (1 - rate) / args.reps), 4)))
+                print(rows[-1], f"({time.time() - t0:.0f}s)", flush=True)
+                write(rows, "gp_validity.csv")
 
 
 # -- 2. certified area vs coupons --------------------------------------------------
@@ -479,7 +508,7 @@ def cmd_plot(args):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("cmd", choices=["validity", "curves", "scaling", "bounds", "ablation", "gp", "plot",
-                                        "gridfst"])
+                                        "gridfst", "gpvalidity"])
     ap.add_argument("--scen", default="toy-good", choices=list(SCENARIOS))
     ap.add_argument("--n", type=int, default=24)
     ap.add_argument("--reps", type=int, default=5)

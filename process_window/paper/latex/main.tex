@@ -574,18 +574,19 @@ works on one problem fails on another (lengthscale 0.2: 5\% on the
 language model, 27.5\% on the synthetic grid), and nothing in the data
 says which tuning to trust. Changing the sampling rule does not change
 this. \emph{BEAM-style active search} certifies more but errs in
-70--100\% of runs at confidence parameter 2 and 20--72.5\% at 3. At 4
+70--100\% of runs at confidence parameter 2 and 20--80\% at 3. At 4
 with lengthscale 0.1 it erred in 1 of 40 runs on each simulated problem
-and certified 66--79\% of the region (ours 54--84\%), the best GP
-result we found; with lengthscale 0.3 the same setting errs in 42.5\% of
-runs on the drug screen, and 1 error in 40 runs only bounds the error rate
-by 13\% (95\% upper bound). \emph{Safe expansion} with the ordering
-samples only at the edge of what it has certified. On the synthetic and
-316L problems it either stalls at its seed (0.7--3.7\% of the region:
-the GP cannot extrapolate one grid step at a 5\% tolerance) or, at
-lengthscale 0.5 and confidence parameter 2, certifies an unsafe setting
-in every run; on the drug screen its three error-free tunings certify
-2--55\% and the other nine err in 37.5--100\% of runs.
+and 1 of 20 on the language model, certifying 66--94\% of the region
+(ours 54--90\%), the best GP result we found. With lengthscale 0.3 the
+same setting errs in 35--42.5\% of runs on the language model and the
+drug screen, and one error in 40 runs only bounds the error rate by 13\%
+(95\% upper bound). \emph{Safe expansion} with the ordering samples
+only at the edge of what it has certified. On the synthetic, 316L and
+language-model problems it either stalls at its seed (0.7--3.7\% of the
+region: the GP cannot extrapolate one grid step at the tolerance) or, at
+the longest lengthscales, certifies an unsafe setting in every run; on
+the drug screen its three error-free tunings certify 2--55\% and the
+other nine err in 37.5--100\% of runs.
 
 \paragraph{Ablations.} Cost to certify half the region at $16\times16$
 (8 runs; synthetic window with good and optimistic side information, drug
