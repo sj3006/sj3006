@@ -221,6 +221,11 @@ class Regime:
         e = EPSILON_REFERENCE if eps is None else eps
         return self._whitener @ (np.asarray(z, float).ravel() / e)
 
+    def unwhiten(self, zw: np.ndarray, eps: float = None) -> np.ndarray:
+        """Inverse of `whiten`: standard-normal units back to relative deviations."""
+        e = EPSILON_REFERENCE if eps is None else eps
+        return e * (self._chol @ np.asarray(zw, float).ravel())
+
     def __repr__(self) -> str:
         return f"Regime({self.name!r}, {self.n_obs} observables, dof={self.dof})"
 

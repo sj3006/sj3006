@@ -1,1 +1,4 @@
 __pycache__/
+# Derived: 245 forward-model evaluations, rebuilt deterministically in ~20 s by
+# cases.ExactResponse(). Not committed, so a clone cannot inherit a stale one.
+_response_cache.npz

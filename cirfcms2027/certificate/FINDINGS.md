@@ -147,6 +147,72 @@ instantaneous regime is 2.7 to 3.9 causes under the exact test, against 2.7 to
 3.8 under the linearised one. The paper's central claim is not an artefact of
 the linearisation.
 
+## 4. The certificate's size is the result, and it is stark
+
+Work packages 2 and 3 turn the geometry into a per-case quantity. The exact
+profile test, 400 cases per fault and signal level, observations from the full
+forward model:
+
+| rho | instantaneous: names one cause | build context: names one cause |
+|---|---|---|
+| 14 | 0.028 | 0.950 |
+| 28 | 0.045 | 0.953 |
+| 56 | 0.068 | 0.940 |
+| 120 | 0.232 | 0.952 |
+
+Mean certificate size instantaneously runs 4.62 causes at rho = 14 down to 2.58
+at rho = 120, out of five. At the paper's own operating point, rho = 28, a
+monitoring agent reading three coaxial signals is entitled to name a unique
+cause in **4.5 % of builds**. With build context it is **95.3 %**, which is the
+test's own ceiling.
+
+Broken out by fault at rho = 56, the instantaneous unique-cause rate is 0.005
+for power, 0.013 for gas, 0.022 for layer, 0.045 for speed and 0.255 for
+geometry. Geometry is the only cause the suite can name, which is consistent
+with its being the only one with angles above 3.6 degrees to everything else.
+
+### The equivalence structure
+
+Thresholding the admissibility matrix `A[k,l] = P(l in C | truth = k)` at 0.5
+and taking connected components:
+
+- **instantaneous**: one class containing all five causes up to rho = 56. At
+  rho = 120 geometry separates, leaving `{power, speed, layer, gas}` as a single
+  clique, meaning every member is confusable with every other rather than merged
+  through a chain.
+- **build context**: five singletons at every signal level from rho = 14 up.
+
+The matrix is deliberately not symmetrised. It is not symmetric: a weak cause
+produces an observation near the origin, where every signature direction passes,
+so geometry admits the others more readily than they admit geometry. At rho = 28,
+`A[geometry, speed] = 0.839` while `A[speed, geometry] = 0.603`.
+
+### What build context is worth, priced in fault magnitude
+
+The resolvability inequality gives each pair the signal it needs. Instantaneously:
+
+| pair | rho needed | the magnitude that implies |
+|---|---|---|
+| layer / geometry | 60.6 | layer f = 0.19 |
+| power / geometry | 65.1 | power f = 0.074 |
+| speed / geometry | 77.6 | speed f = 0.26 |
+| speed / layer | 272.9 | speed f = 0.91 |
+| power / speed | 398.1 | **power f = 0.46** |
+| power / layer | 867.2 | power f = 0.99 |
+| layer / gas | 867.5 | layer f = 2.66 |
+| power / gas | never | degenerate |
+
+Telling a power fault from a speed fault at a single instant needs a 46 % power
+deviation. Telling it from a layer fault needs 99 %. Those are not faults, they
+are different processes, which is why the structural-against-noise-limited
+question is settled on the geometry rather than by simulating to magnitudes the
+forward model has no business being evaluated at.
+
+With build context every pair needs between rho = 11.7 and rho = 22.0, and
+**power against gas becomes resolvable at rho = 18.8, a 0.2 % power deviation**,
+having been unresolvable at any signal strength whatever. That is the single
+sharpest statement of what the build's own known structure buys.
+
 ## What is not affected
 
 The instantaneous Jacobian, its angles, the rank-4 channel bound, the derived

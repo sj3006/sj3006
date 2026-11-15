@@ -76,6 +76,9 @@ complement, and state plainly which is conservative. Resolvability is not
 transitive, so the graph is the honest object and components are a summary.
 Sweep `rho` to show the partition coarsening, and identify which merges are
 structural (power/gas, from the rank bound) rather than merely noise-limited.
+**Status: done** (`classes.py`). Instantaneously all five causes form one class
+up to rho = 56 and a four-member clique at rho = 120; with build context, five
+singletons from rho = 14 up.
 
 ### WP3  Case generator and the exact test  (`cases.py`)
 Observations drawn from the **full nonlinear forward model**, not the
@@ -98,6 +101,8 @@ Magnitudes are chosen to hit a target whitened SNR, `f_k = rho / ||Jw[:,k]||`,
 rather than a common `f`: the fault magnitudes are severity indices on different
 scales, so a shared `f` would not compare equal severities. Each case records
 the truth, the observation, the certificate, and the linearisation residual.
+**Status: done** (`cases.py`). Exact coverage 0.940 to 0.957 at every signal
+level in both regimes, against 0.784 for the linearised test at rho = 120.
 
 ### WP4  Agent backends  (`agents.py`)
 A common interface returning a reported set of causes plus a stated confidence.
