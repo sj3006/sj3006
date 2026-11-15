@@ -213,6 +213,91 @@ With build context every pair needs between rho = 11.7 and rho = 22.0, and
 having been unresolvable at any signal strength whatever. That is the single
 sharpest statement of what the build's own known structure buys.
 
+## 5. The power-and-gas degeneracy is a theorem, and probing cannot touch it
+
+The conference paper reports power and gas confounded for one suite at one
+operating point, and calls the 0.00 degrees an upper bound that a richer gas
+model would open. Both statements can be made much stronger.
+
+Everything the model knows reaches the sensors through four physical channels,
+so the Jacobian factors as
+
+    J = M C
+
+with `C` 4 by 5, how each fault moves each channel, and `M` 3 by 4, how each
+observable responds to each channel. Writing `C` out from the fault routes in
+`faults.py`, channels in log units except preheat in kelvin:
+
+|  | power | speed | layer | gas | geometry |
+|---|---|---|---|---|---|
+| ln(A P) | 1 | 0 | -0.044 | -1 | 0 |
+| ln(v) | 0 | 1 | 0 | 0 | 0 |
+| ln(k) | 0 | 0 | 0.5 | 0 | 0 |
+| preheat | 0 | 0 | 0 | 0 | 100 |
+
+Checked against the Jacobian computed directly from fault perturbations:
+`J = M C` to 6.8e-5 relative, which is the finite-difference error.
+
+A probe changes `M`. Nothing a probe does touches `C`. And reading the first
+row, a power fault raises absorbed power, a gas fault lowers it, and neither
+does anything else, so
+
+    C[:, power] = -C[:, gas]     exactly
+
+from which `(M C)[:, power] = -(M C)[:, gas]` for **every** `M`. The two
+columns are antiparallel in every instrument set, at every operating point, and
+in any stack of operating points. `rank(C) = 4` and its null space is
+one-dimensional:
+
+    power -0.7071,  speed 0,  layer 0,  gas -0.7071,  geometry 0
+
+An equal simultaneous power and gas fault moves no channel, so it moves no
+observable that could be built.
+
+### Probing the other nine pairs does not clear the floor either
+
+| observation set | rank | condition | sv4/sv1 | worst | 2nd worst |
+|---|---|---|---|---|---|
+| nominal, one instant | 3 | 2562 | n/a | 0.000 | 0.323 |
+| two operating points | 3 | 194 | 2.4e-7 | 0.000 | 5.954 |
+| three operating points | 3 | 234 | 6.6e-7 | 0.000 | 4.916 |
+| four operating points | 4 | 288822 | 3.5e-6 | 0.000 | 4.714 |
+| six operating points | 4 | 123582 | 8.1e-6 | 0.000 | 4.614 |
+| build context, no probing | 5 | 52.7 | 1.3e-1 | 25.550 | 30.020 |
+
+Two well-chosen points raise the second-worst pair from 0.32 to 5.95 degrees,
+and the best point over a grid search with one local refinement, 440 W and
+2.29 m/s against a nominal 285 W and 0.96 m/s, reaches 6.15 degrees. Still
+short of ten, and that probe means deliberately running a quarter of the build
+at half the nominal energy density, which produces off-specification material
+in order to learn something the build's own structure already contains.
+
+Four points reach nominal rank 4 with a condition number of 289000, which is
+rank in name only. More points make the angles slightly worse rather than
+better, so probe selection matters and probe count does not.
+
+The mechanism is in `M`. Its preheat column is of order 1e-3 where its
+absorbed-power column is of order 1, at every operating point tested, because a
+kelvin of preheat barely moves a pool running near 3000 K. The fourth channel is
+intrinsically weak and no operating point makes it otherwise. Build context, by
+contrast, has `sv4/sv1 = 0.13`, four orders of magnitude better.
+
+### Why build context escapes a theorem that probing cannot
+
+Worth being precise, because it looks like a contradiction. The factorisation
+`J = M C` assumes the fault magnitudes are the same at every epoch. Build
+context breaks that assumption rather than enriching `M`: a fault's severity
+varies across the build along its own spatial profile, so what is observed is
+`J[s,k] B[j,k]`, and `B[:, power]` is not proportional to `B[:, gas]` even
+though the channel columns are.
+
+So the escape route is differential modulation of the faults, not richer
+observation. **The only thing that separates a power fault from a gas fault is
+that the two vary differently across a build.** Not instruments, not operating
+points, not probe schedules. A probe could supply that modulation deliberately,
+by commanding a known power ripple, and that is the one probe design with a
+route past the ceiling. It is also just build context, paid for rather than free.
+
 ## What is not affected
 
 The instantaneous Jacobian, its angles, the rank-4 channel bound, the derived

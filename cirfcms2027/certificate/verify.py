@@ -272,6 +272,58 @@ def check_scoring() -> None:
            "no causes, no flag")
 
 
+def check_factorisation_and_ceiling() -> None:
+    """The channel factorisation and the probe ceiling, both exact claims.
+
+    `J = M C` is a derivation, so it is checked against the Jacobian computed
+    directly from fault perturbations. The ceiling is an algebraic identity, so
+    it is checked as one rather than by sampling operating points, and then
+    sampled anyway, because an identity that fails in practice has been stated
+    wrongly.
+    """
+    print("\nThe channel factorisation and the ceiling on probing")
+    import probe
+
+    err = probe.verify_factorisation()
+    record(err < 1e-3, "J = M C against the direct Jacobian",
+           f"largest relative disagreement {err:.2e}, finite-difference limited")
+
+    c = probe.ceiling()
+    record(c["rank"] == 4, "C has rank 4, one less than the fault count",
+           f"rank {c['rank']}, singular values "
+           f"{', '.join(f'{x:.4g}' for x in c['singular_values'])}")
+    record(c["power_gas_exact"],
+           "C[:, power] = -C[:, gas] exactly, not approximately",
+           "so M C has antiparallel columns for every M whatever")
+    nd = c["null_direction"]
+    quiet = all(abs(nd[k]) < 1e-12 for k in ("speed", "layer", "geometry"))
+    equal = abs(abs(nd["power"]) - abs(nd["gas"])) < 1e-12
+    record(quiet and equal,
+           "the invisible direction is equal power and gas, and nothing else",
+           ", ".join(f"{k} {x:+.4f}" for k, x in nd.items()))
+
+    stacks = [[probe.NOMINAL],
+              [probe.NOMINAL, (420.0, 2.20)],
+              [(150.0, 0.30), (450.0, 2.50)],
+              [probe.NOMINAL, (420.0, 2.20), (150.0, 0.30), (200.0, 1.50)]]
+    worst = 0.0
+    for ops in stacks:
+        worst = max(worst, obs._angles(probe.stacked_jacobian(ops))[("power", "gas")])
+    record(worst < inf.ANGLE_DEGENERACY_TOL,
+           "no stack of operating points opens the power/gas pair",
+           f"largest angle over {len(stacks)} probe sets is {worst:.2e} deg, "
+           f"against a degeneracy tolerance of {inf.ANGLE_DEGENERACY_TOL}")
+
+    ratios = []
+    for p, u in [probe.NOMINAL, (150.0, 0.30), (450.0, 2.50), (200.0, 1.50)]:
+        M = probe.observation_matrix(p, u)
+        ratios.append(float(np.abs(M[:, 3]).max() / np.abs(M[:, 0]).max()))
+    record(max(ratios) < 1e-2,
+           "the preheat channel stays weak at every operating point",
+           f"largest preheat to absorbed-power response ratio {max(ratios):.2e}, "
+           f"so no probe makes the fourth channel observable")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--draws", type=int, default=100_000)
@@ -290,6 +342,7 @@ def main() -> int:
     check_degenerate_pair_is_degenerate()
     check_single_cause_rate(args.draws, rng)
     check_scoring()
+    check_factorisation_and_ceiling()
 
     failed = [r for r in RESULTS if not r[0]]
     print("\n" + "=" * 74)

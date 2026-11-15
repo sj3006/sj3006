@@ -157,10 +157,38 @@ Instantaneous regime, where 87.6 % of cases are ambiguous. The build-context
 regime has 2 ambiguous cases in 6000, so over-attribution has no signal there
 and decisiveness carries the measurement instead.
 
-### WP6  Probe planning  (`probe.py`, optional)
+### WP6  Probe planning  (`probe.py`)
 Where a degeneracy can be broken by changing the operating point, and the
-structural ceiling where it cannot. Carried only if WP1 to WP5 land early; this
-is idea 3 from the brainstorm and can be a separate paper.
+structural ceiling where it cannot. **Status: done**, and the result is
+negative, which is more useful than the positive one would have been.
+
+The Jacobian factors as `J = M C`: `C` is 4 by 5 and says how each fault moves
+each of the four physical channels, `M` is 3 by 4 and says how each observable
+responds to each channel. A probe changes `M` and can never touch `C`. Since a
+power fault raises absorbed power and a gas fault lowers it and neither does
+anything else, `C[:, power] = -C[:, gas]` exactly, so `(M C)[:, power]` and
+`(M C)[:, gas]` are antiparallel for every `M` whatever. The null space of `C`
+is one-dimensional and is exactly that direction.
+
+So the conference paper's claim strengthens. There, power and gas were
+confounded for one suite at one operating point. Here they are confounded for
+every suite at every operating point and in any stack of operating points, and
+the proof is four entries of a matrix rather than a numerical coincidence.
+
+Probing does not rescue the other nine pairs either. Two well-chosen operating
+points take the second-worst pair from 0.32 to 5.95 degrees, short of the
+floor; four points reach nominal rank 4 with a condition number of 289000,
+which is rank in name only. The reason is that the preheat channel is
+intrinsically weak, `M[:, preheat]` being three orders of magnitude below
+`M[:, absorbed power]` at every operating point, because a kelvin of preheat
+barely moves a pool running near 3000 K.
+
+What escapes the ceiling is not a richer observation but differential
+modulation: build context works because `B[:, power]` and `B[:, gas]` are not
+proportional even though the channel columns are. That makes WP6 the complement
+of the build-context result rather than a competitor to it, and it supplies the
+sentence the paper wants: the only thing that separates a power fault from a gas
+fault is that the two vary differently across a build.
 
 ## Open decisions
 
