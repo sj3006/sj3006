@@ -190,6 +190,25 @@ of the build-context result rather than a competitor to it, and it supplies the
 sentence the paper wants: the only thing that separates a power fault from a gas
 fault is that the two vary differently across a build.
 
+## The paper
+
+`paper/paper.tex` is a complete journal draft except Section 4.7, which reports
+the language-model arms and is marked pending in the source. It compiles to 21
+pages in `elsarticle` preprint form, with no errors and no undefined references
+or citations, and carries six figures drawn from `results.json`.
+
+Numbers do not travel by hand. `results.py` computes everything once into
+`results.json`; `figures.py` draws from that file; `claims.py` holds all 51
+numbers the paper prints, checks each against the same file, and also checks
+that the printed string still occurs in `paper.tex`, which is what catches a
+figure edited in the prose and nowhere else. All 51 pass.
+
+The bibliography carries the thirteen references checked for the conference
+paper plus four new ones checked against the publishers' records. One entry,
+`Chen2025`, is flagged in `refs.bib` because its DOI could not be resolved from
+the machine this was prepared on and rests on secondary listings; verify it
+before submission.
+
 ## Open decisions
 
 1. **Whose account runs the language-model arms.** The only thing now

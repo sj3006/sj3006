@@ -146,24 +146,33 @@ class ExactResponse:
         out = np.column_stack([c(f) for c in self.curve[fault]])
         return out
 
-    def build_context(self, fault: str, f, plan) -> np.ndarray:
+    def build_context(self, fault: str, f, plan, chunk: int = 256) -> np.ndarray:
         """The 15 regression coefficients, shape (..., 15).
 
         Segment `t` sees local magnitude `f * m_k(t)`, its deviation is read off
         the same response curve, and the 84 deviations are regressed onto the
         build regressors exactly as the enlarged observation is defined.
+
+        Evaluated for all magnitudes at once rather than one at a time: the
+        interpolants are called on the flattened magnitude-by-segment grid, and
+        the regression is one `einsum`. Looping in Python over a 4001-point
+        magnitude grid made this the slowest step in the package by two orders
+        of magnitude, for no reason other than call overhead.
         """
         f = np.atleast_1d(np.asarray(f, float))
         G = obs.regressors(plan)
-        hat = np.linalg.inv(G.T @ G) @ G.T
+        hat = np.linalg.inv(G.T @ G) @ G.T                  # 5 x 84
         m = obs.modulations(plan)[:, FAULT_NAMES.index(fault)]
-        rows = []
-        for value in f:
-            local = value * m                                   # 84 magnitudes
-            seg = self.instantaneous(fault, local)              # 84 x 3
-            coef = hat @ seg                                    # 5 x 3
-            rows.append(coef.T.ravel())                         # sensor-major
-        return np.array(rows)
+        out = np.empty((f.size, len(SENSOR_NAMES) * G.shape[1]))
+        curves = self.curve[fault]
+        for a in range(0, f.size, chunk):
+            block = f[a:a + chunk]
+            local = (block[:, None] * m[None, :]).ravel()    # (n*84,)
+            seg = np.stack([c(local) for c in curves], axis=-1)
+            seg = seg.reshape(block.size, m.size, len(SENSOR_NAMES))
+            coef = np.einsum("jt,nts->nsj", hat, seg)        # n x sensors x regressors
+            out[a:a + chunk] = coef.reshape(block.size, -1)
+        return out
 
 
 class SignatureTable:

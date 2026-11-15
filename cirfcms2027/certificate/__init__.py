@@ -21,6 +21,12 @@ open decisions, `FINDINGS.md` the results so far.
                    probe at any operating point separates power from gas.
     verify.py      every claim above, measured rather than asserted. Exits
                    non-zero on failure.
+    results.py     runs all of it once into results.json, the single source
+                   the paper and the figures both read.
+    figures.py     the six figures, drawn from results.json.
+    claims.py      every number the paper prints, checked against results.json
+                   and against the paper's own text. Exits non-zero on drift.
+    paper/         the journal draft, its bibliography and a build script.
 
 Run `python3 verify.py` first: it is the fastest way to see whether the whole
 chain still holds after a change.
