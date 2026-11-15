@@ -52,3 +52,4 @@ Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF
 [47/144] T=0.691 top_p=0.955 rep4>0.2: 0.056  NLL>3.5: 0.000  (232s)
 [48/144] T=0.691 top_p=1.0 rep4>0.2: 0.050  NLL>3.5: 0.000  (361s)
 [49/144] T=0.855 top_p=0.5 rep4>0.2: 0.081  NLL>3.5: 0.000  (492s)
+--- resumed after container restart at 19:44 UTC ---
