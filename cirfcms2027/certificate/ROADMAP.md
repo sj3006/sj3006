@@ -77,9 +77,23 @@ transitive, so the graph is the honest object and components are a summary.
 Sweep `rho` to show the partition coarsening, and identify which merges are
 structural (power/gas, from the rank bound) rather than merely noise-limited.
 
-### WP3  Case generator  (`cases.py`)
+### WP3  Case generator and the exact test  (`cases.py`)
 Observations drawn from the **full nonlinear forward model**, not the
 linearisation, so the certificate test faces the same model error an agent would.
+
+The linearised residual is only valid in a bounded signal-to-noise window, which
+is measured rather than assumed: coverage holds at rho = 28 but falls to 0.68 by
+rho = 120, because the exact response curves away from its own linear signature
+and that departure enters the residual as a bias. The certificate is therefore
+built on the exact profile residual
+
+    R_k(z) = min over f of || z_w - g_k(f) / (sigma eps) ||^2
+
+with `g_k` the exact forward response, which restores nominal coverage at every
+signal-to-noise ratio tested. Response curves are cached as monotone cubic
+interpolants over a magnitude grid, 49 forward evaluations per fault, so the
+per-case cost is a table lookup. The linearised test is kept as a reported
+comparison, not as the method.
 Magnitudes are chosen to hit a target whitened SNR, `f_k = rho / ||Jw[:,k]||`,
 rather than a common `f`: the fault magnitudes are severity indices on different
 scales, so a shared `f` would not compare equal severities. Each case records
