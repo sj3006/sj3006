@@ -13,8 +13,10 @@ Run from process_window/:
 grid at even indices; those 144 settings are copied from surface_scores.npz
 instead of being generated again (output: surface_scores_23.npz).
 
---model NAME --tag TAG measures another model on the 12 x 12 grid (output:
-surface_scores_TAG.npz); the NLL judge is then that model's own NLL.
+--model NAME --tag TAG measures another model (output: surface_scores_TAG.npz,
+or surface_scores_TAG_23.npz with --n 23, which reuses surface_scores_TAG.npz);
+the NLL judge is then that model's own NLL. On a GPU add --device cuda
+--dtype bfloat16 --batch 160 (one batch per setting).
 """
 
 import argparse
@@ -45,24 +47,28 @@ def main():
     ap.add_argument("--model", default=MODEL)
     ap.add_argument("--tag", default=None, help="output suffix for a model other than the default")
     ap.add_argument("--threads", type=int, default=4, help="torch threads (leave cores for other jobs)")
+    ap.add_argument("--device", default="cpu", help="cpu or cuda")
+    ap.add_argument("--dtype", default=None, help="e.g. bfloat16 (default: the checkpoint's precision)")
     args = ap.parse_args()
     os.makedirs(OUT, exist_ok=True)
     temps, tops = grid(args.n)
+    assert args.n in (12, 23), "the grids are 12 x 12 and its nested 23 x 23 refinement"
     if args.model != MODEL:
-        assert args.tag and args.n == 12, "another model needs --tag and the 12 x 12 grid"
-        path = os.path.join(OUT, f"surface_scores_{args.tag}.npz")
+        assert args.tag, "another model needs --tag"
+        stem = f"surface_scores_{args.tag}"
     else:
-        path = os.path.join(OUT, "surface_scores.npz" if args.n == 12 else f"surface_scores_{args.n}.npz")
+        stem = "surface_scores"
+    path = os.path.join(OUT, f"{stem}.npz" if args.n == 12 else f"{stem}_{args.n}.npz")
     done = dict(np.load(path, allow_pickle=True)) if os.path.exists(path) else {}
     done.pop("temps", None)
     done.pop("tops", None)
     if args.n == 23:
-        base = np.load(os.path.join(OUT, "surface_scores.npz"), allow_pickle=True)
+        base = np.load(os.path.join(OUT, f"{stem}.npz"), allow_pickle=True)
         assert np.allclose(base["temps"], temps[::2]) and np.allclose(base["tops"], tops[::2])
         for i in range(12):
             for j in range(12):
                 done.setdefault(f"{2 * i}_{2 * j}", base[f"{i}_{j}"])
-    tok, model = load(args.model, threads=args.threads)
+    tok, model = load(args.model, threads=args.threads, device=args.device, dtype=args.dtype)
     prompts = wikitext_prompts(400)
     t0 = time.time()
     for i, T in enumerate(temps):

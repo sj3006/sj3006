@@ -419,7 +419,13 @@ on average by benchmark runs at the same budget.
 \emph{Additive manufacturing.} A Rosenthal melt-pool model
 \citep{rosenthal1946} of 316L with lack-of-fusion \citep{tang2017lof},
 keyhole \citep{king2014keyhole} and balling criteria, and a synthetic
-window with controllable simulator error.
+window with controllable simulator error. No public data set repeats
+builds at each setting, so these are simulated, but the ordering can be
+checked on published measurements: in 316L melt pools from 11
+single-track studies compiled by \citet{akbari2022meltpoolnet}, depth
+and width grow with power and shrink with speed in every study, and of
+942 neighbouring setting pairs 5 (all in width) reverse by more than two
+standard errors (Appendix~\ref{app:exp}).
 \emph{Drug combinations.} Toxicity and non-response surfaces with a synergy
 term; Bliss independence \citep{bliss1939} as side information. All
 parameters are in Appendix~\ref{app:exp}.
@@ -999,6 +1005,24 @@ time and keeps the side information's offsets relative to the new truth. The mon
 Side information: absorptivity $+0.01$ and thresholds shifted by $-0.03$,
 $+0.3$, $+0.2$.
 
+\paragraph{Published melt-pool measurements.} The regression table of
+\citet{akbari2022meltpoolnet} (316L, laser powder bed fusion, speed at
+least 20\,mm/s). We keep studies with at least 6 settings and drop two
+whose values follow a formula rather than measurement (depth equal to
+width with no speed effect; exactly $(P/v)^{0.5}$); both are perfectly
+monotone. Within each study, along every row and column of its
+power--speed grid, we count neighbouring pairs whose depth (width) falls
+with power or rises with speed, and those that do so by more than
+$2\sqrt2$ times the study's scatter about a smooth trend (quadratic in
+$\log P,\log v$; linear for fewer than 15 settings). That scatter
+includes misfit, so the count is a lower bound on clear violations.
+Depth: 9 studies, 241 settings, 325 pairs, 32 reversed, none beyond two
+standard errors. Width: 8 studies, 365 settings, 617 pairs, 118 reversed,
+5 beyond. Log-linear exponents have the expected signs in every study,
+and the depth-to-width ratio (the keyhole direction) rises with power and
+falls with speed in all 6 studies that report both. Each setting is
+measured once, so these data cannot give failure rates.
+
 \paragraph{Drug combinations.} Doses 0.05--20 for each drug, spaced
 geometrically. Single agents are log-logistic: toxicity EC$_{50}$ 8 and 12,
 slopes 1.6 and 1.4; response EC$_{50}$ 1.5 and 2.5, slopes 1.2 and 1.0.
@@ -1008,7 +1032,8 @@ toxicity and 1.2 for response. $\eps$ is 30\% for toxicity and 50\% for
 non-response. Side information: Bliss independence alone (no interaction).
 
 \paragraph{Language model.} SmolLM2-135M (base model) on CPU with PyTorch
-and Hugging Face Transformers. Prompts are the first 12 words of 400
+and Hugging Face Transformers, in the checkpoint's bfloat16 precision (the
+NLL is computed in float32). Prompts are the first 12 words of 400
 randomly chosen WikiText-2 test paragraphs with more than 40 words
 (headings excluded); each generation draws a prompt at random and samples
 48 new tokens. Repetition is $1-{}$(distinct 4-grams)/(4-grams) of the

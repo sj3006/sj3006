@@ -286,3 +286,21 @@ These change the method, so they need your answer before Phase 2:
   from the surface's shape. Abstract GP sentence rewritten to cover all
   three GP baselines. Supplement: full test suite passes from the unpacked
   archive (57 tests).
+- 2026-11-15: No self-produced LPBF data and no compute budget for now.
+  Literature: the MeltpoolNet tables (Akbari et al. 2022) were checked as
+  a source of real LPBF data. They give one measurement per setting (no
+  repeated builds), some labels are rule-derived, and two 316L studies
+  have formula-like values, so they cannot give failure rates; the one
+  clean depth/width grid has no safe window under any standard keyhole
+  criterion. What they can do is test Assumption A: in 316L melt-pool
+  measurements from 11 single-track studies, depth and width grow with
+  power and shrink with speed in every study, and 5 of 942 neighbouring
+  pairs (all in width) reverse by more than two standard errors; the
+  depth/width ratio (keyhole direction) moves the right way in all 6
+  studies that report both (experiments/am_monotone_check.py; paper
+  Section 6 and Appendix B). COMPUTE_PLAN.md: tier A (three 7B open
+  models, both grids, live runs) is about 10 GPU-hours on one 80 GB GPU,
+  roughly $15-40; scripts/gpu_runs.sh runs it in one command and the LM
+  code now takes --device/--dtype (tested on CPU). Surfaces so far were
+  measured in the checkpoints' bfloat16 (now stated in Appendix B).
+  Qwen2.5-1.5B 12 x 12 surface measuring on CPU (about 7 h).

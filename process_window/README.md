@@ -92,6 +92,7 @@ step needs torch.
 | Ablations | `python3 experiments/final.py ablation --scen toy-good` | `results/final/ablation_*.csv` | 1 h |
 | 316L calibration sensitivity | `python3 experiments/physics_sensitivity.py --n 24 --reps 5` | `results/final/physics_sensitivity_24.csv` | 20 min |
 | Monotonicity violations | `python3 experiments/violation.py` | `results/final/violation.csv` | 30 min |
+| Monotonicity in published 316L melt-pool data (needs the MeltpoolNet CSV; see the script's docstring) | `python3 experiments/am_monotone_check.py --csv <MeltpoolNet>/Data/meltpoolnet_regression.csv` | `results/final/am_monotone_check.csv` | 5 s |
 | Paper figures from the CSVs | `python3 experiments/paper_figs.py` | `paper/latex/figs/*.pdf` | 1 min |
 
 Set `OMP_NUM_THREADS=1` for the benchmark scripts; they are single-threaded

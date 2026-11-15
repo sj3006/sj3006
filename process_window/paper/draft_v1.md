@@ -211,7 +211,13 @@ multiple-testing factor ln(MN/alpha)/L of the ordered lower bound.
   78 of 144 settings are safe.
 - *Additive manufacturing.* A Rosenthal melt-pool model of 316L with
   Tang et al. lack-of-fusion, King et al. keyhole and length/width balling
-  criteria; a synthetic window with controllable simulator error.
+  criteria; a synthetic window with controllable simulator error. No public
+  data set repeats builds at each setting, so these are simulated; the
+  ordering is checked on published 316L melt-pool measurements from 11
+  single-track studies (MeltpoolNet, Akbari et al. 2022): depth and width
+  grow with power and shrink with speed in every study, and 5 of 942
+  neighbouring pairs (all in width) reverse by more than two standard
+  errors (results/final/am_monotone_check.csv).
 - *Drug combination screen.* Toxicity and non-response surfaces with a
   synergy term; Bliss independence as side information.
 

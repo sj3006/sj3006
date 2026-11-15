@@ -24,13 +24,17 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 MODEL = "HuggingFaceTB/SmolLM2-135M"
 
 
-def load(name=MODEL, threads=4):
+def load(name=MODEL, threads=4, device="cpu", dtype=None):
+    """Tokenizer and model. dtype=None keeps the checkpoint's precision
+    (bfloat16 for the models we use); on a GPU pass device="cuda". Scores
+    are always computed in float32."""
     torch.set_num_threads(threads)
     tok = AutoTokenizer.from_pretrained(name)
     tok.padding_side = "left"
     if tok.pad_token is None:
         tok.pad_token = tok.eos_token
-    model = AutoModelForCausalLM.from_pretrained(name)
+    kw = {} if dtype is None else {"dtype": getattr(torch, dtype)}
+    model = AutoModelForCausalLM.from_pretrained(name, **kw).to(device)
     model.eval()
     return tok, model
 
@@ -53,21 +57,26 @@ def seq_rep_n(ids, n=4):
 
 
 @torch.no_grad()
-def generate_and_score(tok, model, prompts, temperature, top_p, max_new_tokens=48):
-    """Return (seq-rep-4, mean NLL) for one continuation per prompt."""
-    enc = tok(prompts, return_tensors="pt", padding=True)
+def generate_and_score(tok, model, prompts, temperature, top_p, max_new_tokens=48, score_batch=32):
+    """Return (seq-rep-4, mean NLL) for one continuation per prompt. The NLL
+    pass runs `score_batch` sequences at a time (the float32 log-probabilities
+    over a large vocabulary dominate memory on a GPU)."""
+    enc = tok(prompts, return_tensors="pt", padding=True).to(model.device)
     out = model.generate(**enc, do_sample=True, temperature=float(temperature), top_p=float(top_p),
                          max_new_tokens=max_new_tokens, pad_token_id=tok.pad_token_id)
     cont = out[:, enc["input_ids"].shape[1]:]
     # NLL of the continuation under the unmodified model.
     attn = torch.cat([enc["attention_mask"], torch.ones_like(cont)], dim=1)
-    logits = model(input_ids=out, attention_mask=attn).logits[:, :-1, :]
-    logp = torch.log_softmax(logits.float(), dim=-1)
-    tgt = out[:, 1:]
-    tok_lp = logp.gather(-1, tgt.unsqueeze(-1)).squeeze(-1)
     start = enc["input_ids"].shape[1] - 1
-    cont_lp = tok_lp[:, start:]
-    valid = cont != tok.pad_token_id
-    nll = -(cont_lp * valid).sum(1) / valid.sum(1).clamp(min=1)
+    nll = []
+    for s in range(0, out.shape[0], score_batch):
+        sl = slice(s, s + score_batch)
+        logits = model(input_ids=out[sl], attention_mask=attn[sl]).logits[:, :-1, :]
+        logp = torch.log_softmax(logits.float(), dim=-1)
+        tok_lp = logp.gather(-1, out[sl, 1:].unsqueeze(-1)).squeeze(-1)
+        cont_lp = tok_lp[:, start:]
+        valid = cont[sl] != tok.pad_token_id
+        nll.append(-(cont_lp * valid).sum(1) / valid.sum(1).clamp(min=1))
+    nll = torch.cat(nll)
     reps = [seq_rep_n([t for t in row.tolist() if t != tok.pad_token_id]) for row in cont]
-    return np.array(reps), nll.numpy()
+    return np.array(reps), nll.float().cpu().numpy()

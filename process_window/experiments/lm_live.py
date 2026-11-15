@@ -9,6 +9,8 @@ for checking the certified region.
 
 Run from process_window/ after lm_surface.py has finished:
     HF_HOME=<cache> python3 experiments/lm_live.py [--budget 8000] [--seed 0]
+Another model: --model NAME --surface results/lm/surface_scores_TAG.npz
+(output lm_live_TAG_seedS.json); on a GPU add --device cuda --dtype bfloat16.
 """
 
 import argparse
@@ -69,10 +71,18 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--budget", type=int, default=8000)
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--model", default=None, help="default: the model of pwcert/lm.py")
+    ap.add_argument("--surface", default=None, help="that model's measured surface (.npz)")
+    ap.add_argument("--device", default="cpu")
+    ap.add_argument("--dtype", default=None)
     args = ap.parse_args()
-    sc = make_lm_scenario(0.10, "pilot")
+    sc = make_lm_scenario(0.10, "pilot", **({"path": args.surface} if args.surface else {}))
     n = sc.truth["degenerate"].shape[0]
-    tok, model = load()
+    tok, model = load(*([args.model] if args.model else []), device=args.device, dtype=args.dtype)
+    tag = ""
+    if args.surface:
+        tag = os.path.splitext(os.path.basename(args.surface))[0].replace("surface_scores", "").strip("_")
+        tag = tag + "_" if tag else ""
     prompts = wikitext_prompts(400, seed=1)      # a fresh prompt pool
     c = LiveCertifier(sc, tok, model, prompts, rule="cone", weights="ensemble", alloc="edge", target_q=0.7,
                       batch=2 * n, coupons0=sc.meta["pilot_coupons"], rng=np.random.default_rng(args.seed))
@@ -88,7 +98,7 @@ def main():
     res = dict(budget=args.budget, seed=args.seed, safe_reference=int(W.sum()), certified=int(C.sum()),
                certified_unsafe_vs_reference=int((C & ~W).sum()), generations=int(c.coupons),
                certified_mask=C.astype(int).tolist(), log=log)
-    with open(os.path.join(OUT, f"lm_live_seed{args.seed}.json"), "w") as f:
+    with open(os.path.join(OUT, f"lm_live_{tag}seed{args.seed}.json"), "w") as f:
         json.dump(res, f)
     print({k: v for k, v in res.items() if k not in ("certified_mask", "log")})
 
