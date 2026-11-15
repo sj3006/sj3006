@@ -122,6 +122,13 @@ T = {x : p_m(x) <= q eps_m for all m}, stop at a time tau with a certified
 set C such that validity holds and P(tau < inf, T ⊆ C) >= 1 - beta.
 Settings with rates between q eps and eps may be certified or not.
 
+**Between grid points.** If the knobs are continuous and each p_m is
+monotone on the whole box, the certificate also covers off-grid settings
+at no extra cost: y is safe for m whenever a grid point at most as safe as
+y for m is certified for m, on the same probability-(1 - alpha) event. A
+grid cell is covered once, for each mode, its riskiest corner is certified
+for that mode.
+
 ## 3. Testing: the cone rule
 
 *Per-configuration evidence.* For each (m, x), a betting e-process
