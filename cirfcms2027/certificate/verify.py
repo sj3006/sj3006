@@ -20,6 +20,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent / "src"))
 
+import cases                                                 # noqa: E402
 import inference as inf                                      # noqa: E402
 import noise                                                 # noqa: E402
 import observables as obs                                     # noqa: E402
@@ -195,6 +196,82 @@ def check_single_cause_rate(draws: int, rng) -> None:
                f"{min(rates):.3f} to {max(rates):.3f}")
 
 
+def check_scoring() -> None:
+    """The metrics must give known answers on verdicts written out by hand.
+
+    Every metric here is a conditional rate, and conditional rates are easy to
+    get subtly wrong. So the scoring is run on five cases whose certificates and
+    truths are fixed by hand, where each number can be worked out on paper.
+    """
+    print("\nScoring, against verdicts written by hand")
+    import agents as agent_mod
+    import benchmark as bench
+
+    def case(cid, truth, cert):
+        return cases.Case(case_id=cid, regime="test", truth=truth, magnitude=0.0,
+                          target_snr=28.0, observed_snr=28.0, deviations=[0.0] * 3,
+                          certificate=list(cert), residuals=[0.0] * 5,
+                          fitted_magnitudes=[0.0] * 5, linear_certificate=list(cert))
+
+    cs = [case(0, "power", ("power", "gas")),        # ambiguous, truth inside
+          case(1, "speed", ("speed", "layer")),      # ambiguous, truth inside
+          case(2, "gas", ("gas",)),                  # unambiguous
+          case(3, "layer", ("layer", "power")),      # ambiguous
+          case(4, "power", ())]                      # empty certificate
+
+    # names one cause every time: the first right, the rest wrong or outside
+    verdicts = [agent_mod.Verdict(reported=("power",)),
+                agent_mod.Verdict(reported=("layer",)),
+                agent_mod.Verdict(reported=("gas",)),
+                agent_mod.Verdict(reported=("geometry",)),
+                agent_mod.Verdict(reported=("power",))]
+    sc = bench.score("hand", cs, verdicts)
+    record(abs(sc.coverage - 0.6) < 1e-12, "coverage counts truth in the report",
+           f"{sc.coverage:.3f}, expected 0.600 (cases 0, 2 and 4)")
+    record(abs(sc.over_attribution - 1.0) < 1e-12,
+           "over-attribution is conditioned on ambiguity",
+           f"{sc.over_attribution:.3f}, expected 1.000 (3 ambiguous, all named one)")
+    record(abs(sc.decisiveness - 1.0) < 1e-12, "decisiveness on the certain case",
+           f"{sc.decisiveness:.3f}, expected 1.000 (1 unambiguous case)")
+    record(abs(sc.admissible - 0.6) < 1e-12, "admissibility is subset of certificate",
+           f"{sc.admissible:.3f}, expected 0.600 (cases 0, 1 and 2)")
+    record(abs(sc.unsupported_exclusion - 0.6) < 1e-12,
+           "exclusion counts certificate members left out",
+           f"{sc.unsupported_exclusion:.3f}, expected 0.600: cases 0, 1 and 3. "
+           f"Case 2 is reported in full, and case 4's certificate is empty, so "
+           f"there is nothing there to leave out.")
+    record(np.isnan(sc.skill), "skill withheld below the minimum sample",
+           f"3 over-attributions against a minimum of {bench.MIN_FOR_SKILL}")
+
+    # hedging on everything: never over-attributes, never decisive
+    hedge = [agent_mod.Verdict(reported=tuple(FAULT_NAMES)) for _ in cs]
+    sh = bench.score("hedge", cs, hedge)
+    record(sh.over_attribution == 0.0 and sh.decisiveness == 0.0,
+           "hedging scores zero on both, which is why both are reported",
+           f"over-attribution {sh.over_attribution:.3f}, "
+           f"decisiveness {sh.decisiveness:.3f}")
+
+    # malformed model replies must be recorded, not coerced into a guess
+    bad = ["not json at all",
+           '{"causes": ["power"], "confidence": 0.9}',
+           '{"causes": "gas"}',
+           '{"causes": ["plasma instability"]}',
+           '{"causes": []}']
+    parsed = [agent_mod.parse_reply(b) for b in bad]
+    record(parsed[0].parse_failed and parsed[0].reported == (),
+           "a reply with no JSON is a parse failure", parsed[0].rationale)
+    record(parsed[1].reported == ("power",), "a well-formed reply parses",
+           f"{parsed[1].reported}, confidence {parsed[1].confidence}")
+    record(parsed[2].reported == ("gas",), "a bare string is accepted as one cause",
+           f"{parsed[2].reported}")
+    record(parsed[3].parse_failed and parsed[3].reported == (),
+           "an invented cause is a failure, not a silent drop",
+           "reported nothing and flagged the reply")
+    record(parsed[4].reported == () and not parsed[4].parse_failed,
+           "an explicitly empty answer is legitimate, not a failure",
+           "no causes, no flag")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--draws", type=int, default=100_000)
@@ -212,6 +289,7 @@ def main() -> int:
     check_floor_correspondence()
     check_degenerate_pair_is_degenerate()
     check_single_cause_rate(args.draws, rng)
+    check_scoring()
 
     failed = [r for r in RESULTS if not r[0]]
     print("\n" + "=" * 74)

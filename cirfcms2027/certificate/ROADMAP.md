@@ -113,9 +113,19 @@ A common interface returning a reported set of causes plus a stated confidence.
 - `Language model`, unconstrained: the observation and the process context in
   prose, the five candidate causes described physically, no Jacobian. Asked for
   a cause.
-- `Language model`, constrained: the same, with the certificate supplied as a
-  tool result, and instructed that it may not narrow beyond it without naming
-  an admissible probe.
+- `Language model`, constrained: the same, with the certificate supplied in the
+  prompt, instructed that it may not narrow beyond it without naming an
+  admissible probe, and with the intersection enforced in code rather than
+  trusted to the instruction.
+
+**Status: done** (`agents.py`). Two further arms were added because without
+them a language-model score means nothing: `Everything`, which hedges on all
+five and so scores a perfect zero over-attribution, and `Chance`, which fixes
+the zero point of the skill metric. Both prompt styles are committed verbatim,
+neutral and operator, so the difference between asking "which causes are
+consistent" and "what went wrong" is measurable rather than an unstated
+confound. A `ScriptedBackend` replays recorded replies so the scoring can be
+changed and re-run without paying for the calls again.
 
 ### WP5  Benchmark  (`benchmark.py`)
 Metrics, over a case set stratified by SNR, regime and suite:
@@ -124,8 +134,28 @@ Metrics, over a case set stratified by SNR, regime and suite:
 - **certified coverage**: truth inside the reported set.
 - **set size**: the price of honesty, in mean causes reported.
 - **admissibility**: reported set is a subset of the certificate.
-Deterministic baselines run with no external service. The language-model arms
-need an API credential, which is the one open decision (see below).
+- **decisiveness**: named one cause when the certificate held one. Required,
+  because over-attribution alone is trivially optimised by never committing.
+- **skill**: accuracy among over-attributions against the chance rate on those
+  same cases, normalised so chance is zero and perfect is one.
+
+**Status: done** (`benchmark.py`). The deterministic arms run with no external
+service and are reported below. The language-model arms need a credential,
+which is the one open decision.
+
+Measured on 6000 cases per regime, 300 per fault and signal level:
+
+| arm | coverage | mean set | over-att | decisive | skill |
+|---|---|---|---|---|---|
+| oracle | 1.000 | 1.00 | 1.000 | 1.000 | 1.00 |
+| maximum likelihood | 0.440 | 1.00 | 1.000 | 1.000 | 0.17 |
+| certificate | 0.951 | 3.70 | 0.000 | 1.000 | n/a |
+| everything | 1.000 | 5.00 | 0.000 | 0.000 | n/a |
+| chance | 0.201 | 1.00 | 1.000 | 1.000 | -0.08 |
+
+Instantaneous regime, where 87.6 % of cases are ambiguous. The build-context
+regime has 2 ambiguous cases in 6000, so over-attribution has no signal there
+and decisiveness carries the measurement instead.
 
 ### WP6  Probe planning  (`probe.py`, optional)
 Where a degeneracy can be broken by changing the operating point, and the
@@ -134,8 +164,8 @@ is idea 3 from the brainstorm and can be a separate paper.
 
 ## Open decisions
 
-1. **Whose account runs the language-model arms.** Needed before WP5 can
-   report. If the runs should happen here, an API credential for
+1. **Whose account runs the language-model arms.** The only thing now
+   blocking a result. Everything else in WP4 and WP5 is built and tested. If the runs should happen here, an API credential for
    `api.anthropic.com` can be requested in-session; if the paper should report
    several vendors, the keys and the cost belong on the authors' side and the
    harness will take them from the environment.
