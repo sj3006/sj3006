@@ -745,6 +745,602 @@ perform formal analysis and to write the original draft. After using this
 service the authors reviewed and edited the content as needed and take full
 responsibility for the content of the published article.
 
+
+%% ===========================================================================
+\appendix
+
+\section{Deriving the sensor noise set from transduction}
+\label{app:noise}
+
+The whitening of Equation~\eqref{eq:obs} divides each instrument's row by its
+own relative noise, which is what puts a photodiode's radiometric power, a
+camera's square metres and a pyrometer's kelvin into one common unit. The three
+figures are therefore half the measurement geometry rather than a detail applied
+after it, and they are derived rather than assumed.
+
+No defensible in-process figure for these instruments exists in the literature.
+The one citable number, 2.3\,\%, is the precision of a post-mortem
+cross-section, $U = 6.2$\,\textmu m at $k=2$ on a 136.3\,\textmu m width
+\cite{Weaver2024}, which is metrology uncertainty rather than the noise of a
+signal acquired during a build. It is used as a reference point and not as a
+value. Everything below follows instead from one assumption,
+%
+\begin{equation}
+\text{every radiometric channel carries the same fractional noise }
+\varepsilon ,
+\label{eq:eps}
+\end{equation}
+%
+together with how each instrument converts radiance into a reading. Only ratios
+enter the whitening, so $\varepsilon$ cancels and no absolute level is claimed.
+
+\subsection{The photodiode sets the unit}
+
+A coaxial photodiode integrates the emission in its band and reports a single
+number proportional to it. A fractional error in the light is the same
+fractional error in the reading, with no intervening transformation:
+%
+\begin{equation}
+\sigma_{\mathrm{pd}} = \varepsilon .
+\end{equation}
+%
+The other two are quoted against this.
+
+\subsection{The camera: a brightness error is a displaced isotherm}
+
+The camera reports melt pool area, obtained by thresholding the image at the
+liquidus. The step that matters is that a fractional brightness error cannot be
+told from the liquidus isotherm sitting at a slightly different temperature. So
+the brightness error is converted into an equivalent temperature error by
+dividing by the steepness of Planck's law,
+%
+\begin{equation}
+\delta \ln T = \frac{-\,\varepsilon}{\partial \ln L / \partial \ln T},
+\qquad
+\frac{\partial \ln L}{\partial \ln T} = \frac{x e^{x}}{e^{x}-1},
+\quad x = \frac{c_2}{\lambda T},
+\label{eq:planck}
+\end{equation}
+%
+with $c_2 = 1.4387769\times 10^{-2}$\,m\,K. At the band centre
+$\lambda = 850$\,nm and the liquidus $T = 1609$\,K, $x = 10.520$ and the
+sensitivity is $10.520$; the Wien limit is simply $x$, and the two agree to
+better than $0.01\,\%$ here because $e^{-x} \approx 3\times10^{-5}$.
+
+Planck is steep at this wavelength and temperature, so the division
+\emph{shrinks} the error: $\varepsilon = 1\,\%$ displaces the apparent isotherm
+by only $0.095\,\%$ in temperature. Re-solving the melt pool with the liquidus
+scaled by $e^{\pm\delta \ln T}$ and differencing gives
+%
+\begin{equation}
+\frac{\partial \ln W}{\partial \varepsilon} = 0.0298 ,
+\qquad
+\frac{\partial \ln L}{\partial \varepsilon} = 0.1124 .
+\end{equation}
+%
+The reported area is $A = \tfrac{\pi}{4} W L$ for the elliptical pool the model
+produces, and the constant drops out of a logarithmic derivative, so
+$\partial \ln A = \partial \ln W + \partial \ln L$ and
+%
+\begin{equation}
+\sigma_{\mathrm{cam}} = 0.0298 + 0.1124 = 0.142\,\varepsilon .
+\end{equation}
+%
+The two axis errors are added rather than combined in quadrature because a
+single threshold shift drives both, so they are perfectly correlated rather than
+independent. Treating them as independent would give
+$\sqrt{0.0298^2 + 0.1124^2} = 0.116$, which is optimistic; the linear sum is the
+conservative choice and the physically correct one.
+
+Thresholding on a steep function localises an edge well, which is why the camera
+is the quietest of the three instruments by a factor of seven, and why its width
+axis alone, at $0.0298\,\varepsilon$, is quieter than the photodiode by a factor
+of thirty-four.
+
+\subsection{The pyrometer: the price of needing no calibration}
+
+A two-colour pyrometer forms the ratio $R = L(\lambda_1)/L(\lambda_2)$ of the
+power in two narrow bands and inverts it for temperature. Under the Wien form of
+Planck's law, $L \propto \lambda^{-5} e^{-c_2/\lambda T}$, the inversion is
+%
+\begin{equation}
+T = \frac{c_2 \left( \lambda_2^{-1} - \lambda_1^{-1} \right)}
+         {\ln R + 5 \ln(\lambda_1/\lambda_2)} ,
+\label{eq:twocolour}
+\end{equation}
+%
+whose defining virtue is that any gain common to the two bands cancels in $R$,
+so no absolute radiometric calibration is needed.
+
+Two steps set the noise, and they pull in opposite directions. First, the two
+band readings carry independent errors, so with
+$g_i = \partial \ln T / \partial \ln p_i$ the inferred temperature carries
+$\sqrt{g_1^2 + g_2^2}\,\varepsilon$. Second, differentiating
+Equation~\eqref{eq:twocolour} gives $g_1 = -g_2 = 1/\Lambda$ with
+%
+\begin{equation}
+\Lambda \;=\; \left| \frac{d \ln R}{d \ln T} \right|
+\;=\; \frac{c_2}{T}\left( \frac{1}{\lambda_1} - \frac{1}{\lambda_2} \right).
+\label{eq:lambda}
+\end{equation}
+%
+At $T = 3030.6$\,K and bands at 750 and 950\,nm, $c_2/T = 4.747\times10^{-6}$\,m
+and $\lambda_1^{-1} - \lambda_2^{-1} = 2.807\times10^{5}$\,m$^{-1}$, so
+$\Lambda = 1.333$ and
+%
+\begin{equation}
+\sigma_{\mathrm{pyr}} = \frac{\sqrt{2}}{\Lambda}\,\varepsilon
+= \frac{\sqrt{2}}{1.333}\,\varepsilon = 1.061\,\varepsilon .
+\end{equation}
+%
+In the implementation this is computed numerically by perturbing each band
+through the code's own inverter rather than from Equation~\eqref{eq:lambda}, so
+that the figure is the sensitivity of the instrument model actually used; the
+two agree to $0.01\,\%$.
+
+As a fraction of its own reading the pyrometer is therefore slightly noisier
+than the photodiode it is built from. Dividing by $\Lambda$ does reduce the
+$\sqrt{2}$, but not all the way back, and the reason is that the two bands sit
+close together. Evaluating Equation~\eqref{eq:planck} at 3030.6\,K gives a
+sensitivity of 6.341 at 750\,nm and 5.031 at 950\,nm, so either band
+\emph{alone} changes by five to six per cent for each one per cent of
+temperature, and a single calibrated band would give $1/6.341 = 0.158\,
+\varepsilon$, better by a factor of six. Their difference, which is what the
+ratio retains, is only 1.31 to 1.33. That gap is the price of needing no
+absolute calibration.
+
+One inconsistency is worth recording. The band radiances are evaluated with the
+exact Planck function while Equation~\eqref{eq:twocolour} is the Wien inversion,
+so the sensitivity used is the Wien value 1.333 rather than the exact-Planck
+band difference $6.341 - 5.031 = 1.310$. Using the latter would give
+$\sigma_{\mathrm{pyr}} = 1.080\,\varepsilon$ instead of $1.061$, a change of
+1.7\,\%. The Wien value is the correct one for the instrument as modelled,
+because it is the derivative of the inversion the instrument performs, and the
+robustness study of the conference paper covers a wider spread than this.
+
+\subsection{The set, and what rests on it}
+
+\begin{equation}
+\sigma_{\mathrm{pd}} : \sigma_{\mathrm{cam}} : \sigma_{\mathrm{pyr}}
+\;=\; 1 : 0.142 : 1.061 .
+\end{equation}
+
+Two choices inside this derivation were taken in the direction that costs the
+analysis rather than flatters it: the camera's extent is read from one threshold
+crossing rather than averaged around the perimeter, and the width and length
+axes are treated as separate observables elsewhere in the paper although a
+common brightness error moves them together, which understates what reporting
+them separately is worth.
+
+
+\section{The profile residual and its exact reference distribution}
+\label{app:resid}
+
+Write $u_k = J_w[:,k] / \lVert J_w[:,k] \rVert$ for the unit signature direction
+of cause $k$, and $P_k = u_k u_k^{\mathsf T}$ and
+$P_k^{\perp} = I_S - P_k$ for the orthogonal projections onto and away from it.
+From Equation~\eqref{eq:resid},
+%
+\begin{equation}
+R_k \;=\; \lVert z_w \rVert^2 - \langle z_w, u_k \rangle^2
+     \;=\; \lVert P_k^{\perp} z_w \rVert^2 .
+\end{equation}
+%
+Now suppose cause $k$ is the true one, with any magnitude $f$, so that
+$z_w = f J_w[:,k] + e$ with $e \sim \mathcal{N}(0, I_S)$. Because
+$J_w[:,k]$ is parallel to $u_k$, the projection annihilates the signal term
+exactly,
+%
+\begin{equation}
+P_k^{\perp} z_w = f\,P_k^{\perp} J_w[:,k] + P_k^{\perp} e = P_k^{\perp} e ,
+\end{equation}
+%
+and the magnitude has left the problem. $P_k^{\perp}$ is an orthogonal
+projection of rank $S-1$, and the squared norm of a standard normal vector
+projected onto a subspace of dimension $S-1$ is chi-squared on $S-1$ degrees of
+freedom. Hence
+%
+\begin{equation}
+R_k \,\big|\, H_k \;\sim\; \chi^2_{S-1}
+\qquad\text{for every } f ,
+\end{equation}
+%
+exactly, with no asymptotic argument and no prior over causes. One degree of
+freedom has been spent estimating the magnitude, which is the only cost of not
+knowing it.
+
+The coverage statement follows immediately. With
+$C_\alpha$ as in Equation~\eqref{eq:cert} and $k^\ast$ the true cause,
+%
+\begin{equation}
+\Pr\bigl( k^\ast \in C_\alpha \bigr)
+= \Pr\bigl( R_{k^\ast} \le q_{1-\alpha}(S-1) \bigr) = 1 - \alpha ,
+\end{equation}
+%
+exactly rather than conservatively, because the test has exact size under each
+hypothesis.
+
+Two consequences are worth stating because they are easy to mistake for faults.
+First, $C_\alpha$ may be empty, which happens with probability about $\alpha$
+and means no single cause explains the data at this level; it is a legitimate
+and informative answer rather than a failure. Second, the guarantee is marginal
+over the noise and conditional on the forward model: it says nothing about
+whether the model itself is right, which is the subject of
+Section~\ref{sec:discussion}.
+
+
+\section{The cone, and the separation floor as a consequence}
+\label{app:cone}
+
+Let $\rho = \lVert z_w \rVert$ be the observed whitened signal-to-noise ratio
+and $\psi_k \in [0, \pi/2]$ the angle between $z_w$ and the line spanned by
+$u_k$, folded because a fault magnitude may be negative and a signature at
+$175^\circ$ is as confounded as one at $5^\circ$. Then
+$\langle z_w, u_k \rangle = \rho \cos \psi_k$ and
+%
+\begin{equation}
+R_k = \rho^2 - \rho^2 \cos^2 \psi_k = \rho^2 \sin^2 \psi_k ,
+\end{equation}
+%
+so admissibility is a statement about direction alone once $\rho$ is fixed:
+%
+\begin{equation}
+k \in C_\alpha
+\iff
+\sin \psi_k \le \frac{\sqrt{q_{1-\alpha}(S-1)}}{\rho}
+\iff
+\psi_k \le \psi^\ast, \quad
+\psi^\ast = \arcsin\!\left(\frac{\sqrt{q}}{\rho}\right).
+\end{equation}
+%
+The certificate is the set of signature directions lying inside a cone of
+half-angle $\psi^\ast$ about the observation, and the cone narrows as the signal
+grows, in proportion to $1/\rho$ for small angles.
+
+\paragraph{The floor.} Fix two causes $k$ and $l$ at mutual angle $\Delta$.
+Both are admissible precisely when the observation direction lies within
+$\psi^\ast$ of both $u_k$ and $u_l$. The set of directions within $\psi^\ast$ of
+both is non-empty if and only if the two cones intersect, that is if and only if
+%
+\begin{equation}
+\Delta \;\le\; 2 \psi^\ast .
+\end{equation}
+%
+Contrapositively, at observed signal-to-noise $\rho$ \emph{no} observation can
+place both causes in the certificate exactly when
+%
+\begin{equation}
+\Delta \;>\; 2 \arcsin\!\left(
+\frac{\sqrt{q_{1-\alpha}(S-1)}}{\rho}\right),
+\label{eq:floorapp}
+\end{equation}
+%
+which is Equation~\eqref{eq:floor}. This is a sharp characterisation, not a rule
+of thumb: the condition is necessary as well as sufficient.
+
+\paragraph{Reading it the other way.} Equation~\eqref{eq:floorapp} inverts to
+give, for any pair, the signal strength at which it stops being confusable,
+%
+\begin{equation}
+\rho_{\min}(\Delta) = \frac{\sqrt{q_{1-\alpha}(S-1)}}{\sin(\Delta/2)} ,
+\end{equation}
+%
+and Equation~\eqref{eq:rho} converts that into a fault magnitude,
+$f = \rho_{\min} \varepsilon / \lVert J_w[:,k] \rVert$. With three instruments,
+$S - 1 = 2$ and $q_{0.95}(2) = 5.9915$, so a ten degree floor corresponds to
+$\rho = \sqrt{5.9915}/\sin 5^\circ = 2.4477/0.08716 = 28.08$. For the enlarged
+observation $S - 1 = 14$, $q_{0.95}(14) = 23.6848$, and the same floor
+corresponds to $\rho = 55.84$: more dimensions means a higher threshold, and
+the floor asserts a correspondingly stronger signal.
+
+A pair at $\Delta = 0$ gives $\rho_{\min} = \infty$. That is not a very large
+number but an impossibility, and Appendix~\ref{app:channels} shows that one pair
+here is at $\Delta = 0$ by algebra rather than by numerical coincidence.
+
+
+\section{The covariance of the enlarged observation}
+\label{app:kron}
+
+Whitening makes the geometry mean separability only if the noise is isotropic
+afterwards, and dividing each row by its own standard deviation achieves that
+only for independent observations. Three instruments read at one instant are
+independent by assumption. The enlarged observation is not, and this appendix
+derives what it is instead.
+
+Let $G$ be the $N \times p$ matrix of build regressors, here $84 \times 5$, and
+$z_s \in \mathbb{R}^N$ the relative deviations of instrument $s$ across the
+segments, carrying independent noise of standard deviation
+$\sigma_s \varepsilon$ per segment. The observation is the least-squares
+coefficient vector
+%
+\begin{equation}
+\hat c_s = (G^{\mathsf T} G)^{-1} G^{\mathsf T} z_s ,
+\end{equation}
+%
+a linear map of $z_s$, so with $H = (G^{\mathsf T} G)^{-1} G^{\mathsf T}$,
+%
+\begin{equation}
+\operatorname{Cov}(\hat c_s)
+= H \left( \sigma_s^2 \varepsilon^2 I_N \right) H^{\mathsf T}
+= \sigma_s^2 \varepsilon^2 (G^{\mathsf T} G)^{-1} G^{\mathsf T} G
+  (G^{\mathsf T} G)^{-1}
+= \sigma_s^2 \varepsilon^2 (G^{\mathsf T} G)^{-1} .
+\label{eq:covblock}
+\end{equation}
+%
+This is diagonal only if the regressors are orthogonal. In the scan plan used
+here they are not: normalising Equation~\eqref{eq:covblock} to a correlation
+matrix gives $0.577$ between the turn-density and support-depth coefficients,
+because a region of the plate with many turns tends also to sit over more solid
+support.
+
+Instruments being independent of one another, the covariance of the full stacked
+observation, ordered instrument-major as in the definition of the enlarged
+Jacobian, is block diagonal with blocks given by
+Equation~\eqref{eq:covblock}, which is exactly a Kronecker product:
+%
+\begin{equation}
+\operatorname{Cov}
+= \varepsilon^2 \left(
+\operatorname{diag}(\sigma_1^2, \dots, \sigma_S^2)
+\;\otimes\;
+(G^{\mathsf T} G)^{-1}
+\right).
+\label{eq:kronapp}
+\end{equation}
+%
+The correct whitener is its inverse square root. It factors, because for
+positive definite $A$ and $B$ the Cholesky factor of a Kronecker product is the
+Kronecker product of the factors,
+%
+\begin{equation}
+\operatorname{chol}(A \otimes B)
+= \operatorname{chol}(A) \otimes \operatorname{chol}(B) ,
+\label{eq:cholkron}
+\end{equation}
+%
+verified numerically here to $1.4\times10^{-17}$. This factorisation is used
+again in Appendix~\ref{app:modulation}.
+
+\paragraph{What the diagonal approximation costs.} Replacing
+Equation~\eqref{eq:kronapp} by the diagonal of its own square root, that is
+whitening by the marginal standard errors
+$\sigma_s \sqrt{[(G^{\mathsf T}G)^{-1}]_{jj}}$ as though the coefficients were
+independent, leaves correlated noise behind. The nominally 95\,\% certificate
+then covers 93.8\,\% of the time rather than 95.0\,\%, and the pairwise angles
+move by up to 8.8 degrees, enough to change which pair is the worst. The
+marginal standard errors themselves are correct and are the right quantity for
+reporting a coefficient's precision; the error is in using them in place of a
+covariance.
+
+
+\section{The channel factorisation and the power--gas theorem}
+\label{app:channels}
+
+\subsection{The factorisation}
+
+Each fault enters the forward model through a stated physical route, and every
+route terminates in one of four quantities the thermal solution depends on: the
+absorbed power $AP$, the scan speed $v$, the effective conductivity $k$, and the
+local preheat $T_0$. Reading the routes of Section~\ref{sec:forward} in
+logarithmic form,
+%
+\begin{align}
+\ln(AP) &= \mathrm{const} + \ln(1+f_P) + (c_A + c_H) f_{\mathrm{layer}}
+           - f_{\mathrm{gas}} , \\
+\ln v   &= \mathrm{const} + \ln(1+f_v) , \\
+\ln k   &= \mathrm{const} + c_k f_{\mathrm{layer}} , \\
+T_0     &= \mathrm{const} + c_{\mathrm{geo}} f_{\mathrm{geo}} ,
+\end{align}
+%
+so that differentiating at the healthy point gives the $4 \times 5$ matrix $C$
+of Table~\ref{tab:C}. Writing $M$ for the $3 \times 4$ matrix of relative
+instrument responses to those same four channels, the chain rule gives
+%
+\begin{equation}
+J = M C .
+\end{equation}
+%
+$C$ depends only on the faults and the material; $M$ depends only on the
+instruments and the operating point. Computing $M$ by perturbing each channel at
+its source and comparing $MC$ with the Jacobian obtained by perturbing the
+faults themselves, the two agree to $6.8 \times 10^{-5}$ relative, which is the
+finite-difference error of the comparison.
+
+\subsection{The theorem}
+
+\begin{quote}
+\textbf{Proposition.} A power fault and a shielding gas fault produce
+antiparallel signatures in every instrument set, at every operating point, and
+in any finite stack of operating points.
+\end{quote}
+
+\noindent
+\emph{Proof.} From the first displayed equation above, $f_P$ and
+$f_{\mathrm{gas}}$ appear in $\ln(AP)$ and nowhere else, with opposite sign, so
+in the first row of $C$ they contribute $+1$ and $-1$ and in every other row
+they contribute zero. Hence
+%
+\begin{equation}
+C[:,\mathrm{power}] = -\,C[:,\mathrm{gas}]
+\label{eq:antipar}
+\end{equation}
+%
+exactly, by the form of the model rather than by numerical accident. For any
+matrix $M$ whatever, linearity gives
+%
+\begin{equation}
+(MC)[:,\mathrm{power}] = M\,C[:,\mathrm{power}]
+= -\,M\,C[:,\mathrm{gas}] = -\,(MC)[:,\mathrm{gas}] ,
+\end{equation}
+%
+so the two columns are antiparallel and the folded angle between them is zero.
+Whitening does not disturb this, since it left-multiplies by a further matrix.
+Stacking $m$ operating points replaces $M$ by
+$\tilde M = [M_1^{\mathsf T} \cdots M_m^{\mathsf T}]^{\mathsf T}$, which is
+again a matrix, so the conclusion is unchanged. $\square$
+
+\subsection{The invisible fault direction}
+
+Solving $Cx = 0$ row by row: the second row forces $x_v = 0$, the third forces
+$c_k x_{\mathrm{layer}} = 0$ and hence $x_{\mathrm{layer}} = 0$, the fourth
+forces $x_{\mathrm{geo}} = 0$, and the first then reduces to
+$x_P - x_{\mathrm{gas}} = 0$. So
+%
+\begin{equation}
+\ker C = \operatorname{span}
+\{ (1, 0, 0, 1, 0)^{\mathsf T} \} ,
+\qquad \operatorname{rank} C = 4 ,
+\end{equation}
+%
+one-dimensional and lying exactly along an equal, simultaneous power and gas
+fault. Such a combination moves no channel, so it moves no observable that could
+be built from the melt pool, whatever the instrument. Numerically the computed
+null vector is $(-0.7071, 0, 0, -0.7071, 0)$ with $C x$ zero to machine
+precision.
+
+\subsection{Why probing cannot help, and why the other pairs are different}
+
+A deliberate probe changes the operating point and therefore $M$; it cannot
+change $C$, which is a property of how faults enter the physics. The
+proposition then says the power--gas pair is closed to probing in principle.
+
+The remaining nine pairs are confounded for an unrelated reason: $M$ has rank 3
+against four channels, so one combination of channels is invisible to the
+instruments. Stacking operating points can raise that rank, which is why probing
+is worth testing at all, and Section~\ref{sec:probe} reports that it does not
+help much in practice because the preheat channel is intrinsically weak,
+$M[:,T_0]$ being of order $10^{-3}$ where $M[:,AP]$ is of order unity at every
+operating point tested.
+
+
+\section{Why differential modulation escapes the theorem}
+\label{app:modulation}
+
+Build context separates power from gas, reaching 30 degrees, while
+Appendix~\ref{app:channels} proves no instrument and no probe can. The two
+statements are consistent, and seeing exactly why identifies what build context
+is doing.
+
+The proposition of Appendix~\ref{app:channels} assumes the fault magnitudes are
+the same at every epoch, which is what allows a single $C$ to be factored out.
+Build context violates that assumption rather than enriching $M$: a fault's
+severity varies across the build along its own spatial profile. The enlarged
+signature of fault $k$ has entries $J[s,k]\,B[j,k]$, a product of an
+instantaneous sensitivity and a profile loading, so what is compared between two
+faults is no longer their channel columns alone.
+
+\paragraph{The limiting case makes this sharp.} Suppose all five faults share
+one profile shape, differing only in strength, so that
+$B[:,k] = c_k b$ for a common vector $b$ and scalars $c_k$. Then the enlarged
+column of fault $k$ is the Kronecker product
+%
+\begin{equation}
+J[:,k] \otimes (c_k b) = c_k \left( J[:,k] \otimes b \right),
+\end{equation}
+%
+and by Equation~\eqref{eq:cholkron} the whitener for
+Equation~\eqref{eq:kronapp} is itself a Kronecker product,
+$\operatorname{diag}(\sigma)^{-1} \otimes (G^{\mathsf T}G)^{1/2}$, so whitening
+preserves the structure and replaces $b$ by
+$b' = (G^{\mathsf T}G)^{1/2} b$. Using
+$\langle u \otimes b', v \otimes b' \rangle
+ = \langle u, v \rangle \lVert b' \rVert^2$ and
+$\lVert u \otimes b' \rVert = \lVert u \rVert \lVert b' \rVert$, the cosine
+between two enlarged whitened columns is
+%
+\begin{equation}
+\frac{c_k c_l \langle J_w[:,k], J_w[:,l] \rangle \lVert b' \rVert^2}
+     {|c_k| \lVert J_w[:,k]\rVert \lVert b' \rVert \cdot
+      |c_l| \lVert J_w[:,l]\rVert \lVert b' \rVert}
+= \pm \frac{\langle J_w[:,k], J_w[:,l] \rangle}
+          {\lVert J_w[:,k]\rVert \, \lVert J_w[:,l]\rVert} .
+\end{equation}
+%
+Both the common profile and the per-fault scalars cancel, and after folding to
+$[0, \pi/2]$ the enlarged angle is \emph{exactly} the instantaneous one. Build
+context then buys nothing at all. Reproduced numerically, the ten enlarged
+angles return to the instantaneous ones to within
+$1.0 \times 10^{-8}$ degrees.
+
+\paragraph{The consequence.} What build context exploits is therefore not the
+extra dimensions but the non-proportionality of the profile loadings. Two
+faults are separated by it only when $B[:,k]$ is not a multiple of $B[:,l]$, and
+the power--gas pair opens precisely because the recoater, the gas flow and the
+part geometry modulate the two differently across a build even though their
+channel columns are antiparallel. Equivalently: the only route past the
+theorem of Appendix~\ref{app:channels} is to make the faults vary differently,
+not to observe them better.
+
+This also sets the requirement a different machine would have to meet. Not that
+any particular fault own any particular spatial pattern, but only that no two
+faults share one, which is a far weaker condition than measuring five profile
+contrasts.
+
+
+\section{The exact profile test, and where its reference distribution is
+approximate}
+\label{app:exact}
+
+Appendix~\ref{app:resid} is exact because the set of whitened observations
+consistent with cause $k$, as its magnitude varies, is the straight line
+$\{ f J_w[:,k] : f \in \mathbb{R}\}$ through the origin, and the residual is the
+squared distance to a linear subspace. The exact forward model does not produce
+a straight line. Writing $g_k(f)$ for the exact relative deviation under a fault
+of type $k$ and magnitude $f$, the signature set is the curve
+%
+\begin{equation}
+\mathcal{M}_k = \left\{ \, g_k(f) / (\sigma \varepsilon)
+\;:\; f \in \mathbb{R} \, \right\} \subset \mathbb{R}^S ,
+\end{equation}
+%
+which passes through the origin at $f = 0$ and is tangent there to
+$J_w[:,k]$, but curves away from it. Equation~\eqref{eq:exact} is the squared
+distance from $z_w$ to $\mathcal{M}_k$.
+
+\paragraph{Why the tangent is not good enough.} Under $H_k$ with true magnitude
+$f_0$, the mean observation is the point $g_k(f_0)/(\sigma\varepsilon)$ on the
+curve. Decompose it into the component along the tangent direction $u_k$ and the
+rest,
+%
+\begin{equation}
+\frac{g_k(f_0)}{\sigma \varepsilon} = a\,u_k + d_\perp,
+\qquad
+d_\perp \perp u_k .
+\end{equation}
+%
+The linearised residual of Equation~\eqref{eq:resid} cannot explain $d_\perp$ by
+any choice of magnitude, so under $H_k$ it is distributed as a
+\emph{noncentral} chi-squared, $\chi^2_{S-1}(\lambda)$ with noncentrality
+$\lambda = \lVert d_\perp \rVert^2$, rather than the central distribution the
+threshold assumes. The test is then too small, and the probability of retaining
+the true cause falls below $1-\alpha$.
+
+The departure is a property of the model, not of the noise, and it grows with
+the fault magnitude. Measured for a power fault at $\varepsilon = 1\,\%$,
+$\lVert d_\perp \rVert$ is 0.19 at $\rho = 28$, 0.77 at $\rho = 56$ and 1.72 at
+$\rho = 120$, the last giving $\lambda = 2.97$ against a threshold
+$q_{0.95}(2) = 5.99$, so the bias alone consumes half the test's budget. The
+measured coverage of the linearised certificate falls accordingly, to 0.76 at
+$\rho = 120$, and the failure is in the dangerous direction: under-coverage
+means the true cause is excluded more often than advertised.
+
+\paragraph{The exact test and its own approximation.} Profiling through
+$\mathcal{M}_k$ instead removes $d_\perp$ by construction, since the mean lies
+on the curve. The residual is then a profile likelihood ratio with a single
+nuisance parameter, and the usual argument gives $\chi^2_{S-1}$ as the reference
+distribution. That argument is exact when $\mathcal{M}_k$ is a line and
+asymptotic otherwise, the error being governed by the curvature of
+$\mathcal{M}_k$ near the fitted point.
+
+The honest position is that this residual error is measured rather than assumed
+negligible. Generating observations from the exact model and scoring the exact
+test, the coverage of the nominally 95\,\% certificate is 0.943 at $\rho = 14$,
+0.950 at $\rho = 28$, 0.961 at $\rho = 56$ and 0.950 at $\rho = 120$, against a
+standard error of about 0.006 at these sample sizes. The curvature correction is
+not detectable at this precision, which is the claim the paper makes and the
+strongest one it is entitled to.
+
 %% ===========================================================================
 \bibliographystyle{elsarticle-num}
 \bibliography{refs}

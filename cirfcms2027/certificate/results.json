@@ -22,7 +22,7 @@
    "camera",
    "pyrometer"
   ],
-  "seconds": 330.0219261646271
+  "seconds": 278.37571907043457
  },
  "geometry": {
   "sigmas": {
@@ -1221,5 +1221,28 @@
     "cliques": []
    }
   }
+ },
+ "appendix": {
+  "camera_width": 0.0298,
+  "camera_length": 0.1124,
+  "camera_quadrature": 0.11628327480768677,
+  "planck_x_camera": 10.520066373004306,
+  "planck_s_camera": 10.52035031094376,
+  "planck_s_750": 6.341207327633733,
+  "planck_s_950": 5.031286620298949,
+  "planck_difference": 1.3099207073347845,
+  "wien_lambda": 1.3326117936825137,
+  "single_band_sigma": 0.15769867603006715,
+  "pyro_sigma_exact_planck": 1.0796176856006108,
+  "c2_over_T": 4.747429514993955e-06,
+  "inv_lambda_difference": 280701.75438596494,
+  "sqrt_q_inst": 2.447746830680816,
+  "sqrt_q_ctx": 4.866702302878262,
+  "q_ctx": 23.684791304840576,
+  "sin_five_degrees": 0.08715574274765817,
+  "collapse_max_degrees": 9.939384426616016e-09,
+  "chol_kron_error": 1.3877787807814457e-17,
+  "noncentrality_120": 2.969675517210672,
+  "regressor_correlation": 0.577205732341076
  }
 }

@@ -176,6 +176,63 @@ def compute(draws: int, per_cell: int) -> dict:
         out.setdefault("admissibility", {})[label] = mats
         print(f"   admissibility, {label:13s}   {time.time() - t0:6.1f}s")
 
+    # ---- quantities that appear only in the appendices --------------------
+    from sensors import SensorConfig
+    cfg = SensorConfig()
+    T_pyro = 3030.644
+    l1, l2 = cfg.pyrometer_bands
+    s1 = noise.planck_log_sensitivity(l1, T_pyro)
+    s2 = noise.planck_log_sensitivity(l2, T_pyro)
+    lam_cam = float(np.mean(cfg.photodiode_band))
+    t_liq = 1609.0
+    wien = (noise.C2 / T_pyro) * (1.0 / l1 - 1.0 / l2)
+
+    # the shared-profile collapse: force one profile shape and compare angles
+    B_shape = obs.modulations(plan)[:, 0].copy()
+    scale = np.array([1.0, 0.7, 1.3, 0.9, 1.1])
+    B_shared = np.linalg.lstsq(obs.regressors(plan),
+                               np.outer(B_shape, scale), rcond=None)[0]
+    Jk = np.vstack([inst.J[s, :] * B_shared[j, :]
+                    for s in range(inst.n_obs) for j in range(B_shared.shape[0])])
+    GtGinv = np.linalg.inv(obs.regressors(plan).T @ obs.regressors(plan))
+    cov_k = np.kron(np.diag(noise.SIGMAS ** 2), GtGinv)
+    Jw_k = np.linalg.inv(np.linalg.cholesky(cov_k)) @ Jk
+    a_k, a_i = obs._angles(Jw_k), obs._angles(inst.Jw)
+    collapse = max(abs(a_k[p] - a_i[p]) for p in a_i)
+    chol_kron = float(np.abs(
+        np.linalg.cholesky(cov_k)
+        - np.kron(np.linalg.cholesky(np.diag(noise.SIGMAS ** 2)),
+                  np.linalg.cholesky(GtGinv))).max())
+
+    out["appendix"] = {
+        "camera_width": float(noise.DERIVED["camera_width"]),
+        "camera_length": float(noise.DERIVED["camera_length"]),
+        "camera_quadrature": float(np.hypot(noise.DERIVED["camera_width"],
+                                            noise.DERIVED["camera_length"])),
+        "planck_x_camera": float(noise.C2 / (lam_cam * t_liq)),
+        "planck_s_camera": float(noise.planck_log_sensitivity(lam_cam, t_liq)),
+        "planck_s_750": float(s1), "planck_s_950": float(s2),
+        "planck_difference": float(s1 - s2),
+        "wien_lambda": float(wien),
+        "single_band_sigma": float(1.0 / s1),
+        "pyro_sigma_exact_planck": float(np.sqrt(2) / (s1 - s2)),
+        "c2_over_T": float(noise.C2 / T_pyro),
+        "inv_lambda_difference": float(1.0 / l1 - 1.0 / l2),
+        "sqrt_q_inst": float(np.sqrt(inf.chi2_threshold(inst.dof))),
+        "sqrt_q_ctx": float(np.sqrt(inf.chi2_threshold(ctx.dof))),
+        "q_ctx": float(inf.chi2_threshold(ctx.dof)),
+        "sin_five_degrees": float(np.sin(np.radians(5.0))),
+        "collapse_max_degrees": float(collapse),
+        "chol_kron_error": chol_kron,
+        "noncentrality_120": float(
+            dep["power|120"]["perpendicular"] ** 2),
+        "regressor_correlation": float(np.abs(
+            (GtGinv / np.outer(np.sqrt(np.diag(GtGinv)),
+                               np.sqrt(np.diag(GtGinv))))
+            - np.eye(GtGinv.shape[0])).max()),
+    }
+    print(f"   appendix quantities             {time.time() - t0:6.1f}s")
+
     out["meta"]["seconds"] = time.time() - t0
     return out
 

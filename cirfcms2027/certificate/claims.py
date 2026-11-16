@@ -264,6 +264,95 @@ def build(R: dict) -> list[Claim]:
               "magnitude at rho = 28 for a power fault",
               "what rho = 28 means as a power deviation at one per cent noise",
               notes="recomputed by scaling, since the stored map is per pair"))
+
+    # --- appendix A, the noise derivation ----------------------------------
+    ap = R["appendix"]
+    add(Claim("app.cam.w", "A.2", "0.0298", ap["camera_width"],
+              "appendix.camera_width",
+              "how far the isotherm shift moves the pool's width, per unit eps"))
+    add(Claim("app.cam.l", "A.2", "0.1124", ap["camera_length"],
+              "appendix.camera_length", "the same for its length"))
+    add(Claim("app.cam.quad", "A.2", "0.116", ap["camera_quadrature"],
+              "appendix.camera_quadrature",
+              "what the camera's noise would be if the two axes were treated "
+              "as independent, which they are not"))
+    add(Claim("app.planck.x", "A.2", "10.520", ap["planck_x_camera"],
+              "appendix.planck_x_camera",
+              "c2 / (lambda T) at the camera band and the liquidus"))
+    add(Claim("app.planck.s", "A.2", "10.520", ap["planck_s_camera"],
+              "appendix.planck_s_camera",
+              "the exact Planck log sensitivity there, which the Wien limit x "
+              "matches to better than 0.01 per cent"))
+    add(Claim("app.dlnT", "A.2", "0.095", 100.0 / ap["planck_s_camera"] * 0.01,
+              "1 / appendix.planck_s_camera",
+              "the apparent temperature shift a one per cent brightness error "
+              "produces, per cent"))
+    add(Claim("app.lambda", "A.3", "1.333", ap["wien_lambda"],
+              "appendix.wien_lambda",
+              "how much the two-colour ratio moves per unit of temperature"))
+    add(Claim("app.c2T", "A.3", "4.747", 1e6 * ap["c2_over_T"],
+              "appendix.c2_over_T x 1e6", "c2 / T in units of 1e-6 metre kelvin"))
+    add(Claim("app.dinv", "A.3", "2.807", 1e-5 * ap["inv_lambda_difference"],
+              "appendix.inv_lambda_difference x 1e-5",
+              "the reciprocal wavelength difference, in units of 1e5 per metre"))
+    add(Claim("app.s750", "A.3", "6.341", ap["planck_s_750"],
+              "appendix.planck_s_750",
+              "Planck log sensitivity of the 750 nm band at the pool temperature"))
+    add(Claim("app.s950", "A.3", "5.031", ap["planck_s_950"],
+              "appendix.planck_s_950", "the same for the 950 nm band"))
+    add(Claim("app.sdiff", "A.3", "1.310", ap["planck_difference"],
+              "appendix.planck_difference",
+              "their difference, which is the exact-Planck counterpart of the "
+              "Wien value 1.333"))
+    add(Claim("app.pyro.exact", "A.3", "1.080", ap["pyro_sigma_exact_planck"],
+              "appendix.pyro_sigma_exact_planck",
+              "what the pyrometer's noise would be using the exact-Planck "
+              "sensitivity instead of the inverter's own"))
+    add(Claim("app.single", "A.3", "0.158", ap["single_band_sigma"],
+              "appendix.single_band_sigma",
+              "the noise a single calibrated band would give, six times better"))
+
+    # --- appendix C, the cone ----------------------------------------------
+    add(Claim("app.sqrtq", "C", "2.4477", ap["sqrt_q_inst"],
+              "appendix.sqrt_q_inst", "the square root of the threshold, three "
+              "instruments"))
+    add(Claim("app.sin5", "C", "0.08716", ap["sin_five_degrees"],
+              "appendix.sin_five_degrees", "the sine of half the ten degree floor"))
+    add(Claim("app.qctx", "C", "23.6848", ap["q_ctx"], "appendix.q_ctx",
+              "the threshold for the enlarged observation, fourteen degrees of "
+              "freedom"))
+
+    # --- appendix D, the covariance ----------------------------------------
+    add(Claim("app.corr", "D", "0.577", ap["regressor_correlation"],
+              "appendix.regressor_correlation",
+              "the largest correlation between coefficient estimates, which is "
+              "what the diagonal approximation ignores"))
+    add(Claim("app.cholkron", "D", "1.4", 1e17 * ap["chol_kron_error"],
+              "appendix.chol_kron_error x 1e17",
+              "agreement of chol(A kron B) with chol(A) kron chol(B), in units "
+              "of 1e-17", skip_text=True,
+              notes="the printed token is '1.4', too common a substring for the "
+                    "text-presence check to mean anything, so only the value is "
+                    "checked here"))
+
+    # --- appendix F, the collapse ------------------------------------------
+    add(Claim("app.collapse", "F", "1.0", 1e8 * ap["collapse_max_degrees"],
+              "appendix.collapse_max_degrees x 1e8",
+              "how exactly the enlarged angles return to the instantaneous ones "
+              "when every fault shares one profile, in units of 1e-8 degrees",
+              skip_text=True,
+              notes="as above, '1.0' is too common a substring to test for"))
+
+    # --- appendix G, the exact test ----------------------------------------
+    add(Claim("app.noncentral", "G", "2.97", ap["noncentrality_120"],
+              "appendix.noncentrality_120",
+              "the noncentrality a linearised test carries at rho = 120, "
+              "against a threshold of 5.99"))
+    for snr, printed in (("14", "0.943"), ("28", "0.950"), ("56", "0.961"),
+                         ("120", "0.950")):
+        add(Claim(f"app.cov.{snr}", "G", printed, ci[snr]["coverage"],
+                  f"certificates.instantaneous.{snr}.coverage",
+                  f"measured coverage of the exact test at rho = {snr}"))
     return out
 
 
