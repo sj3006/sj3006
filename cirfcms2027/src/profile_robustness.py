@@ -139,6 +139,9 @@ def permutation_sweep() -> dict:
             base = min(a.values())
     worst = np.array(worst)
     return {"n": len(worst), "identity_worst": base,
+            # the full set, not only its summary, so a figure can show the
+            # distribution rather than quote its two ends
+            "worst_values": worst.tolist(),
             "worst_min": float(worst.min()), "worst_max": float(worst.max()),
             "worst_median": float(np.median(worst)),
             "all_rank_5": int(np.sum(np.array(ranks) == 5)),
