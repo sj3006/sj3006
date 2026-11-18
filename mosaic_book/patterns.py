@@ -374,3 +374,311 @@ GENERATORS = [
     ("Ripples", ripples),
     ("Spiral Twist", spiral),
 ]
+
+
+# ==========================================================================
+# Collection 2: 100 more designs
+#   14 hand-made classics + 86 composed (motif x grid x style x background)
+# ==========================================================================
+
+def _cell(X, Y, s, kind):
+    """Split the page into cells. Returns local coords u, v (cell units,
+    centred, roughly -0.5..0.5) and integer cell indices gx, gy."""
+    if kind == "square":
+        gx, gy = np.round(X / s), np.round(Y / s)
+        return X / s - gx, Y / s - gy, gx.astype(int), gy.astype(int)
+    if kind == "brick":
+        gy = np.round(Y / s)
+        off = (gy % 2) * 0.5
+        gx = np.round(X / s - off)
+        return X / s - gx - off, Y / s - gy, gx.astype(int), gy.astype(int)
+    if kind == "diamond":
+        U, V = _rot(X, Y, np.pi / 4)
+        gx, gy = np.round(U / s), np.round(V / s)
+        u, v = _rot(U / s - gx, V / s - gy, -np.pi / 4)
+        return u, v, gx.astype(int), gy.astype(int)
+    if kind == "hex":
+        d, cx, cy, rr, cc = _hex_centres(X, Y, s)
+        return (X - cx) / s, (Y - cy) / s, cc.astype(int), rr.astype(int)
+    if kind == "centre":
+        z = np.zeros(X.shape, dtype=int)
+        return X / s, Y / s, z, z
+    raise ValueError(kind)
+
+
+def _m_star(n):
+    def f(u, v):
+        r, t = np.hypot(u, v), np.arctan2(v, u) - np.pi / 2
+        return r / (0.72 + 0.28 * np.cos(n * t))
+    return f
+
+
+def _m_flower(n):
+    def f(u, v):
+        r, t = np.hypot(u, v), np.arctan2(v, u)
+        return r / (0.62 + 0.38 * np.abs(np.cos(n / 2 * t)))
+    return f
+
+
+def _m_octagram(u, v):
+    a = np.maximum(np.abs(u), np.abs(v))
+    b = (np.abs(u) + np.abs(v)) / np.sqrt(2)
+    return np.minimum(a, b) * 1.15
+
+
+MOTIFS = {
+    "Circles":        lambda u, v: np.hypot(u, v),
+    "Squares":        lambda u, v: np.maximum(np.abs(u), np.abs(v)),
+    "Diamonds":       lambda u, v: (np.abs(u) + np.abs(v)) * 0.8,
+    "Hexagons":       lambda u, v: np.maximum(np.abs(u) * 0.866 + np.abs(v) * 0.5, np.abs(v)),
+    "Octagons":       lambda u, v: np.maximum(np.maximum(np.abs(u), np.abs(v)),
+                                              (np.abs(u) + np.abs(v)) / np.sqrt(2)),
+    "Eight-Point Stars": _m_octagram,
+    "Five-Point Stars":  _m_star(5),
+    "Six-Point Stars":   _m_star(6),
+    "Four-Petal Flowers": _m_flower(4),
+    "Six-Petal Flowers":  _m_flower(6),
+    "Crosses":        lambda u, v: np.minimum(np.maximum(2.4 * np.abs(u), np.abs(v)),
+                                              np.maximum(np.abs(u), 2.4 * np.abs(v))),
+    "Lenses":         lambda u, v: np.maximum(np.hypot(u - 0.28, v), np.hypot(u + 0.28, v)) - 0.12,
+    "Astroids":       lambda u, v: (np.abs(u) ** 0.6 + np.abs(v) ** 0.6) ** (1 / 0.6) * 0.55,
+    "Clovers": lambda u, v: np.minimum.reduce([np.hypot(u - a, v - b)
+                                   for a, b in ((.17, 0), (-.17, 0), (0, .17), (0, -.17))]) + 0.08,
+}
+
+GRIDS = {"square": "Square Grid", "brick": "Brick Grid",
+         "diamond": "Diamond Grid", "hex": "Hex Grid"}
+STYLES = ["rings", "outlined", "split", "alternating"]
+BACKS = ["checker", "page rings", "diagonal", "plain"]
+
+
+def make_composed(grid, motif, style, back):
+    mfun = MOTIFS[motif]
+
+    def gen(X, Y, rng):
+        s = rng.uniform(0.6, 0.78) if grid != "hex" else rng.uniform(0.62, 0.8)
+        u, v, gx, gy = _cell(X, Y, s, grid)
+        d = mfun(u, v)
+        R = 0.44                                  # motif radius in cell units
+        w = max(0.13, 0.13 / s)                   # band width >= ~2.5 dots
+        inside = d < R
+        if style == "rings":
+            m = np.floor(d / w).astype(int)
+        elif style == "outlined":
+            m = np.where(d > R - 0.11 / s, 0, np.where(d < 0.09 / s, 2, 1))
+        elif style == "split":
+            q = (u * v > 0).astype(int)
+            m = np.where(d < 0.09 / s, 2, q)
+        else:                                     # alternating cell colours
+            m = np.where(d > R - 0.11 / s, 0, 1 + ((gx + gy) % 2))
+        if back == "checker":
+            b = (gx + gy) % 2
+        elif back == "page rings":
+            b = np.floor(np.hypot(X, Y) / 0.5).astype(int) % 3
+        elif back == "diagonal":
+            b = np.floor((X + Y) / 0.45).astype(int) % 2
+        else:
+            b = np.zeros(X.shape, dtype=int)
+        return np.where(inside, m, 10 + b)
+    return gen
+
+
+def make_centred(motif):
+    mfun = MOTIFS[motif]
+
+    def gen(X, Y, rng):
+        d = mfun(X, Y)
+        w = rng.uniform(0.13, 0.17)
+        return np.floor(d / w).astype(int)
+    return gen
+
+
+# ---- hand-made classics ---------------------------------------------------
+
+def tumbling_blocks(X, Y, rng):
+    s = rng.uniform(0.42, 0.55)
+    d, cx, cy, rr, cc = _hex_centres(X, Y, s)
+    t = np.arctan2(Y - cy, X - cx)
+    return (np.floor(((t - np.pi / 2) % TAU) / (TAU / 3)).astype(int)
+            + 3 * (np.floor(np.hypot(X, Y) / 0.7).astype(int) % 2))
+
+
+def herringbone(X, Y, rng):
+    s = rng.uniform(0.25, 0.32)
+    w = rng.uniform(0.14, 0.18)
+    c = np.floor(X / s).astype(int)
+    lx = X - c * s
+    sign = np.where(c % 2 == 0, 1, -1)
+    idx = np.floor((Y + sign * lx) / w).astype(int)
+    return (idx + c) % 3 + 3 * (c % 2)
+
+
+def basketweave(X, Y, rng):
+    s = rng.uniform(0.42, 0.5)
+    gx, gy = np.floor(X / s).astype(int), np.floor(Y / s).astype(int)
+    fx, fy = X / s - gx, Y / s - gy
+    vertical = (gx + gy) % 2 == 0
+    strip = np.where(vertical, np.floor(fx * 3), np.floor(fy * 3)).astype(int)
+    return strip + 3 * vertical
+
+
+def log_cabin(X, Y, rng):
+    s = rng.uniform(0.8, 1.0)
+    u, v, gx, gy = _cell(X, Y, s, "square")
+    flip = np.where((gx + gy) % 2 == 0, 1, -1)
+    ring = np.floor(np.maximum(np.abs(u), np.abs(v)) / 0.13).astype(int)
+    light = (u * flip + v) > 0
+    return np.where(ring == 0, 0, ring * 2 + light)
+
+
+def bargello(X, Y, rng):
+    p = rng.uniform(0.45, 0.6)
+    h = rng.uniform(0.35, 0.5)
+    w = rng.uniform(0.11, 0.14)
+    f = np.abs(((X / p) % 1) - 0.5) * 2
+    return np.floor((Y + h * (1 - f) ** 2) / w).astype(int)
+
+
+def houndstooth(X, Y, rng):
+    q = rng.uniform(0.1, 0.13)
+    i, j = np.floor(X / q).astype(int), np.floor(Y / q).astype(int)
+    A, B = (i // 2) % 2, (j // 2) % 2
+    tone = np.where(A == B, A, (i + j) % 2)
+    return tone + 2 * (np.floor((Y + 1.5) / 0.75).astype(int) % 2)
+
+
+def quatrefoil(X, Y, rng):
+    s = rng.uniform(0.6, 0.75)
+    u, v, gx, gy = _cell(X, Y, s, "square")
+    a = 0.19
+    q = np.minimum.reduce([np.hypot(u - a, v), np.hypot(u + a, v),
+                           np.hypot(u, v - a), np.hypot(u, v + a)])
+    inside = q < 0.2
+    ring = (q < 0.1).astype(int) + (np.hypot(u, v) < 0.12)
+    bg = 5 + (np.abs(u) + np.abs(v) > 0.62).astype(int)
+    return np.where(inside, ring + 2 * ((gx + gy) % 2), bg)
+
+
+def rainbow_arches(X, Y, rng):
+    s = rng.uniform(0.6, 0.75)
+    h = s / 2
+    row = np.floor(Y / h).astype(int)
+    off = (row % 2) * s / 2
+    cx = np.round((X - off) / s) * s + off
+    d = np.hypot(X - cx, Y - row * h)
+    band = np.floor(d / (s / 2 / 4)).astype(int)
+    return np.where(d < s / 2, band, 4)
+
+
+def sawtooth(X, Y, rng):
+    p = rng.uniform(0.3, 0.42)
+    w = rng.uniform(0.13, 0.17)
+    if rng.random() < 0.5:
+        X, Y = Y, X
+    return np.floor((Y + (X % p) * 1.2) / w).astype(int)
+
+
+def interlocking_triangles(X, Y, rng):
+    w = rng.uniform(0.2, 0.26)
+    up = np.maximum(-Y, Y * 0.5 + np.abs(X) * 0.866)
+    dn = np.maximum(Y, -Y * 0.5 + np.abs(X) * 0.866)
+    return np.floor(up / w).astype(int) + np.floor(dn / w).astype(int)
+
+
+def ohio_star(X, Y, rng):
+    s = rng.uniform(0.9, 1.05)
+    gx, gy = np.floor(X / s + 0.5).astype(int), np.floor(Y / s + 0.5).astype(int)
+    fx, fy = X / s + 0.5 - gx, Y / s + 0.5 - gy
+    a, b = np.floor(fx * 3).astype(int), np.floor(fy * 3).astype(int)
+    lx, ly = fx * 3 - a - 0.5, fy * 3 - b - 0.5
+    centre = (a == 1) & (b == 1)
+    corner = (a != 1) & (b != 1)
+    # which quarter-triangle of the edge square, relative to the block centre
+    dirx, diry = 1 - a, 1 - b                      # points towards the centre
+    along = np.where(dirx != 0, lx * dirx, ly * diry)
+    across = np.where(dirx != 0, ly, lx)
+    side = np.abs(across) > np.abs(along)
+    tri = np.where(side, 1, np.where(along > 0, 2, 3))
+    par = 4 * ((gx + gy) % 2)
+    return np.where(centre, 0 + par, np.where(corner, 3, tri + np.where(tri == 3, 0, par)))
+
+
+def corner_sunburst(X, Y, rng):
+    cx, cy = rng.choice([-1, 1]) * 1.0, rng.choice([-1, 1]) * 1.45
+    r, t = _polar(X, Y, cx, cy)
+    rays = rng.choice([20, 26, 32])
+    sec = np.floor(t / np.pi * rays).astype(int)
+    ring = np.floor(r / 0.42).astype(int)
+    return ring * 2 + (sec + ring) % 2
+
+
+def polka_gradient(X, Y, rng):
+    s = rng.uniform(0.3, 0.36)
+    u, v, gx, gy = _cell(X, Y, s, "brick")
+    size = 0.12 + 0.3 * (Y + 1.45) / 2.9
+    d = np.hypot(u, v)
+    return np.where(d < size, 1 + (gy % 3), np.where(d < size + 0.14, 0, 4))
+
+
+def trellis(X, Y, rng):
+    s = rng.uniform(0.38, 0.48)
+    a = ((X + Y) / s) % 1
+    b = ((X - Y) / s) % 1
+    line = (a < 0.24) | (b < 0.24)
+    knot = (a < 0.24) & (b < 0.24)
+    ring = np.floor(np.hypot(X, Y) / 0.45).astype(int) % 3
+    return np.where(knot, 0, np.where(line, 1, 2 + ring))
+
+
+CLASSICS = [
+    ("Tumbling Blocks", tumbling_blocks),
+    ("Herringbone", herringbone),
+    ("Basketweave", basketweave),
+    ("Log Cabin Quilt", log_cabin),
+    ("Bargello Flames", bargello),
+    ("Houndstooth", houndstooth),
+    ("Quatrefoil", quatrefoil),
+    ("Rainbow Arches", rainbow_arches),
+    ("Sawtooth", sawtooth),
+    ("Interlocking Triangles", interlocking_triangles),
+    ("Ohio Star Quilt", ohio_star),
+    ("Corner Sunburst", corner_sunburst),
+    ("Polka Gradient", polka_gradient),
+    ("Trellis", trellis),
+]
+
+
+def _composed_list(n_tiled=78):
+    import itertools
+    # centred big motifs (mandala-like); skip shapes already in collection 1
+    centred = [m for m in MOTIFS if m not in
+               ("Circles", "Squares", "Diamonds", "Eight-Point Stars", "Astroids", "Hexagons")]
+    singular = {"Crosses": "Cross", "Lenses": "Lens"}
+    out = [(f"Giant {singular.get(m, m[:-1])}", make_centred(m)) for m in centred]
+    # near-duplicates of collection 1
+    skip = {("hex", "Hexagons", "rings"), ("square", "Circles", "rings"),
+            ("square", "Eight-Point Stars", "rings")}
+    combos = [c for c in itertools.product(GRIDS, MOTIFS, STYLES)
+              if c not in skip]
+    order = np.random.default_rng(2026).permutation(len(combos))
+    chosen, seen = [], {}
+    for k in order:                               # spread motifs evenly
+        g, m, st = combos[k]
+        if seen.get(m, 0) >= (n_tiled + len(MOTIFS) - 1) // len(MOTIFS):
+            continue
+        seen[m] = seen.get(m, 0) + 1
+        chosen.append((g, m, st))
+        if len(chosen) == n_tiled:
+            break
+    for i, (g, m, st) in enumerate(chosen):
+        back = BACKS[i % len(BACKS)]
+        label = {"rings": "Ringed", "outlined": "Outlined",
+                 "split": "Split", "alternating": "Alternating"}[st]
+        out.append((f"{label} {m} · {GRIDS[g]}", make_composed(g, m, st, back)))
+    return out
+
+
+_composed = _composed_list()
+GENERATORS_2 = CLASSICS + _composed[: 100 - len(CLASSICS)]
+assert len(GENERATORS_2) == 100, len(GENERATORS_2)
+ALL_GENERATORS = GENERATORS + GENERATORS_2
