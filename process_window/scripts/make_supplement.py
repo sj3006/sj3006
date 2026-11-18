@@ -63,6 +63,9 @@ README_EDITS = [
      "Failure Modes\". Section and theorem numbers in code comments refer to\n"
      "the paper.\n"),
     ("\nIndependent of the LIME/RUL work elsewhere in this repository.\n", ""),
+    ("\n**Start with [`PROJECT_RECORD.md`](PROJECT_RECORD.md)**: the full record of\n"
+     "the project (idea, results, decisions, history, what is left, and how to\n"
+     "submit).\n", ""),
     ("results/          CSVs, logs and figures written by the experiments\n",
      "results/          CSVs and measured surfaces the paper is built from\n"),
     ("notes/            study notes and earlier proof drafts\n", ""),

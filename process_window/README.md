@@ -4,6 +4,10 @@ Code for the ICML 2027 submission. The paper itself is
 `paper/latex/main.tex` (compiled: `paper/latex/main.pdf`); the proofs in
 plain text are `paper/appendix_theory.md`.
 
+**Start with [`PROJECT_RECORD.md`](PROJECT_RECORD.md)**: the full record of
+the project (idea, results, decisions, history, what is left, and how to
+submit).
+
 **The problem.** A system has two knobs (a language model's temperature and
 top-p; a laser's power and scan speed; two drug doses). Each setting can fail
 in several ways, and each failure rate can only be estimated by running
@@ -58,12 +62,12 @@ notes/            study notes and earlier proof drafts
 ## Install
 
 ```bash
-pip install -r requirements.txt          # core: numpy, scipy, matplotlib, pytest
+pip install -r requirements.txt          # core: numpy, scipy, matplotlib, pytest, pandas
 pip install -r requirements-lm.txt       # only for measuring the LM surface
-python3 -m pytest -q tests               # 54 tests, about 1 minute
+python3 -m pytest -q tests               # 60 tests, about 1 minute
 ```
 
-Tested with Python 3.13, numpy 2.5, scipy 1.18, matplotlib 3.11, torch 2.15
+Tested with Python 3.13, numpy 2.5, scipy 1.18, matplotlib 3.11, pandas 3.0, torch 2.15
 (CPU), transformers 5.22, datasets 5.2.
 
 ## Reproducing the paper
