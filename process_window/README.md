@@ -97,6 +97,7 @@ step needs torch.
 | 316L calibration sensitivity | `python3 experiments/physics_sensitivity.py --n 24 --reps 5` | `results/final/physics_sensitivity_24.csv` | 20 min |
 | Monotonicity violations | `python3 experiments/violation.py` | `results/final/violation.csv` | 30 min |
 | Monotonicity in published 316L melt-pool data (needs the MeltpoolNet CSV; see the script's docstring) | `python3 experiments/am_monotone_check.py --csv <MeltpoolNet>/Data/meltpoolnet_regression.csv` | `results/final/am_monotone_check.csv` | 5 s |
+| Correlated trials within a build plate (per trial vs per plate vs plate-aware allocation) | `python3 experiments/plate_effects.py --parts single,cost,grid` | `results/final/plate_effects_{single,cost,grid}.csv` | 1 h |
 | Paper figures from the CSVs | `python3 experiments/paper_figs.py` | `paper/latex/figs/*.pdf` | 1 min |
 | Tables 1-2 rows for one language model, from its CSVs | `python3 scripts/lm_table_rows.py --suffix _qwen05b --label Qwen` (no suffix: SmolLM2 12x12; `_23`: 23x23) | printed | 5 s |
 

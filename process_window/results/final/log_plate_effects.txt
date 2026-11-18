@@ -71,3 +71,4 @@
 {'p': 0.05, 'k': 24, 'rho': 0.1, 'unit': 'trial', 'runs': 400, 'median_trials': 120.0, 'certified': '400/400'}
 {'p': 0.05, 'k': 24, 'rho': 0.1, 'unit': 'plate', 'runs': 400, 'median_trials': 2232.0, 'certified': '400/400'}
 {'part': 'validity 8x8 at tolerance', 'design': 'trial', 'rho': 0.0, 'runs': 400, 'error': 0.0, 'se': 0.0, 'median_trials': '', 'median_plates': '', 'unsafe_certified': ''} (127s)
+{'part': 'validity 8x8 at tolerance', 'design': 'trial', 'rho': 0.05, 'runs': 400, 'error': 0.0075, 'se': 0.0043, 'median_trials': '', 'median_plates': '', 'unsafe_certified': ''} (132s)
