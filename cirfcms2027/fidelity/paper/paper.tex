@@ -55,7 +55,77 @@ digital twin \sep model validation \sep fault diagnosis \sep identifiability
 \section{Introduction}
 \label{sec:intro}
 
-%%INTRO%%
+A digital twin of a manufacturing process is usually judged by how well it
+predicts. A thermal model of laser powder bed fusion is calibrated against
+measured melt pool dimensions, its error on held-out conditions is reported, and
+a model that reproduces width and depth to within a stated tolerance is taken to
+be validated. The same model is then often used for a different purpose: to
+interpret signals from in-situ instruments and to say which process fault caused
+an anomaly. The two companion papers of this work take that step. The first
+asks which faults a coaxial monitoring suite can tell apart \cite{JainConf}; the
+second builds a statistical test, the certificate, that returns the set of
+causes consistent with an observation, with exact coverage \cite{JainCert}. Both
+rest on a calibrated thermal model, and both treat it as correct.
+
+Prediction and diagnosis ask different things of a model. Prediction needs the
+level of an output at a given input. Diagnosis needs the direction in which each
+fault moves the instrument readings, because the certificate compares the
+direction of an observed change with the direction each candidate fault would
+produce. Nothing guarantees that a model good at the first is good at the
+second. The concern is not new in general terms. The National Academies report
+on digital twins argues that verification and validation should be tied to the
+decision a twin supports rather than to the model in the abstract
+\cite{NASEM2024}, and the ASME V\&V 40 standard sets the credibility a model must
+demonstrate by its context of use \cite{ASMEVV40}. In system identification it
+has long been understood that the model with the smallest prediction error need
+not be the best model for designing a controller \cite{Gevers2005}. In
+calibration it is understood that parameters fitted to a misspecified model
+compensate for the misspecification and need not be physical, even when the
+predictions are good \cite{Kennedy2001,Brynjarsdottir2014}, and that many models
+are sloppy, with data that constrain a few combinations of parameters and leave
+the rest free \cite{Gutenkunst2007}. What is missing for diagnosis is a
+quantitative statement: how accurate, and in what respect, a twin must be for a
+given diagnostic claim to hold.
+
+This paper supplies that statement for the certificate and measures it for the
+twin of the companion papers. The approach is the twin experiment of data
+assimilation. One model is designated the truth and generates the observations;
+a second model, the twin, interprets them. When the two are the same, the
+experiment is an identical twin and is known to overstate what the method can
+do \cite{Yu2019}. The companion papers were identical-twin studies in this sense.
+Here the twin differs from the truth in one controlled respect at a time, and
+each twin is scored twice: on how well it predicts a healthy build, which is
+what validation measures, and on how well it preserves the certificate, which is
+what diagnosis needs.
+
+The robust fault diagnosis literature treats model error as a disturbance to be
+decoupled from the residual at the design stage \cite{ChenPatton1999}. The
+question here is different: given a test that is exact for a correct model, how
+large may the model's error be before the test loses its stated coverage, and
+can validation detect an error of that size.
+
+\paragraph{Contributions}
+\begin{enumerate}
+\item A partition of the twin's quantities into prediction-only,
+diagnosis-only and shared classes, which shows on structural grounds that
+validation against healthy builds cannot detect a class of errors that
+diagnosis depends on (Section~\ref{sec:classes}).
+\item Six results that state what the certificate requires of the twin: only
+the directions of the fault signatures matter; a directional error $\delta$
+reduces coverage by an exact amount; the admissible error shrinks as $1/\rho$,
+so stronger signals need a more accurate twin; noise-model errors cost a fixed
+amount; build context carries the error unchanged but raises its price; and a
+direction measured from a few commanded steps meets the requirement at every
+signal strength (Section~\ref{sec:theory}).
+\item A twin experiment over %%NTWINS%% twins in ten families, which measures
+how far twins that validate equally well disagree about fault directions, and
+whether prediction accuracy indicates diagnostic accuracy
+(Sections~\ref{sec:experiments} and \ref{sec:results}).
+\item A finding about the numerical resolution of the instrument model of the
+companion papers, which changes no prediction and moves the fault directions by
+up to one degree, a large fraction of the admissible error
+(Section~\ref{sec:results}).
+\end{enumerate}
 
 %% ===========================================================================
 \section{Setting}
@@ -360,7 +430,110 @@ has an error that shrinks with the same signal that makes it expensive.
 \section{Twin experiments}
 \label{sec:experiments}
 
-%%EXPERIMENTS%%
+\subsection{The truth}
+
+The truth is the calibrated model of the companion papers, with one change
+described in Section~\ref{sec:grid}: its instrument model is evaluated on a
+quadrature grid of $481\times481$ cells rather than $121\times121$. Observations
+are generated from the truth's linearisation, $z_w = \rho u + e$, so that every
+loss of coverage is attributable to the twin and none to the truth's own
+curvature, which the certificate paper treats separately. The test signal
+strength is $\rho = 28$ unless stated, the value the ten-degree floor implies,
+and the coverage target is 90\,\% for a nominal 95\,\% certificate.
+
+\subsection{The twins}
+
+Each twin differs from the truth in one controlled respect. The families are
+listed in Table~\ref{tab:families}.
+
+\emph{Validation-equivalent twins.} The calibration's three thermal parameters
+were sampled at 2048 Sobol points over the calibration's own bounds,
+$\mu\in[0.30, 0.80]$, $k\in[11.0, 35.0]$\,W\,m$^{-1}$\,K$^{-1}$ and
+$c_p\in[450, 1200]$\,J\,kg$^{-1}$\,K$^{-1}$, with the keyhole coefficient
+fitted in closed form at each point. A point is accepted if the measured widths
+and depths cannot reject it, by the classical confidence region of nonlinear
+regression,
+\begin{equation}
+\frac{\bigl(\mathrm{SSR}(\theta) - \mathrm{SSR}_{\min}\bigr)/p}
+     {\mathrm{SSR}_{\min}/(n - 4)} \le F_{p,\,n-4,\,0.95},
+\label{eq:region}
+\end{equation}
+with $n = 14$ measurements, $p = 3$ sampled parameters, and $\mathrm{SSR}$ the
+sum of squared relative residuals. Dividing by the residual variance rather
+than by the measurement uncertainty keeps the region meaningful for a model
+that is misspecified, as this one is. Of the 2048 points, 328 (16.0\,\%) are
+accepted. One hundred and twenty were drawn at random from the accepted points
+and 120 from the rejected points. The accepted twins are the models that any
+validation against these data would pass equally well.
+
+\emph{Structural alternatives.} The conduction-only model refitted without the
+keyhole term, and the uncalibrated model with literature properties and
+absorptivity fitted alone. These are real alternative twins rather than
+perturbations.
+
+\emph{One shared parameter.} Absorptivity, conductivity or heat capacity alone,
+offset by $\pm2$ and $\pm5$\,\%. These are not validation-equivalent; they give
+the local rate at which each parameter costs direction.
+
+\emph{Operating point.} The power or speed the twin believes the machine runs
+at, offset by $\pm1$, $\pm2$, $\pm5$ and $\pm10$\,\%. A common deployment error.
+
+\emph{Prediction only.} The keyhole coefficient scaled by 0.5 to 1.5. Every
+predicted depth changes; Table~\ref{tab:classes} predicts that no direction
+does.
+
+\emph{Couplings.} The constants that carry the layer fault into absorptivity and
+conductivity, varied over their plausible ranges, and, as a control, the
+geometry preheat constant varied from 25 to 400\,K, which
+Theorem~\ref{thm:magnitude} predicts to have no effect.
+
+\emph{Noise model.} The three alternative noise sets of the conference paper,
+and a common error in the assumed noise level of $-20$ to $+25$\,\%.
+
+\emph{Missing and spurious channel.} Beam scattering by the vapour plume,
+present in the truth and absent from the twin, and the reverse, at three
+strengths.
+
+\emph{Numerical resolution.} The instrument model evaluated on a coarser grid
+than the truth's, $121\times121$ as in the companion papers, and
+$241\times241$.
+
+\begin{table}[t]
+\centering
+\caption{Twin families. Classes as in Table~\ref{tab:classes}.}
+\label{tab:families}
+\small
+\begin{tabular}{@{}llr@{}}
+\toprule
+family & class & twins \\
+\midrule
+%%FAMILYROWS%%
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Scores}
+
+Each twin is scored on both kinds of fidelity.
+
+\emph{Prediction error} is the root-mean-square relative difference between the
+twin's and the truth's healthy-build widths and depths at the seven benchmark
+conditions and at the production operating point. It is what validation can
+see. The twin's own error against the measured dimensions is also recorded.
+
+\emph{Directional error} $\delta_k$ is the angle between the twin's and the
+truth's whitened signatures for fault $k$, measured in the truth's whitened
+space; the score is its largest value over the five faults. It is what
+Theorem~\ref{thm:coverage} charges for.
+
+\emph{Coverage} is that of the twin's nominally 95\,\% certificate for each true
+cause, from Theorem~\ref{thm:coverage} for twins whose noise model is correct
+and from Proposition~\ref{prop:noise} for twins whose Jacobian is correct and
+whose noise model is not. The score is its smallest value over the five faults.
+
+\emph{Verdict changes} count the fault pairs whose separability verdict at the
+ten-degree floor differs between twin and truth, each computed in its own
+whitened space, at one instant and with build context.
 
 %% ===========================================================================
 \section{Results}

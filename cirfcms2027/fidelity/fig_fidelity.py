@@ -30,7 +30,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import theory as th                                               # noqa: E402
 
-OUTDIR = HERE / "paper"
+OUTDIR = HERE / "paper" / "figures"
 INK, INK2, MUTED = "#0b0b0b", "#52514e", "#b4b3ad"
 BLUE, ORANGE = "#2a78d6", "#eb6834"
 FLOOR_DEG = 1e-3      # zero directional error drawn here on the log axis
@@ -78,7 +78,7 @@ def draw(ax, rows, rho=28.0):
 
 def main():
     rows = json.loads((HERE / "_study.json").read_text())["rows"]
-    OUTDIR.mkdir(exist_ok=True)
+    OUTDIR.mkdir(parents=True, exist_ok=True)
     fig, ax = plt.subplots(figsize=(5.2, 3.6), dpi=200)
     draw(ax, rows)
     fig.tight_layout()

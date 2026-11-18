@@ -93,9 +93,10 @@ REGION_CACHE = HERE / "_region.json"
 
 #: Sensor-model grid used for every twin in the study. The default of 121 cells
 #: leaves the fault directions up to about 1 degree from their converged values,
-#: which is comparable with the directional budget; 481 is within 0.1 degree of
-#: 961. See LABNOTEBOOK entry 3.
-STUDY_GRID = 481
+#: which is comparable with the directional budget. 481 is within 0.1 degree of
+#: 961 for the truth but up to 0.6 degree off for some twins; 961 is within
+#: 0.15 degree of 1921 for every twin checked. See LABNOTEBOOK entries 3 and 4.
+STUDY_GRID = 961
 
 #: The truth of the study: the calibrated model on the converged grid.
 REFERENCE = TRUTH.but("truth", n_grid=STUDY_GRID)

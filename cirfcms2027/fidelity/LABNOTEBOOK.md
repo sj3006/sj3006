@@ -202,3 +202,61 @@ against twins they do not) and were sampled from the same box.
 
 **Parallelism.** The 481-grid Jacobian takes about 8 s, so the study now fills
 its Jacobian cache with four worker processes before scoring.
+
+---
+
+## 2026-11-18, entry 4: the 481 grid was not enough either; study moved to 961
+
+**Second run, sensor grid 481 (superseded), 301 cases.** With the new families:
+
+| family | n | prediction RMS % (median) | largest direction error, deg (median / max) | over budget |
+|---|---|---|---|---|
+| validation-equivalent | 120 | 8.5 | 22.5 / 88.9 | 0.99 |
+| region-rejected | 120 | 13.9 | 71.4 / 89.7 | 1.00 |
+| structural | 2 | 17.8 | 66.5 / 70.3 | 1.00 |
+| prediction only (keyhole x0.5 to x1.5) | 4 | 12.7 | 0 / 0 | 0 |
+| one parameter (+-2, 5 %) | 12 | 1.1 | 0.28 / 0.72 | 0 |
+| operating point (+-1 to 10 %) | 16 | 0.7 | 0.31 / 1.53 | 0 |
+| numerical resolution (121, 241 vs 481) | 2 | 0 | 0.61 / 0.92 | 0 |
+| missing scattering channel | 3 | 0 | 1.52 / 2.23 | 0.33 |
+
+Spread among the accepted twins with no truth designated: median pairwise
+largest direction error 29.8 deg over 7140 pairs, 98 % of pairs over budget.
+Within the accepted set, Spearman correlation of prediction error with direction
+error 0.18 (p = 0.048).
+
+The operating-point and one-parameter errors are much smaller than on the 121
+grid (power x1.05: 2.91 deg on 121, 0.72 on 481), confirming that most of what
+the first run reported for them was the grid.
+
+**But the floor on 481 is not small enough.** `floor_check.py` recomputed seven
+of the small errors on a 961 grid. Five agreed within 0.06 deg; speed x1.10
+moved by 0.29 deg and power x1.05 by 0.60 deg (0.72 on 481, 1.32 on 961). So on
+481 a twin's small directional error can be wrong by a third of the budget, even
+though the truth's own directions on 481 are within 0.1 deg of 961.
+
+**Convergence of the readings themselves.** Relative sensitivity of the
+photodiode to a power fault at the calibrated point: 1.3999 (241), 1.3969 (481),
+1.3859 (961), 1.3869 (1921), 1.3880 (2881). Settled to about 0.15 % from 961.
+The pyrometer's sensitivities are two orders smaller and settle later (layer:
+-0.0022, 0.0003, 0.0008, 0.0010, 0.0010). The camera reading is analytic and
+identical at every grid.
+
+**961 against 1921**, largest direction error: power x1.05 1.317 / 1.292,
+speed x1.10 1.243 / 1.396, heat capacity x1.05 0.253 / 0.218; the truth's
+own directions within 0.055 deg. So the floor on 961 is about 0.15 deg, a tenth
+of the budget.
+
+**Decision: the study is rerun on 961.** About four times the cost of 481;
+roughly an hour on four workers. The 481 outputs are kept locally as
+`_study_grid481.json` and `_results_grid481.json` (not committed; the tables
+above are the record).
+
+**For the paper.** Directional errors below about 0.15 deg are not resolved by
+the instrument model even at 961 and are reported as such. More important, this
+is a finding in its own right for the companion papers: their instrument model
+on its default grid gives fault directions that are about 1 degree from
+converged, and twins that differ by a few percent in operating point acquire
+spurious directional differences of the same size. Any future use of that model
+for diagnosis should use a grid of at least 961, or move the photodiode and
+pyrometer integrals off the grid as was done for the camera.
