@@ -28,6 +28,18 @@ couplings
 operating point
     The power or speed the twin believes the machine runs at, offset.
 
+prediction only
+    The keyhole coefficient scaled. Every predicted depth changes; the sensors
+    read the surface, so no fault direction does.
+
+one parameter
+    Absorptivity, conductivity or heat capacity alone, offset by 2 and 5 %.
+    Not validation-equivalent; the local rate at which each costs direction.
+
+numerical resolution
+    The sensor model's quadrature grid coarser than the truth's. No healthy
+    prediction changes.
+
 noise model
     The four noise sets of the conference paper. Diagnosis-only, through
     whitening.
@@ -74,10 +86,19 @@ from faults import FaultCouplings                                  # noqa: E402
 from route_b import RATIO_SETS                                     # noqa: E402
 from sensors import SENSOR_NAMES                                   # noqa: E402
 
-__all__ = ["ssr_profiled", "region_threshold", "sample_region", "Case",
+__all__ = ["REFERENCE", "STUDY_GRID", "ssr_profiled", "region_threshold", "sample_region", "Case",
            "named_cases", "region_cases", "REGION_CACHE"]
 
 REGION_CACHE = HERE / "_region.json"
+
+#: Sensor-model grid used for every twin in the study. The default of 121 cells
+#: leaves the fault directions up to about 1 degree from their converged values,
+#: which is comparable with the directional budget; 481 is within 0.1 degree of
+#: 961. See LABNOTEBOOK entry 3.
+STUDY_GRID = 481
+
+#: The truth of the study: the calibrated model on the converged grid.
+REFERENCE = TRUTH.but("truth", n_grid=STUDY_GRID)
 
 #: The box sampled for the validation region: the calibration's own bounds.
 BOX_LO = np.array(BOUNDS_LO[:3], float)
@@ -145,11 +166,11 @@ def sample_region(n_samples: int = 2048, seed: int = 0,
 class Case:
     """A truth, a twin, and the family the comparison belongs to."""
 
-    def __init__(self, family: str, twin: Twin, truth: Twin = TRUTH,
+    def __init__(self, family: str, twin: Twin, truth: Twin | None = None,
                  note: str = ""):
         self.family = family
         self.twin = twin
-        self.truth = truth
+        self.truth = REFERENCE if truth is None else truth
         self.note = note
 
     @property
@@ -166,12 +187,12 @@ def named_cases() -> list[Case]:
 
     # structural alternatives
     c = conduction_only_fit()
-    cases.append(Case("structural", TRUTH.but(
+    cases.append(Case("structural", REFERENCE.but(
         "conduction-only refit", absorptivity=c["absorptivity"],
         k=c["conductivity"], cp=c["heat_capacity"], keyhole_c=0.0),
         note="same three parameters refitted without the keyhole term"))
     h = historical_one_parameter_fit()
-    cases.append(Case("structural", TRUTH.but(
+    cases.append(Case("structural", REFERENCE.but(
         "uncalibrated, one-parameter", absorptivity=h["absorptivity"],
         k=PROVISIONAL.k, cp=PROVISIONAL.cp, keyhole_c=0.0),
         note="literature properties, absorptivity fitted alone"))
@@ -179,21 +200,21 @@ def named_cases() -> list[Case]:
     # couplings: the layer constants rotate a column, the geometry one scales it
     base = FaultCouplings()
     for v in (0.0, 0.25, 0.75, 1.0, 1.5):
-        cases.append(Case("couplings", TRUTH.but(
+        cases.append(Case("couplings", REFERENCE.but(
             f"layer-to-conductivity {v:g}",
             couplings=FaultCouplings(layer_to_absorptivity=base.layer_to_absorptivity,
                                      layer_to_powder_enthalpy=base.layer_to_powder_enthalpy,
                                      layer_to_conductivity=v,
                                      geometry_preheat_kelvin=base.geometry_preheat_kelvin))))
     for v in (-0.46, -0.115, 0.0):
-        cases.append(Case("couplings", TRUTH.but(
+        cases.append(Case("couplings", REFERENCE.but(
             f"layer-to-absorptivity {v:g}",
             couplings=FaultCouplings(layer_to_absorptivity=v,
                                      layer_to_powder_enthalpy=base.layer_to_powder_enthalpy,
                                      layer_to_conductivity=base.layer_to_conductivity,
                                      geometry_preheat_kelvin=base.geometry_preheat_kelvin))))
     for v in (25.0, 50.0, 200.0, 400.0):
-        cases.append(Case("couplings control", TRUTH.but(
+        cases.append(Case("couplings control", REFERENCE.but(
             f"geometry preheat {v:g} K",
             couplings=FaultCouplings(layer_to_absorptivity=base.layer_to_absorptivity,
                                      layer_to_powder_enthalpy=base.layer_to_powder_enthalpy,
@@ -201,29 +222,48 @@ def named_cases() -> list[Case]:
                                      geometry_preheat_kelvin=v)),
             note="Theorem 1 predicts no effect on the certificate"))
 
+    # prediction only: the keyhole coefficient never reaches the sensors
+    for s in (0.5, 0.8, 1.2, 1.5):
+        cases.append(Case("prediction only", REFERENCE.but(
+            f"keyhole coefficient x{s:g}", keyhole_c=REFERENCE.keyhole_c * s),
+            note="changes every predicted depth; the fault directions not at all"))
+
+    # one shared material parameter at a time
+    for field_, label in (("absorptivity", "absorptivity"), ("k", "conductivity"),
+                          ("cp", "heat capacity")):
+        for s in (0.95, 0.98, 1.02, 1.05):
+            cases.append(Case("one parameter", REFERENCE.but(
+                f"{label} x{s:.2f}", **{field_: getattr(REFERENCE, field_) * s})))
+
     # operating point
-    for s in (0.90, 0.95, 1.05, 1.10):
-        cases.append(Case("operating point", TRUTH.but(
-            f"power x{s:.2f}", power=TRUTH.power * s)))
-        cases.append(Case("operating point", TRUTH.but(
-            f"speed x{s:.2f}", speed=TRUTH.speed * s)))
+    for s in (0.90, 0.95, 0.98, 0.99, 1.01, 1.02, 1.05, 1.10):
+        cases.append(Case("operating point", REFERENCE.but(
+            f"power x{s:.2f}", power=REFERENCE.power * s)))
+        cases.append(Case("operating point", REFERENCE.but(
+            f"speed x{s:.2f}", speed=REFERENCE.speed * s)))
 
     # noise model
     for name, ratios in RATIO_SETS.items():
         if name == "derived":
             continue
-        cases.append(Case("noise model", TRUTH.but(
+        cases.append(Case("noise model", REFERENCE.but(
             f"noise: {name}", sigmas=tuple(float(ratios[n]) for n in SENSOR_NAMES))))
     for c in (0.8, 0.9, 1.1, 1.25):
-        cases.append(Case("noise level", TRUTH.but(
+        cases.append(Case("noise level", REFERENCE.but(
             f"noise level x{c:g}",
-            sigmas=tuple(float(s) * c for s in TRUTH.sigmas)),
+            sigmas=tuple(float(s) * c for s in REFERENCE.sigmas)),
             note="a common error in the assumed noise; c < 1 underestimates it"))
+
+    # numerical resolution of the sensor model: no healthy prediction changes
+    for n in (121, 241):
+        cases.append(Case("numerical resolution", REFERENCE.but(
+            f"sensor grid {n}", n_grid=n),
+            note="the earlier papers used 121; healthy predictions are grid-free"))
 
     # missing or spurious physics
     for k in (0.25, 0.75, 1.0):
-        scatter = TRUTH.but(f"scattering k={k:g}", scattering_k=k)
-        cases.append(Case("missing channel", TRUTH.but(f"twin omits scattering k={k:g}"),
+        scatter = REFERENCE.but(f"scattering k={k:g}", scattering_k=k)
+        cases.append(Case("missing channel", REFERENCE.but(f"twin omits scattering k={k:g}"),
                           truth=scatter,
                           note="the process broadens the beam; the twin does not"))
         cases.append(Case("spurious channel", scatter,
@@ -244,7 +284,7 @@ def region_cases(region: dict, max_each: int = 120,
     for fam, R in (("validation-equivalent", pick(acc)),
                    ("region-rejected", pick(rej))):
         for i, (mu, k, cp, C, ssr) in enumerate(R):
-            out.append(Case(fam, TRUTH.but(
+            out.append(Case(fam, REFERENCE.but(
                 f"{fam} {i}", absorptivity=float(mu), k=float(k), cp=float(cp),
                 keyhole_c=float(C)), note=f"SSR {ssr:.4f}"))
     return out

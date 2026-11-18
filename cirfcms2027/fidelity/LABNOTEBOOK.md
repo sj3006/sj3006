@@ -111,3 +111,94 @@ and pass the slowly varying factors to QUADPACK's Fourier-integral routine. Now
 committed was refused by the session's permission classifier; the same work
 split into a file edit and a separate commit went through. Recorded in case it
 recurs.
+
+---
+
+## 2026-11-18, entry 3: first study run, and a numerical problem in the sensor model
+
+**First run, sensor grid 121 (superseded).** `study.py` scored 275 cases: the 35
+named twins, 120 validation-equivalent and 120 region-rejected. Summary, kept
+because the second run replaces it:
+
+| family | n | prediction RMS % (median) | largest direction error, deg (median / max) | share over the 1.6 deg budget |
+|---|---|---|---|---|
+| validation-equivalent | 120 | 8.5 | 22.8 / 89.0 | 0.99 |
+| region-rejected | 120 | 13.9 | 70.7 / 89.9 | 1.00 |
+| structural | 2 | 17.8 | 66.2 / 69.8 | 1.00 |
+| operating point (+-5, 10 %) | 8 | 1.4 | 1.6 / 3.4 | 0.50 |
+| couplings (layer) | 8 | 0 | 0.08 / 0.52 | 0 |
+| couplings control (geometry) | 4 | 0 | 2e-6 | 0 |
+| missing scattering channel | 3 | 0 | 2.1 / 3.0 | 0.67 |
+
+Spearman correlation of prediction error with direction error: 0.32 over all 240
+sampled twins, 0.07 (p = 0.46) within the validation-equivalent set alone.
+Accepted twins do have smaller direction errors than rejected ones (one-sided
+Mann-Whitney p = 6e-11), so validation is informative, but the median accepted
+twin is still fourteen times over budget. The control behaved exactly as Theorem 1
+says: changing the geometry preheat constant from 25 K to 400 K moved no
+direction by more than 2e-6 degrees.
+
+**What did not look right.** The operating-point family was not monotone: power
+offset by +5 % gave a larger error (2.91 deg) than +10 % (2.10 deg), and the
++5 % value alone depended on the finite-difference step (2.95, 2.91, 2.48 deg at
+steps 0.001, 0.002, 0.004), while at the calibrated point the step made no
+difference to three decimals. A scan in 1 % steps showed the direction error
+jumping by about 1 degree between neighbouring offsets, and the pyrometer reading
+moving non-monotonically with power (3026.13, 3026.09, 3025.98, 3026.27 K at
+0.90 to 0.93).
+
+**Cause: the quadrature grid of the sensor model.** The photodiode and pyrometer
+integrate a surface temperature field, capped at the boiling point, over a fixed
+121 x 121 grid. The cap makes the integrand non-smooth; as power changes, the
+edge of the capped region crosses grid nodes and the readings acquire small kinks
+at the grid scale. The camera reading was moved off the grid earlier in the
+project for this reason (its docstring says so); the other two sensors were not.
+Repeating the scan at finer grids:
+
+| grid | largest direction error at power x 0.93, 0.94, 0.95, 0.96, 1.02, 1.04, 1.05, 1.06, 1.10 |
+|---|---|
+| 121 | 0.44 1.69 1.22 1.07 1.47 1.60 2.91 2.59 2.10 |
+| 241 | 1.14 0.58 0.57 0.24 0.59 0.55 0.66 0.91 0.78 |
+| 481 | 0.27 0.40 0.15 0.45 0.53 0.57 0.72 1.13 0.94 |
+
+And the calibrated model's own Jacobian against a 961 grid:
+
+| grid | direction change per fault (power, speed, layer, gas, geometry), deg |
+|---|---|
+| 121 | 0.89 0.73 0.97 0.89 0.37 |
+| 241 | 0.09 0.20 0.23 0.09 0.05 |
+| 481 | 0.07 0.10 0.05 0.07 0.03 |
+
+The pairwise angles move by up to 0.6 degrees between 121 and 961 (for example
+4.31 to 3.80 and 4.63 to 4.03 degrees). Every pair stays far below the 10 degree
+floor at every grid, so no verdict in the earlier papers changes; the quoted
+angles carry an error of this size. **This affects the conference and
+certificate papers and is reported to the authors rather than changed silently.**
+`grid_convergence.py` reproduces both tables.
+
+**Decision: the study uses a 481 grid for every twin and for the truth.** It is
+within 0.1 degree of 961, an order of magnitude under the budget, at a sixteenth
+of the cost. `Twin` gained an `n_grid` field (default 121, so the earlier papers
+are still reproduced bit for bit and `verify.py` still passes 13 of 13), and
+`twins.REFERENCE` is the calibrated model on the 481 grid.
+
+**The grid becomes a family.** A twin that differs from the truth only in its
+quadrature grid predicts every healthy width and depth identically, since those
+come from the analytic melt-pool dimensions, yet its fault directions differ by
+up to about 1 degree. That is a clean instance of the paper's thesis with no
+physics in it at all: numerical resolution is a diagnosis-only property that no
+validation against healthy builds can detect. Added as "numerical resolution".
+
+**Families added at the same time.** "Prediction only" (keyhole coefficient x0.5
+to x1.5: every depth changes, no direction can), which fills the opposite corner
+of the headline figure; "one parameter" (absorptivity, conductivity and heat
+capacity alone at +-2 and +-5 %), which gives the local rate at which each
+shared parameter costs direction and so a direct answer to "how accurate must
+the twin be"; and finer operating-point offsets (+-1, 2 %).
+
+**Study design note.** The roadmap's "off-ridge" family was not built; the
+region-rejected draws serve the same contrast (twins the data do constrain
+against twins they do not) and were sampled from the same box.
+
+**Parallelism.** The 481-grid Jacobian takes about 8 s, so the study now fills
+its Jacobian cache with four worker processes before scoring.

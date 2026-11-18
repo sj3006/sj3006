@@ -68,7 +68,7 @@ def _jkey(t: Twin) -> str:
                        round(t.power, 12), round(t.speed, 12),
                        c.layer_to_absorptivity, c.layer_to_powder_enthalpy,
                        c.layer_to_conductivity, c.geometry_preheat_kelvin,
-                       round(t.scattering_k, 12)])
+                       round(t.scattering_k, 12), int(t.n_grid)])
 
 
 class Scorer:
@@ -182,11 +182,37 @@ def score_case(case: tw_mod.Case, sc: Scorer) -> dict:
     }
 
 
+def _jac_worker(t: Twin):
+    return _jkey(t), t.jacobian().tolist()
+
+
+def precompute(cases, sc: Scorer, workers: int = 4) -> None:
+    """Fill the Jacobian cache in parallel; scoring is then cheap."""
+    from concurrent.futures import ProcessPoolExecutor
+    todo, seen = [], set(sc.cache)
+    for c in cases:
+        for t in (c.truth, c.twin):
+            k = _jkey(t)
+            if k not in seen:
+                seen.add(k)
+                todo.append(t)
+    t0 = time.time()
+    with ProcessPoolExecutor(workers) as ex:
+        for i, (k, J) in enumerate(ex.map(_jac_worker, todo, chunksize=2)):
+            sc.cache[k] = J
+            if (i + 1) % 20 == 0:
+                sc.save()
+                print(f"   {i + 1}/{len(todo)} Jacobians, {time.time() - t0:.0f}s",
+                      flush=True)
+    sc.save()
+
+
 def run(region_max_each: int = 120, out: Path = HERE / "_study.json") -> dict:
     t0 = time.time()
     sc = Scorer()
     region = tw_mod.sample_region()
     cases = tw_mod.named_cases() + tw_mod.region_cases(region, region_max_each)
+    precompute(cases, sc)
     rows = []
     for i, c in enumerate(cases):
         rows.append(score_case(c, sc))
@@ -200,6 +226,7 @@ def run(region_max_each: int = 120, out: Path = HERE / "_study.json") -> dict:
               "n_region_accepted": int(sum(r[4] <= region["threshold"]
                                            for r in region["rows"])),
               "n_region": len(region["rows"]),
+              "study_grid": tw_mod.STUDY_GRID,
               "seconds": time.time() - t0}
     out.write_text(json.dumps(result, indent=1, default=float))
     return result

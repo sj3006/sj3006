@@ -11,7 +11,8 @@ The fields fall into the three classes of `ROADMAP.md`:
     prediction only   keyhole_c                     depth correction; the sensors
                                                     read the surface and never see it
     diagnosis only    couplings, sigmas,            act only when a fault is nonzero,
-                      scattering_k                  or only through whitening
+                      scattering_k, n_grid          or only through whitening, or
+                                                    only in the sensor model
     shared            absorptivity, k, cp,          change both a healthy build and
                       power, speed                  how faults move it
 
@@ -50,6 +51,7 @@ FIELD_CLASS = {
     "couplings": "diagnosis",
     "sigmas": "diagnosis",
     "scattering_k": "diagnosis",
+    "n_grid": "diagnosis",
     "absorptivity": "shared",
     "k": "shared",
     "cp": "shared",
@@ -72,6 +74,10 @@ class Twin:
     couplings: FaultCouplings = field(default_factory=FaultCouplings)
     sigmas: tuple = tuple(float(s) for s in noise.SIGMAS)
     scattering_k: float = 0.0
+    #: Sensor-model quadrature grid. 121 reproduces the earlier papers exactly;
+    #: the study uses a finer grid (see LABNOTEBOOK entry 3). Healthy-build
+    #: predictions do not depend on it, so it is diagnosis-only.
+    n_grid: int = 121
 
     # ------------------------------------------------------------------ model
     def material(self) -> Material:
@@ -92,7 +98,7 @@ class Twin:
     def readings(self, fault: FaultState = FaultState()) -> np.ndarray:
         """The three baseline sensor readings, in `SENSOR_NAMES` order."""
         beam, material = self.beam_material(fault)
-        r = sensor_readings(beam, material, SensorConfig())
+        r = sensor_readings(beam, material, SensorConfig(n_grid=int(self.n_grid)))
         return np.array([r[s] for s in SENSOR_NAMES], dtype=float)
 
     def jacobian(self, step: float = STEP) -> np.ndarray:
