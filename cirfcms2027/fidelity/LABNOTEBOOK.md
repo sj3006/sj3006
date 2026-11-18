@@ -260,3 +260,58 @@ converged, and twins that differ by a few percent in operating point acquire
 spurious directional differences of the same size. Any future use of that model
 for diagnosis should use a grid of at least 961, or move the photodiode and
 pyrometer integrals off the grid as was done for the camera.
+
+---
+
+## 2026-11-18, entry 5: an exact symmetry of the model, and the local precision question
+
+**How deep inside the validation region does the disagreement persist?** From
+the 481 run, grouping the accepted twins by how close their SSR is to the
+minimum:
+
+| SSR at most | twins | median largest direction error | share over budget |
+|---|---|---|---|
+| 1.25 x min | 6 | 8.7 deg | 0.83 |
+| 1.5 x min | 28 | 11.1 deg | 0.96 |
+| 2.0 x min | 94 | 20.9 deg | 0.99 |
+| 2.11 x min (the region) | 120 | 22.5 deg | 0.99 |
+
+So the error does shrink as validation tightens, but even the tightest group is
+five times over budget. A sentence drafted for the appendix ("the disagreement
+is already present among twins far inside it") was too strong as written and
+is to be replaced by these numbers. The Sobol sample has no point within 1.1x
+of the minimum, so the tight end needs a different tool: the local analysis
+below.
+
+**`sloppy.py`: the precision validation would need, locally and in the worst
+case.** Linearise predictions (`P`, 16 x 4 in log-parameters) and directions
+(`A_k`, the derivative of fault k's unit direction projected off itself) and
+solve the generalised eigenproblem `(A_k^T A_k, P^T P)`. Its largest eigenvalue
+gives the worst-case degrees of direction per percent RMS of prediction, and
+the budget divided by that is the validation precision required.
+
+**An exact null direction.** The first `P` had singular values 3.43, 0.78,
+0.066 and 3.7e-8. The null vector is absorptivity, conductivity and heat
+capacity scaled together: every row of `P` has its first three entries summing
+to zero (0.256 + 0.121 - 0.377 = 0). The Eagar-Tsai solution depends on them only
+through absorbed power over conductivity and through diffusivity, both invariant
+under a common scaling. Checked directly: scaling all three by 0.8, 0.9 or 1.1
+leaves every healthy prediction (to 4e-16), every instrument reading (exactly)
+and every fault direction (exactly) unchanged. So it is a symmetry of the whole
+model, invisible to validation and harmless to diagnosis alike.
+
+Two consequences:
+
+1. **It explains why the calibration sits on its bounds.** The calibrated
+   conductivity (35.0, the upper bound) and heat capacity (450, the lower bound)
+   were noted in entry 1 as an obstacle to a Laplace approximation. The reason
+   is that the fit is degenerate along this line and the optimiser drifted until
+   it hit a bound. Only two thermal groups are identifiable from melt-pool
+   geometry, not three parameters. This bears on how the companion papers
+   describe their calibrated values: the individual numbers are not
+   identifiable, only the groups are. Reported to the authors.
+2. The eigenproblem is solved on the identifiable subspace, and the null
+   direction's effect on the directions is reported separately (it is zero, but
+   the script computes it rather than assuming it).
+
+Run after the 961 study frees the processors.

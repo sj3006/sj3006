@@ -571,6 +571,55 @@ responsibility for the content of the published article.
 \appendix
 \section{Proofs}
 \label{app:proofs}
-%%PROOFS%%
+This appendix gives the steps omitted from Section~\ref{sec:theory}.
+
+\paragraph{Proposition~\ref{prop:verdict}, attainment}
+Take four unit vectors in one plane at angles $0$, $\delta_k$,
+$\theta - \delta_l$ and $\theta$ from a reference, with $u_k$ at $0$, the twin's
+$v_k$ at $\delta_k$, the twin's $v_l$ at $\theta - \delta_l$ and $u_l$ at
+$\theta$. Then $d(u_k,u_l) = \theta$ and $d(v_k,v_l) = \theta - \delta_k -
+\delta_l$ whenever both lie in $[0^\circ, 90^\circ]$, so the bound holds with
+equality. The accompanying code attains $7.000000^\circ$ against a bound of
+$7.0^\circ$ in this configuration and finds no violation in 40\,000 random
+triples.
+
+\paragraph{Proposition~\ref{prop:noise}, the distribution}
+With $D$ diagonal and $P^\perp$ the orthogonal projection off $Du$, the matrix
+$A = D P^\perp D$ is symmetric and positive semidefinite with rank $S-1$. For
+$e \sim N(0, I_S)$, $e^\top A e = \sum_i \lambda_i \chi^2_{1,i}$ with
+$\lambda_i$ the nonzero eigenvalues of $A$ and the $\chi^2_{1,i}$ independent.
+Its distribution function is evaluated by Imhof's inversion formula
+\cite{Imhof1961}. The oscillating tail of the integrand is separated as
+$\sin(\phi - \omega t) = \sin\phi\cos\omega t - \cos\phi\sin\omega t$ and
+integrated with a Fourier-weighted quadrature, which reproduces the scalar case
+$\lambda_i = c^2$ to $2\times10^{-11}$.
+
+\paragraph{Proposition~\ref{prop:kron}, the whitener}
+The covariance of the enlarged observation in the certificate paper is
+$\Sigma = \mathrm{diag}(\sigma^2) \otimes G$ for a matrix $G$ fixed by the build
+plan. Its inverse Cholesky factor is
+$\mathrm{diag}(\sigma)^{-1} \otimes L_G^{-1}$, and applied to $J[:,k]\otimes
+B[:,k]$ it gives $(J[:,k]/\sigma) \otimes (L_G^{-1}B[:,k])$, the Kronecker
+product of the two whitened factors. The inner-product identity for Kronecker
+products then gives the stated relation.
+
+\paragraph{Proposition~\ref{prop:commanded}, the coverage}
+Conditional on the estimated direction $v$, the observation of a later fault is
+independent of the commanded responses, so Theorem~\ref{thm:coverage} applies
+with $\delta = \hat\delta$. Averaging over the distribution of $\hat\delta$
+gives the stated expectation. It is evaluated by Gauss--Hermite quadrature in
+$z_1$ and equal-probability nodes in $W$; simulation of the full experiment, the
+commanded steps and the later fault together, agrees within 1.5 standard errors
+over five designs. The constant $\kappa^*$ solves
+$E_W\bigl[P(\chi^2_{S-1}(\kappa^2 W)\le q)\bigr] = 0.90$.
+
+\paragraph{The validation region}
+Equation~\eqref{eq:region} is the likelihood-ratio region of nonlinear least
+squares with the error variance estimated from the residuals. It is exact for a
+model linear in its parameters and approximate otherwise. Its use here is to
+define a population of twins that validation cannot distinguish, not to make a
+probability statement about the parameters, and the conclusions of
+Section~\ref{sec:results} do not depend on its confidence level: the
+directional disagreement is already present among twins far inside it.
 
 \end{document}
