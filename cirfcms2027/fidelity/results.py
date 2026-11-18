@@ -188,6 +188,42 @@ def tolerances(rows: list[dict]) -> dict:
     return out
 
 
+def depth_groups(rows: list[dict], study: dict) -> list[dict]:
+    """Accepted twins grouped by how close their SSR is to the minimum."""
+    smin = study["region"]["ssr_min"]
+    acc = [r for r in rows if r["family"] == "validation-equivalent"]
+    ssr = np.array([float(r["note"].split()[1]) for r in acc])
+    dm = np.array([r["delta_max"] for r in acc])
+    b = budget()
+    out = []
+    for lim in (1.25, 1.5, 2.0, study["region"]["threshold"] / smin):
+        m = ssr <= lim * smin
+        out.append({"ssr_ratio": float(lim), "n": int(m.sum()),
+                    "median": float(np.median(dm[m])) if m.any() else None,
+                    "min": float(dm[m].min()) if m.any() else None,
+                    "frac_over": float(np.mean(dm[m] > b)) if m.any() else None})
+    return out
+
+
+def theory_numbers() -> dict:
+    out = {"lambda_star_S3": float(th.noncentrality_for_coverage(0.90, 3)),
+           "budget": {str(r): float(th.delta_max(r, 3)) for r in (14, 28, 56, 120)},
+           "budget_S15": {str(r): float(th.delta_max(r, 15)) for r in (14, 28, 56, 120)},
+           "kappa_star_S3": th.kappa_star(3), "kappa_star_S15": th.kappa_star(15),
+           "repeats_S3": {str(r): th.commanded_repeats(r, r, 3) for r in (14, 28, 56, 120)},
+           "repeats_S15": {str(r): th.commanded_repeats(r, r, 15) for r in (14, 28, 56, 120)}}
+    from scipy.stats import chi2
+    q = chi2.ppf(0.95, 2)
+    out["noise_level_coverage"] = {f"{c:g}": float(chi2.cdf(q / c ** 2, 2))
+                                   for c in (1 / 0.9, 1 / 0.75, 1 / 0.5, 1.1, 1.25, 1.5)}
+    return out
+
+
+def _side(name: str):
+    p = HERE / name
+    return json.loads(p.read_text()) if p.exists() else None
+
+
 def main() -> dict:
     data = json.loads(STUDY.read_text())
     rows = data["rows"]
@@ -197,7 +233,20 @@ def main() -> dict:
     sp = spread(rows)
     tol = tolerances(rows)
     res = {"table": table, "tests": t, "controls": c, "spread": sp,
-           "tolerances": tol, "gain": data["gain"],
+           "tolerances": tol, "depth_groups": depth_groups(rows, data),
+           "theory": theory_numbers(), "sloppy": _side("_sloppy.json"),
+           "floor": _side("_floor.json"),
+           "grid": ({k: v for k, v in _side("_grid.json").items() if k != "rows"}
+                    | {"rows": {n: {"delta": r["delta"], "pairs": r["pairs"]}
+                                for n, r in _side("_grid.json")["rows"].items()}}
+                    if _side("_grid.json") else None),
+           "study_grid": data.get("study_grid"),
+           "named": {r["name"]: {k: r[k] for k in ("family", "pred_rms", "delta",
+                                                     "delta_max", "cov_inst_min28",
+                                                     "cov_big_min28", "flips_inst")}
+                     for r in rows if r["family"] not in
+                     ("validation-equivalent", "region-rejected")},
+           "gain": data["gain"],
            "region": data["region"], "n_region_accepted": data["n_region_accepted"],
            "n_region": data["n_region"]}
     OUT.write_text(json.dumps(res, indent=1))
@@ -225,6 +274,9 @@ def main() -> dict:
     print("\nspread among accepted twins, no truth designated")
     for k, v in sp.items():
         print(f"   {k}: {v}")
+    print("\naccepted twins by depth inside the region")
+    for g in res["depth_groups"]:
+        print(f"   SSR <= {g['ssr_ratio']:.2f} x min: {g}")
     print("\ntolerances (offset %, largest direction error deg, prediction RMS %)")
     for k, v in tol.items():
         print(f"   {k:14s} ok to {v['largest_ok_pct']:4.1f} %   "
