@@ -181,6 +181,54 @@ def check_proposition4(draws: int, rng) -> None:
            f"largest difference between rho = 10 and 100 is {worst_rho:.4f}")
 
 
+def check_proposition5(rng) -> None:
+    """Build context carries the twin's error unchanged, and errors compose."""
+    print("\nProposition 5, build context and the twin's error")
+    sys.path.insert(0, str(HERE.parent / "src"))
+    import observables as obs
+    from twin import TRUTH
+
+    plan = obs.scan_plan()
+    G = obs.regressors(plan)
+    GtGinv = np.linalg.inv(G.T @ G)
+    B = obs.projection_matrix(plan)
+    sig = np.asarray(TRUTH.sigmas, float)
+    LG = np.linalg.inv(np.linalg.cholesky(GtGinv))
+    Linv = np.kron(np.diag(1.0 / sig), LG)
+
+    # the whitener really is the Kronecker product of the factors' whiteners
+    full = np.linalg.inv(np.linalg.cholesky(np.kron(np.diag(sig ** 2), GtGinv)))
+    record(np.abs(full - Linv).max() < 1e-12,
+           "the build-context whitener factors as a Kronecker product",
+           f"max difference {np.abs(full - Linv).max():.1e}")
+
+    def big(J, Bm):
+        rows = [J[s, :] * Bm[j, :] for s in range(J.shape[0]) for j in range(Bm.shape[0])]
+        return Linv @ np.vstack(rows)
+
+    Jt = TRUTH.jacobian()
+    tw = TRUTH.but("probe", absorptivity=0.45, k=25.0, cp=700.0)
+    Jw = tw.jacobian()
+    worst = 0.0
+    for k in range(5):
+        d_inst = th.folded_angle(Jt[:, k] / sig, Jw[:, k] / sig)
+        d_big = th.folded_angle(big(Jt, B)[:, k], big(Jw, B)[:, k])
+        worst = max(worst, abs(d_inst - d_big))
+    record(worst < 1e-9, "with the profiles right, the error carries over exactly",
+           f"worst difference between instantaneous and build-context error {worst:.1e} deg")
+
+    worst = 0.0
+    for _ in range(20):
+        Bw = B + 0.15 * rng.standard_normal(B.shape) * np.abs(B).mean()
+        for k in range(5):
+            dJ = th.folded_angle(Jt[:, k] / sig, Jw[:, k] / sig)
+            dB = th.folded_angle(LG @ B[:, k], LG @ Bw[:, k])
+            dbig = th.folded_angle(big(Jt, B)[:, k], big(Jw, Bw)[:, k])
+            worst = max(worst, abs(dbig - th.kron_direction_error(dJ, dB)))
+    record(worst < 1e-9, "with a profile error too, cos d_big = cos d_J cos d_B",
+           f"worst difference {worst:.1e} deg over 100 random profile errors")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--draws", type=int, default=200_000)
@@ -194,6 +242,7 @@ def main() -> int:
     check_corollary(args.draws, rng)
     check_proposition3(rng)
     check_proposition4(args.draws, rng)
+    check_proposition5(rng)
 
     failed = [r for r in RESULTS if not r[0]]
     print("\n" + "=" * 74)

@@ -119,6 +119,30 @@ involve `rho`. Two consequences:
 
 The contrast with Theorem 2 is the useful part: **errors in the fault model cost
 more as the signal grows; errors in the noise model cost a fixed amount.**
+
+Proposition 5, how build context carries a twin's error
+-------------------------------------------------------
+In the build-context regime of the certificate paper, column `k` of the enlarged
+Jacobian is the Kronecker product `J[:,k] kron B[:,k]`, and its whitener is
+`diag(sigma)^-1 kron L_G^-1`, itself a Kronecker product. So the whitened column
+is `u_k kron b_k` with `u_k` the instantaneous whitened direction and
+`b_k = L_G^-1 B[:,k]` the whitened profile loading. For unit vectors,
+`< u kron b, v kron b' > = < u, v > < b, b' >`, so a twin whose instantaneous
+direction is off by `delta_J` and whose profile is off by `delta_B` has, in build
+context,
+
+    cos delta_big = cos delta_J  cos delta_B .
+
+With the profiles right, `delta_big = delta_J` exactly: build context neither
+amplifies nor attenuates an error in the thermal twin. []
+
+The consequence is not that build context is indifferent to twin error. At a
+fixed fault magnitude its whitened signature is longer by `|| b_k ||`, the norm
+of the whitened profile loading, which is 9.3 to 11.5 in this plan, and Theorem
+2 charges directional error in proportion to `rho`. So at matched fault severity
+build context needs a twin several times more accurate than the instantaneous
+suite does, despite tolerating more error at matched `rho`. The resolving power
+and the fidelity demand come from the same source.
 """
 
 from __future__ import annotations
@@ -136,7 +160,8 @@ sys.path.insert(0, str(HERE.parent / "certificate"))
 
 __all__ = ["folded_angle", "unit_columns", "residuals", "coverage_directional",
            "noncentrality_for_coverage", "delta_max", "verdict_margin",
-           "generalised_chi2_cdf", "coverage_noise_model", "ALPHA"]
+           "generalised_chi2_cdf", "coverage_noise_model",
+           "kron_direction_error", "matched_severity_budget", "ALPHA"]
 
 ALPHA = 0.05
 
@@ -271,6 +296,26 @@ def coverage_noise_model(u: np.ndarray, sigma_true, sigma_twin,
     lam = np.linalg.eigvalsh(D @ P @ D)
     q = chi2.ppf(1.0 - alpha, len(u) - 1)
     return generalised_chi2_cdf(q, lam)
+
+
+# ---------------------------------------------------------------------------
+# Proposition 5
+# ---------------------------------------------------------------------------
+def kron_direction_error(delta_J_deg, delta_B_deg):
+    """Build-context directional error from its instantaneous and profile parts."""
+    c = np.cos(np.radians(delta_J_deg)) * np.cos(np.radians(delta_B_deg))
+    return np.degrees(np.arccos(np.clip(c, -1.0, 1.0)))
+
+
+def matched_severity_budget(rho_inst: float, gain: float, target: float = 0.90,
+                            S_inst: int = 3, S_big: int = 15) -> tuple[float, float]:
+    """delta_max instantaneously and with build context, at one fault magnitude.
+
+    `gain` is the ratio of build-context to instantaneous whitened signature
+    norm for the fault, so the same magnitude gives `rho_big = gain * rho_inst`.
+    """
+    return (float(delta_max(rho_inst, S_inst, target)),
+            float(delta_max(gain * rho_inst, S_big, target)))
 
 
 def report() -> None:
