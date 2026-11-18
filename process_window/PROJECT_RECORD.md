@@ -171,9 +171,10 @@ standard full-grid testing; the gap grows with the grid's resolution."
 ## 3. The paper as it stands
 
 **Title:** Certifying Safe Operating Regions under Monotone Failure Modes.
-**Format:** ICML style (2026 files until the 2027 ones are released); main
-text 7 of the allowed 8 pages; then Impact Statement, references,
-Appendix A (proofs), Appendix B (experiment details); 14 pages in total.
+**Format:** ICML style (2026 files until the 2027 ones are released). The
+main text ends near the top of page 8 (8 pages allowed). Then come the
+Impact Statement, references, Appendix A (proofs) and Appendix B
+(experiment details): 15 pages in total.
 **Anonymous:** author block and PDF metadata say "Anonymous Authors".
 
 ### Sections
@@ -241,6 +242,18 @@ LB = the lower bound of Theorem 2.
 - **Robust to the 316L calibration**: absorptivity and each threshold moved
   by 10-20%: still 1.4-2.5x fewer trials than no ordering, 14-62x fewer
   than full-grid FST, no false certificate.
+- **Correlated trials on one build plate** (added 2026-11-18). If coupons
+  on a plate share a plate effect, feeding them to the method one by one
+  breaks the guarantee: in the worst case it errs in 0.75% of runs at an
+  intra-plate correlation of 0.05, but 23% at 0.2.
+
+  Two fixes keep it valid for any correlation:
+  - one outcome per setting per plate, which costs 19x more trials
+    because the edge rule stacks trials of a setting on one plate;
+  - a plate-aware edge rule (one coupon per setting per plate), which
+    costs 2.4x more trials and plates.
+
+  Section 6 "Correlated trials" and Appendix B.
 - **GP baselines** (level set, with the monotone closure, BEAM-style active
   search, safe expansion): no tuning is both useful and reliable across
   problems. The best case (BEAM-style, confidence 4, lengthscale 0.1)
@@ -466,7 +479,7 @@ experiments/        one script per table or figure (commands in README.md)
   paper_figs.py     Figures 2-3 from the CSVs
   exp01-exp05       early exploratory experiments (not in the paper)
 
-tests/              60 unit tests (validity checks included); ~1 minute
+tests/              63 unit tests (validity checks included); ~1 minute
 scripts/
   make_supplement.py  builds the anonymous archive dist/supplement.zip
   gpu_runs.sh         all GPU language-model runs in one command
@@ -511,7 +524,7 @@ results/
 | Published 316L melt-pool check | `final/am_monotone_check.csv` |
 | Live LM run | `lm/lm_live_seed0.json` |
 | Measured LM surfaces | `lm/surface_scores.npz` (SmolLM2 12²), `_23.npz` (23²), `_qwen05b.npz`, `_qwen15b.npz` (1.5B, partial) |
-| Plate correlation (new, not yet in the paper) | `final/plate_effects_{single,cost,grid}.csv` |
+| Correlated trials on a plate (Section 6, Appendix B) | `final/plate_effects_{single,cost,grid}.csv` |
 
 Each `log_*.txt` next to a CSV is the console output of the run that made it.
 
@@ -525,7 +538,7 @@ Each `log_*.txt` next to a CSV is the console output of the run that made it.
   ```bash
   pip install -r requirements.txt          # core
   pip install -r requirements-lm.txt       # only to measure language models
-  python3 -m pytest -q tests               # 60 tests, about a minute
+  python3 -m pytest -q tests               # 63 tests, about a minute
   ```
 - LaTeX: TeX Live with `latex-extra`. On Ubuntu:
   `apt-get install texlive-latex-extra`. Without it the paper falls back
@@ -639,9 +652,6 @@ Listed in [`paper/submission_metadata.md`](paper/submission_metadata.md)
     ```
   - Then follow "Add a new language model" above. On any GPU, the
     remaining settings take minutes.
-- **Plate correlation** (`experiments/plate_effects.py`). Answers reviewer
-  question 2 ("trials on one build plate are not independent"). See the
-  status note at the end of this section.
 - **GPU tier A**: `bash scripts/gpu_runs.sh` on one 80 GB GPU. It adds 7B
   rows on both grids and live runs on a 7B model. Details in
   `COMPUTE_PLAN.md`.
@@ -703,10 +713,12 @@ If ICML does not work out:
   real plate study, the AM part becomes a real-data case study. ROADMAP.md
   lists the questions that would shape it (outcome type, coupon type,
   coupons per plate, balling direction).
-- **Correlated trials on a plate.** Valid alternatives exist (one outcome
-  per plate, or spreading settings across plates). Their cost, and a
-  plate-aware edge rule, are a natural extension; first results are in
-  `experiments/plate_effects.py`.
+- **Correlated trials on a plate.** The paper now shows the problem and
+  two valid fixes (Section 6, Appendix B). Two next steps:
+  - With a known upper bound on the plate correlation, a deflated
+    per-trial e-value could recover most of the per-trial efficiency.
+  - A smarter plate-aware allocation could cut the 2.4x price, because
+    the current rule fills spare plate slots with re-checks.
 - **Task-level LM failures.** For example, format violations or an LLM
   judge on chat prompts (tier C in `COMPUTE_PLAN.md`).
 - **Theory:**
@@ -766,4 +778,4 @@ If ICML does not work out:
 (Updated at the end of each working session.)
 
 - Qwen2.5-1.5B: 98/144 settings measured; resumed 2026-11-18.
-- Plate-correlation experiment: running 2026-11-18.
+- Plate-correlation experiment: done 2026-11-18, in the paper.

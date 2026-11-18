@@ -304,3 +304,24 @@ These change the method, so they need your answer before Phase 2:
   code now takes --device/--dtype (tested on CPU). Surfaces so far were
   measured in the checkpoints' bfloat16 (now stated in Appendix B).
   Qwen2.5-1.5B 12 x 12 surface measuring on CPU (about 7 h).
+- 2026-11-15 to 2026-11-18: The Qwen2.5-1.5B CPU measurement was stopped
+  three times: twice the cloud session's machine was reclaimed while the
+  session was idle, once by the 2-hour limit on background jobs. It is
+  resumable and was resumed each time. scripts/lm_table_rows.py prints the
+  Tables 1-2 rows for any measured model (reproduces the existing rows).
+  PROJECT_RECORD.md: the full project record (idea, results, history,
+  decisions, mistakes fixed, file map, results index, how to run, what is
+  left, step-by-step submission plan); a top-level README.md points to it.
+  requirements.txt gains pandas (the melt-pool check and its tests need it).
+  New experiment, correlated trials on one build plate
+  (experiments/plate_effects.py): with a beta-binomial plate effect,
+  feeding trials one by one breaks validity (worst case 0.75% at
+  correlation 0.05, 23% at 0.2; one setting with 24 trials per plate 17%
+  at 0.05, 57% at 0.2). Two fixes are valid for any correlation and never
+  erred: one outcome per setting per plate (19x more trials, because the
+  edge rule stacks trials of one setting on a plate) and a plate-aware
+  edge rule (2.4x more trials and plates). A plate is worth one to two
+  independent trials of a setting however many it holds. Added to Section
+  6, Appendix B, Limitations, the Impact Statement and reviewer FAQ 2;
+  the main text now ends near the top of page 8. lm_live.py gains
+  --threads; a second live run (seed 1) is running.

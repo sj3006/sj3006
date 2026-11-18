@@ -8,3 +8,11 @@ Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF
 {'generations': 2448, 'certified': 0, 'unsafe_vs_reference': 0, 'seconds': 64.1}
 {'generations': 2472, 'certified': 0, 'unsafe_vs_reference': 0, 'seconds': 72.3}
 {'generations': 2496, 'certified': 0, 'unsafe_vs_reference': 0, 'seconds': 81.0}
+{'generations': 2520, 'certified': 0, 'unsafe_vs_reference': 0, 'seconds': 89.5}
+{'generations': 2544, 'certified': 0, 'unsafe_vs_reference': 0, 'seconds': 97.6}
+{'generations': 2568, 'certified': 0, 'unsafe_vs_reference': 0, 'seconds': 105.8}
+{'generations': 2592, 'certified': 0, 'unsafe_vs_reference': 0, 'seconds': 114.5}
+{'generations': 2616, 'certified': 0, 'unsafe_vs_reference': 0, 'seconds': 122.6}
+{'generations': 2640, 'certified': 0, 'unsafe_vs_reference': 0, 'seconds': 133.9}
+{'generations': 2664, 'certified': 0, 'unsafe_vs_reference': 0, 'seconds': 146.5}
+{'generations': 2688, 'certified': 0, 'unsafe_vs_reference': 0, 'seconds': 155.8}

@@ -64,7 +64,7 @@ notes/            study notes and earlier proof drafts
 ```bash
 pip install -r requirements.txt          # core: numpy, scipy, matplotlib, pytest, pandas
 pip install -r requirements-lm.txt       # only for measuring the LM surface
-python3 -m pytest -q tests               # 60 tests, about 1 minute
+python3 -m pytest -q tests               # 63 tests, about 1 minute
 ```
 
 Tested with Python 3.13, numpy 2.5, scipy 1.18, matplotlib 3.11, pandas 3.0, torch 2.15
