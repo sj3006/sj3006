@@ -635,6 +635,19 @@ region is certified by spreading in 75--92\% of runs; an audit re-testing
 every certified setting (about 1.2$\times$ the budget) catches gross
 violations (96--100\%) but rarely mild ones (4--9\%).
 
+\paragraph{Correlated trials.} Builds on one plate may share a plate
+effect (powder, gas flow), so their trials are not independent; language-model
+generations are, given the setting. With a beta-binomial plate effect of
+intra-plate correlation $\rho$, feeding trials one by one breaks validity:
+with every setting at the tolerance it errs in 0.75\% of runs at $\rho=0.05$
+but 23\% at $\rho=0.2$ ($8\times8$, plates of 16), and one setting with 24
+trials per plate errs in 17\% at $\rho=0.05$. Validity holds for any $\rho$
+if each setting's failure fraction on a plate is one outcome. Since the edge
+rule stacks trials of one setting on a plate, this costs 19$\times$ more
+trials; a plate-aware edge rule with one trial per setting per plate costs
+2.4$\times$ more trials and plates than the independent case, with no error
+(Appendix~\ref{app:exp}).
+
 % =====================================================================
 \section{Related work}
 
@@ -688,7 +701,8 @@ parameters \citep{beam2026}; dose finding for combinations
 Assumption~A is load-bearing (Section~\ref{sec:exp}); thin regions gain
 less at coarse resolution; the search's gap to the lower bound grows with
 the grid (the multiple-testing and probe factors), reaching 13.5--14.8
-at about 500--2300 settings; the language-model benchmark draws outcomes from
+at about 500--2300 settings; correlated trials on one plate need the
+plate as the unit, which costs about 2.4$\times$ more; the language-model benchmark draws outcomes from
 a measured surface (one live run agrees with it), with two small models and
 automatic judges; the manufacturing studies are simulated with
 placeholder calibrations (the gains hold when each is moved by 10--20\%,
@@ -703,7 +717,8 @@ qualification, less compute when choosing sampling settings for a deployed
 language model, and, in dose-combination screening, fewer subjects exposed;
 any clinical use would need validation well beyond this paper. The
 guarantee is only as good as its assumptions: trials at a setting must be
-independent, each failure mode must be monotone in the declared
+independent (or, for builds that share a plate, the plate taken as the
+unit), each failure mode must be monotone in the declared
 direction, and the failure judges must measure what matters. A wrong
 ordering or a poor judge can turn a certificate into false confidence.
 We report how the method degrades when monotonicity is violated and give
@@ -1029,6 +1044,35 @@ standard errors. Width: 8 studies, 365 settings, 617 pairs, 118 reversed,
 and the depth-to-width ratio (the keyhole direction) rises with power and
 falls with speed in all 6 studies that report both. Each setting is
 measured once, so these data cannot give failure rates.
+
+\paragraph{Correlated trials on a plate.} Trials at setting $x$ on plate
+$b$ fail with a plate-level rate $p_b(x)$ drawn from a beta distribution with
+mean $p(x)$ and intra-plate correlation $\rho$; plates are independent, and
+the certificate is about the mean $p(x)$. Fed one plate at a time (the
+plate's failure fraction at $x$, which lies in $[0,1]$ and has mean $p(x)$
+given earlier plates), the e-processes are unchanged and Theorem~\ref{thm:valid}
+applies for any $\rho$. \emph{One setting at the tolerance}
+($\eps=10\%$, up to 2{,}400 trials, 400 runs, $k$ trials per plate,
+$\rho\in\{0,0.02,0.05,0.1,0.2\}$): fed trial by trial it is certified in
+2.3--6.5\% of runs for $k=4$ and $\rho\le0.1$, but in 14\% at $k=4$,
+$\rho=0.2$, in 17\% at $k=24$, $\rho=0.05$, and in 57\% at $k=24$,
+$\rho=0.2$; fed plate by plate, in at most 3.3\% of runs in all 15
+cases. The price is that a plate is worth one to two independent trials of
+a setting, however many it holds: at a true rate of 2\%, certification takes
+55 plates for $k=4$, 12 and 24, against 64 single trials (5\%: 86--96
+plates against 174 trials). \emph{Grid} (cone rule, edge rule): with every
+setting at the tolerance ($8\times8$, plates of 16, 4{,}000 trials, 400
+runs) trial-by-trial analysis errs in 0\%, 0.75\% and 23\% of runs at
+$\rho=0$, 0.05 and 0.2; plate-by-plate analysis and the plate-aware rule
+below never err. To certify half of the synthetic $16\times16$ window
+(plates of 32, 8 runs), trial-by-trial analysis needs 7.5k trials (235
+plates) when trials are independent. Plate-by-plate analysis with the same
+allocation needs 143k (4{,}480 plates), because the edge rule stacks many
+trials of one setting on a plate. A plate-aware edge rule, which puts one
+trial on each setting the edge rule wants, most nearly certified first, and
+fills the plate with re-checks, needs 18.0k (563 plates) at $\rho=0$ and
+18.5k (579) at $\rho=0.1$. No unsafe setting was certified in any of these
+runs.
 
 \paragraph{Drug combinations.} Doses 0.05--20 for each drug, spaced
 geometrically. Single agents are log-logistic: toxicity EC$_{50}$ 8 and 12,

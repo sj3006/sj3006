@@ -110,3 +110,10 @@ Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF
 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
 [99/144] T=1.509 top_p=0.591 rep4>0.2: 0.031  NLL>3.5: 0.000  (277s)
 [100/144] T=1.509 top_p=0.636 rep4>0.2: 0.013  NLL>3.5: 0.000  (442s)
+[101/144] T=1.509 top_p=0.682 rep4>0.2: 0.019  NLL>3.5: 0.000  (596s)
+[102/144] T=1.509 top_p=0.727 rep4>0.2: 0.013  NLL>3.5: 0.000  (748s)
+[103/144] T=1.509 top_p=0.773 rep4>0.2: 0.006  NLL>3.5: 0.000  (908s)
+[104/144] T=1.509 top_p=0.818 rep4>0.2: 0.006  NLL>3.5: 0.006  (1060s)
+[105/144] T=1.509 top_p=0.864 rep4>0.2: 0.000  NLL>3.5: 0.019  (1211s)
+[106/144] T=1.509 top_p=0.909 rep4>0.2: 0.006  NLL>3.5: 0.025  (1370s)
+[107/144] T=1.509 top_p=0.955 rep4>0.2: 0.000  NLL>3.5: 0.087  (1525s)

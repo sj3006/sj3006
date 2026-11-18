@@ -12,7 +12,7 @@ Ubuntu, `apt-get install texlive-latex-extra`. Without the style files the
 draft falls back to a two-column layout with ICML-like margins.
 
 Page budget: ICML allows 8 pages of main text. The main text currently ends
-on page 7; the Impact Statement (outside the limit), references, the proofs
+near the top of page 8; the Impact Statement (outside the limit), references, the proofs
 (Appendix A) and the experiment details (Appendix B) follow.
 
 Supplementary material: `python3 scripts/make_supplement.py` (from

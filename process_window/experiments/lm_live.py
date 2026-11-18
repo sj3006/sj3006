@@ -75,10 +75,11 @@ def main():
     ap.add_argument("--surface", default=None, help="that model's measured surface (.npz)")
     ap.add_argument("--device", default="cpu")
     ap.add_argument("--dtype", default=None)
+    ap.add_argument("--threads", type=int, default=4, help="CPU threads for torch")
     args = ap.parse_args()
     sc = make_lm_scenario(0.10, "pilot", **({"path": args.surface} if args.surface else {}))
     n = sc.truth["degenerate"].shape[0]
-    tok, model = load(*([args.model] if args.model else []), device=args.device, dtype=args.dtype)
+    tok, model = load(*([args.model] if args.model else []), threads=args.threads, device=args.device, dtype=args.dtype)
     tag = ""
     if args.surface:
         tag = os.path.splitext(os.path.basename(args.surface))[0].replace("surface_scores", "").strip("_")

@@ -328,6 +328,28 @@ is certified by spreading in 75-92% of runs; an audit re-testing every
 certified setting (about 1.2x the budget) catches gross violations (96-100%)
 but rarely mild ones (4-9%).
 
+**Correlated trials.** Builds on one plate may share a plate effect (powder,
+gas flow), so their trials are not independent; language-model generations
+are, given the setting. With a beta-binomial plate effect of intra-plate
+correlation rho, feeding trials one by one breaks validity: with every
+setting at the tolerance it errs in 0.75% of runs at rho = 0.05 but 23% at
+rho = 0.2 (8x8, plates of 16), and one setting with 24 trials per plate errs
+in 17% at rho = 0.05. Validity holds for any rho if each setting's failure
+fraction on a plate is one outcome. Since the edge rule stacks trials of one
+setting on a plate, this costs 19x more trials; a plate-aware edge rule with
+one trial per setting per plate costs 2.4x more trials and plates than the
+independent case, with no error (Appendix B;
+`experiments/plate_effects.py`). Details: fed plate by plate, a single
+setting at the tolerance is certified in at most 3.3% of runs in all 15
+(k, rho) cases, against up to 57% trial by trial (k = 24, rho = 0.2); a
+plate is worth one to two independent trials of a setting however many it
+holds (at a true rate of 2%: 55 plates for k = 4, 12 and 24, against 64
+single trials). On the 16x16 synthetic window, half the safe region costs
+7.5k trials (235 plates) trial by trial with independent trials, 143k (4,480
+plates) plate by plate with the same allocation, and 18.0k (563 plates) with
+the plate-aware rule (18.5k and 579 at rho = 0.1); no unsafe setting was
+certified in any run.
+
 ## 7. Related work
 
 (As in draft v0, plus: Conformal Language Modeling (Quach et al. 2024),
@@ -340,7 +362,8 @@ evaluation of a single system.)
 
 Assumption A is load-bearing (Section 6); thin regions gain less at coarse
 resolution; the multiple-testing factor dominates the gap to the lower
-bound; the language-model study uses two small models and automatic judges;
+bound; correlated trials on one plate need the plate as the unit, which
+costs about 2.4x more; the language-model study uses two small models and automatic judges;
 the manufacturing studies are simulated with placeholder calibrations
 (the gains hold when each is moved by 10-20%, but a real process map may
 differ more).

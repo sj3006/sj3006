@@ -1,0 +1,16 @@
+part,design,rho,runs,error,se,median_trials,median_plates,unsafe_certified
+validity 8x8 at tolerance,trial,0.0,400,0.0,0.0,,,
+validity 8x8 at tolerance,trial,0.05,400,0.0075,0.0043,,,
+validity 8x8 at tolerance,trial,0.2,400,0.2325,0.0211,,,
+validity 8x8 at tolerance,plate,0.0,400,0.0,0.0,,,
+validity 8x8 at tolerance,plate,0.05,400,0.0,0.0,,,
+validity 8x8 at tolerance,plate,0.2,400,0.0,0.0,,,
+validity 8x8 at tolerance,spread,0.0,400,0.0,0.0,,,
+validity 8x8 at tolerance,spread,0.05,400,0.0,0.0,,,
+validity 8x8 at tolerance,spread,0.2,400,0.0,0.0,,,
+"cost 16x16, half the safe region",trial,0.0,8,,,7520.0,235.0,0/8
+"cost 16x16, half the safe region",trial,0.1,8,,,5360.0,167.5,0/8
+"cost 16x16, half the safe region",plate,0.0,8,,,143344.0,4479.5,0/8
+"cost 16x16, half the safe region",plate,0.1,8,,,115120.0,3597.5,0/8
+"cost 16x16, half the safe region",spread,0.0,8,,,18016.0,563.0,0/8
+"cost 16x16, half the safe region",spread,0.1,8,,,18528.0,579.0,0/8

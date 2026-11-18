@@ -23,7 +23,7 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 EXPERIMENTS = ["am_monotone_check.py", "exp_lm.py", "exp_search.py", "final.py", "lm_figure.py", "lm_live.py",
                "lm_sensitivity.py", "lm_surface.py", "paper_figs.py", "physics_sensitivity.py",
-               "violation.py"]
+               "plate_effects.py", "violation.py"]
 RESULT_GLOBS = ["results/final/*.csv", "results/lm/*.csv", "results/lm/*.npz", "results/lm/*.json"]
 
 # Case-insensitive patterns that must not appear anywhere in the archive.

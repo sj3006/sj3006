@@ -25,10 +25,25 @@ We can add: a pre-registered audit budget recommendation (it is a
 parameter of the audit already).
 
 **2. Trials are not independent in practice (builds on one plate, prompts).**
-True for plates. The fix is to treat the plate (or batch) as the unit, or
-to randomize settings across plates. This is not implemented; say so and
-cite it as future work. For language models the prompts are drawn
-independently at random, so trials are i.i.d. given the setting.
+True for plates, and now tested (Section 6 "Correlated trials", Appendix B,
+`experiments/plate_effects.py`, `results/final/plate_effects_*.csv`). With a
+beta-binomial plate effect, feeding trials one by one breaks validity:
+- worst case (every setting at the tolerance, 8x8, plates of 16): 0.75% at
+  intra-plate correlation 0.05, 23% at 0.2;
+- one setting with 24 trials per plate: 17% at 0.05, 57% at 0.2.
+
+Two fixes are valid for any correlation, and neither erred in any run:
+- one outcome per setting per plate (the plate's failure fraction). It
+  costs 19x more trials, because the edge rule stacks trials of one
+  setting on a plate.
+- a plate-aware edge rule (one trial per setting per plate). It costs
+  2.4x more trials and plates than the independent case.
+
+A plate is worth one to two independent trials of a setting, however many
+it holds. That is the price of not knowing the correlation; with a known
+bound on it one could do better (future work). For language models the
+prompts are drawn independently at random, so generations are i.i.d. given
+the setting.
 
 **3. Knobs are continuous; you certify a grid.**
 New remark in Section 2 ("Between grid points"): with monotone rates, a

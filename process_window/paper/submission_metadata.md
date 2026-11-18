@@ -84,7 +84,7 @@ run. Tuned Gaussian-process baselines have no such guarantee.
 
 - [x] Anonymous: author block "Anonymous Authors"; PDF metadata author
       "Anonymous Authors"; no names, paths or e-mails in the PDF text.
-- [x] Main text within 8 pages (ends on page 7); Impact Statement,
+- [x] Main text within 8 pages (ends near the top of page 8); Impact Statement,
       references and appendices after it.
 - [x] Impact Statement present.
 - [x] Supplement: dist/supplement.zip (scripts/make_supplement.py),
