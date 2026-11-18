@@ -6,8 +6,5 @@ Full_Dataset.xlsx
 __pycache__/
 paper_outputs_quick/
 
-# LAMMPS machining run: large trajectory files
-machining/run/dump.*
-machining/run/final.data
-machining/run/Cu_mishin1.eam.alloy
-machining/run/in.cutting
+# LAMMPS machining: working run directory (key outputs are copied to machining/results/)
+machining/run/
