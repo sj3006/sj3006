@@ -229,6 +229,38 @@ def check_proposition5(rng) -> None:
            f"worst difference {worst:.1e} deg over 100 random profile errors")
 
 
+def check_proposition6(draws: int, rng) -> None:
+    """Simulate the commanded-step experiment end to end."""
+    print("\nProposition 6, measuring a direction instead of modelling it")
+    worst, tol = 0.0, 0.0
+    n = max(draws // 4, 20000)
+    for S, rho, rho_c, N in ((3, 28.0, 28.0, 4), (3, 56.0, 14.0, 9),
+                             (3, 14.0, 28.0, 1), (15, 28.0, 28.0, 9),
+                             (3, 120.0, 120.0, 2)):
+        u = _random_unit(S, rng)
+        ybar = rho_c * u + rng.standard_normal((n, S)) / np.sqrt(N)
+        v = ybar / np.linalg.norm(ybar, axis=1, keepdims=True)
+        z = rho * u + rng.standard_normal((n, S))
+        R = (z ** 2).sum(1) - (z * v).sum(1) ** 2
+        sim = float(np.mean(R <= chi2.ppf(0.95, S - 1)))
+        exact = th.commanded_coverage(rho, rho_c * np.sqrt(N), S)
+        se = np.sqrt(exact * (1 - exact) / n)
+        worst = max(worst, abs(sim - exact) / se)
+    record(worst < 4.0, "coverage with a measured direction matches simulation",
+           f"worst gap {worst:.2f} standard errors over 5 designs, {n} draws each")
+
+    k = th.kappa_star(3)
+    covs = [th.commanded_coverage(r, r / k, 3) for r in (50.0, 200.0, 1000.0)]
+    gap = max(abs(c - 0.90) for c in covs)
+    record(gap < 0.01, "at large lambda coverage depends on rho / lambda alone",
+           f"coverage at rho / lambda = kappa* for rho 50, 200, 1000: "
+           f"{', '.join(f'{c:.4f}' for c in covs)} (target 0.90)")
+
+    Ns = [th.commanded_repeats(r, r, 3) for r in (14.0, 28.0, 56.0, 120.0)]
+    record(len(set(Ns)) == 1, "repeats needed at rho_c = rho do not depend on rho",
+           f"N = {Ns} at rho 14, 28, 56, 120")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--draws", type=int, default=200_000)
@@ -243,6 +275,7 @@ def main() -> int:
     check_proposition3(rng)
     check_proposition4(args.draws, rng)
     check_proposition5(rng)
+    check_proposition6(args.draws, rng)
 
     failed = [r for r in RESULTS if not r[0]]
     print("\n" + "=" * 74)

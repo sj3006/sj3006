@@ -143,6 +143,42 @@ of the whitened profile loading, which is 9.3 to 11.5 in this plan, and Theorem
 build context needs a twin several times more accurate than the instantaneous
 suite does, despite tolerating more error at matched `rho`. The resolving power
 and the fidelity demand come from the same source.
+
+Proposition 6, measuring a direction instead of modelling it
+------------------------------------------------------------
+Theorem 1 says the certificate needs only each fault's direction. For a fault
+that can be commanded on a healthy machine (a power step, a speed step, a
+change of layer thickness) that direction can be measured rather than taken
+from the twin. Command the step `N` times, each giving a whitened response
+`y_i = rho_c u + e_i` with `e_i ~ N(0, I_S)`, and use the direction of the mean,
+`v = ybar / || ybar ||`. Scaling the mean by `sqrt(N)` gives `lambda u + z` with
+`lambda = rho_c sqrt(N)` and `z ~ N(0, I_S)`, so the estimated direction's error
+satisfies, exactly,
+
+    sin^2 delta_hat = W / ( W + (lambda + z_1)^2 ),
+    W ~ chi^2_{S-1},  z_1 ~ N(0, 1),  independent.
+
+A later fault of whitened strength `rho` is then certified with coverage
+
+    C(rho, lambda) = E[ F_{chi^2_{S-1}( rho^2 sin^2 delta_hat )}( q ) ],
+
+the average of Theorem 2 over the estimation error. For large `lambda`,
+`rho^2 sin^2 delta_hat -> (rho / lambda)^2 W`, so coverage depends on the ratio
+`kappa = rho / lambda` alone, and holding it at a target needs
+
+    N  >=  ( rho / (kappa* rho_c) )^2 ,
+
+with `kappa*` a constant fixed by `S` and the target. When the commanded step is
+as strong as the fault to be diagnosed, `rho_c = rho`, the number of repeats is
+`1 / kappa*^2` **whatever the signal strength**. Unlike a modelled direction,
+whose error is fixed and whose cost grows with `rho` (Corollary), a measured
+direction's error shrinks with the same signal that makes it expensive. []
+
+This is the constructive counterpart of the paper's negative result. Validation
+against healthy-build geometry cannot pin the directions down (the study); a
+handful of commanded steps can, for the faults that can be commanded. Faults
+that cannot (an overhang, a gas-flow failure that cannot be safely induced)
+still need the twin, and for them the Corollary's budget is the requirement.
 """
 
 from __future__ import annotations
@@ -161,7 +197,8 @@ sys.path.insert(0, str(HERE.parent / "certificate"))
 __all__ = ["folded_angle", "unit_columns", "residuals", "coverage_directional",
            "noncentrality_for_coverage", "delta_max", "verdict_margin",
            "generalised_chi2_cdf", "coverage_noise_model",
-           "kron_direction_error", "matched_severity_budget", "ALPHA"]
+           "kron_direction_error", "matched_severity_budget",
+           "commanded_coverage", "kappa_star", "commanded_repeats", "ALPHA"]
 
 ALPHA = 0.05
 
@@ -318,6 +355,57 @@ def matched_severity_budget(rho_inst: float, gain: float, target: float = 0.90,
             float(delta_max(gain * rho_inst, S_big, target)))
 
 
+# ---------------------------------------------------------------------------
+# Proposition 6
+# ---------------------------------------------------------------------------
+def _w_nodes(S: int, n: int = 400):
+    """Equal-probability nodes of chi^2_{S-1}: midpoints of n quantile bins."""
+    p = (np.arange(n) + 0.5) / n
+    return chi2.ppf(p, S - 1)
+
+
+def commanded_coverage(rho: float, lam: float, S: int, alpha: float = ALPHA,
+                       n_w: int = 400, n_z: int = 80) -> float:
+    """Coverage at signal `rho` with a direction measured at strength `lam`.
+
+    `lam = rho_c sqrt(N)`. Exact up to quadrature: Gauss-Hermite in `z_1`,
+    equal-probability nodes in `W`.
+    """
+    q = chi2.ppf(1.0 - alpha, S - 1)
+    W = _w_nodes(S, n_w)
+    x, w = np.polynomial.hermite_e.hermegauss(n_z)
+    w = w / w.sum()
+    z = x[:, None]
+    s2 = W[None, :] / (W[None, :] + (lam + z) ** 2)
+    F = ncx2.cdf(q, S - 1, rho ** 2 * s2)
+    return float((w[:, None] * F).sum() / W.size)
+
+
+def kappa_star(S: int, target: float = 0.90, alpha: float = ALPHA) -> float:
+    """Large-lambda ratio rho / lambda at which coverage falls to `target`."""
+    q = chi2.ppf(1.0 - alpha, S - 1)
+    W = _w_nodes(S, 2000)
+    f = lambda k: float(ncx2.cdf(q, S - 1, k ** 2 * W).mean()) - target
+    return float(optimize.brentq(f, 1e-6, 10.0))
+
+
+def commanded_repeats(rho: float, rho_c: float, S: int, target: float = 0.90,
+                      n_max: int = 100000) -> int:
+    """Smallest number of commanded steps keeping coverage at `target`, exact."""
+    lo, hi = 1, 1
+    while commanded_coverage(rho, rho_c * np.sqrt(hi), S) < target:
+        hi *= 2
+        if hi > n_max:
+            return -1
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if commanded_coverage(rho, rho_c * np.sqrt(mid), S) >= target:
+            hi = mid
+        else:
+            lo = mid + 1
+    return lo
+
+
 def report() -> None:
     print("Fidelity theory: what a twin must get right")
     print("=" * 74)
@@ -334,6 +422,12 @@ def report() -> None:
     for c in (0.8, 0.9, 1.0, 1.1, 1.25, 1.5):
         q = chi2.ppf(0.95, 2)
         print(f"   c = {c:4.2f}   coverage {chi2.cdf(q / c ** 2, 2):.4f}")
+    print("\nMeasuring a direction by commanded steps (Proposition 6)")
+    for S in (3, 15):
+        k = kappa_star(S)
+        print(f"   S = {S}: kappa* = {k:.4f}; at rho_c = rho, N >= {1 / k ** 2:.1f}")
+        for rho in (14, 28, 56, 120):
+            print(f"      rho {rho:4d}: exact N = {commanded_repeats(rho, rho, S)}")
 
 
 if __name__ == "__main__":
