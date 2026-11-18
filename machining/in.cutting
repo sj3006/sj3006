@@ -1,87 +1,88 @@
 # =====================================================================
-#  Orthogonal nanometric cutting of single-crystal copper
-#  with a rigid diamond tool (2D plane-strain, periodic in z)
+#  3D nanometric cutting of single-crystal aluminium
+#  with a rigid diamond tool
 #
-#  Workpiece : Cu, FCC, a = 3.615 A, EAM (Mishin 2001)
-#              cut on (010) plane along [-100]
-#  Tool      : diamond (C), rigid, rake angle 0 deg, clearance 10 deg
-#  Cu-C      : Morse, D0 = 0.087 eV, alpha = 5.14 1/A, r0 = 2.05 A
-#  Speed     : 100 m/s  (= 1 A/ps)       Depth of cut : 1.5 nm
-#  Length    : 10 nm of cutting          Temperature  : 300 K
+#  Workpiece : Al, FCC, a = 4.05 A, EAM (Mendelev et al. 2008)
+#              free-standing 3D block, cut on (010) along [-100]
+#  Tool      : diamond (C), rigid, rake 0 deg, clearance 10 deg,
+#              narrower than the workpiece -> side burrs form (3D)
+#  Al-C      : Morse, D0 = 0.4691 eV, alpha = 1.738 1/A, r0 = 2.246 A
+#  Speed     : 100 m/s (= 1 A/ps)        Depth of cut : 1.5 nm
+#  Length    : 7 nm of cutting           Temperature  : 300 K
 #
 #  Run:  mpirun -np 4 lmp -in in.cutting
+#  Output: dump/cut.*.gz  (open dump/cut.*.gz in OVITO)
 # =====================================================================
 
 # ---------------- user parameters ------------------------------------
 variable  T        equal 300.0      # K
 variable  vcut     equal 1.0        # A/ps  (1 A/ps = 100 m/s)
 variable  doc      equal 15.0       # depth of cut, A
-variable  rake     equal 0.0        # rake angle, deg (positive = sharper)
+variable  rake     equal 0.0        # rake angle, deg
 variable  clear    equal 10.0       # clearance angle, deg
-variable  cutlen   equal 100.0      # tool travel during cutting, A
+variable  cutlen   equal 70.0       # tool travel during cutting, A
+variable  toolZ    equal 45.0       # tool width (z), A
 variable  seed     equal 4928459
 
-variable  aCu      equal 3.615
+variable  aAl      equal 4.05
 variable  aC       equal 3.567
-variable  nx       equal 55         # workpiece cells along x  (~19.9 nm)
-variable  ny       equal 22         # workpiece cells along y  (~8.0 nm)
-variable  nz       equal 6          # thickness cells, periodic (~2.2 nm)
+variable  nx       equal 35         # ~14.2 nm along cutting direction
+variable  ny       equal 15         # ~6.1 nm height
+variable  nz       equal 17         # ~6.9 nm width
 
 # ---------------- derived geometry -----------------------------------
-variable  L        equal ${nx}*${aCu}
-variable  H        equal ${ny}*${aCu}
-variable  W        equal ${nz}*${aCu}
-variable  xfix     equal 10.0               # fixed layer thickness, A
-variable  xthm     equal 20.0               # fixed + thermostat, A
-variable  ytop     equal ${H}+60.0          # room for the chip
-variable  xtip     equal ${L}+10.0          # tool tip starts 1 nm away
+variable  L        equal ${nx}*${aAl}
+variable  H        equal ${ny}*${aAl}
+variable  W        equal ${nz}*${aAl}
+variable  xfix     equal 8.0                # fixed layer thickness, A
+variable  xthm     equal 16.0               # fixed + thermostat, A
+variable  xtip     equal ${L}+8.0           # tool tip starts 0.8 nm away
 variable  ytip     equal ${H}-${doc}
-variable  toolW    equal 40.0
-variable  toolTop  equal ${H}+45.0
-variable  xbox     equal ${xtip}+${toolW}+10.0
+variable  toolX    equal 30.0
+variable  toolTop  equal ${H}+30.0
+variable  z0       equal 0.5*(${W}-${toolZ})
+variable  z1       equal 0.5*(${W}+${toolZ})
 
 units           metal
 dimension       3
-boundary        s s p
+boundary        s s s
 atom_style      atomic
 atom_modify     map array
 
-region          box block -5 ${xbox} -5 ${ytop} 0 ${W} units box
+region          box block -5 $(v_xtip+v_toolX+5) -5 $(v_H+50) -5 $(v_W+5) units box
 create_box      2 box
 
-# ---------------- workpiece (type 1 = Cu) ----------------------------
-lattice         fcc ${aCu} orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
-region          work block 0 $(v_L-0.1) 0 $(v_H-0.1) INF INF units box
+# ---------------- workpiece (type 1 = Al) ----------------------------
+lattice         fcc ${aAl} orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+region          work block 0 $(v_L-0.1) 0 $(v_H-0.1) 0 $(v_W-0.1) units box
 create_atoms    1 region work
 
 # ---------------- tool (type 2 = C, diamond) -------------------------
-# rake face  : passes through tip, tilted by the rake angle
-# flank face : rises from the tip at the clearance angle
 variable        rn_x equal  cos(${rake}*PI/180)
 variable        rn_y equal  sin(${rake}*PI/180)
 variable        cn_x equal -sin(${clear}*PI/180)
 variable        cn_y equal  cos(${clear}*PI/180)
 region          rakeF  plane ${xtip} ${ytip} 0 ${rn_x} ${rn_y} 0 units box
 region          flankF plane ${xtip} ${ytip} 0 ${cn_x} ${cn_y} 0 units box
-region          tbox   block ${xtip} $(v_xtip+v_toolW) ${ytip} ${toolTop} INF INF units box
+region          tbox   block ${xtip} $(v_xtip+v_toolX) ${ytip} ${toolTop} ${z0} ${z1} units box
 region          tool   intersect 3 rakeF flankF tbox
 lattice         diamond ${aC}
 create_atoms    2 region tool
 
-mass            1 63.546
+mass            1 26.9815
 mass            2 12.011
 
 # ---------------- interactions ---------------------------------------
-pair_style      hybrid eam/alloy morse 6.0
-pair_coeff      * * eam/alloy Cu_mishin1.eam.alloy Cu NULL
-pair_coeff      1 2 morse 0.087 5.14 2.05
+pair_style      hybrid eam/fs morse 6.5
+pair_coeff      * * eam/fs Al_mm.eam.fs Al NULL
+pair_coeff      1 2 morse 0.4691 1.738 2.246
 pair_coeff      2 2 none
 neighbor        2.0 bin
 neigh_modify    every 1 delay 0 check yes exclude type 2 2
 
-# ---------------- groups ---------------------------------------------
+# ---------------- groups: fixed / thermostat / Newtonian -------------
 group           tool   type 2
-group           cu     type 1
+group           al     type 1
 region          rfixL  block INF ${xfix} INF INF INF INF units box
 region          rfixB  block INF INF INF ${xfix} INF INF units box
 region          rfix   union 2 rfixL rfixB
@@ -89,28 +90,23 @@ region          rthmL  block INF ${xthm} INF INF INF INF units box
 region          rthmB  block INF INF INF ${xthm} INF INF units box
 region          rthm   union 2 rthmL rthmB
 group           fixed  region rfix
-group           fixed  intersect fixed cu
+group           fixed  intersect fixed al
 group           thmall region rthm
-group           thmall intersect thmall cu
+group           thmall intersect thmall al
 group           thermo subtract thmall fixed
-group           newton subtract cu thmall
-group           mobile subtract cu fixed
+group           newton subtract al thmall
+group           mobile subtract al fixed
 
-# ---------------- computes / outputs ---------------------------------
+# ---------------- computes -------------------------------------------
 compute         pe   all pe/atom
-compute         csym all centro/atom fcc
-compute         ke   all ke/atom
 compute         Tnew newton temp
 compute         Tthm thermo temp
 
-variable        Fx   equal  fcm(tool,x)       # cutting force on tool, eV/A (+ = resists motion)
-variable        Fy   equal  fcm(tool,y)       # thrust force on tool, eV/A (+ = pushes tool up)
-variable        FxnN equal  v_Fx*1.602176634   # nN
-variable        FynN equal  v_Fy*1.602176634
-variable        xt   equal  xcm(tool,x)
-variable        t    equal  step*dt
+variable        FxnN equal fcm(tool,x)*1.602176634   # cutting force, nN
+variable        FynN equal fcm(tool,y)*1.602176634   # thrust force, nN
+variable        FznN equal fcm(tool,z)*1.602176634   # lateral force, nN
 
-# ---------------- equilibration --------------------------------------
+# ---------------- equilibration (5 ps) -------------------------------
 timestep        0.001
 velocity        mobile create ${T} ${seed} dist gaussian mom yes rot yes
 velocity        fixed  set 0 0 0
@@ -120,9 +116,9 @@ fix             f_nve  mobile nve
 fix             f_lang thermo langevin ${T} ${T} 0.1 ${seed}
 fix_modify      f_lang temp Tthm
 
-thermo_style    custom step time c_Tnew c_Tthm pe v_FxnN v_FynN
+thermo_style    custom step time c_Tnew c_Tthm pe
 thermo          1000
-run             10000
+run             5000
 reset_timestep  0
 
 # ---------------- cutting --------------------------------------------
@@ -130,11 +126,13 @@ fix             f_move tool move linear -${vcut} 0.0 0.0
 
 variable        nsteps equal round(${cutlen}/${vcut}/dt)
 variable        trav   equal ${vcut}*step*dt
-fix             f_out all print 100 "$(step) ${t} ${trav} ${FxnN} ${FynN} $(c_Tnew)" &
-                file forces.dat screen no title "# step time_ps tool_travel_A Fx_nN Fy_nN T_newton_K"
+fix             f_out all print 100 "$(step) $(time) ${trav} ${FxnN} ${FynN} ${FznN} $(c_Tnew)" &
+                file forces.dat screen no &
+                title "# step time_ps tool_travel_A Fx_nN Fy_nN Fz_nN T_newton_K"
 
-dump            d1 all custom 2000 dump.cutting id type x y z c_csym c_pe
-dump_modify     d1 sort id
+shell           mkdir dump
+dump            d1 all custom/gz 2000 dump/cut.*.gz id type element x y z c_pe
+dump_modify     d1 sort id element Al C format float %.3f
 
 thermo_style    custom step time v_trav c_Tnew c_Tthm v_FxnN v_FynN
 run             ${nsteps}
