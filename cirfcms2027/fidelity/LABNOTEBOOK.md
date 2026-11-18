@@ -54,3 +54,13 @@ the measurement uncertainty by the observed residual variance and so remains
 meaningful when the model is misspecified, as this one demonstrably is (depth
 error 13 % against a measurement uncertainty near 5 %). The keyhole coefficient
 enters depth linearly, so it is profiled out in closed form for each sample.
+
+**GitHub index: issues are disabled on this repository.** The plan was a single
+tracking issue as a branch-independent index. Creating it returned `410 Issues
+has been disabled in this repository`. A pull request would have served instead,
+but none was requested, so none was opened. The record therefore lives on the
+branch: `cirfcms2027/INDEX.md` indexes all three papers, and this notebook,
+`ROADMAP.md` and `FINDINGS.md` are committed and pushed after each step. The
+branch persists on GitHub unless someone deletes it; merging it, or enabling
+issues so an index can be created, would make the work findable without knowing
+the branch name.
