@@ -122,13 +122,82 @@ def controls(rows: list[dict]) -> dict:
     return out
 
 
+def spread(rows: list[dict]) -> dict:
+    """Disagreement among the accepted twins themselves, no truth designated.
+
+    If the process were any one of the twins the data accept, the others are
+    what a practitioner might have deployed instead. The pairwise directional
+    disagreement is therefore the error validation leaves open, whichever
+    member is closest to reality.
+    """
+    import study as st_mod
+    import twins as tw_mod
+    sc = st_mod.Scorer()
+    acc = [r for r in rows if r["family"] == "validation-equivalent"]
+    sig = np.asarray(tw_mod.REFERENCE.sigmas, float)
+    U = []
+    for r in acc:
+        t = r["twin"]
+        tw = tw_mod.REFERENCE.but("x", absorptivity=t["absorptivity"], k=t["k"],
+                                  cp=t["cp"], keyhole_c=t["keyhole_c"])
+        J = sc.J(tw) / sig[:, None]
+        U.append(J / np.linalg.norm(J, axis=0))
+    U = np.array(U)
+    n = len(U)
+    D = np.zeros((n, n))
+    for i in range(n):
+        c = np.abs(np.einsum("sk,jsk->jk", U[i], U)).clip(0, 1)
+        D[i] = np.degrees(np.arccos(c)).max(1)
+    iu = np.triu_indices(n, 1)
+    pairs = D[iu]
+    b = budget()
+    per_twin_median = np.nanmedian(np.where(np.eye(n, dtype=bool), np.nan, D), axis=1)
+    return {"n_twins": n, "n_pairs": int(len(pairs)),
+            "pair_delta_max_median": float(np.median(pairs)),
+            "pair_delta_max_q10": float(np.quantile(pairs, 0.10)),
+            "pair_delta_max_q90": float(np.quantile(pairs, 0.90)),
+            "pair_frac_over_budget": float(np.mean(pairs > b)),
+            "best_center_median": float(per_twin_median.min()),
+            "worst_center_median": float(per_twin_median.max())}
+
+
+def tolerances(rows: list[dict]) -> dict:
+    """Parameter accuracy that keeps every fault inside the budget.
+
+    From the one-parameter and operating-point families: for each parameter
+    and sign, the largest offset tried whose largest directional error is
+    within budget, and the error per percent at the smallest offset.
+    """
+    b = budget()
+    out = {}
+    R = [r for r in rows if r["family"] in ("one parameter", "operating point")]
+    groups: dict[str, list] = {}
+    for r in R:
+        label, scale = r["name"].rsplit(" x", 1)
+        groups.setdefault(label, []).append((float(scale), r["delta_max"], r["pred_rms"]))
+    for label, g in groups.items():
+        g.sort()
+        ok = [abs(s - 1) for s, d, _ in g if d <= b]
+        bad = [abs(s - 1) for s, d, _ in g if d > b]
+        smallest = min(g, key=lambda x: abs(x[0] - 1))
+        out[label] = {"offsets": [(round(100 * (s - 1), 1), round(d, 3), round(p, 3))
+                                  for s, d, p in g],
+                      "largest_ok_pct": 100 * max(ok) if ok else 0.0,
+                      "smallest_bad_pct": 100 * min(bad) if bad else None,
+                      "deg_per_pct_at_smallest": smallest[1] / (100 * abs(smallest[0] - 1))}
+    return out
+
+
 def main() -> dict:
     data = json.loads(STUDY.read_text())
     rows = data["rows"]
     table = family_table(rows)
     t = tests(rows)
     c = controls(rows)
-    res = {"table": table, "tests": t, "controls": c, "gain": data["gain"],
+    sp = spread(rows)
+    tol = tolerances(rows)
+    res = {"table": table, "tests": t, "controls": c, "spread": sp,
+           "tolerances": tol, "gain": data["gain"],
            "region": data["region"], "n_region_accepted": data["n_region_accepted"],
            "n_region": data["n_region"]}
     OUT.write_text(json.dumps(res, indent=1))
@@ -153,6 +222,13 @@ def main() -> dict:
     print()
     for k, v in c.items():
         print(f"{k}: {v}")
+    print("\nspread among accepted twins, no truth designated")
+    for k, v in sp.items():
+        print(f"   {k}: {v}")
+    print("\ntolerances (offset %, largest direction error deg, prediction RMS %)")
+    for k, v in tol.items():
+        print(f"   {k:14s} ok to {v['largest_ok_pct']:4.1f} %   "
+              f"{v['deg_per_pct_at_smallest']:.2f} deg per %   {v['offsets']}")
     return res
 
 
