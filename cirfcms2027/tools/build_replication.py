@@ -180,6 +180,13 @@ def build_static() -> None:
         p.chmod(0o755)
     commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT,
                             capture_output=True, text=True).stdout.strip() or "unknown"
+    # source changes not yet committed (the package and its zip excluded)
+    dirty = [l for l in subprocess.run(
+        ["git", "status", "--porcelain", "--", ".", ":!replication", f":!{ZIP.name}"],
+        cwd=ROOT, capture_output=True, text=True).stdout.splitlines() if l.strip()]
+    if dirty:
+        commit += "` plus uncommitted changes to " + str(len(dirty)) + " files (`" + \
+                  ", ".join(l[3:] for l in dirty[:5])
     readme = (STATIC / "README.md").read_text()
     readme = (readme.replace("%%VERSION%%", VERSION)
               .replace("%%BUILT%%", dt.date.today().isoformat())
