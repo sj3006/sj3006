@@ -1,7 +1,9 @@
 # Index of the LPBF diagnosability work
 
-Three linked papers live in this directory. All of it is on the branch
-`claude/lucid-feynman-bqpmqw` of `sj3006/sj3006` until merged.
+Three linked papers live in this directory. It is kept in two places with the
+same content and history: the dedicated repository `sj3006/cirpcms2027`, and the
+directory `cirfcms2027/` on the branch `claude/lucid-feynman-bqpmqw` of
+`sj3006/sj3006`.
 
 | directory | paper | state |
 |---|---|---|
