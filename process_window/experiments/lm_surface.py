@@ -59,9 +59,7 @@ def main():
     assert args.n in (12, 23), "the grids are 12 x 12 and its nested 23 x 23 refinement"
     if args.model != MODEL:
         assert args.tag, "another model needs --tag"
-        stem = f"surface_scores_{args.tag}"
-    else:
-        stem = "surface_scores"
+    stem = f"surface_scores_{args.tag}" if args.tag else "surface_scores"
     path = os.path.join(OUT, f"{stem}.npz" if args.n == 12 else f"{stem}_{args.n}.npz")
     done = dict(np.load(path, allow_pickle=True)) if os.path.exists(path) else {}
     done.pop("temps", None)

@@ -349,6 +349,10 @@ def do_model(run, tag, hw):
                                  "--dtype float32 on larger GPUs)")
             run.say(f"{tag}: {st['status']}")
             return status
+    if n_settings(s12) < 144:
+        st["status"] = f"surface12 incomplete: {s12} has {n_settings(s12)} of 144 settings"
+        run.say(f"{tag}: {st['status']}")
+        return "error"
     st["stages"]["surface12"] = "done"
 
     # 3. the 23 x 23 surface (contains the 12 x 12 one)
@@ -361,6 +365,10 @@ def do_model(run, tag, hw):
             return status
     if "surface23" in a.stages:
         st["stages"]["surface23"] = "done" if n_settings(s23) >= 529 else f"{n_settings(s23)}/529"
+        if not a.dry_run and n_settings(s23) < 529:
+            st["status"] = f"surface23 incomplete: {s23} has {n_settings(s23)} of 529 settings"
+            run.say(f"{tag}: {st['status']}")
+            return "error"
 
     # 4. live runs: the certifier queries the model directly
     if "live" in a.stages:
@@ -375,6 +383,8 @@ def do_model(run, tag, hw):
             if p["dtype"]:
                 cmd += ["--dtype", p["dtype"]]
             status = run.run(cmd, f"{tag}_live.log")
+            if status == "ok" and not os.path.exists(js):
+                status = "error"
             if status != "ok":
                 st["status"] = "paused (time limit)" if status == "timeout" else f"live seed {seed} {status}"
                 run.say(f"{tag}: {st['status']}")
@@ -524,14 +534,15 @@ def main():
     if a.time_limit:
         run.say(f"time limit: {a.time_limit:.1f} h (stops {a.margin:.0f} min before to pack the results)")
     try:
-        for m in models:
+        for i, m in enumerate(models):
             r = do_model(run, m, hw)
             if a.delete_models_after:
                 delete_model(MODELS.get(m, m))
-            pack(run)                           # pack after every model, so nothing is lost
             if r == "timeout":
                 run.say("stopping: time limit. Run again with --resume-from <this output> to continue.")
                 break
+            if i < len(models) - 1:
+                pack(run)                       # pack after every model, so nothing is lost
     finally:
         pack(run)
     run.say("summary: " + "; ".join(f"{k}: {v.get('status')}" for k, v in run.info["models"].items()))
