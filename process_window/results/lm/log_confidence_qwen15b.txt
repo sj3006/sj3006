@@ -1,0 +1,2 @@
+{'target_size': 60, 'LB_target': 1047, 'LB_ordered': 2212, 'LB_unordered': 10334, 'search': 24416.0, 'search_complete': '8/8', 'search_unsafe': 0, 'per-setting': 51456.0, 'per-setting_complete': '8/8', 'per-setting_unsafe': 0}
+-> lm_fixed_confidence_qwen15b.csv

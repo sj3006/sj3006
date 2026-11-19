@@ -85,7 +85,9 @@ step needs torch.
 | LM 23x23 rows of Tables 1-2 | `python3 experiments/exp_lm.py --parts cost,confidence --surface results/lm/surface_scores_23.npz --pilot-stride 2 --budget 150000` | `results/lm/lm_*_23.csv` | 1 h |
 | Figure 1 and its caption numbers (23x23, 10k generations) | `python3 experiments/exp_lm.py --parts budget --surface results/lm/surface_scores_23.npz --pilot-stride 2`, then `python3 experiments/lm_figure.py --path results/lm/surface_scores_23.npz --pilot-stride 2 --budget 10000` | `results/lm/lm_fixed_budget_23.csv`, `results/lm/fig_lm_surface_23.{png,pdf}` | 5 min |
 | Second LM (Qwen2.5-0.5B) surface and its Tables 1-2 rows | `HF_HOME=<cache> python3 experiments/lm_surface.py --model Qwen/Qwen2.5-0.5B --tag qwen05b --threads 3`, then `python3 experiments/exp_lm.py --parts cost,confidence,check,budget,gp --surface results/lm/surface_scores_qwen05b.npz` | `results/lm/surface_scores_qwen05b.npz`, `results/lm/lm_*_qwen05b.csv` | 3 h + 30 min |
-| Live LM run (certifier queries the model) | `HF_HOME=<cache> python3 experiments/lm_live.py` | `results/lm/lm_live_seed0.json` | 40 min |
+| Third LM (Qwen2.5-1.5B) surface and its Tables 1-2 rows | the same two commands with `--model Qwen/Qwen2.5-1.5B --tag qwen15b` and `--surface results/lm/surface_scores_qwen15b.npz` | `results/lm/surface_scores_qwen15b.npz`, `results/lm/lm_*_qwen15b.csv` | 7 h + 10 min |
+| Live LM runs (certifier queries the model), seeds 0-4 | `HF_HOME=<cache> python3 experiments/lm_live.py --seed <s>` | `results/lm/lm_live_seed<s>.json` | 40 min each |
+| Live runs next to surface runs at the same budget | `python3 experiments/lm_live_summary.py --reps 20` | `results/lm/lm_live_summary.csv` | 10 s |
 | Table 1, Figure 2 (scaling) | `python3 experiments/final.py scaling --scen toy-good` and `--scen lpbf-good`, then `final.py gridfst` | `results/final/scaling_*.csv` | several hours |
 | Table 2, Figure 3 (fixed confidence) | `python3 experiments/exp_search.py` | `results/final/fixed_confidence*.csv` | several hours |
 | Validity (worst case) | `python3 experiments/final.py validity` | `results/final/validity.csv` | 30 min |

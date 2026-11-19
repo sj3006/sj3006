@@ -90,10 +90,12 @@ runs, no false certificate). A task-level failure (format errors, an LLM
 judge) is tier C in COMPUTE_PLAN.md.
 
 **9. The models are small.**
-135M, 0.5B and 1.5B (if the CPU run finishes in time). 7B models from three
-families are tier A in COMPUTE_PLAN.md (about 10 GPU-hours). The method's
-cost does not depend on model size; only measuring the reference surface
-does.
+135M, 0.5B and 1.5B, all measured (Tables 1-2). Across the three, the gain
+over no ordering at half the safe region is 1.6-2.1x (2.1-3.0x at 70%),
+and the safe region grows slightly with size (78, 86, 88 of 144
+settings). 7B models from three families are tier A in COMPUTE_PLAN.md
+(about 10 GPU-hours). The method's cost does not depend on model size;
+only measuring the reference surface does.
 
 **10. Benchmark runs resample a fitted surface instead of querying the model.**
 The live run queries SmolLM2 directly: 8.0k generations certified 64 of

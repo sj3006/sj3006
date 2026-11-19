@@ -1,0 +1,19 @@
+Loading weights:   0%|          | 0/272 [00:00<?, ?it/s]Loading weights: 100%|██████████| 272/272 [00:00<00:00, 3444.21it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+{'generations': 2328, 'certified': 0, 'unsafe_vs_reference': 0, 'seconds': 6.4}
+{'generations': 2352, 'certified': 0, 'unsafe_vs_reference': 0, 'seconds': 12.1}
+{'generations': 2376, 'certified': 0, 'unsafe_vs_reference': 0, 'seconds': 18.0}
+{'generations': 2400, 'certified': 0, 'unsafe_vs_reference': 0, 'seconds': 24.4}
+{'generations': 2424, 'certified': 0, 'unsafe_vs_reference': 0, 'seconds': 32.9}
+{'generations': 2448, 'certified': 0, 'unsafe_vs_reference': 0, 'seconds': 38.4}
+{'generations': 2472, 'certified': 0, 'unsafe_vs_reference': 0, 'seconds': 44.3}
+{'generations': 2496, 'certified': 0, 'unsafe_vs_reference': 0, 'seconds': 51.4}
+{'generations': 2520, 'certified': 0, 'unsafe_vs_reference': 0, 'seconds': 58.7}
+{'generations': 2544, 'certified': 0, 'unsafe_vs_reference': 0, 'seconds': 64.4}
+{'generations': 2568, 'certified': 0, 'unsafe_vs_reference': 0, 'seconds': 69.5}
+{'generations': 2592, 'certified': 0, 'unsafe_vs_reference': 0, 'seconds': 74.6}
+{'generations': 2616, 'certified': 0, 'unsafe_vs_reference': 0, 'seconds': 79.5}
+{'generations': 2640, 'certified': 0, 'unsafe_vs_reference': 0, 'seconds': 84.8}
+{'generations': 2664, 'certified': 0, 'unsafe_vs_reference': 0, 'seconds': 89.7}
+{'generations': 2688, 'certified': 0, 'unsafe_vs_reference': 0, 'seconds': 95.1}
+{'generations': 2712, 'certified': 0, 'unsafe_vs_reference': 0, 'seconds': 100.3}

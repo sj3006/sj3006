@@ -3,7 +3,7 @@
 What extra compute would buy for the paper, how much it needs, and how to
 run it. Nothing here is required for submission. The paper already has
 three measured language-model surfaces done on a 4-core CPU: SmolLM2-135M
-(12x12 and 23x23 grids), Qwen2.5-0.5B, and Qwen2.5-1.5B (running now on CPU).
+(12x12 and 23x23 grids), Qwen2.5-0.5B and Qwen2.5-1.5B (both 12x12).
 The obvious reviewer question is "does this hold for a model people
 actually deploy?" A GPU answers it.
 
@@ -80,4 +80,4 @@ there directly.
   from 0.1B to 7B or 14B) and live runs on a 7B model. With these, the
   certification cost can also be reported in GPU-minutes against the
   full-grid baseline.
-- Limitations: "two small models" becomes "models from 0.1B to 7B (14B)".
+- Limitations: "three small models (0.1B-1.5B)" becomes "models from 0.1B to 7B (14B)".
