@@ -1,0 +1,7 @@
+y_pad_cross_section_mm,depth_antiparallel_um,depth_parallel_um
+0.6,175.2,120.0
+1.5,175.1,123.5
+1.9,174.0,124.7
+2.9,170.1,137.1
+# X-pad control depth changes: -0.0241, -0.0471
+# standard deviations across Table 5: 3.9 to 10.7 um; argon cross-flow 4.3 m/s

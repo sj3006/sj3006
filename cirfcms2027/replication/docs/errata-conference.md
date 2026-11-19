@@ -1,0 +1,2059 @@
+# Errata and changes for draft 2
+
+A running list of defects found in the first draft of the paper
+(`paper/paper.tex`, 6 pages, two-column Procedia layout) after it was written,
+together with suggested additions.
+
+**How this file works.** One entry per item, newest at the top of its section.
+Every entry carries the same five fields:
+
+    WHAT DRAFT 1 SAYS   verbatim, with the paper section and the .tex line
+    WHAT IS WRONG       the defect, stated plainly. For an [S] entry this reads
+                        WHY IT IS WORTH ADDING - nothing is wrong, something is
+                        missing that would make the paper stronger.
+    EVIDENCE            the measurement that establishes it
+    DOES IT CHANGE THE RESULT?   honestly, including "no"
+    CHANGE FOR DRAFT 2  the edit to make
+
+Entries are classified:
+
+    [E]  error present in draft 1 - the paper states something untrue or too strong
+    [O]  omission in draft 1 - nothing false, but something load-bearing is missing
+    [S]  suggested addition - draft 1 is correct as it stands; this would make it
+         better. Costs page space, so each entry says what it would displace.
+    [P]  plan - a structural choice for draft 2 affecting several sections, not a
+         single edit. Needs a decision before the edits under it can be made.
+    [W]  working error - a mistake made during analysis, caught before it reached
+         the paper. Logged so it is not repeated, not because draft 1 is wrong.
+
+**Applied to the paper so far:** all of them --- O1, E2, E5, E9, S1, E4, E6, E7,
+E8, E10, E1, E3, S2 and the P1 reframing (Level 2), plus E11 and W2 found while
+applying them. Nothing in this file is outstanding. E8 was the largest: the noise
+figures are now derived rather than asserted, which moved most numbers in the
+paper.
+
+---
+
+## Status summary
+
+| id | type | one line | changes a result? |
+|---|---|---|---|
+| E1 | DONE | "every conclusion invariant" to the conductivity coupling is too strong | no longer, after E8: the cell it changed is now moot |
+| E2 | DONE | 11.7 % / 13.0 % is an aggregate that hides the base-case error and a one-sided bias | no |
+| E3 | DONE | the VED correlation coefficients do not reproduce, are grid-dependent, and are mis-framed as a check against external data | no diagnosability result; replaced by a grid-independent exponent test |
+| E4 | DONE | the mechanism given for the split-camera recommendation has width and length the wrong way round | no, the recommendation stands; the explanation does not |
+| E5 | DONE | "counted conservatively as C" is the wrong word - that choice protects our novelty claim rather than costing us | no |
+| E6 | DONE | the literature tally in Section 5.1 is wrong: seven works classify outcomes, not twelve, and the total is now 19 | no, but it is the paragraph a reviewer will check first |
+| E7 | DONE | the proposed Reijonen comparison uses the wrong quantity on our side and calls the test "decisive" | no, but the test as specified would be biased by ~12 % |
+| **E8** | **DONE** | **both free noise ratios were asserted and both are wrong - pyrometer by ~35x, camera by ~7x, in opposite directions** | **no conclusion breaks; headline 25.83 -> 24.90, instantaneous class 1 drops 5/10 -> 0/10** |
+| E10 | DONE | the power/gas confound formula in Section 4.2 has the wrong sign | no, the angle and column ratio were right either way |
+| E9 | DONE | the paper claims four noise assumption sets; the code contains three | no, but the paper is not reproducible from its own code |
+| O1 | DONE | the operating point the whole analysis linearises about is never stated | no |
+| S1 | DONE | add the sensor correlation matrix - the plainest statement of the paper's problem | no, strengthens presentation |
+| S2 | DONE | the gas profile can be inverted from benchmark data and is conservative; say so instead of calling it asserted | no, converts the paper's largest exposure |
+| E11 | DONE, **partly retracted** | the pad depth "175 um" IS in Weaver Table 5; only the uncertainty label was wrong | no, the inversion uses the percentages |
+| E12 | DONE | the Reijonen check is now performed: the model is 39 % too steep on the speed exponent and does not reproduce its power-dependence | no number changes; one validation leg now partly fails, for a declared reason |
+| W2 | working | I evaluated the keyhole correction on model rather than measured dimensions, breaking the S2 inversion | no, caught before it reached the paper |
+| P1 | DONE | how to fix the asserted profiles properly: measure what is measurable, then stop asserting | no numbers; changes what the paper claims to deliver |
+| W1 | working | spot size used as the Gaussian sigma instead of a D4-sigma diameter | no |
+
+---
+
+# E1. "Every conclusion invariant to it" is too strong [E]
+
+## What draft 1 says
+
+Section 3.2, `paper.tex` lines 236-238:
+
+> "Its conductivity coupling remains an unmeasured estimate, swept across its
+> plausible range in Section 4.5 **with every conclusion invariant to it**."
+
+and Section 4.5, lines 427-429:
+
+> "The unmeasured conductivity coupling leaves the worst angle at 25.83 degrees
+> throughout its range..."
+
+## What is wrong
+
+The second sentence is true. The first is not. *Every accumulated-regime*
+conclusion is invariant to `layer_to_conductivity`. One **instantaneous** class
+assignment is not, and the coupling turns out to be load-bearing in a way the
+draft never mentions.
+
+## Evidence
+
+Instantaneous pairwise angles against the coupling `c_k`:
+
+| c_k | power/layer | speed/layer | layer/gas | layer/geometry |
+|---|---|---|---|---|
+| **0.00** | **0.00** | 7.12 | **0.00** | 61.39 |
+| 0.10 | 2.34 | 9.46 | 2.34 | 59.36 |
+| 0.25 | 3.09 | **10.21** | 3.09 | 58.71 |
+| **0.50 (study value)** | 3.46 | **10.58** | 3.46 | 58.40 |
+| 0.75 | 3.60 | 10.72 | 3.61 | 58.27 |
+| 1.00 | 3.68 | 10.80 | 3.68 | 58.21 |
+| 1.50 | 3.76 | 10.88 | 3.76 | 58.14 |
+
+Enlarged pairwise angles over the same sweep:
+
+| c_k | power/layer | speed/layer | layer/gas | layer/geometry | overall worst | rank | cond |
+|---|---|---|---|---|---|---|---|
+| 0.00 | 36.26 | 46.57 | 44.48 | 68.59 | **25.83** | 5 | 47 |
+| 0.50 | 36.40 | 47.08 | 44.58 | 66.45 | **25.83** | 5 | 30 |
+| 1.50 | 36.43 | 47.13 | 44.60 | 66.27 | **25.83** | 5 | 36 |
+
+Two consequences.
+
+**speed/layer crosses the isolability floor inside the swept range.** At the
+study value it clears 10 degrees by **0.58 degrees**. Below about c_k = 0.2 it
+falls under and becomes class 2. The draft's instantaneous count of "five of ten
+pairs in class 1" depends entirely on this one marginal pair: the other four
+class-1 pairs are all geometry pairs at 58-68 degrees. At c_k = 0.1 the count is
+4/10, not 5/10.
+
+**At c_k = 0 the layer fault becomes exactly confounded with power and gas**,
+both reading 0.00 degrees. This is not numerical noise. The layer fault's two
+power-side channels nearly cancel - absorptivity -0.230 plus enthalpy +0.186
+gives a net -0.044 on the product (absorptivity x power) - so with no
+conductivity channel the layer fault acts *only* through the same product that
+power and gas act through, and joins their degeneracy exactly.
+
+**The conductivity coupling is therefore the only thing that makes a layer fault
+instantaneously distinguishable from a power fault at all**, and it is the one
+coupling in the model with no literature behind it.
+
+Why the enlarged regime does not care: the coupling changes the layer
+signature's *magnitude* by a factor of 23 (whitened column norm 0.101 at c_k = 0
+to 2.326 at c_k = 1.5) but its *direction* by under half a degree across
+0.25-1.5. Angles depend only on direction.
+
+| c_k | layer column norm | angle vs c_k = 0.50 |
+|---|---|---|
+| 0.00 | 0.101 | 3.46 deg |
+| 0.25 | 0.472 | 0.37 deg |
+| 0.50 | 0.843 | - |
+| 1.00 | 1.584 | 0.22 deg |
+| 1.50 | 2.326 | 0.30 deg |
+
+## Does it change the result?
+
+**The headline: no.** Power/gas stays at 0.00 degrees (algebraic, nothing to do
+with layer couplings). Instantaneous rank stays 3, enlarged rank stays 5. The
+enlarged worst pair is **25.83 degrees at every value of the coupling**. The
+paper's central contribution - build context dissolves the instantaneous limit -
+is untouched, as is the whole accumulated regime where all ten pairs are class 1.
+
+**One secondary number: yes.** The instantaneous class-1 count of 5/10 is
+contingent on c_k being above roughly 0.2. It is also sensitive to the floor
+convention: speed/layer is at 10.58 degrees, so any floor above that gives 4/10.
+
+## Change for draft 2
+
+1. Replace the Section 3.2 clause. Proposed: *"...swept across its plausible
+   range in Section 4.5, with every accumulated-regime conclusion invariant to
+   it. In the instantaneous regime it is load-bearing: it is the only channel
+   separating a layer fault from a power fault, and speed/layer clears the 10
+   degree floor at 10.58 degrees only for couplings above about 0.2."*
+2. Add a caveat where the 5/10 instantaneous count is reported (Section 4.6),
+   noting that speed/layer clears the floor by 0.58 degrees and that the count
+   is 4/10 for a weaker coupling or a slightly higher floor.
+3. Name the measurement that would settle it: Liu, Kinzel and Leu (2023),
+   lock-in thermography of powder layer thermal diffusivity against thickness.
+
+**Also fix in the code, not the paper:** the `FaultCouplings` docstring in
+`src/faults.py` claims conductivity is "by far the weakest of the three layer
+effects: isolating each at f = 0.2 moves the melt depth by 3.4 % (absorptivity),
+1.6 % (enthalpy) and 0.35 % (conductivity)." Re-measured, those are -3.55 %,
++2.97 % and -1.41 %. Conductivity is four times stronger than documented, and
+because the first two nearly cancel it is the **dominant surviving channel**,
+not the weakest. The docstring states the opposite of the truth.
+
+---
+
+# E2. 11.7 % / 13.0 % is an aggregate that conceals three things [E]
+
+## What draft 1 says
+
+Section 3.1, `paper.tex` line 205:
+
+> "Four parameters --- effective absorptivity, effective conductivity, heat
+> capacity and the keyhole constant --- are fitted to the seven IN718 bare-plate
+> single-track cases of the 2022 Additive Manufacturing Benchmark, giving
+> **11.7 % error on melt pool width and 13.0 % on depth**."
+
+## What is wrong
+
+The numbers are correctly computed - the fit returns width 11.687 %, depth
+13.036 % - but presenting them alone is misleading in three ways.
+
+**(a) It is not the error at the point the paper linearises about.** Those are
+means over seven conditions. At the baseline condition itself, which is where
+the entire Jacobian is evaluated, the width error is **-15.54 %**, worse than
+the quoted aggregate and **3.4x the measurement's own expanded uncertainty**
+(U, k=2, of 6.2 um). The depth error there is +1.72 %, 0.2x its uncertainty -
+the best of all seven. The base case is lopsided, and the aggregate hides it.
+
+**(b) A mean absolute percentage error implies two-sided scatter. It is a
+one-sided miss.** All seven width errors are negative. The model is
+systematically narrow at every condition, which is a structural property of a
+constant-property conduction solution - it has no Marangoni convection and no
+recoil-driven spreading, so it cannot widen a pool.
+
+**(c) The depth figure is 13.0 or 13.1 depending on which parameter set is
+used.** `calibrate.py` re-runs the fit and gets mu = 0.383549, giving 13.036 %.
+The runtime model uses the stored rounded constant mu = 0.384, giving 13.061 %.
+The paper quotes the fit. The difference is immaterial but the two numbers do
+differ, and anyone re-running the code will see 13.1 and wonder.
+
+## Evidence
+
+| case | width model | width meas | width err | xU | depth model | depth meas | depth err | xU |
+|---|---|---|---|---|---|---|---|---|
+| **0 baseline** | 115.1 | 136.3 | **-15.54 %** | **3.4** | 142.1 | 139.7 | **+1.72 %** | **0.2** |
+| 1.1 small spot | 104.1 | 106.2 | -1.97 % | 0.4 | 163.0 | 227.2 | -28.25 % | 2.8 |
+| 1.2 large spot | 125.1 | 141.7 | -11.73 % | 2.8 | 130.2 | 102.4 | +27.10 % | 2.7 |
+| 2.1 fast | 106.5 | 112.9 | -5.66 % | 1.3 | 122.7 | 109.7 | +11.83 % | 1.2 |
+| 2.2 slow | 123.5 | 156.1 | -20.86 % | 4.2 | 159.8 | 176.5 | -9.46 % | 0.9 |
+| 3.1 high power | 118.9 | 134.3 | -11.43 % | 2.6 | 157.6 | 166.1 | -5.12 % | 0.5 |
+| 3.2 low power | 110.7 | 129.4 | -14.43 % | 3.4 | 126.2 | 116.9 | +7.95 % | 0.8 |
+| | | | **MAPE 11.7 %** | | | | **MAPE 13.0 %** | |
+
+Also relevant and also unstated in draft 1: three of the four fitted parameters
+sit on their bounds - conductivity at its upper bound (35.0 of 11-35), heat
+capacity at its lower (450 of 450-1200), keyhole factor at its lower (1.00 of
+1-5). Only absorptivity is interior. The 11.7 % is the best this model can do
+*while remaining physically arguable*, not its unconstrained best. Draft 1 does
+say "the fitted parameters sit at their bounds" in the limitations, but does not
+connect that to the quality of the fit.
+
+## Does it change the result?
+
+**No.** Diagnosability depends on the *direction* the readings move under a
+fault, not on absolute geometry being right. The operating-point sweep (O1
+below) confirms the conclusions hold across all seven benchmark cases. Nothing
+in Sections 4.2 to 4.7 moves.
+
+What it changes is how much accuracy a reader should credit the model with at
+the one point that matters.
+
+## Change for draft 2
+
+1. Add one sentence after the Gate 1 figures: *"At the baseline condition
+   itself, where the Jacobian is evaluated, the errors are -15.5 % on width and
+   +1.7 % on depth, against expanded uncertainties (k=2) of 6.2 and 14.1 um."*
+2. Add a half-sentence that all seven width errors are negative, so the model is
+   systematically narrow rather than scattered. This is more honest and it is
+   also a cleaner statement of the model's limitation than the current prose.
+3. Decide 13.0 or 13.1 and make the code and paper agree, or state which
+   parameter set the figure comes from.
+
+---
+
+# E3. The energy-density correlation check [E]
+
+## What draft 1 says
+
+Section 4.1, `paper.tex` lines 345-348:
+
+> "**Two checks are made against data not used in the fit.** Over 27 melted
+> conditions the model reproduces the benchmark correlation structure: depth
+> correlates with volumetric energy density (**r = +0.727**) while width does
+> not (**r = +0.032**)."
+
+## What is wrong
+
+Three separate things.
+
+**(a) The coefficients do not reproduce.** Running the check now:
+
+| source | n | width r | depth r |
+|---|---|---|---|
+| `sanity_checks.py` as it stands | 27 | **+0.206** | **+0.778** |
+| same grid, calibrated absorptivity 0.384 | 27 | +0.201 | +0.767 |
+| **paper** | 27 | **+0.032** | **+0.727** |
+
+The "27 melted conditions" does identify the grid - a 3 x 3 x 3 sweep over power
+{150, 250, 350} W, speed {0.4, 0.8, 1.6} m/s and spot {60, 100, 140} um - but
+that grid returns +0.206 for width, not +0.032. Five other plausible grids were
+tried and none produced the published pair. The width figure is the one that
+moved, and it is the load-bearing one: +0.032 reads as "no relationship at all",
++0.206 does not.
+
+**(b) The width result is not robust to the sweep grid.** Depth is stable
+everywhere; width is not:
+
+| grid | width r | depth r |
+|---|---|---|
+| Weaver's own spot range 49/67/82 um | **+0.644** | +0.860 |
+| Weaver-like P and v | **-0.376** | +0.527 |
+| wide spots 50/100/200 um | -0.223 | +0.704 |
+| 4 x 4 x 2 grid | -0.004 | +0.704 |
+| sanity_checks 3 x 3 x 3 | +0.206 | +0.778 |
+
+Width's correlation swings from -0.38 to +0.64 depending purely on which region
+of parameter space is sampled. **"Width does not correlate with VED" is a
+statement about the chosen grid, not a property of the model.** What survives
+every grid is the weaker comparative claim: depth tracks VED far more strongly
+than width does. That is the defensible version and it is what the code's own
+pass criterion actually tests (`abs(r_depth) > abs(r_width)`).
+
+**(c) "Two checks are made against data not used in the fit" is wrong for this
+check.** It is true of the Guo check. It is false here on two counts:
+
+- **No data enters it.** All 27 points are model output. The check correlates
+  the model's own input with the model's own output; nothing is compared against
+  a measurement.
+- **The property is not independent of the fit.** Weaver's "depth tracks VED,
+  width does not" is derived from the same seven Table 4 cases that the four
+  parameters were fitted to.
+
+Something real remains - the fit targeted seven point residuals, never a
+correlation, and the sweep extrapolates to a parameter region containing none of
+the fitted points - but the honest description is **one external validation
+(Guo) and one structural self-consistency check**, not two external checks. The
+module docstring in `src/validation.py` already states this correctly
+("Validation means reproducing something the fit did not target"); the paper
+overstates it.
+
+## Does it change the result?
+
+**No diagnosability result.** The r values appear nowhere downstream. Angles,
+ranks, condition numbers and the matrix are untouched.
+
+**It does weaken one of the two validation legs**, and it removes one strand of
+support for "width carries information depth does not". Note that the split-
+camera recommendation in Section 4.7 does **not** rest on these coefficients -
+it rests on the constant-VED sweep, where length varies 2.53x against 1.11x for
+width and depth, which is a different measurement and is unaffected.
+
+## Change for draft 2
+
+1. Regenerate the coefficients from the calibrated model and quote what it
+   actually returns, with the grid stated so the number is reproducible.
+2. Replace the absolute claim with the comparative one, which holds on every
+   grid tried: *"depth tracks volumetric energy density far more strongly than
+   width does"*, and state the grid sensitivity rather than hiding it.
+3. Reword the opening sentence. Proposed: *"One external check and one check of
+   internal structure. Over 27 melted conditions spanning power, speed and spot
+   size, ..."*.
+
+**Also fix in the code, not the paper:** `src/sanity_checks.py` hard-codes
+`ABS = 0.35` and `NQ = 100` at module level instead of using the calibrated
+`IN718_ABSORPTIVITY = 0.384` and the standard quadrature. The module that
+produces this validation figure is therefore not running the calibrated model.
+That alone accounts for +0.206 against +0.201, not for the gap to +0.032, but it
+should not be there.
+
+---
+
+# E4. The split-camera mechanism has width and length inverted [E]
+
+## What draft 1 says
+
+Section 4.7, `paper.tex` lines 535-538:
+
+> "The mechanism is the validation result above: length carries 2.5x the
+> variation of width and depth at constant energy density, and **an area
+> multiplies the least informative dimension by the most informative one**."
+
+By that sentence, length is "most informative" (it varies 2.53x at constant
+energy density) and width is "least informative" (1.11x).
+
+## What is wrong
+
+It conflates two different meanings of "informative", and for diagnosability it
+picks the wrong one.
+
+- **Responsiveness** - how much a dimension moves. Length wins, 2.53x to 1.11x.
+  This is what Section 4.1 measured.
+- **Independence** - how *differently* a dimension moves from what the other
+  sensors already see. This is what diagnosability depends on, and on this
+  measure the ranking **inverts**.
+
+How alike each observable is to the base photodiode, from the whitened sensor
+correlation matrix:
+
+| added observable | correlation | angle from photodiode |
+|---|---|---|
+| SWIR photodiode | 0.99996 | 0.49 deg |
+| camera (area) | 0.99960 | 1.63 deg |
+| pyrometer | 0.99508 | 5.68 deg |
+| pyrometer, wide band | 0.99135 | 7.54 deg |
+| **camera length** | 0.97906 | **11.75 deg** |
+| **camera width** | **0.77930** | **38.80 deg** |
+
+**Width is the independent direction, by a factor of three over length.** A
+sensor can move a great deal and still tell you nothing new; width moves least
+and tells you most.
+
+Two further consequences the sentence misses:
+
+**Area is nearly as redundant as a second photodiode** - 1.63 degrees against
+0.49. So "a geometric measurement adds a direction" (Section 4.6) is true of B
+versus C but is not true of *area* in any strong sense. Area buries the
+independent information rather than carrying it.
+
+## Evidence
+
+Adding one dimension at a time to the baseline three-sensor suite, keeping the
+area channel (instantaneous class-1 count; power/speed in the enlarged regime):
+
+| added | instantaneous class 1 | power/speed |
+|---|---|---|
+| nothing (area only) | 5/10 | 25.83 deg |
+| **width only** | **9/10** | 31.24 deg |
+| length only | 7/10 | 32.14 deg |
+| both | 9/10 | 36.45 deg |
+| SWIR photodiode | 4/10 | 25.75 deg |
+
+Width alone takes the instantaneous class-1 count from 5/10 to **9/10**; length
+alone reaches 7/10. Width is the stronger single addition, which is the opposite
+of what the draft's mechanism predicts.
+
+**Care with this table: it is not the paper's configuration.** The rows above ADD
+a dimension on top of the area channel. The paper's +13.40 deg is the REPLACE
+case - photodiode, width, length, pyrometer, with the area channel dropped -
+which is what "reporting the camera's two axes separately rather than as an area"
+means. Both were recomputed:
+
+| configuration | inst class 1 | power/speed inst | power/speed enlarged |
+|---|---|---|---|
+| base (area) | 5/10 | 7.12 | 25.83 |
+| **replace area by w+l** | **9/10** | **31.35** | **39.23** |
+| add w+l to area | 9/10 | 27.53 | 36.45 |
+| replace: width only | 9/10 | 21.98 | 32.74 |
+| replace: length only | 7/10 | 24.29 | 34.23 |
+
+**The paper's 39.23 deg is correct**; it is the replace row. Note that under the
+replace framing the two measures disagree on which single axis is better: width
+wins the class-1 count 9/10 to 7/10, length wins the power/speed angle 34.23 to
+32.74. The correlation argument is the one that generalises, so the paper's
+corrected sentence rests on the correlation (0.779 vs 0.979), not on either
+single-axis angle.
+
+## Does it change the result?
+
+**No. The recommendation and its number are both correct.** Splitting the camera
+is still worth +13.40 degrees on the binding pair, and the SWIR photodiode and
+wide-band pyrometer are still worth nothing. Only the *explanation* is wrong.
+
+That still matters: it is an explanation a reviewer can check in two minutes,
+and it is wrong in a way that suggests the authors did not understand their own
+result.
+
+## Change for draft 2
+
+1. Replace the mechanism sentence. Proposed: *"The mechanism is independence
+   rather than responsiveness: melt pool width is the least correlated of the
+   available observables with the coaxial photodiode (0.78 against 0.99996 for a
+   second photodiode band), so reporting it separately adds a direction, while
+   folding it into an area does not."*
+2. Keep the Section 4.1 responsiveness result where it is, but stop using it to
+   explain the split-camera gain - the two are different measurements answering
+   different questions.
+3. If S1 is adopted, this follows from the same correlation table, so the two
+   changes share their evidence and cost no extra space.
+
+---
+
+# E5. "Counted conservatively as C" is the wrong word [E]
+
+## What draft 1 says
+
+Section 4.6, `paper.tex` lines 499-501:
+
+> "One surveyed system may belong at E rather than C, depending on whether its
+> laser-energy photodiode samples upstream; this could not be established from
+> public documentation, so it is **counted conservatively** as C."
+
+## What is wrong
+
+"Conservatively" implies we chose the reading that costs us. It does not.
+
+If that machine really belongs at E, a commercial system **already implements
+the paper's central hardware recommendation**, which makes the recommendation
+less novel. Classing it as C keeps the claim "no surveyed machine separates
+power from gas" intact. **The choice protects our contribution rather than
+restraining it.**
+
+There is a defensible reason for the choice - we should not credit a product
+with a capability we cannot verify - but that is epistemic caution about a third
+party, not conservatism about our own result, and the wording should say which.
+
+An earlier draft of this sentence went further and called C "the reading that
+does not favour this analysis". That phrase was removed during page trimming,
+which was lucky; it was the same error stated more strongly.
+
+## Does it change the result?
+
+**No.** The configuration table and every angle in it are unaffected. This is a
+one-word honesty point, and the kind of thing a sharp reviewer notices.
+
+## Change for draft 2
+
+Replace "counted conservatively as C" with something that states the actual
+reason, for example: *"this could not be established from public documentation,
+so it is classed by what is documented rather than by what is likely."*
+
+Optionally add the consequence in half a sentence: if that system does sample
+upstream, it is evidence that the recommendation is already reachable on
+existing hardware - which strengthens the paper's practical relevance even as it
+weakens its novelty.
+
+---
+
+# E6. The literature tally in Section 5.1 is wrong [E]
+
+## What draft 1 says
+
+Section 5.1, `paper.tex` lines 546-552:
+
+> "The premise that predicted limits could be compared against reported
+> accuracies turns out to be mostly unrealisable, and the reason is itself the
+> result. **Of 18 works extracted, 12 classify outcomes**, about which this
+> analysis makes no prediction: a melt pool deeper than the layer will fuse
+> whatever made it deep. No published work attempts to separate power from gas,
+> or layer from power --- the pairs identified here as confounded. That is
+> absence of evidence rather than evidence of absence, but no published result
+> contradicts the predicted limits."
+
+This paragraph carries the abstract's final promise - *"the predicted limits are
+compared against the defect classes and accuracies reported in the monitoring
+literature"* - and converts its failure into a finding. It is therefore the
+paragraph a reviewer will scrutinise hardest, because "we could not do what we
+promised, but that is actually the result" is the shape of an excuse.
+
+Which makes it worse that the numbers do not hold up.
+
+## What is wrong
+
+**(a) "12 classify outcomes" is false.** Counting the class column of
+`07-literature-extraction.md`:
+
+| class | count |
+|---|---|
+| **outcome** | **7** |
+| cause, separate | 3 |
+| cause-level physics | 2 |
+| cause, but lumped | 1 |
+| cause-level sensitivity, separate | 1 |
+| nuisance correction | 1 |
+| feature engineering | 1 |
+| forward optimisation | 1 |
+| instrumentation | 1 |
+| unrelated | 1 |
+
+**Seven classify outcomes, not twelve.**
+
+The 12 is traceable: 7 outcome + nuisance correction + feature engineering +
+forward optimisation + instrumentation + unrelated = 12, which is **every work
+making no cause-separation claim**. That is a real and defensible category. It
+simply is not "classify outcomes", which is what the sentence says. **The number
+was attached to the wrong label.**
+
+**(b) "18 works" is stale.** The table now has **19** rows; Reijonen et al.
+(2024) was added as row 19 after the draft was written. 18 was correct when
+written.
+
+**(c) There is no stated inclusion criterion.** Nothing in the paper or in
+`07-literature-extraction.md` says how the works were selected. A reviewer can
+ask, and the current answer is "we extracted them". This is the genuine soft
+spot in the paragraph and **it is not fixed by correcting the count.**
+
+## Does it change the result?
+
+**No diagnosability result.** The tally appears nowhere upstream.
+
+But it damages the one paragraph that can least afford it. A reviewer who opens
+the supporting table and counts will find seven where the paper claims twelve,
+in the passage that is already asking for the benefit of the doubt.
+
+## Change for draft 2
+
+**1. Correct the numbers, and note that the honest version is stronger.**
+Proposed: *"Of 19 works extracted, seven classify outcomes and five more address
+neither outcomes nor cause separation. Only four attempt to estimate process
+inputs from in-situ signals, and one of those predicts a lumped energy-density
+class rather than its components."*
+
+"Only four of nineteen even try, and one of those reports the lumped group" is a
+sharper indictment than "12 classify outcomes".
+
+**Correction made while applying this, the "four" is three.** Re-counting the
+class column against each row's *input* column, the works that estimate a
+process input **from an in-situ signal** are:
+
+| row | work | input | estimated |
+|---|---|---|---|
+| 2 | k-NN parameter estimation, 2025 | melt pool images | energy density **class** (lumped) |
+| 6 | RAISE-LPBF, 2024 | on-axis video | laser power and speed |
+| 11 | Liu et al., 2022 | infrared camera, post-recoat transient | local powder layer thickness |
+
+Row 16 (Honarmandi et al.) was counted in the proposed "four" but does not
+belong: its input is *Bayesian calibration of Eagar-Tsai*, not an in-situ
+signal, so it is model-parameter inference rather than in-situ estimation. Row
+19 (Reijonen) reports sensitivities, not estimates.
+
+Full accounting of the 19: 7 outcome, 5 addressing neither, 3 estimating an
+input from a signal, and 4 reporting cause-level physics or sensitivity without
+estimating anything (rows 1, 15, 16, 19).
+
+**What went into the paper:** *"Of 19 works extracted --- in-situ LPBF
+monitoring with a stated input signal and output, 2019--2025 --- seven classify
+outcomes and only three estimate a process input from an in-situ signal, one of
+those a lumped energy-density class rather than its components."* Point 2 (the
+structural argument from Section 4.3) and point 3 (the inclusion criterion, as
+the em-dashed clause) were applied in the same rewrite.
+
+**2. Argue from Section 4.3 instead of from a head-count.** The parenthetical -
+*"a melt pool deeper than the layer will fuse whatever made it deep"* - is doing
+more work than it is credited with. It is an instance of the four-channel
+argument already proved in Section 4.3:
+
+> Outcomes are functions of the melt pool. The melt pool is a function of the
+> four channels. **Therefore outcome classification cannot separate two causes
+> that share a channel - for exactly the reason no melt-pool instrument can.**
+
+That converts the paragraph from a survey result (*the field happened not to ask
+this*) into a structural one (*the field's dominant method cannot answer it, and
+we proved why two sections ago*). It also makes the paragraph robust to the
+tally being argued with at all, since the claim would no longer rest on counting
+papers.
+
+**3. State the inclusion criterion**, even briefly - what was searched, over what
+period, and what was excluded. One sentence in the paper, with the detail in the
+extraction file.
+
+---
+
+# E7. The proposed Reijonen comparison is mis-specified [E]
+
+## What draft 1 says
+
+Section 5.1, `paper.tex` lines 558-564:
+
+> "One quantitative comparison remains available and should be made before any
+> strong claim of model fidelity. Reijonen reports the photodiode response to
+> scan speed as a power law y = ax^-b, **whose relative sensitivity is exactly
+> -b and so is directly comparable to the Jacobian entry here, -0.483**; the
+> same work reports the power response as approximately linear where the entry
+> here, +1.518, is superlinear. **Whether these agree is a decisive test of the
+> forward model.**"
+
+This is the paper's **only** proposed quantitative check against external data.
+Everything else in Section 5.1 is qualitative. So it matters that it is
+specified correctly, and it is not.
+
+## What is wrong
+
+**(a) The Jacobian entry is not the comparable quantity.** The step "relative
+sensitivity is exactly -b" holds only if the response is an *exact* power law.
+Ours is close but not exact. Fitting a power law to our own model's photodiode
+output:
+
+| | our global fit | our Jacobian entry | gap |
+|---|---|---|---|
+| speed, over 0.4-2.2 m/s | **-0.4302** | -0.4835 | **12 %** |
+| power, over 150-500 W | **+1.3638** | +1.5177 | **11 %** |
+
+Log-log residual is about 1 % in ln units - a good power law, not a perfect one
+- and the local slope drifts from roughly -0.38 to -0.47 across the speed range.
+
+Reijonen's *b* is a **global fit** over their sweep. It must be compared against
+**our global fit, -0.430**, not against the Jacobian's -0.483. As specified, the
+test carries a built-in 12 % discrepancy before any physics enters. If their b
+returned 0.45, the paper as written would report disagreement where the correct
+comparison shows agreement.
+
+**(b) "Decisive" overclaims.** Even done correctly, disagreement would not
+isolate the model as the cause. Four things differ between the two quantities:
+
+- **Band.** Ours integrates 700-1000 nm; theirs is a real photodiode of unstated
+  band, and a different slice of the Planck curve gives a different exponent.
+- **Plume emission.** Reijonen states the plume's presence and removal plays a
+  crucial role in the signal. **Our photodiode has no plume emission at all** -
+  in our model gas only *attenuates*, never *emits*. Their signal contains a
+  component ours does not represent.
+- **Powder versus bare plate.** Our parameters are calibrated on AM-Bench
+  bare-plate single tracks.
+- **What is held constant** during each sweep, which their full text would have
+  to confirm.
+
+Agreement would be strong corroboration; disagreement would be ambiguous.
+
+**(c) The power comparison asserts a conflict we cannot demonstrate.**
+"Approximately linear" most likely means a straight-line fit y = a + bP, whose
+relative sensitivity is bP/(a+bP) - below 1 for a positive intercept, above 1
+for a negative one. Only a fit *through the origin* implies relative sensitivity
+1.0 and genuinely conflicts with a superlinear value. **Without the intercept we
+cannot say whether their result disagrees with ours at all.**
+
+## Does it change the result?
+
+**No.** Nothing upstream depends on it; the comparison has not been performed.
+What is wrong is the specification of a test the paper recommends, in the one
+place it offers an external quantitative check.
+
+## Change for draft 2
+
+1. **Compare fitted exponent to fitted exponent.** Refit our model over whatever
+   speed range Reijonen used and quote that number. State the range, so the
+   comparison is reproducible.
+2. **Downgrade "decisive"** to something like *"the closest available external
+   check on the forward model"*, and name the band, plume and powder caveats in
+   half a sentence - the plume one especially, since it is a component our model
+   omits entirely.
+3. **Drop or soften the power half** until the intercept is known. As written it
+   claims a conflict that may not exist.
+
+**Note for whoever reads Reijonen's full text** (see the open items): extract
+the fitted b *and its range of validity*, and the power fit's **intercept** as
+well as its slope. Without the intercept, point 3 cannot be resolved.
+
+---
+
+# E8. The pyrometer noise ratio is contradicted by first principles [E]
+
+**This is the entry to look into deeply.** It is not a wrong number copied from
+one place to another; it is an assumption that a derivation appears to
+contradict, defended by a sweep that could not have failed.
+
+## What draft 1 says
+
+Section 3.6, `paper.tex` lines 328-337:
+
+> "Only one in-process noise figure proved citable... No comparable in-process
+> characterisation was found for a coaxial photodiode or two-colour pyrometer...
+> Sensor noise is therefore treated as a *ratio* and **swept over four
+> assumption sets, with every conclusion required to hold under all of them.**"
+
+and Section 4.5, line 428-429:
+
+> "...and four noise-ratio assumption sets give $24.97^\circ$--$25.83^\circ$."
+
+The study default throughout is **photodiode 1.0, camera 1.0, pyrometer 0.03**.
+
+## What is wrong
+
+### (a) 0.03 has no derivation
+
+There is none in the code, the notes or the paper. The comment beside the
+constant reads *"same noise ratio as the Tier 2 headline"*, which points at
+another use of the same number.
+
+### (b) A first-principles estimate gives ~1, not 0.03
+
+The pyrometer reports temperature from the ratio of two bands. Using Wien,
+`dlnL/dlnT = c2 / (lam T)` with `c2 = 1.4388e-2 m K` and `T = 3030.644 K`:
+
+    lam = 750 nm    dlnL/dlnT = 6.330
+    lam = 950 nm    dlnL/dlnT = 4.997
+
+For the ratio `R = L(750)/L(950)`:
+
+    dlnR/dlnT = 6.330 - 4.997 = 1.333
+    =>  dlnT   = (1/1.333) dlnR = 0.750 dlnR
+
+If each band carries independent relative noise `eps`, the ratio carries
+`sqrt(2) eps`, so
+
+    relative temperature noise = 0.750 * 1.414 * eps = 1.06 eps
+
+and the photodiode, a single integrated band, carries about `eps`. Hence
+
+    pyrometer / photodiode  ~  1.06        the study uses 0.03
+    favourable by a factor of ~35
+
+**Why the ratio is noisier, not quieter:** taking a ratio amplifies random noise
+(sqrt(2)), and inverting it to temperature divides by a **small** exponent
+difference (1.333), which amplifies again.
+
+### (c) The sweep is centred on the assumption, so it could not fail
+
+The code's own comment states the construction: *"The first set is the one used
+throughout the study. The others are deliberate stress cases."* The four sets
+are our value, one decade either side, and the equal case. **A sweep centred on
+an assumption tests local sensitivity, not the assumption.**
+
+### (d) And our value sits on a local maximum
+
+| pyrometer sigma | 0.001 | 0.01 | **0.02** | **0.03** | 0.05 | 0.3 | 1.0 | 5.0 |
+|---|---|---|---|---|---|---|---|---|
+| enlarged worst angle | 24.90 | 25.50 | **25.92** | **25.83** | 25.48 | 24.99 | 24.98 | 24.97 |
+
+Stepping either way from 0.03 lowers the number, so the sweep **presents our
+choice as naturally optimal**. It was reassuring before it was run.
+
+There is a real mechanism behind the hump, and it is worth keeping: whitening
+divides each row by its noise, so an over-quiet pyrometer gets an enormous row
+that dominates the matrix - and one row, however loud, is still one direction,
+which cannot separate five faults. An over-noisy one vanishes and leaves two
+sensors. The optimum is the balance. **That finding is sound; using its peak as
+the default is what is not.**
+
+### (e) We labelled the defensible value as the stress case
+
+`RATIO_SETS` calls **[1, 1, 1] "equal noise"** a *"deliberate stress case"*. On
+the derivation above that set is **closer to the physically motivated value than
+our default is.**
+
+## Does it change the result?
+
+**Nothing structural.** At sigma = 1.0:
+
+- power/gas still **0.00 deg** - algebraic, noise-independent
+- instantaneous rank **3**, enlarged rank **5** - unchanged
+- enlarged worst angle **24.98 deg** against 25.83 - a loss of **0.85 deg**,
+  still 2.5x the 10 deg floor
+
+Every conclusion in the paper survives. The headline angle drops by under a
+degree.
+
+## Caveats on the derivation, for whoever picks this up
+
+The estimate above is a sketch and must be checked before it is used:
+
+- assumes both sensors are **shot-noise limited** with comparable photon budgets
+- treats the two pyrometer bands as **independent**
+- covers **random** noise only. Two-colour ratios genuinely do suppress
+  common-mode **systematic** drift (window fouling, emissivity), which whitening
+  does not model at all - so the "right" answer may differ by error type
+- narrow pyrometer bands collect **fewer** photons than the integrated
+  photodiode band, so `eps_band > eps_photodiode` and the true ratio is likely
+  **larger** than 1.06, not smaller
+- should be sanity-checked against a real two-colour pyrometer's published
+  noise-equivalent temperature difference
+
+## Change for draft 2
+
+1. **Derive the ratio properly** and report the derivation, replacing an
+   assertion with a number. An afternoon's work.
+2. **Set the sweep range from the derivation**, bracketing what the physics
+   permits rather than what we guessed.
+3. **Quote the headline at the defensible value** and report the favourable one
+   as the upper end - the opposite of the current presentation.
+4. If the derived value is near 1, **make [1,1,1] the study default** and
+   relabel 0.03 as the optimistic case.
+5. Keep the pyrometer-optimum finding; it is real and interesting. Report it as
+   a result about sensor specification, not as a justification for the default.
+
+That turns *"we assumed a number and swept around it"* into *"we derived a
+number, swept the range physics allows, and the conclusion holds throughout"* -
+which is what Section 3.6 already implies but does not do.
+
+---
+
+# E9. The paper claims four noise sets; the code contains three [E]
+
+## What draft 1 says
+
+Section 3.6 line 333 and Section 4.5 line 428 both say **four** assumption sets.
+
+## What is wrong
+
+`RATIO_SETS` in `src/route_b.py` contains **three**: study default, equal noise,
+fine pyrometer. The fourth, the coarse pyrometer at **[1, 1, 0.3]**, was
+computed ad hoc when the robustness table was generated and **never written into
+the code**.
+
+Our own files disagree too: `04-noise-position.md` says three,
+`05-validation-and-robustness.md` shows a four-row table, the paper says four.
+
+## Does it change the result?
+
+**No.** All four were reproduced and they agree, 24.97-25.83 deg. This is a
+**reproducibility** failure rather than a numerical one: a reader running the
+published code gets three sets and finds the paper describing an analysis its
+own code does not perform. That is the first thing a careful reviewer tests.
+
+## Change for draft 2
+
+Add `[1, 1, 0.3]` to `RATIO_SETS` - one line - and make the three documents
+agree. If E8 is acted on, the whole set list is being rebuilt anyway and this
+is subsumed.
+
+---
+
+# O1. The operating point is never stated [O]
+
+## What draft 1 says
+
+Nothing. `paper.tex` contains no mention of the laser power, scan speed or spot
+size the analysis is performed at. Grepping the source for "67", "spot", "D4" or
+"Gaussian" returns only the phrase "Gaussian heat source" in the model
+description and unrelated numeric matches.
+
+## What is wrong
+
+Every result in the paper is a linearisation about one operating point - AM
+Bench case 0, 285 W, 960 mm/s, 67 um D4-sigma spot, bare IN718 plate. A reader
+cannot tell this from the paper. They cannot reproduce the Jacobian, cannot
+judge whether the condition is representative of their machine, and cannot see
+that the analysis is local at all.
+
+This is the kind of omission a reviewer will catch and it is cheap to fix.
+
+## Does it change the result?
+
+**No** - and this has now been tested, which draft 1 could not claim because the
+sweep had never been run. Diagnosability recomputed at all seven benchmark cases
+plus five off-benchmark points:
+
+| operating point | inst rank | power/gas | enl rank | enl worst |
+|---|---|---|---|---|
+| **case 0 baseline (used)** | 3 | 0.00 | 5 | **25.83** |
+| case 1.1 small spot 49 um | 3 | 0.01 | 5 | 25.71 |
+| case 1.2 large spot 82 um | 3 | 0.00 | 5 | 25.65 |
+| case 2.1 fast 1.2 m/s | 3 | 0.00 | 5 | 29.34 |
+| case 2.2 slow 0.8 m/s | 3 | 0.00 | 5 | 29.03 |
+| case 3.1 high power 325 W | 3 | 0.00 | 5 | 29.34 |
+| case 3.2 low power 245 W | 3 | 0.00 | 5 | 29.34 |
+| off-bench 200 W | 3 | 0.00 | 5 | 29.34 |
+| off-bench 400 W | 3 | 0.00 | 5 | 26.41 |
+| off-bench 0.5 m/s | 3 | 0.00 | 5 | 29.34 |
+| off-bench 1.8 m/s | 3 | 0.00 | 5 | 29.34 |
+| off-bench spot 120 um | 3 | 0.01 | 5 | 26.89 |
+
+Instantaneous rank 3 and enlarged rank 5 everywhere; power/gas confounded at
+0.00-0.01 degrees everywhere; enlarged worst angle within 25.65-29.34 degrees.
+Case 0's 25.83 degrees sits near the **bottom** of that band, so the inherited
+operating point understates the result rather than flattering it.
+
+## Change for draft 2
+
+1. State the operating point in Section 3.1, one clause: *"...evaluated at the
+   benchmark's baseline condition, 285 W, 960 mm s^-1, 67 um D4-sigma spot."*
+2. Add one sentence to Section 4.5 reporting the sweep, since it closes what was
+   the study's largest untested assumption: *"Recomputing at all seven benchmark
+   conditions and five off-benchmark points leaves the instantaneous rank at 3,
+   the enlarged rank at 5 and the enlarged worst pair within 25.65-29.34
+   degrees."* This is a strengthening, not a concession.
+
+---
+
+# P1. Fixing the asserted profiles properly [P]
+
+S2 converts one profile from asserted to measured. This entry is the plan for
+the other four, and for the deeper problem that measuring them all would still
+not settle the question.
+
+## Level 1 - measure what can be measured
+
+| profile | status | route | effort |
+|---|---|---|---|
+| **gas** | **done** - see S2 | inverted from Weaver's pad scans | complete |
+| **layer** | **available now** | Liu et al. (2022) and the 2023 lock-in follow-up measure local powder layer thickness **in situ**. Their layer-to-layer spread gives the contrast **directly - no inversion, no model in the loop**, so it is cleaner than the gas result. | needs the full text, which is reachable with institutional access |
+| **geometry** | attempted, failed | needs an overhang or thin-wall dataset where preheat dominates, rather than a pad where remelting confounds it | moderate |
+| **speed** | bounded only | scanner tracking error against vector length is a standard measurement; Weaver cite turnaround work where "double-wide" melt pools form | moderate |
+| **power** | likely stays asserted | needs laser output stability over build-length timescales; no obvious benchmark source | hard, and matters least |
+
+Power carries the **smallest** asserted contrast (0.3 against 1.0 for layer) and
+the contrast sweep shows the binding pairs survive scaling to 0.33, so it is the
+right one to leave unmeasured.
+
+**Outcome of Level 1: two of five measured, three bounded by sweep.** Achievable
+for draft 2 and mostly reading rather than computing. The layer profile is the
+single highest-value item left in the whole project.
+
+## Level 2 - stop asserting, which is the actual fix
+
+**Even five perfectly measured profiles would not settle this**, because the
+profiles are **machine- and build-specific**. A different gas nozzle geometry, a
+different scan strategy or a different part produces different patterns. There
+is no universal set of five numbers to go and find.
+
+So the fix is not to measure harder. It is to change what the paper asserts:
+
+- report the result **as a function of profile strength** - which the contrast
+  sweep already half does, and which S2's margin figures strengthen
+- give the reader the **recipe to calibrate their own machine** - which is Part A
+  of `explainers/10-measuring-the-profiles.md`
+
+That converts the weakness into the contribution. The deliverable becomes *"here
+is the method, here is how you calibrate it for your machine, and here is how
+much pattern strength you need for it to work"* rather than *"here is the answer
+for the machine we assumed"*.
+
+**This is a reframing, not new computation.** No number changes. Sections 3.5,
+4.5 and 5.3 change emphasis, and the conclusions gain one sentence.
+
+## Level 3 - the requirement is weaker than the paper implies
+
+Worth stating because it changes what has to be measured at all.
+
+The collapse test (C3 in `05-validation-and-robustness.md`) shows the method
+does **not** need five accurate contrasts. It needs the patterns to be
+**distinct**, and it fails in only two specific cases: recoater sharing with gas
+(3.84 degrees) and speed sharing with gas (8.12 degrees).
+
+So the quantity that must be established on a given machine is not "how strong
+is each profile" but **"are the recoater, gas and speed signatures
+distinguishable here"**. That is a far weaker and far more achievable claim.
+
+**And half of it is already settled by measurement.** The Weaver data shows the
+gas signature alternating at **track** scale, while a recoater signature
+alternates at **layer** scale - different periodicities, which is exactly what
+Condition 1 requires. The recoater/gas half of the requirement is met by
+benchmark data, not by assumption.
+
+## Level 4 - what stays future work
+
+**No benchmark dataset with deliberately induced machine faults exists.** Until
+one does, no profile can be measured on a genuinely faulted build rather than
+inferred from a healthy one. Every inversion in S2 reads baseline behaviour in a
+normal build and extrapolates to a degradation.
+
+That experiment - a build with known, deliberately injected faults, monitored
+with a coaxial suite - is the natural follow-on and the only thing that would
+fully close the gap. The paper should name it as such rather than leaving the
+reader to infer it.
+
+## Recommendation
+
+**Do Level 1 for the layer profile, write the paper at Level 2, name Level 4 as
+future work, and use Level 3 to narrow what Level 1 has to achieve.**
+
+That is a stronger paper than one which got lucky with five correct guesses,
+because it is honest about what is machine-specific and it hands the reader
+something they can apply to their own equipment.
+
+**Decision needed before the S2 and E1 edits are finalised**, since Level 2
+changes the surrounding wording those edits sit in.
+
+---
+
+# S2. The gas profile can be measured, not asserted [S]
+
+## What draft 1 says
+
+Section 3.5, after the Weaver pad-scan paragraph:
+
+> "Because the remaining profiles are asserted, all results are reported against
+> swept profile contrast rather than at a single value."
+
+and Section 5.3:
+
+> "The modulation profiles are the largest remaining exposure. One is supported
+> by benchmark measurement, but by a measurement organised differently from the
+> regressor used here; the others are asserted."
+
+Draft 1 therefore uses the Weaver gas data **qualitatively only** - as evidence
+that a gas-related modulation exists. It never converts it to a number.
+
+## Why it is worth adding
+
+It converts. Inverting Weaver's measured depth changes through the model's depth
+channel gives the gas channel's effective severity at two scan directions inside
+one healthy build:
+
+| Weaver measurement | depth change | implied f_gas |
+|---|---|---|
+| perpendicular control | -3.6 % | **0.0467** |
+| parallel, weakest cross-section | -19.4 % | 0.2749 |
+| parallel, mean of four | **-27.2 %** | **0.4043** |
+| parallel, strongest | -31.5 % | 0.4817 |
+
+    swing = 0.4043 / 0.0467 = 8.66x      measured contrast  c = ln(8.66)/2 = 1.079
+    asserted gas profile    = 6.05x      asserted contrast  c = 0.90
+
+**The one profile that can be checked against measurement is understated by
+about 20 %, not overstated.** The paper currently claims less than its own data
+supports, in the direction that costs it credibility for no reason.
+
+Depth is the right channel to invert through: at the base case the model's depth
+error is +1.72 % (0.2x the measurement uncertainty) against -15.54 % on width
+(3.4x, and one-sided). Full derivation in
+`explainers/10-measuring-the-profiles.md`.
+
+## Does it change the result?
+
+**No number in the paper changes.** The profiles stay as they are; the sweep
+stays as it is. What changes is the standing of the largest assumption: from
+"asserted, defended by sweeping" to "one channel checked against benchmark
+measurement and found conservative, the rest defended by sweeping."
+
+It also **strengthens the robustness claim**. The sweep shows the binding pairs
+survive scaling to 0.33 of asserted strength; the measurement says the real gas
+contrast is 1.2x asserted. The margin is larger than draft 1 claims.
+
+## Change for draft 2
+
+1. In Section 3.5, replace the qualitative use of the Weaver result with the
+   inverted number: *"Inverting the measured depth changes through the model's
+   depth channel gives an effective gas severity swinging 8.7x within a single
+   build, against the 6.05x asserted here - so the assumed profile is
+   conservative relative to the one channel that can be checked."*
+2. Carry the three caveats verbatim: the measured driver is scan direction
+   rather than position along the gas axis; the measurement is of baseline plume
+   behaviour in a healthy build rather than of a fault; and the inversion is
+   model-mediated.
+3. In Section 5.3, change "one is supported by benchmark measurement" to "one
+   is quantitatively consistent with benchmark measurement, and conservatively
+   so".
+
+**Report the failure too.** The same inversion applied to the geometry profile
+returns f_geometry = 6.87, that is +687 K of preheat, which is not credible as a
+measurement: a pad differs from a single track by remelting of adjacent tracks as
+well as by preheat. Reporting only the channel that worked would be
+cherry-picking. The failure also surfaces something worth one line in the
+limitations - the model's preheat channel buys only +2.23 % depth per 100 K, so
+the paper's "per 100 K" geometry results may be quoted at an unrealistically
+small fault size.
+
+**Page cost.** Roughly a third of a column for the table and caveats. The
+qualitative Weaver paragraph it replaces already occupies about half of that.
+
+---
+
+# S1. Add the sensor correlation matrix [S]
+
+## What draft 1 says
+
+Section 4.3, `paper.tex` lines 375-381, opens the argument with the singular
+values:
+
+> "The whitened 3 x 5 Jacobian has singular values 3.451, 0.155 and 0.041 ---
+> rank 3, condition number 85 --- so two fault directions are unobservable, and
+> they are computable..."
+
+Correct, and nothing needs changing. But it asks the reader to accept an SVD
+before they are given any reason to believe the three sensors are redundant.
+
+## Why it is worth adding
+
+There is a plainer statement of the same fact, available one step earlier in the
+derivation and requiring no eigenvalue, no whitening argument and no SVD.
+
+Multiply the whitened Jacobian by its own transpose to get the 3 x 3
+sensor-against-sensor matrix, normalise it, and it is a correlation table:
+
+| | photodiode | camera | pyrometer |
+|---|---|---|---|
+| photodiode | 1.00000 | **0.99960** | **0.99508** |
+| camera | 0.99960 | 1.00000 | **0.99477** |
+| pyrometer | 0.99508 | 0.99477 | 1.00000 |
+
+**Three physically different instruments - a photodiode integrating band
+radiance, a camera measuring melt pool area in square metres, and a two-colour
+pyrometer reporting kelvin - respond to the five faults in patterns that agree
+to better than 99.4 %.**
+
+A reader who stops at that table already understands why the suite is
+rank-deficient, why a fourth melt-pool observable adds nothing, and why the
+paper's recommendation has to point upstream of the melt pool. The singular
+values then arrive as quantification of something already believed, rather than
+as the thing the reader is asked to take on faith.
+
+It also makes the design rule in Section 5.2 land harder. "A sensor reading the
+melt pool adds a row, not a direction" is an assertion in draft 1; with this
+table in hand it is the obvious reading of measured redundancy.
+
+## Evidence
+
+Derived in `explainers/09-where-the-singular-values-come-from.md`, Part B1. The
+diagonal is each sensor's total squared response (photodiode 5.18565, camera
+3.38626, pyrometer 3.36098, each equal to the sum of squares of its row of the
+whitened Jacobian), and the off-diagonal normalised by sqrt(A_ii A_jj) gives the
+correlations above.
+
+The same file records why the correlations are so high: 99.79 % of the total
+response energy (trace 11.932892) sits in the single largest eigenvalue
+11.907373.
+
+## Does it change the result?
+
+**No.** It is the same matrix the singular values already come from, presented
+one step earlier. No number changes. It is a presentation improvement, and the
+reason to log it is that it may be the single most persuasive object in the
+whole analysis and it currently appears nowhere in the paper.
+
+## Change for draft 2
+
+1. Insert the 3 x 3 correlation table at the start of Section 4.3, before the
+   singular values, with one sentence of the form: *"The three observables are
+   not independent: normalising the whitened Jacobian's sensor Gram matrix gives
+   pairwise correlations above 0.994."*
+2. Keep the singular values immediately after, now read as quantification rather
+   than assertion.
+
+**Page cost.** A 3 x 3 table with a short caption is roughly a third of a
+column. Candidates to displace, in order of preference: the unobservable-
+direction arithmetic in the same paragraph (lines 377-381) could be cut to its
+conclusion, since the factor of 85 is restated as the condition number anyway;
+or the segment-count sweep in Section 4.5 could lose two of its four values.
+
+**Related caution, same section.** The angles, the rank and the condition number
+all come from the same two Gram matrices and share their nonzero eigenvalues, so
+they are consistent by construction and cannot disagree. Draft 1 presents them
+in sequence in a way that could read as three independent confirmations. Adding
+this table makes the shared origin more visible, so the sequence should be
+worded to match - as quantification of one fact, not three lines of evidence.
+
+---
+
+# W1. Spot diameter used as the Gaussian sigma [W]
+
+## Where it happened
+
+Not in the paper. In an analysis script written during the session that produced
+the operating-point sweep in O1.
+
+## What is wrong
+
+Weaver et al. quote the spot size as a **D4-sigma diameter** ("laser spot size
+(Gaussian diameter) 67 um"). The `Beam` object wants the Gaussian standard
+deviation, sigma = D/4 = **16.75 um**. The script passed 67e-6 directly as
+sigma, a factor-of-four error corresponding to a 268 um spot.
+
+`src/eagar_tsai.py` provides `sigma_from_spot_diameter` for exactly this, and
+the `Beam` docstring warns: *"Use `sigma_from_spot_diameter` rather than
+guessing - a factor-of-two error in the spot convention will quietly wreck the
+calibration."* The warning was there and was not heeded.
+
+## How it was caught
+
+The first run of the operating-point sweep produced y(0) = 7.687e-03 for the
+photodiode and 2933 K for the pyrometer at case 0. The study's own values are
+8.383867e-03 and 3030.644 K. **Case 0 failed to reproduce the model it is the
+baseline of**, which is the one cross-check that could expose it. After the fix
+the sweep reproduces the study Jacobian at case 0 to `max|difference| = 0.00e+00`.
+
+## Does it change the result?
+
+**No.** The error never reached the paper. The corrected sweep is the one
+reported in O1, and the first table was discarded.
+
+## Change for draft 2
+
+None to the paper. Two process notes worth keeping:
+
+- Any script that recomputes the model at a new operating point must assert that
+  it reproduces the stored case-0 Jacobian before its output is trusted. That
+  single check caught a 4x error immediately.
+- When a quantity has two conventions in the literature (D4-sigma vs 1/e^2 vs
+  FWHM, radius vs diameter), pass it through the provided converter rather than
+  inline arithmetic.
+
+---
+
+# Still open, not yet errata
+
+Carried here so they are not lost. These are decisions, untested assumptions and
+loose ends rather than established defects.
+
+- **The sqrt(N) noise gain assumes independent segment-to-segment noise, and
+  nothing tests that.** Section 3.5 states: *"...which here lies between 0.109
+  and 0.136, so fitting N = 84 segments to five regressors buys roughly a
+  ninefold noise reduction."* That factor is sqrt(84) = 9.165, and it follows
+  from `Cov(r) = sigma_s^2 I` - the assumption that the noise on each segment is
+  independent of every other and of the same size. Real in-process noise need
+  not be: laser drift, a thermal transient across a build, or a slow detector
+  gain change would all correlate neighbouring segments, and correlated noise
+  averages down more slowly than sqrt(N). The true gain would then be smaller,
+  by an amount set by the correlation length relative to the 84 segments.
+  **What it would and would not touch:** nothing in the reported angles, rank or
+  condition number, which are invariant to a common scaling - the same argument
+  as in E1 of `explainers/07-coefficient-noise.md`. It would touch any absolute
+  statement about how quiet the enlarged observation is, and it would matter a
+  great deal for a detectability claim, which the paper is careful not to make.
+  The honest status is that this is an unexamined assumption in a sentence that
+  currently reads as a derived fact. Options for draft 2: soften "buys roughly a
+  ninefold noise reduction" to note the i.i.d. condition, or test it by imposing
+  a correlated noise model on the residuals and re-deriving the coefficient
+  covariance as `(G^T G)^-1 G^T Sigma G (G^T G)^-1` for a non-diagonal Sigma.
+  Not yet done either way.
+- **Class 3 is empty by construction.** The class-2 test allows an idealised
+  direct sensor with 5 % relative noise, which forces any pair containing the
+  measured fault to 83-84 degrees. Class 3 cannot be populated unless that
+  sensor is worse than about 247 % relative noise. "Nothing is structurally
+  irreducible for this suite" is therefore a property of the test, not a finding
+  about LPBF. A proposed redefinition - class 3 = *not resolvable by any
+  additional melt-pool observable* - would put power/gas into class 3 for
+  configurations A-D and make the matrix genuinely three-class. Decision pending.
+- **The term "structurally irreducible"** collides with the precise FDI sense of
+  "structural" used elsewhere in the same paper, where the matrix carries a
+  column reporting genuine structural isolability. Rename regardless of the
+  decision above.
+- **`matrix.classify()` cannot represent a configuration with a direct sensor.**
+  It takes only a sensor-name list, so configuration E is silently scored as C.
+  `commercial.py` handles it correctly and the paper's Table 1 is right, but the
+  function is a trap for reuse.
+- **Trapp et al. (2017)** still lacks volume and page numbers; the DOI is
+  confirmed, publisher hosts are unreachable from the build environment.
+- **The Reijonen comparison** proposed in Section 5.1 has not been carried out.
+  Their fitted speed exponent b is directly comparable to our Jacobian entry of
+  -0.483, and their power response to our +1.518. It could contradict the model.
+
+---
+
+# Applying S1, E4, E6 and E7: what it cost in page space
+
+Logged because the next person to apply an errata entry will hit the same wall.
+
+The four entries together **added** material to a paper that was already at
+exactly six pages: the correlation matrix (S1), a longer and more careful
+mechanism sentence (E4), and a Section 5.1 that now states its inclusion
+criterion, argues structurally and specifies the Reijonen test properly (E6,
+E7). That pushed it to seven pages, and roughly half a column had to be
+recovered from elsewhere.
+
+Where it came from, in the order it was tried:
+
+1. **Prose compression across fourteen passages** - Sections 1, 2.1, 2.2, 2.3,
+   3.1, 3.2, 3.5, 3.6, 4.4, 4.5, 4.6, 4.7, 5.2, 5.3 and the conclusions. No
+   claim, number or citation was removed; only wording. Worth about five lines
+   in total, which is far less than it feels like while doing it.
+2. **S1's table became a displayed matrix.** The 3x3 correlation table with a
+   float and caption cost about sixteen lines; `\begin{equation}` with the same
+   nine numbers costs about eight, and arguably reads better, since it shows the
+   object *is* the normalised Gram matrix rather than a table derived from one.
+   The sensor order moved into the sentence above it.
+3. **The bibliography was justified rather than ragged-right**, then set in
+   `\scriptsize` rather than `\footnotesize`. This is what actually closed the
+   gap - worth more than every prose trim combined, because fourteen references
+   at about four lines each is a large fixed block.
+
+**What did not work, and is worth knowing.** The matrix figure's width makes no
+difference anywhere between 0.60 and 0.90 of the column: the overflow is
+identical at both, because the float lands at the top of a column either way and
+the surrounding text fills the same space. Only below about 0.46 does it change
+the page count, and at that size the figure is illegible. It is now set at
+**0.90** - legible, and free. Float-driven page breaks are quantised; measuring
+"lines on page 7" after each small trim is misleading, because nothing moves
+until a threshold is crossed.
+
+**Remaining space position.** The paper is at six pages with no slack. S2 asks
+for roughly a third of a column (the inverted gas table and its caveats) and
+displaces the qualitative Weaver paragraph, which is about half of that, so S2
+costs about a sixth of a column net. P1 at Level 2 would rewrite Sections 3.5,
+4.5 and 5.3 and its page cost is not yet known. **Neither can be applied without
+finding space first**, and the cheap sources above are now spent.
+
+---
+
+# E10. The power/gas confound formula has the wrong sign [E]
+
+Found while checking which fault-space direction the whitened Jacobian cannot
+observe, during the E8 work.
+
+## What draft 1 says
+
+Section 4.2, `paper.tex`:
+
+> "Both faults act \emph{only} on the product (effective absorptivity $\times$
+> power), and the Eagar--Tsai temperature rise is linear in that product.
+> Choosing **$f_{\mathrm{gas}}=-\ln(1+f_{\mathrm{power}})$** therefore produces
+> an identical melt pool: the same temperature at every point, hence identical
+> readings from any instrument that could be built."
+
+## What is wrong
+
+The sign. Gas attenuates absorptivity as `A e^(-f_gas)` and power scales as
+`P (1 + f_power)`, so the product `A P` is unchanged when
+
+    (1 + f_power) * e^(-f_gas) = 1    =>    f_gas = +ln(1 + f_power)
+
+The draft has a minus sign, which **doubles** the perturbation instead of
+cancelling it.
+
+## Evidence
+
+Run directly against the model at f_power = +0.05:
+
+| f_gas | photodiode | camera | pyrometer |
+|---|---|---|---|
+| **+ln(1.05) = +0.048790** | ratio **1.00000000** | **1.00000000** | **1.00000000** |
+| -ln(1.05) = -0.048790 | ratio 1.13583360 | 1.12162113 | 0.99892087 |
+
+The absorptivity-power product confirms it: nominal 109.440, with f_gas = +0.0488
+it is 109.440 exactly, with f_gas = -0.0488 it is 120.658.
+
+The same conclusion from the null space of the whitened Jacobian: the direction
+(power +1, gas +1)/sqrt(2) lies **entirely** in the unobservable null space
+(projection 1.000000, response 1.8e-05 against 8.7e+00 for a plain power fault),
+while (power +1, gas -1)/sqrt(2) has only 0.325 of its norm there and a response
+of 1.24e+01. Power and gas are unobservable together when they move with the
+**same** sign, because their Jacobian columns are anti-parallel.
+
+## Does it change the result?
+
+**No.** Every reported quantity is right: the Jacobian column ratio of
+-0.99999 / -1.00000 / -0.99993, the 0.00-degree angle, the rank deficiency, the
+structural result. The formula was a one-line gloss on an identity the code never
+used - the code perturbs each fault separately and reads the columns.
+
+But it is a formula a reviewer can check in ten seconds, in the section making
+the paper's headline claim, and getting it backwards suggests not understanding
+one's own degeneracy.
+
+## Change for draft 2
+
+Applied. Section 4.2 now derives it rather than asserting it:
+
+> "Gas attenuates absorptivity as $A\,e^{-f_{\mathrm{gas}}}$ and power scales as
+> $P(1+f_{\mathrm{power}})$, so the product is unchanged whenever
+> $f_{\mathrm{gas}}=\ln(1+f_{\mathrm{power}})$, which produces an identical melt
+> pool --- the same temperature at every point, hence identical readings from any
+> instrument that could be built, verified to reproduce all three nominal
+> readings to eight significant figures."
+
+Showing the two factors and letting the cancellation fall out is both shorter and
+harder to get wrong than quoting the result.
+
+---
+
+# E8, resolved: the noise figures are now derived
+
+The entry above records the defect. This records the fix, which was large enough
+to touch nearly every number in the paper.
+
+Full derivation, with all intermediates, convergence checks and the before/after
+table: **`explainers/11-deriving-sensor-noise.md`**. Code: **`src/noise.py`**.
+
+## What was done
+
+One assumption - each radiometric channel carries the same fractional noise
+`eps` - and each instrument's chain propagated from there. Only ratios enter the
+whitening, so `eps` cancels and no absolute noise is claimed.
+
+| observable | derived sigma/eps | chain |
+|---|---|---|
+| photodiode | 1.0000 | its reading *is* a band-integrated radiometric power |
+| camera (area) | 0.1422 | eps is equivalent to a liquidus shift of eps/10.52, pushed through the real dimension solver |
+| pyrometer | 1.0612 | sqrt(2) eps on the ratio, divided by |dlnR/dlnT| = 1.333 |
+| camera_width | 0.0298 | steep lateral gradient |
+| camera_length | 0.1124 | shallow trailing edge, 3.8x worse localised |
+| photodiode_swir | 1.0000 | another band-integrated power |
+| pyrometer_wide | 0.3583 | separated bands recover sensitivity, |dlnR/dlnT| = 3.947 |
+
+**Derived 1 : 0.142 : 1.061 against the asserted 1 : 1 : 0.03.** Both free
+entries were wrong and in opposite directions: the draft made the pyrometer 35x
+too quiet and the camera 7x too noisy.
+
+## What it changed
+
+The full table is in the explainer. The ones that matter:
+
+- **Instantaneous class 1 went 5/10 to 0/10.** With the pyrometer no longer
+  granted a 35x precision advantage it stops dominating the whitened matrix, and
+  since all three rows are 99.5 % correlated the suite separates nothing per
+  segment. The paper's two-regime story gets *starker*: none per segment, all ten
+  over a build.
+- **Enlarged worst pair 25.83 -> 24.90 degrees.** Rank still 5, power/gas still
+  29.34, all ten pairs still clear the floor. The central claim is untouched.
+- **Seven observables now attain rank 3, not 4.** The fourth singular value sits
+  at 2e-7 of the leading one against the 1e-6 threshold. The paper now reports
+  the singular values and the threshold rather than the bare integer, since the
+  integer is the fragile part.
+- **Splitting the camera axes went from +13.40 to +23.89 degrees**, and is now
+  the only change that resolves anything per segment at all, 0/10 to 7/10. It
+  became the paper's strongest practical recommendation.
+- **The sensor correlation table did not move by a single digit**, because the
+  row scalings cancel in the normalisation. S1's table is invariant to the noise
+  assumption, which the paper now says explicitly.
+- **The permutation sweep narrowed from 17.13-30.58 to 24.89-25.29 degrees.**
+
+Weaker, and stated in the paper: the profiles must now be *strictly* distinct -
+every collapse falls below the floor, where the draft said only two did; the
+contrast margin is 2x rather than 2.5x; and the nonlinear margin at a +20 % fault
+is 12.82 degrees, 1.3x the floor rather than 2.2x.
+
+## The 0.03 was not arbitrary - it was an unstated limit
+
+Worth recording, because it is the fairest reading of what the draft did. The
+common-mode part of a real system's radiometric error **cancels in the
+pyrometer's ratio**, both bands sharing the optical path - that is why two-colour
+pyrometers exist. A system dominated by slow gain or emissivity drift rather than
+detection noise really would have a very quiet pyrometer, approaching 0.03.
+
+So 0.03 is the **gain-dominated limit, asserted without saying so**. For
+per-segment diagnosability the detection-noise limit is the right one, because
+gain is static over a segment and a shared bias does not discriminate between two
+fault hypotheses at the same operating point. Both limits are now swept, as two
+of the four assumption sets, along with the perimeter-averaged camera and the
+all-alike case. The old sweep was centred on the assumption it was meant to test
+(E8c); the new one brackets it.
+
+## Code consequences
+
+The noise figures were hardcoded in six places across five modules. They are now
+in `src/noise.py` alone, with `verify()` recomputing them from the model and
+asserting the stored values reproduce. That single file is what makes E9 - the
+paper claiming four assumption sets while the code held three - structurally
+unable to recur.
+
+`figures.py` also had the class counts written into a figure title in words
+("Five pairs need a measurement per segment"), which went stale the moment the
+noise changed. The title is now computed from the data.
+
+## Still open under E8
+
+- The derivation assumes independent noise on the two pyrometer channels. If an
+  instrument ratios them from a shared photocurrent the sqrt(2) is wrong.
+- `camera_width` and `camera_length` are whitened as independent while a
+  common-mode error correlates them perfectly. The honest treatment is a full
+  covariance rather than a diagonal; independence understates the split's value,
+  so the reported +23.89 degrees is a floor, but the correct number is unknown.
+- The perimeter-averaging factor sqrt(N_el) = 8.53 uses the simulation grid
+  spacing, which is not a camera's instantaneous field of view. It is swept, not
+  used, for that reason.
+
+---
+
+# E1, resolved: the conductivity coupling, re-derived after E8
+
+The original entry was written under the asserted noise figures and two of its
+three findings did not survive E8. Re-derived under the derived set:
+
+**Dead.** "speed/layer crosses the isolability floor inside the swept range" and
+"the instantaneous class-1 count of 5/10 depends on this one marginal pair".
+Under the derived noise, speed/layer runs 0.70--1.06 degrees across the whole
+coupling range, nowhere near the 10 degree floor, and the instantaneous count is
+0/10 at every value. The contingency E1 worried about was removed by E8, not by
+E1.
+
+**Confirmed and sharper.** At `layer_to_conductivity = 0` the layer fault joins
+the power/gas degeneracy **exactly**, and this is noise-independent because it is
+a statement about column direction:
+
+    c_k = 0.00   layer column / power column = [-0.044, -0.044, -0.043999]
+    c_k = 0.50   layer column / power column = [-0.385, -0.372, -0.332]
+
+The predicted net on the absorbed-power product is -0.230 + 0.186 = **-0.044**,
+which the three sensors reproduce to five figures. Power/layer and layer/gas both
+read 0.00 degrees: a **three-way** exact confound instead of a pair.
+
+**Confirmed, and now exact.** The enlarged worst pair is **24.90 degrees at
+every value of the coupling from 0 to 1.5**, and power/layer and speed/layer are
+constant to two decimals (36.26 and 46.16). The mechanism is unchanged: the
+coupling moves the layer column's *magnitude* by 23x (whitened norm 0.384 to
+9.003) while moving its *direction* by under a third of a degree, and angles
+depend only on direction.
+
+## Change for draft 2
+
+Applied. Section 3.2 now reads:
+
+> "The conductivity coupling remains an unmeasured estimate, swept across its
+> range in Section 4.5 with every accumulated-regime result invariant to it, but
+> it is load-bearing instantaneously: the other two channels nearly cancel on the
+> absorbed-power product ($-0.230+0.186=-0.044$), so without it the layer fault
+> acts only through that product and joins the power/gas degeneracy
+> *exactly* --- its Jacobian column becomes $-0.044$ times the power column on all
+> three sensors, and power/layer and layer/gas both read $0.00^\circ$. This one
+> unmeasured coupling is all that distinguishes a thin layer from a weak laser at
+> an instant."
+
+## The code fix, which was worse than the entry said
+
+`FaultCouplings` claimed conductivity was "by far the weakest of the three layer
+effects", quoting 3.4% / 1.6% / 0.35% depth changes at f = 0.2. Those do not
+reproduce. Re-measured, isolating each channel:
+
+| at f_layer = 0.2 | depth | width |
+|---|---|---|
+| absorptivity only | -2.57 % | -1.19 % |
+| enthalpy only | +2.12 % | +0.94 % |
+| conductivity only | -0.75 % | +1.16 % |
+| absorptivity + enthalpy | **-0.50 %** | **-0.23 %** |
+| all three | -1.25 % | +0.93 % |
+
+Because the first two nearly cancel, conductivity is the **dominant surviving
+channel**, not the weakest: it supplies -0.75 of the -1.25 net on depth, and on
+**width** - which is what the camera actually measures - it is five times the
+other two combined and **flips the sign** of the net. The docstring stated the
+opposite of the truth and now carries the table above.
+
+(The earlier errata re-measurement quoted -3.55 / +2.97 / -1.41. Those were
+measured on a different depth definition; the figures above are from the current
+code, isolating each coupling with the other two set to zero.)
+
+---
+
+# E3, resolved: a grid-independent replacement for the correlation
+
+The entry stands as written: +0.032 does not reproduce (the grid returns
+**+0.201**), the width correlation is not robust to the grid, and "two checks
+against data not used in the fit" was wrong for this one. All three are fixed.
+
+The interesting part is what replaced it. A Pearson coefficient answers "does
+this track VED" badly, because it depends on which region of parameter space is
+sampled:
+
+| grid | width r | depth r |
+|---|---|---|
+| sanity_checks 3x3x3 | **+0.201** | +0.767 |
+| benchmark spot range | **+0.644** | +0.860 |
+| benchmark P and v | **+0.677** | +0.877 |
+| wide spots | **-0.223** | +0.704 |
+| dense 4x4x3 | **+0.109** | +0.748 |
+
+Width swings from +0.68 to -0.22. Depth is stable. So the *comparative* claim
+survives every grid and the absolute one does not.
+
+**The exponents are a property of the model, not of the sample.** Each dimension
+follows a power law in (P, v, d) to R^2 >= 0.94 for width and depth, and VED =
+P/(v d^2) means a pure function of VED must have exponents along the ray
+(1, -1, -2). Measuring the angle to that ray:
+
+| dim | cos(exponents, VED ray) across five grids |
+|---|---|
+| **width** | **-0.107 to +0.002** - essentially orthogonal |
+| **depth** | **+0.642 to +0.736** |
+| length | +0.250 to +0.397 |
+
+Depth sits closer to the VED ray than width on **every** grid, where the
+correlation coefficient reverses sign across them.
+
+**The mechanism, which the correlation hides.** The fitted exponents are
+
+    width  ~ (P/v)^0.32 * d^(+0.38)
+    depth  ~ (P/v)^0.56 * d^(-0.14)
+    length ~ P^1.00     * v^(~0) * d^(~0)
+
+Both width and depth are near-functions of P/v; they differ in the **sign of the
+spot exponent**, and spot size is the one variable a volumetric density folds
+away. A bigger spot makes a wider but shallower pool, while VED treats it as
+reducing energy density - so depth follows VED's sign in d and width opposes it.
+That is why depth tracks VED and width does not, stated without reference to any
+grid.
+
+**Length corroborates Section 4.7 from a new direction.** Length goes as P^1.00
+with essentially no speed or spot dependence, which is the classic high-Peclet
+Rosenthal limit (Pe = 5.05 at the base case). So at constant energy density,
+where P and v scale together, length moves with P while width barely moves -
+independently reproducing the 2.53x against 1.11x result, and explaining why the
+two axes carry different information.
+
+## Change for draft 2
+
+Applied to Section 4.1, which now opens "One external check and one of internal
+structure", quotes the reproducible +0.20 / +0.77, states the grid sensitivity,
+and gives the cos values and the mechanism. The code fix is applied too:
+`sanity_checks.py` used a hardcoded `ABS = 0.35` instead of the calibrated 0.384,
+and now imports `IN718_ABSORPTIVITY`. A new `check_energy_density_exponents()`
+runs the five-grid exponent test so the paper's numbers come from the code.
+
+---
+
+# E11. An unsourced measurement in Section 3.5 [E]
+
+## What draft 1 says
+
+> "...on tracks scanned parallel to the gas flow relative to anti-parallel
+> tracks, against expanded uncertainties of **6--11 um on depths near 175 um**,
+> attributed to vapour-plume interaction with the laser."
+
+## What is wrong
+
+Neither figure is traceable. "175 um" and "6--11 um" appear nowhere in this
+project's records - not in the extraction table, not in the explainers, not in
+`calibrate.py`'s transcription of Weaver Table 4. The single-track figures that
+*are* recorded are different numbers (depth 139.7 um, U(k=2) = 14.1 um at case 0),
+and the pads are a different measurement from the single tracks.
+
+While applying S2 I first "corrected" 175 to 140 by substituting the single-track
+value, which is equally wrong for a different reason: it quotes a single-track
+depth as if it were a pad depth.
+
+## Does it change the result?
+
+**No.** The inversion uses the measured depth *percentages* (-3.6 %, -19.4 %,
+-27.2 %, -31.5 %), which are recorded and traceable. The absolute depth was
+context only.
+
+## Change for draft 2
+
+Applied: both figures are removed and the sentence now states the percentages
+and the control, plus the condition the inversion is performed at. An absolute
+pad depth should go back only if it can be read from the paper's own tables.
+
+---
+
+# W2. The keyhole correction evaluated on the wrong dimensions [W]
+
+## Where it happened
+
+Not in the paper. In the script that re-verified S2's gas inversion.
+
+## What is wrong
+
+`corrected_depth(beam, material, C, conduction_depth, conduction_width)` applies
+the Gladush-Smurov term only if `is_keyholing(width, depth)` passes. I passed the
+**model's** conduction dimensions (115.1 x 69.7 um), which fail the criterion, so
+the correction was silently inert and the function returned the bare conduction
+depth.
+
+The criterion is meant to be evaluated on the **measured** dimensions - its own
+docstring says so, "so that the criterion does not depend on the model being
+corrected". Case 0's measured 136.3 x 139.7 um passes it, and the correction adds
+72.40 um to the conduction depth's 69.70, giving 142.10 um against a measured
+139.7 - the **+1.72 %** the paper quotes.
+
+## How it was caught
+
+The gas channel's depth response came out at -2.79 % per f_gas = 0.05 where
+`explainers/10-measuring-the-profiles.md` recorded -3.85 %, and the inversion
+returned f_gas = 0.0645 against the recorded 0.0467. **A number that had been
+computed before stopped reproducing**, which is the check that mattered. I first
+suspected the explainer, then the D4-sigma bug of W1, then the operating point,
+before finding it was the regime criterion.
+
+With the correction active the response reproduces exactly: -3.85 %, -14.53 %,
+-26.96 % at f_gas = 0.05, 0.20, 0.40, and f_gas = 0.0467 / 0.2749 / 0.4043 /
+0.4817 for the four measurements. The keyhole term scales as A*P, so a gas fault
+attenuating absorptivity by exp(-f) scales it by exp(-f) too - which is *why* the
+response is steeper than conduction alone and why getting this wrong mattered.
+
+## Does it change the result?
+
+**No.** The error was mine, during verification; the explainer and the paper were
+right. Logged because the failure mode is subtle and will recur.
+
+## Change for draft 2
+
+None to the paper. One process note: `corrected_depth` takes the dimensions used
+for the regime test as arguments, which makes it easy to pass the wrong ones
+silently. It would be safer if it took the measured pair explicitly, or warned
+when the criterion fails on inputs that look like model output.
+
+---
+
+# P1, resolved: Level 2 adopted
+
+The recommendation was "do Level 1 for the layer profile, write the paper at
+Level 2, name Level 4 as future work, and use Level 3 to narrow what Level 1 has
+to achieve." Of these:
+
+**Level 2 is adopted, and is the main change.** The paper no longer presents one
+assumed profile set with a robustness sweep attached. Section 3.5 states that the
+profiles are machine-specific - a different nozzle, scan strategy or part gives
+different patterns, so there is no universal set of five to find - and Section 4.5
+now opens "Because the profiles are machine-specific, the primary result is
+separability *as a function of* profile strength". The S2 inversion is presented
+as the recipe a reader applies to their own machine, and the conclusions say so.
+
+**Level 4 is named.** Section 5.3: "no dataset yet offers a build with
+*deliberately induced* machine faults: every inversion here reads a healthy build
+and extrapolates, and that experiment is the natural follow-on."
+
+**Level 3 needed re-deriving and came out weaker.** The original argument was
+that the method needs only *distinct* patterns and fails in two specific cases.
+Under the derived noise figures every collapse falls below the floor, because
+forcing two profiles equal returns that pair to its instantaneous angle and all
+of those are now under 5 degrees. What survives is the part that matters: the
+requirement is distinctness, **not accuracy**, so what must be established on a
+given machine is "are these signatures distinguishable here", not "how strong is
+each of five profiles". The paper states it that way, and notes that the
+recoater/gas half is settled by the benchmark periodicity evidence.
+
+**Level 1 for the layer profile was not done.** It needs the full text of Liu et
+al. (2022) and the 2023 lock-in follow-up, which are not reachable from this
+machine. It remains the single highest-value item outstanding, and is now the
+only one.
+
+---
+
+# E11, partly retracted: "175 um" was traceable after all
+
+Amit supplied the Weaver full text. **The figure I removed as unsourced is in
+Table 5.** It is the Y-pad odd-track depth:
+
+| Y-pad cross-section | odd (anti-parallel) | even (parallel) | change |
+|---|---|---|---|
+| 0.6 mm | 175.2 | 120.0 | **-31.5 %** |
+| 1.5 mm | 175.1 | 123.5 | -29.5 % |
+| 1.9 mm | 174.0 | 124.7 | -28.3 % |
+| 2.9 mm | 170.1 | 137.1 | **-19.4 %** |
+| | | **mean** | **-27.2 %** |
+
+X-pad control (perpendicular): -2.41 % and -4.71 %.
+
+So "depths near 175 um" was correct. I could not verify it from this machine and
+removed it; that was over-cautious, and the entry as written -- "appears nowhere
+in this project" -- was true of our own records but drew the wrong conclusion
+about the source.
+
+**What was genuinely wrong** is the label. Draft 1 said "expanded uncertainties
+of 6-11 um". Table 5 reports **standard deviations**, and across all twelve rows
+they run **3.9-10.7 um**. Different quantity, slightly different range.
+
+**The whole gas inversion is now verified against its source.** The -27.2 %
+mean, the 19.4-31.5 % range and the 2.4-4.7 % control all reproduce exactly from
+Table 5 by direct computation. S2 stands.
+
+**What went into the paper:** "melt pool depth falling from 175 to 125 um ... a
+27.2 % mean reduction against standard deviations of 4-11 um". That says what
+the draft never let the reader see - the effect is about 50 um against a scatter
+of about 10 um, five times the noise.
+
+**Lesson, and it is not the obvious one.** "I cannot verify this" is not the same
+finding as "this is unsourced", and I conflated them. The right response to the
+first is to flag it and leave the number alone, or to get the source. Removing it
+was a silent loss of correct content. What justified removal was only the
+mislabelled uncertainty, which is a different defect.
+
+---
+
+# E12. The Reijonen check, performed [E]
+
+The check E7 specified has now been carried out, Amit having supplied the full
+text. **The model partly fails it.**
+
+## What Reijonen reports
+
+- Scan speed: `y = a x^-b`, with **b = 0.337 at 400 W** over 400-1200 mm/s
+- The trend **grows with laser power**: "almost non-existent" at 100 W
+- Laser power: **"Positive linear y = ax + b"** (their Table 2) - so there IS an
+  intercept, which settles E7(c); they do not quote its value
+- Material 316L, 30 um layers, 120 um hatch, 80 +/- 6 um beam
+- The TED photodiode is a **shortpass below 800 nm**; ours integrates 700-1000 nm
+
+## What our model gives, refitted over their range
+
+| power | our fitted b | theirs |
+|---|---|---|
+| 100 W | 0.501 | ~0 |
+| 200 W | 0.414 | - |
+| 285 W | 0.439 | - |
+| 400 W | **0.468** | **0.337** |
+
+**Magnitude: 39 % too steep** at the one power they quote.
+**Trend: not reproduced at all.** Theirs grows strongly with power; ours is flat.
+
+## Why, and this is the part worth keeping
+
+Reijonen's own Table 2 attributes the speed dependence to the **vapour plume**:
+the trend holds only "if gas flow speed is high and constant", and at low power,
+"corresponding to conduction mode melting there is no vapor plume, and in such
+conditions, the shielding gas flow speed has no impact on the photodiode signal."
+
+**The trend IS the plume appearing as power rises.** Our model has:
+
+- no plume emission at all - gas only attenuates
+- attenuation independent of power and speed
+
+So there is no mechanism by which `b` could grow with power. **We assumed away
+exactly the physics their measurement resolves.**
+
+## What it costs and what it buys
+
+**Costs:** the only external check on our sensor model is now a partial failure,
+and the paper says so.
+
+**Buys:** that same assumption - plume attenuation independent of power and
+speed - is what makes the power/gas degeneracy *exact*. Reijonen measures the
+real attenuation depending on both, and reversing sign with scan speed at low
+gas flow. So **the 0.00 degrees is an upper bound on external evidence**, where
+Section 5.3 previously asserted it. That is a real strengthening of the paper's
+most-scrutinised claim.
+
+## Caveats, recorded so they are not re-derived
+
+Against the comparison: different material (316L vs IN718), different band
+(shortpass <800 nm vs 700-1000 nm), powder bed vs bare plate.
+
+In the model's defence: it is calibrated at 285 W where all seven benchmark
+cases keyhole (aspect ratios 1.45-4.28), so the fixed optical depth is a local
+approximation *inside* the regime where a plume exists, not a claim about
+conduction-mode melting. Reijonen's "no plume at 100 W" does not contradict us at
+our operating point; it contradicts us if the model is extrapolated downward.
+
+## Still open
+
+The power-response comparison remains unresolvable: their fit is linear with an
+unquoted intercept, and relative sensitivity `aP/(aP+b)` equals one only through
+the origin. Reading points off their Figs. 2 and 6 suggests the intercept is
+small relative to `aP` at 285 W, so their relative sensitivity is near 1 against
+our +1.52 - but that is eyeball estimation from a figure and is not quotable. The
+data is "available on request" per their data-availability statement.
+
+---
+
+# E13. The profiles were never tested against following the wrong driver [E]
+
+Raised by Liu et al. (2022), supplied by Amit. Not a defect in any number - a
+gap in what the robustness section tested.
+
+## The gap
+
+A modulation profile can be wrong in three ways. Draft 1 tested two:
+
+| failure mode | tested by | result |
+|---|---|---|
+| too weak | contrast sweep | survives to 50 % of assumed strength |
+| swapped between faults | all 120 permutations | survives every one |
+| **follows the wrong build variable** | **nothing** | **not tested** |
+
+## Why Liu raises the third
+
+We assert the layer fault follows the **recoater cycle** - worse on alternate
+layers, which is the `layer_sync` regressor. Liu measures local powder layer
+thickness in a real build and finds the variation organised by **part support**:
+the unsupported edge of an overhang thins progressively, from about 100 um
+against 200 um at the specimen centre, then collapsing from layer 180 to
+breakthrough at 212.
+
+`support_depth` is the **geometry** fault's driver. If the layer fault loads on
+it too, the two approach a shared profile - and the collapse test says that pair
+falls to roughly 5 degrees, below the floor.
+
+Liu also shows the thinning growing with layer index, a monotonic drift, which
+is the **power** fault's driver (`build_index`). So there are two contamination
+routes, not one.
+
+## The measurement
+
+Mixing a fraction alpha of the contaminating driver into the layer profile and
+renormalising:
+
+| alpha | (a) layer/geometry | (b) power/layer | worst pair |
+|---|---|---|---|
+| 0.0 | 40.54 | 36.26 | 24.90 |
+| 0.4 | 29.99 | 26.25 | 24.90 |
+| 0.6 | 22.00 | 21.24 | 22.00 |
+| 0.8 | **12.21** | 17.82 | 12.21 |
+| 0.9 | **7.23** | 17.38 | 7.23 |
+| 1.0 | 5.36 | **18.02** | 5.36 |
+
+**Route (a) tolerates about 85 %** before layer/geometry crosses the floor. The
+headline degrades from about alpha = 0.55, where layer/geometry overtakes
+power/speed as the binding pair.
+
+**Route (b) never fails**, even at alpha = 1 where the two faults follow the
+identical variable. The reason is structural and worth keeping: every profile is
+rescaled to unit mean, so each is "1 plus a varying part", and two faults on the
+same driver give (1, a) and (1, b). Those are non-proportional wherever a != b.
+Layer and power carry contrasts 1.0 and 0.3, so they stay distinguishable.
+**Sharing a driver is not sharing a profile, provided the strengths differ.**
+
+## Does it change a result?
+
+**No.** Nothing in the paper moves. It closes a hole in the robustness argument,
+and the answer is favourable on both routes.
+
+## One distinction the entry should keep
+
+Liu measures *baseline* layer-thickness variation. Our fault is a *recoater
+short-feed*, which is a recoater mechanism and follows the recoater cycle. They
+are different phenomena affecting the same quantity, and they interact -
+distortion thins the powder, which worsens overheating, which worsens distortion.
+So alpha for a short-feed fault is probably well below 0.5, against a tolerance
+of 0.85. The risk is real but second-order.
+
+## Change for draft 2
+
+Applied to Section 4.5, after the distinctness paragraph:
+
+> "Distinctness also tolerates a profile being attributed to the wrong build
+> variable, which matters because measured layer-thickness variation is reported
+> to follow part support rather than the recoater cycle assumed here. Mixing the
+> geometry fault's support driver into the layer profile leaves layer/geometry
+> above the floor until that profile is roughly 85 % support-driven (12.21
+> degrees at 80 %), and mixing the power fault's build-drift driver never brings
+> power/layer below it at any fraction, since every profile is normalised to
+> unit mean and two faults sharing a driver still differ wherever their
+> contrasts do."
+
+## Note on alpha = 1 versus the collapse test
+
+At alpha = 1 the layer profile is built from the geometry driver with both
+contrasts at 1.0, so it should reproduce the collapse test exactly. It gives
+5.36 degrees against the collapse test's 4.63. The difference is the
+renormalisation used in the sweep script against `_range_normalise` in
+`observables.py`. Both are below the floor and the conclusion is unaffected, but
+the two numbers are not interchangeable and should not be quoted as if they were.
+
+---
+
+# E14. The 0.00-degree confound is exact only because gas has one channel [E]
+
+Found while re-examining whether Reijonen et al. (2020) was safe to drop for
+space. It was not, and the reason is the most substantive finding from the three
+uploaded papers.
+
+## What the paper claims
+
+Power and gas are confounded at **0.00 degrees**, "by algebra rather than noise",
+because both act only on the product (absorptivity x power). That is the paper's
+headline result.
+
+## The observation that undermines its exactness
+
+Reijonen (2024) cites their own 2020 work for this:
+
+> "loss of penetration and **increased melt pool width** was associated with
+> **reduced gas flow speeds** due to laser attenuation and **scattering** in the
+> plume."
+
+Reduced gas flow -> **wider** pool. Our model gives the opposite:
+
+| f_gas | width | depth | length |
+|---|---|---|---|
+| 0.0 | 115.12 um | 142.10 | 415.47 |
+| 0.2 | -5.00 % | -14.53 % | -17.25 % |
+| 0.4 | **-9.97 %** | -26.96 % | -31.08 % |
+
+**A sign disagreement on the width channel**, which is the informative one (E4).
+
+## Why it happens
+
+Our gas fault is an optical depth: it attenuates, so less power reaches the pool
+and everything shrinks. A real plume does two things - attenuates (all dimensions
+down) and **scatters**, broadening the beam (width up, depth down). On depth the
+two agree; on width they oppose, and experiment says broadening wins.
+
+## Why it matters more than a sign
+
+**The exact degeneracy exists precisely because gas has only one channel.** Gas
+acts on absorbed power; power acts on absorbed power; the Jacobian columns are
+anti-parallel and the angle is zero. Give gas a *second* channel that power
+lacks - effective spot size - and the degeneracy must break.
+
+## The measurement
+
+Modelling the scattering as sigma -> sigma * exp(k * f_gas):
+
+| k | width at f=0.4 | power/gas | worst pair |
+|---|---|---|---|
+| 0.00 (model as it stands) | **-9.97 %** | **0.00** | 0.00 |
+| 0.50 | -2.12 % | 1.25 | 0.32 |
+| **0.75** (width sign reverses) | **+2.22 %** | **2.05** | 0.32 |
+| 1.00 | +6.95 % | 3.01 | 0.32 |
+| 1.50 | +16.81 % | 5.61 | 0.32 |
+
+## What this does and does not cost
+
+**Costs:** the word "exactly" is a property of the model, not of the process. At
+the broadening needed to match the observed width sign, the pair sits at about
+2-3 degrees, not 0.
+
+**Does not cost:** 2-3 degrees against a 10-degree floor is still confounded in
+practice, and the suite's **worst pair does not move at all** (0.32 degrees, a
+different pair). So no class changes, no count changes, no conclusion changes.
+
+**Buys:** Section 5.3 previously asserted "the reported 0.00 degrees is an upper
+bound". It is now a measured sensitivity with a named mechanism and a citation.
+
+## Change for draft 2
+
+Applied to Section 5.3, and **Reijonen et al. (2020) is restored to the
+bibliography** - it had been dropped for space when its claim was compressed to
+a passing remark, and it is now the only source for the width-sign observation.
+
+Frisk et al. (2017) stays out: a tools paper whose methodological claim
+Krysander (2008) carries.
+
+## The pattern across all three uploaded papers
+
+Each source identifies more physical channels than this model represents, and in
+each case the omission runs in the conservative direction:
+
+| source | their mechanism | ours |
+|---|---|---|
+| Weaver (2024) | attenuation, scattering **and lensing** | attenuation |
+| Reijonen (2024) | plume emission + power- and speed-dependent obstruction | neither |
+| Reijonen (2020) | attenuation **and scattering** -> width up | attenuation -> width down |
+| Liu (2022) | layer thickness driven by support **and** layer index | recoater cycle |
+
+Worth stating once in the paper rather than four times.

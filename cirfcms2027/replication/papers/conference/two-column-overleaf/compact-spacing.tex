@@ -1,0 +1,56 @@
+%% ===========================================================================
+%% compact-spacing.tex
+%%
+%% Vertical compaction for the Procedia CIRP (elsarticle, 5p twocolumn)
+%% layout. Put \input{compact-spacing} immediately BEFORE \begin{document}.
+%%
+%% Purpose: recover column space at submission without cutting text. The
+%% publisher re-typesets from source at proof stage, so this affects only the
+%% submitted PDF. Keep it in one block so it can be deleted in one edit.
+%%
+%% Measured on paper_rechecked.tex (7 pages, 6 sections + 18 subsections):
+%%   elsarticle default            reference
+%%   stretch removed only          131 pt recovered (~11 body lines)
+%%   headings tightened            243 pt recovered (~21 body lines)
+%%   + displays and floats         255 pt recovered (~22 body lines)
+%% No new overfull boxes; one fewer underfull vbox than the default.
+%%
+%% elsarticle.cls defaults, for reference (\@startsection arguments 4 and 5
+%% are the space above and below the heading):
+%%   \section        above 18pt +6 -3    below 9pt +6 -3
+%%   \subsection     above 12pt +6 -3    below 3pt +6 -3
+%%   \subsubsection  above 12pt +6 -3    below 1pt
+%% The "+6pt" on the below-skip is the main cost: under a flush-bottom
+%% two-column layout LaTeX spends that stretch on nearly every heading.
+%% ===========================================================================
+
+\makeatletter
+
+\renewcommand\section{\@startsection{section}{1}{\z@}%
+           {10\p@ \@plus 2\p@ \@minus 3\p@}%   % above (default 18pt +6 -3)
+           {4\p@ \@minus 1\p@}%                % below (default  9pt +6 -3)
+           {\normalsize\bfseries\boldmath}}
+
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+           {7\p@ \@plus 2\p@ \@minus 2\p@}%    % above (default 12pt +6 -3)
+           {1\p@}%                             % below (default  3pt +6 -3)
+           {\normalfont\normalsize\itshape}}
+
+\renewcommand\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+           {7\p@ \@plus 2\p@ \@minus 2\p@}%
+           {0.5\p@}%
+           {\normalfont\normalsize\itshape}}
+
+\makeatother
+
+% Displayed equations.
+\setlength{\abovedisplayskip}{4pt plus 1pt minus 2pt}
+\setlength{\belowdisplayskip}{4pt plus 1pt minus 2pt}
+\setlength{\abovedisplayshortskip}{2pt plus 1pt minus 1pt}
+\setlength{\belowdisplayshortskip}{3pt plus 1pt minus 1pt}
+
+% Floats and captions.
+\setlength{\textfloatsep}{8pt plus 2pt minus 2pt}
+\setlength{\intextsep}{8pt plus 2pt minus 2pt}
+\setlength{\abovecaptionskip}{4pt}
+\setlength{\belowcaptionskip}{0pt}

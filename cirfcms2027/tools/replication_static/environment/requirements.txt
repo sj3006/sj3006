@@ -1,0 +1,6 @@
+# Versions with which every result in this package was produced and checked
+# (November 2026, Linux x86-64, Python 3.13.18). Older releases may work;
+# numpy must be 2.0 or later (the code uses numpy.trapezoid).
+numpy==2.5.3
+scipy==1.18.1
+matplotlib==3.11.2

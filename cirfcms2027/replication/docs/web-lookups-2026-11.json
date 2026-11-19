@@ -1,0 +1,1020 @@
+[
+ {
+  "ts": "2026-11-15T20:01:04.752Z",
+  "tool": "WebSearch",
+  "q": "Angelopoulos Bates gentle introduction conformal prediction distribution-free uncertainty quantification",
+  "prompt": null,
+  "links": [
+   {
+    "title": "A Gentle Introduction to Conformal Prediction and Distribution-Free Uncertainty Quantification",
+    "url": "https://aitopics.org/doc/arxivorg:537187EC"
+   },
+   {
+    "title": "Conformal Prediction: A Gentle Introduction",
+    "url": "https://bohrium.dp.tech/paper/arxiv/1203.5422"
+   },
+   {
+    "title": "arxiv.org",
+    "url": "https://arxiv.org/abs/2107.07511v4"
+   },
+   {
+    "title": "arxiv.org",
+    "url": "https://arxiv.org/abs/2107.07511v6"
+   },
+   {
+    "title": "License: arXiv.org perpetual non-exclusive license",
+    "url": "https://arxiv.org/html/2107.07511v6"
+   },
+   {
+    "title": "gentle intro",
+    "url": "https://people.eecs.berkeley.edu/~angelopoulos/blog/posts/gentle-intro"
+   },
+   {
+    "title": "www.emergentmind.com",
+    "url": "https://www.emergentmind.com/papers/2107.07511.md"
+   },
+   {
+    "title": "ar5iv.labs.arxiv.org",
+    "url": "https://ar5iv.labs.arxiv.org/html/2107.07511"
+   },
+   {
+    "title": "A Gentle Introduction to Conformal Prediction and Distribution-Free Uncertainty Quantification",
+    "url": "https://tldr.takara.ai/p/2107.07511"
+   },
+   {
+    "title": "A Gentle Introduction to Conformal Prediction and Distribution-Free",
+    "url": "https://fugumt.com/fugumt/paper_check/2107.07511v1_enmode"
+   }
+  ],
+  "ok": true,
+  "excerpt": ""
+ },
+ {
+  "ts": "2026-11-15T20:01:14.847Z",
+  "tool": "WebSearch",
+  "q": "Chow 1970 optimum character recognition reject option IEEE Transactions Information Theory",
+  "prompt": null,
+  "links": [
+   {
+    "title": "\u2022 DocumentCode",
+    "url": "https://search.isc.ac/inventory/49/913313.htm"
+   },
+   {
+    "title": "DocumentCode :",
+    "url": "https://manuscript.isc.ac/Inventory/49/913313.htm"
+   },
+   {
+    "title": "58ba4fd7 b463 41e2 a3f1 3fcae0784853",
+    "url": "https://cs.reviewer.ly/app/publication/58ba4fd7-b463-41e2-a3f1-3fcae0784853"
+   },
+   {
+    "title": "On optimum recognition error and reject tradeoff",
+    "url": "https://scilit.net/publications/658ce4ef3a82419c5e0f8499ced57d4f"
+   },
+   {
+    "title": "EP 0320663 A3 19911023 - METHOD AND APPARATUS FOR CHARACTER RECOGNITION SYSTEMS",
+    "url": "https://data.epo.org/gpi/EP0320663A3"
+   },
+   {
+    "title": "1977 agrawala machinerecognitionofpatterns",
+    "url": "https://gwern.net/docs/ai/1977-agrawala-machinerecognitionofpatterns.djvu"
+   },
+   {
+    "title": "DocumentCode :",
+    "url": "https://manuscript.isc.ac/Inventory/49/1352898.htm"
+   },
+   {
+    "title": "An optimum character recognition system using decision functions",
+    "url": "https://scilit.com/publications/e1726a2116ab2811242bee58d03ca7df"
+   },
+   {
+    "title": "Application of optimum error-reject functions (Corresp.)",
+    "url": "https://www.bohrium.com/paper-details/application-of-optimum-error-reject-functions-corresp/812352847822716928-2561"
+   },
+   {
+    "title": "1957 chow",
+    "url": "https://www.Gwern.net/doc/ai/highleyman/1957-chow.pdf"
+   }
+  ],
+  "ok": true,
+  "excerpt": ""
+ },
+ {
+  "ts": "2026-11-15T20:01:26.962Z",
+  "tool": "WebSearch",
+  "q": "large language models overconfident calibration verbalized confidence hallucination benchmark 2024",
+  "prompt": null,
+  "links": [
+   {
+    "title": "Can LLMs Express Their Uncertainty? An Empirical Evaluation of Confidence Elicitation in LLMs",
+    "url": "https://arxiv.org/pdf/2306.13063"
+   },
+   {
+    "title": "ConfidenceBench: Evaluating Confidence Calibration",
+    "url": "https://www.alphaxiv.org/abs/2607.20526.md"
+   },
+   {
+    "title": "ConfidenceBench: Evaluating Confidence Calibration in Large Language Models",
+    "url": "https://www.alphaxiv.org/abs/2607.20526"
+   },
+   {
+    "title": "2024.trustnlp 1.13",
+    "url": "https://aclanthology.org/2024.trustnlp-1.13.pdf"
+   },
+   {
+    "title": "arxiv.org",
+    "url": "https://arxiv.org/abs/2405.02917v1"
+   },
+   {
+    "title": "arxiv.org",
+    "url": "https://arxiv.org/html/2306.13063v2"
+   },
+   {
+    "title": "alphaxiv.org",
+    "url": "https://alphaxiv.org/overview/2412.14737v1"
+   },
+   {
+    "title": "api.emergentmind.com",
+    "url": "https://api.emergentmind.com/papers/2405.02917"
+   },
+   {
+    "title": "Overconfidence is Key: Verbalized Uncertainty Evaluation in Large Language and Vision-Language Models",
+    "url": "https://arxiv.org/html/2405.02917v1"
+   },
+   {
+    "title": "Overconfidence is Key: Verbalized Uncertainty Evaluation in Large Language and Vision-Language Models",
+    "url": "https://ar5iv.labs.arxiv.org/html/2405.02917"
+   }
+  ],
+  "ok": true,
+  "excerpt": ""
+ },
+ {
+  "ts": "2026-11-15T20:01:38.708Z",
+  "tool": "WebSearch",
+  "q": "large language model agents manufacturing process monitoring digital twin review 2024 2025",
+  "prompt": null,
+  "links": [
+   {
+    "title": "[Literature Review] Leveraging LLM Agents and Digital Twins for Fault Handling in Process Plants",
+    "url": "https://www.themoonlight.io/review/leveraging-llm-agents-and-digital-twins-for-fault-handling-in-process-plants"
+   },
+   {
+    "title": "publications.aston.ac.uk",
+    "url": "https://publications.aston.ac.uk/id/eprint/47252"
+   },
+   {
+    "title": "integrating large language model and digital twins in the context",
+    "url": "https://research.aston.ac.uk/en/publications/integrating-large-language-model-and-digital-twins-in-the-context/"
+   },
+   {
+    "title": "inc.kmutt.ac.th",
+    "url": "https://inc.kmutt.ac.th/download/capstone_design_projects/2568/20.pdf"
+   },
+   {
+    "title": "aisel.aisnet.org",
+    "url": "https://aisel.aisnet.org/acis2025/226"
+   },
+   {
+    "title": "s42524 026 5273 5",
+    "url": "https://journal.hep.com.cn/fem/EN/PDF/10.1007/s42524-026-5273-5"
+   },
+   {
+    "title": "[Literature Review] Leveraging LLM Agents and Digital Twins for Fault Handling in Process Plants",
+    "url": "https://www.themoonlight.io/en/review/leveraging-llm-agents-and-digital-twins-for-fault-handling-in-process-plants"
+   },
+   {
+    "title": "Leveraging Large Language Models for Enhanced Digital Twin Modeling:",
+    "url": "https://arxiv.org/html/2503.02167v1"
+   },
+   {
+    "title": "July 31, 2025",
+    "url": "https://falkor.com/blog/the-new-intelligence-layer-transforming-the-chemical-industry-agentic-ai-meets-digital-twins"
+   },
+   {
+    "title": "synapsesocial.com",
+    "url": "https://synapsesocial.com/papers/W4415334576"
+   }
+  ],
+  "ok": true,
+  "excerpt": ""
+ },
+ {
+  "ts": "2026-11-15T20:01:49.978Z",
+  "tool": "WebFetch",
+  "q": "https://doi.org/10.1016/j.rcim.2025.102982",
+  "prompt": "Report the exact title, all author names, journal name, volume, article number and year of this paper. Quote the title verbatim.",
+  "links": [],
+  "ok": true,
+  "excerpt": "getaddrinfo ENOTFOUND doi.org. In this cloud session a host fails to resolve like this when it is outside the session's allowed network domains, or does not exist. If another host has failed the same way, stop trying more sites: carry on without them, and say in your answer that doi.org has to be al"
+ },
+ {
+  "ts": "2026-11-17T15:19:55.976Z",
+  "tool": "WebSearch",
+  "q": "Grasso Colosimo \"Process defects and in situ monitoring methods in metal powder bed fusion\" review Measurement Science and Technology 2017",
+  "prompt": null,
+  "links": [
+   {
+    "title": "Grasso colosimo Review PBF revised 3",
+    "url": "https://re.public.polimi.it/bitstream/11311/1024010/7/Grasso_colosimo_Review_PBF_revised_3.pdf"
+   },
+   {
+    "title": "In-situ measurement and monitoring methods for metal powder bed fusion: an updated review. (15th July 2021)",
+    "url": "https://eld.bl.uk/catalog/100139286632_0x000001"
+   },
+   {
+    "title": "re.public.polimi.it",
+    "url": "https://re.public.polimi.it/handle/11311/1024010"
+   },
+   {
+    "title": "re.public.polimi.it",
+    "url": "https://re.public.polimi.it/handle/11311/1178140"
+   },
+   {
+    "title": "re.public.polimi.it",
+    "url": "https://re.public.polimi.it/handle/11311/1149643"
+   },
+   {
+    "title": "re.public.polimi.it",
+    "url": "https://re.public.polimi.it/handle/11311/1196614"
+   },
+   {
+    "title": "A%20review%20of%20the%20current%20state of the art%20on%20in%20situ%20monitoring%20in%20electron%20beam%20powder%20bed%20fusion",
+    "url": "https://re.public.polimi.it/retrieve/7fe3de7d-8b0c-4f79-90d9-e2391dd464df/A%20review%20of%20the%20current%20state-of-the-art%20on%20in%20situ%20monitoring%20in%20electron%20beam%20powder%20bed%20fusion.pdf"
+   },
+   {
+    "title": "Process defects and in situ monitoring methods in metal powder bed fusion: a review",
+    "url": "https://vufind-test.katalog.k.utb.cz/SummonRecord/FETCH-LOGICAL-c365t-5c434ee4a82f1572981219b00e9cae97692f7f8964403b9a7aa9a487b38dac593"
+   },
+   {
+    "title": "Process defects and in situ monitoring methods in metal powder bed fusion: a review",
+    "url": "https://vufind-test.katalog.k.utb.cz/SummonRecord/FETCH-LOGICAL-c365t-5c434ee4a82f1572981219b00e9cae97692f7f8964403b9a7aa9a487b38dac593/Details"
+   },
+   {
+    "title": "Process defects and in situ monitoring methods in metal powder bed fusion: a review",
+    "url": "https://vufind-test.katalog.k.utb.cz/SummonRecord/FETCH-LOGICAL-c365t-5c434ee4a82f1572981219b00e9cae97692f7f8964403b9a7aa9a487b38dac593/UserComments"
+   }
+  ],
+  "ok": true,
+  "excerpt": ""
+ },
+ {
+  "ts": "2026-11-17T15:20:04.816Z",
+  "tool": "WebFetch",
+  "q": "https://re.public.polimi.it/handle/11311/1024010",
+  "prompt": "Report the exact title, all authors, journal name, volume, issue, article number or page range, year and DOI of this publication. Quote the bibliographic record verbatim.",
+  "links": [],
+  "ok": true,
+  "excerpt": "getaddrinfo ENOTFOUND re.public.polimi.it. In this cloud session a host fails to resolve like this when it is outside the session's allowed network domains, or does not exist. If another host has failed the same way, stop trying more sites: carry on without them, and say in your answer that re.publi"
+ },
+ {
+  "ts": "2026-11-17T15:20:07.229Z",
+  "tool": "WebSearch",
+  "q": "\"Grasso\" \"Colosimo\" 2017 \"Measurement Science and Technology\" volume 28 044005 powder bed fusion review citation",
+  "prompt": null,
+  "links": [
+   {
+    "title": "Process defects and in situ monitoring methods in metal powder bed fusion: a review",
+    "url": "https://vufind-test.katalog.k.utb.cz/SummonRecord/FETCH-LOGICAL-c365t-5c434ee4a82f1572981219b00e9cae97692f7f8964403b9a7aa9a487b38dac593/Details"
+   },
+   {
+    "title": "Process defects and in situ monitoring methods in metal powder bed fusion: a review",
+    "url": "https://vufind-test.katalog.k.utb.cz/SummonRecord/FETCH-LOGICAL-c365t-5c434ee4a82f1572981219b00e9cae97692f7f8964403b9a7aa9a487b38dac593"
+   },
+   {
+    "title": "Process defects and in situ monitoring methods in metal powder bed fusion: a review",
+    "url": "https://vufind-test.katalog.k.utb.cz/SummonRecord/FETCH-LOGICAL-c365t-5c434ee4a82f1572981219b00e9cae97692f7f8964403b9a7aa9a487b38dac593/UserComments"
+   },
+   {
+    "title": "0In situ%20measurement%20and%20monitoring%20methods%20for%20metal%20powder%20bed%20fusion%20%E2%80%93%20an%20updated%20review",
+    "url": "https://re.public.polimi.it/bitstream/11311/1178140/1/0In-situ%20measurement%20and%20monitoring%20methods%20for%20metal%20powder%20bed%20fusion%20%E2%80%93%20an%20updated%20review.pdf"
+   },
+   {
+    "title": "www.euspen.eu",
+    "url": "https://www.euspen.eu/knowledge-base/ICE18362.pdf"
+   },
+   {
+    "title": "re.public.polimi.it",
+    "url": "https://re.public.polimi.it/handle/11311/1178140"
+   },
+   {
+    "title": "grasso euspen january2017 openaccess",
+    "url": "https://nottingham.ac.uk/research/groups/advanced-manufacturing-technology-research-group/documents/manufacturing-metrology-team/qcam-17/grasso-euspen-january2017-openaccess.pdf"
+   },
+   {
+    "title": "re.public.polimi.it",
+    "url": "https://re.public.polimi.it/handle/11311/1167692"
+   },
+   {
+    "title": "Grasso colosimo Review PBF revised 3",
+    "url": "https://re.public.polimi.it/bitstream/11311/1024010/7/Grasso_colosimo_Review_PBF_revised_3.pdf"
+   },
+   {
+    "title": "IMEKO TC10 2016 049",
+    "url": "https://imeko.org/publications/tc10-2016/IMEKO-TC10-2016-049.pdf"
+   }
+  ],
+  "ok": true,
+  "excerpt": ""
+ },
+ {
+  "ts": "2026-11-17T15:29:17.115Z",
+  "tool": "WebSearch",
+  "q": "Shevchik Wasmer acoustic emission in situ quality monitoring additive manufacturing spectral convolutional neural networks Additive Manufacturing 2018",
+  "prompt": null,
+  "links": [
+   {
+    "title": "deep learning for in situ and real time quality monitoring vjrxwlwoy9",
+    "url": "https://typeset.io/pdf/deep-learning-for-in-situ-and-real-time-quality-monitoring-vjrxwlwoy9.pdf"
+   },
+   {
+    "title": "Tough nuts, cracked in a smart way",
+    "url": "https://innovations-report.com/materials-sciences/tough-nuts-cracked-in-a-smart-way"
+   },
+   {
+    "title": "Tough nuts, cracked in a smart way",
+    "url": "https://innovations-report.com/?p=310770"
+   },
+   {
+    "title": "Artificial intelligence in quality monitoring",
+    "url": "https://www.empa.ch/web/s604/am-quality-check"
+   },
+   {
+    "title": "2018 08 tough nuts smart",
+    "url": "https://phys.org/news/2018-08-tough-nuts-smart.pdf"
+   },
+   {
+    "title": "Dissemin is shutting down on January 1st, 2025",
+    "url": "https://dissem.in/p/103967901/acoustic-emission-for-in-situ-quality-monitoring-in-additive-manufacturing-using-spectral-convolutional-neural-networks"
+   },
+   {
+    "title": "idw \u2013 Informationsdienst Wissenschaft",
+    "url": "https://idw-online.de/en/news701332"
+   },
+   {
+    "title": "Repository logo",
+    "url": "https://infoscience.epfl.ch/entities/publication/582a5a50-69fc-4467-8991-9ed494dc2544?ln=en"
+   },
+   {
+    "title": "in situ quality monitoring in am using acoustic emission a cdk421i08s",
+    "url": "https://typeset.io/pdf/in-situ-quality-monitoring-in-am-using-acoustic-emission-a-cdk421i08s.pdf"
+   },
+   {
+    "title": "s11665 018 3690 2",
+    "url": "https://springerlink.bibliotecabuap.elogim.com/content/pdf/10.1007/s11665-018-3690-2.pdf"
+   }
+  ],
+  "ok": true,
+  "excerpt": ""
+ },
+ {
+  "ts": "2026-11-17T15:29:25.580Z",
+  "tool": "WebSearch",
+  "q": "Hooper \"Melt pool temperature and cooling rates in laser powder bed fusion\" Additive Manufacturing 2018 two-colour imaging pyrometry volume pages",
+  "prompt": null,
+  "links": [
+   {
+    "title": "Melt pool temperature and cooling rates in laser powder bed fusion",
+    "url": "https://spiral.imperial.ac.uk/entities/publication/d7257fe5-cc02-4b26-afb8-fecbac8dcab5"
+   },
+   {
+    "title": "Melt pool temperature and cooling rates in laser powder bed fusion",
+    "url": "https://www.scinapse.io/papers/2803999279"
+   },
+   {
+    "title": "peeref.com",
+    "url": "https://peeref.com/works/75959017"
+   },
+   {
+    "title": "s40192 023 00291 w",
+    "url": "https://link.springer.com/content/pdf/10.1007/s40192-023-00291-w.pdf"
+   },
+   {
+    "title": "peeref.com",
+    "url": "https://peeref.com/works/38841088"
+   },
+   {
+    "title": "www.nist.gov",
+    "url": "https://www.nist.gov/node/1639016"
+   },
+   {
+    "title": "cas.cz",
+    "url": "https://katalog.lib.cas.cz/KNAV/EdsRecord/edb,142407978"
+   },
+   {
+    "title": "Back to Search Start Over",
+    "url": "https://searchworks.jioinstitute.edu.in/articles/asx__125787778"
+   },
+   {
+    "title": "s40192 020 00170 8",
+    "url": "https://springerlink.bibliotecabuap.elogim.com/content/pdf/10.1007/s40192-020-00170-8.pdf"
+   },
+   {
+    "title": "s40192 020 00169 1",
+    "url": "https://springerlink.bibliotecabuap.elogim.com/content/pdf/10.1007/s40192-020-00169-1.pdf"
+   }
+  ],
+  "ok": true,
+  "excerpt": ""
+ },
+ {
+  "ts": "2026-11-17T15:29:46.517Z",
+  "tool": "WebSearch",
+  "q": "two-colour pyrometry LPBF porosity defect detection classification in-situ monitoring machine learning study",
+  "prompt": null,
+  "links": [
+   {
+    "title": "process agnostic multi metric nondestructive characterization of",
+    "url": "https://researchwith.stevens.edu/en/publications/process-agnostic-multi-metric-nondestructive-characterization-of-/"
+   },
+   {
+    "title": "Predicting Porosity Formation in Laser Powder Bed Fusion using In-situ Data from a Two Wavelength Imaging Pyrometer",
+    "url": "https://asm.confex.com/asm/imat2021/webprogram/Paper54289.html"
+   },
+   {
+    "title": "arxiv.org",
+    "url": "https://arxiv.org/pdf/2404.16882v1.pdf"
+   },
+   {
+    "title": "www.arxiv.org",
+    "url": "https://www.arxiv.org/pdf/2112.11212"
+   },
+   {
+    "title": "www.osti.gov",
+    "url": "https://www.osti.gov/biblio/1977320"
+   },
+   {
+    "title": "Publications Details",
+    "url": "https://www.sandia.gov/research/publications/details/linking-pyrometry-to-porosity-in-additively-manufactured-metals-2020-01-01/"
+   },
+   {
+    "title": "528924 Fulltext",
+    "url": "https://research.chalmers.se/publication/528924/file/528924_Fulltext.pdf"
+   },
+   {
+    "title": "linking pyrometry to porosity in additively manufactured metals 2020 01 01",
+    "url": "https://www.sandia.gov/ccr/publications/details/linking-pyrometry-to-porosity-in-additively-manufactured-metals-2020-01-01"
+   },
+   {
+    "title": "s10845 022 02039 3",
+    "url": "https://link.springer.com/10.1007/s10845-022-02039-3"
+   },
+   {
+    "title": "## Introduction and Research Objective",
+    "url": "https://chatpaper.com/de/paper/17361"
+   }
+  ],
+  "ok": true,
+  "excerpt": ""
+ },
+ {
+  "ts": "2026-11-18T21:30:56.778Z",
+  "tool": "WebSearch",
+  "q": "Imhof 1961 \"Computing the distribution of quadratic forms in normal variables\" Biometrika volume pages",
+  "prompt": null,
+  "links": [
+   {
+    "title": "access.archive-ouverte.unige.ch",
+    "url": "https://access.archive-ouverte.unige.ch/access/metadata/4a7195a7-be6d-4605-8f1e-94ff4b638b8d/download"
+   },
+   {
+    "title": "Scientific article",
+    "url": "https://archive-ouverte.unige.ch/unige:101766"
+   },
+   {
+    "title": "Computing the Distribution of Quadratic Forms in Normal Variables",
+    "url": "https://katalog.lib.cas.cz/KNAV/EdsRecord/edsjsr,edsjsr.10.2307.2332763"
+   },
+   {
+    "title": "Computing the Distribution of Quadratic Forms in Normal Variables",
+    "url": "https://www.bohrium.com/paper-details/computing-the-distribution-of-quadratic-forms-in-normal-variables/812100493718323200-861"
+   },
+   {
+    "title": "www.scilit.net",
+    "url": "https://www.scilit.net/publications/db56388b9f8e889d43d8eb99a79858ff"
+   },
+   {
+    "title": "infoscience.epfl.ch",
+    "url": "https://infoscience.epfl.ch/record/84834/files/860929.pdf?version=1"
+   },
+   {
+    "title": "support.nag.com",
+    "url": "https://support.nag.com/numeric/fl/nagdoc_fl26/pdf/g01/g01jdf.pdf"
+   },
+   {
+    "title": "rdrr.io",
+    "url": "https://rdrr.io/cran/CompQuadForm/man/imhof.html"
+   },
+   {
+    "title": "search.r-project.org",
+    "url": "https://search.r-project.org/CRAN/packages/CompQuadForm/CompQuadForm.pdf"
+   },
+   {
+    "title": "mirror.linux.duke.edu",
+    "url": "https://mirror.linux.duke.edu/pub/cran/web/packages/CompQuadForm/CompQuadForm.pdf"
+   }
+  ],
+  "ok": true,
+  "excerpt": ""
+ },
+ {
+  "ts": "2026-11-18T21:30:57.908Z",
+  "tool": "WebSearch",
+  "q": "National Academies 2023 \"Foundational Research Gaps and Future Directions for Digital Twins\" verification validation uncertainty quantification",
+  "prompt": null,
+  "links": [
+   {
+    "title": "Foundational Research Gaps and Future Directions for Digital Twins (2024)",
+    "url": "https://www.nationalacademies.org/read/26894/chapter/10"
+   },
+   {
+    "title": "foundational research gaps and future directions for digital twins",
+    "url": "https://www.nationalacademies.org/our-work/foundational-research-gaps-and-future-directions-for-digital-twins"
+   },
+   {
+    "title": "Foundational Research Gaps and Future Directions for Digital Twins (2024)",
+    "url": "https://uwnxt.nationalacademies.org/read/26894/chapter/10"
+   },
+   {
+    "title": "9fba0a13 a36c 4c9d 9d2d 02ef81efa3c1",
+    "url": "https://www.nationalacademies.org/cdn/materials/9fba0a13-a36c-4c9d-9d2d-02ef81efa3c1"
+   },
+   {
+    "title": "Foundational Research Gaps and Future Directions for Digital Twins (2024)",
+    "url": "https://www.nationalacademies.org/read/26894/chapter/8"
+   },
+   {
+    "title": "unlocking the promise of digital twins",
+    "url": "https://www.nationalacademies.org/news/unlocking-the-promise-of-digital-twins"
+   },
+   {
+    "title": "unlocking the promise of digital twins",
+    "url": "https://www.nationalacademies.org/news/2024/06/unlocking-the-promise-of-digital-twins"
+   },
+   {
+    "title": "Foundational Research Gaps and Future Directions for Digital Twins (2024)",
+    "url": "https://uwnxt.nationalacademies.org/read/26894/chapter/8"
+   },
+   {
+    "title": "Foundational Research Gaps and Future Directions for Digital Twins (2024)",
+    "url": "https://uwnxt.nationalacademies.org/read/26894/chapter/12"
+   },
+   {
+    "title": "Report on Digital Twins",
+    "url": "https://e3sm.org/?p=70480"
+   }
+  ],
+  "ok": true,
+  "excerpt": ""
+ },
+ {
+  "ts": "2026-11-18T21:30:58.496Z",
+  "tool": "WebSearch",
+  "q": "Chen Patton \"Robust Model-Based Fault Diagnosis for Dynamic Systems\" 1999 Kluwer book modelling uncertainty",
+  "prompt": null,
+  "links": [
+   {
+    "title": "www.schweitzer-online.de",
+    "url": "https://www.schweitzer-online.de/en/buch/Chen/Robust-Model-Based-Fault-Diagnosis-for-Dynamic-Systems/9781461373445/A3811761/"
+   },
+   {
+    "title": "Zum Hauptinhalt springen",
+    "url": "https://www.lehmanns.ch/shop/mathematik-informatik/827194-9780792384113-robust-model-based-fault-diagnosis-for-dynamic-systems"
+   },
+   {
+    "title": "zendy.io",
+    "url": "https://zendy.io/title/10.1002/rnc.615"
+   },
+   {
+    "title": "Robust Model-Based Fault Diagnosis for Dynamic Systems",
+    "url": "https://ebooks.mpdl.mpg.de/ebooks/Record/EB000625935"
+   },
+   {
+    "title": "www.schweitzer-online.de",
+    "url": "https://www.schweitzer-online.de/en/buch/Chen/Robust-Model-Based-Fault-Diagnosis-for-Dynamic-Systems/9780792384113/A3811717/"
+   },
+   {
+    "title": "Robust model-based fault diagnosis for dynamic systems /",
+    "url": "https://libcat.library.tamu.edu/Record/in00001494476/Description"
+   },
+   {
+    "title": "Robust Model-Based Fault Diagnosis for Dynamic Systems",
+    "url": "https://betterread.com.au/book/robust-model-based-fault-diagnosis-for-dynamic-systems-book-9781461373445.do"
+   },
+   {
+    "title": "link.springer.com",
+    "url": "https://link.springer.com/978-1-4613-7344-5"
+   },
+   {
+    "title": "Robust Model-Based Fault Diagnosis for Dynamic Systems /",
+    "url": "https://libcat.library.tamu.edu/Record/in00003577017"
+   },
+   {
+    "title": "Robust Model-Based Fault Diagnosis for Dynamic Systems [electronic resource] /",
+    "url": "https://sidalc.net/search/Record/KOHA-OAI-TEST:184148"
+   }
+  ],
+  "ok": true,
+  "excerpt": ""
+ },
+ {
+  "ts": "2026-11-18T21:30:58.603Z",
+  "tool": "WebSearch",
+  "q": "\"identical twin experiment\" data assimilation definition observing system simulation experiment model error fraternal twin",
+  "prompt": null,
+  "links": [
+   {
+    "title": "os 15 1801 2019",
+    "url": "https://os.copernicus.org/articles/15/1801/2019/os-15-1801-2019.pdf"
+   },
+   {
+    "title": "Articles | Volume 15, issue 6",
+    "url": "https://os.copernicus.org/articles/15/1801/2019/"
+   },
+   {
+    "title": "os 2019 85 AC1 supplement",
+    "url": "https://os.copernicus.org/preprints/os-2019-85/os-2019-85-AC1-supplement.pdf"
+   },
+   {
+    "title": "os 2019 85 AR1",
+    "url": "https://os.copernicus.org/preprints/os-2019-85/os-2019-85-AR1.pdf"
+   },
+   {
+    "title": "os 2019 85.pdf",
+    "url": "https://os.copernicus.org/preprints/os-2019-85/os-2019-85.pdf"
+   },
+   {
+    "title": "os 2019 85 manuscript version3",
+    "url": "https://os.copernicus.org/preprints/os-2019-85/os-2019-85-manuscript-version3.pdf"
+   },
+   {
+    "title": "www2.cesm.ucar.edu",
+    "url": "https://www2.cesm.ucar.edu/events/wg-meetings/2014/presentations/amwg/raeder.pdf"
+   },
+   {
+    "title": "Ip14 Prive Nikki",
+    "url": "https://cscamm.umd.edu/programs/das6/program/Posters/uploads/Ip14-Prive_Nikki.pdf"
+   },
+   {
+    "title": "2014 AMWG SEvFV",
+    "url": "https://www.image.ucar.edu/pub/DART/2014/2014_AMWG_SEvFV.pdf"
+   },
+   {
+    "title": "evaluation of fraternal versus identical twin approaches for observation impact assessments an",
+    "url": "https://www.aminer.cn/pub/5db926a347c8f766461b4b2d/evaluation-of-fraternal-versus-identical-twin-approaches-for-observation-impact-assessments-an"
+   }
+  ],
+  "ok": true,
+  "excerpt": ""
+ },
+ {
+  "ts": "2026-11-18T21:31:18.469Z",
+  "tool": "WebSearch",
+  "q": "Ocean Science 2019 volume 15 page 1801 \"fraternal versus identical twin\" authors title Gulf of Mexico",
+  "prompt": null,
+  "links": [
+   {
+    "title": "os 15 1801 2019",
+    "url": "https://os.copernicus.org/articles/15/1801/2019/os-15-1801-2019.pdf"
+   },
+   {
+    "title": "Articles | Volume 15, issue 6",
+    "url": "https://os.copernicus.org/articles/15/1801/2019/"
+   },
+   {
+    "title": "os 2019 85.pdf",
+    "url": "https://os.copernicus.org/preprints/os-2019-85/os-2019-85.pdf"
+   },
+   {
+    "title": "Articles | Volume 15, issue 6",
+    "url": "https://os.copernicus.org/articles/15/1801/2019/os-15-1801-2019-discussion.html"
+   },
+   {
+    "title": "evaluation of fraternal versus identical twin approaches for observation impact assessments an",
+    "url": "https://www.aminer.cn/pub/5db926a347c8f766461b4b2d/evaluation-of-fraternal-versus-identical-twin-approaches-for-observation-impact-assessments-an"
+   },
+   {
+    "title": "Articles | Volume 15, issue 6",
+    "url": "https://os.copernicus.org/articles/15/1801/2019/os-15-1801-2019-assets.html"
+   },
+   {
+    "title": "Articles | Volume 15, issue 6",
+    "url": "https://os.copernicus.org/articles/15/1801/2019/os-15-1801-2019-relations.html"
+   },
+   {
+    "title": "Articles | Volume 15, issue 6",
+    "url": "https://os.copernicus.org/articles/15/1801/2019/os-15-1801-2019-metrics.html"
+   },
+   {
+    "title": "Ocean Science (Dec 2019)",
+    "url": "https://doaj.org/article/31560b8fdedd4ea8b37212d2dd44d543"
+   },
+   {
+    "title": "doaj.art 31560b8fdedd4ea8b37212d2dd44d543",
+    "url": "https://libmast.utm.my/Record/doaj.art-31560b8fdedd4ea8b37212d2dd44d543"
+   }
+  ],
+  "ok": true,
+  "excerpt": ""
+ },
+ {
+  "ts": "2026-11-18T21:31:18.483Z",
+  "tool": "WebSearch",
+  "q": "ASME V&V 40-2018 \"Assessing Credibility of Computational Modeling through Verification and Validation\" context of use model risk",
+  "prompt": null,
+  "links": [
+   {
+    "title": "pmc.ncbi.nlm.nih.gov",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7883933"
+   },
+   {
+    "title": "www.hb.fh-muenster.de",
+    "url": "https://www.hb.fh-muenster.de/opus4/solrsearch/index/search/searchtype/authorsearch/author/%22Quadrat%2C+Eric%22"
+   },
+   {
+    "title": "2 Pathmanathan ICCVAM CoP 2024 508",
+    "url": "https://ntp.niehs.nih.gov/sites/default/files/2024-02/2_Pathmanathan_ICCVAM-CoP-2024_508.pdf"
+   },
+   {
+    "title": "compbiomed e seminar 31",
+    "url": "https://hpc.ipb.ac.rs/events/compbiomed-e-seminar-31/compbiomed-e-seminar-31.pdf"
+   },
+   {
+    "title": "Bioengineering Blog: An Emerging Regulatory Framework for Medical Device Simulation",
+    "url": "https://www.asme.org/topics-resources/content/bioengineering-blog-an-emerging-regulatory-framework-for-medical-device-simulation"
+   },
+   {
+    "title": "pmc.ncbi.nlm.nih.gov",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6445134/table/T2"
+   },
+   {
+    "title": "Bioengineering Blog: An Emerging Regulatory Framework for Medical Device Simulation",
+    "url": "https://asme.org/Topics-Resources/Content/Bioengineering-Blog-An-Emerging-Regulatory-Framework-for-Medical-Device-Simulation"
+   },
+   {
+    "title": "New ASME V&V 40 Standard for Medical Devices Released",
+    "url": "https://simutechgroup.com/asme-vv-40-standard-medical-devices/"
+   },
+   {
+    "title": "New ASME V&V 40 Standard for Medical Devices Released",
+    "url": "https://simutechgroup.com/?p=3123"
+   },
+   {
+    "title": "Bioengineering Blog: An Emerging Regulatory Framework for Medical Device Simulation",
+    "url": "https://contentstaging12.asme.org/Topics-Resources/Content/Bioengineering-Blog-An-Emerging-Regulatory-Framework-for-Medical-Device-Simulation"
+   }
+  ],
+  "ok": true,
+  "excerpt": ""
+ },
+ {
+  "ts": "2026-11-18T21:32:57.500Z",
+  "tool": "WebSearch",
+  "q": "Brynjarsd\u00f3ttir O'Hagan 2014 \"Learning about physical parameters: the importance of model discrepancy\" Inverse Problems 30 114007",
+  "prompt": null,
+  "links": [
+   {
+    "title": "Jenny Brynjarsdottir and Anthony O\u2019Hagan",
+    "url": "https://tonyohagan.co.uk/academic/abs/simmach.html"
+   },
+   {
+    "title": "Post date: Oct 10, 2014 3:40:24 PM",
+    "url": "https://sites.google.com/case.edu/jennybrynjarsdottir/news/publication-in-inverse-problems"
+   },
+   {
+    "title": "Published November 2014 | Version v1",
+    "url": "https://inis.iaea.org/records/cbkr0-am688"
+   },
+   {
+    "title": "Learning about physical parameters: the importance of model discrepancy",
+    "url": "https://vufind.katalog.k.utb.cz/SummonRecord/FETCH-LOGICAL-c397t-281072e83579cfc092c4713bd222cc7d2f87b3aed929ee5c36a74c7d89d8405e3"
+   },
+   {
+    "title": "arxiv.org",
+    "url": "https://arxiv.org/pdf/2201.06463v2"
+   },
+   {
+    "title": "inverting imperfect model   warwick   february 2015",
+    "url": "https://text.www2.warwick.ac.uk/fac/sci/maths/research/events/2014-15/nonsymposium/uccm/inverting_imperfect_model_-_warwick_-_february_2015.pdf"
+   },
+   {
+    "title": "Learning about physical parameters: the importance of model discrepancy",
+    "url": "https://www.bohrium.com/paper-details/learning-about-physical-parameters-the-importance-of-model-discrepancy/814686399516114949-925"
+   },
+   {
+    "title": "Learning about physical parameters: the importance of model discrepancy",
+    "url": "https://vufind-test.katalog.k.utb.cz/SummonRecord/FETCH-LOGICAL-c397t-281072e83579cfc092c4713bd222cc7d2f87b3aed929ee5c36a74c7d89d8405e3/UserComments"
+   },
+   {
+    "title": "4tu.nl",
+    "url": "https://www.4tu.nl/ami/Agenda-Events/Past-events/slidestonyohagan.pdf"
+   },
+   {
+    "title": "anthony o hagan LeLQ6l",
+    "url": "https://scite.ai/authors/anthony-o-hagan-LeLQ6l"
+   }
+  ],
+  "ok": true,
+  "excerpt": ""
+ },
+ {
+  "ts": "2026-11-18T21:32:58.048Z",
+  "tool": "WebSearch",
+  "q": "Gutenkunst 2007 \"Universally sloppy parameter sensitivities in systems biology models\" PLoS Computational Biology 3(10) e189",
+  "prompt": null,
+  "links": [
+   {
+    "title": "universally sloppy parameter sensitivities in systems biology mod",
+    "url": "https://experts.arizona.edu/en/publications/universally-sloppy-parameter-sensitivities-in-systems-biology-mod/"
+   },
+   {
+    "title": "PLoS Computational Biology (Oct 2007)",
+    "url": "https://doaj.org/article/7946c35be1c14192b260ae11c1c21d0f"
+   },
+   {
+    "title": "Quantitative Biology > Quantitative Methods",
+    "url": "https://arxiv.org/abs/q-bio/0701039v3"
+   },
+   {
+    "title": "Quantitative Biology > Quantitative Methods",
+    "url": "https://arxiv.org/abs/q-bio/0701039v1"
+   },
+   {
+    "title": "arxiv.org",
+    "url": "https://arxiv.org/abs/q-bio/0701039"
+   },
+   {
+    "title": "sethna.lassp.cornell.edu",
+    "url": "https://sethna.lassp.cornell.edu/pubPDF/SloppyEverywhere.pdf"
+   },
+   {
+    "title": "Universally sloppy parameter sensitivities in systems biology models",
+    "url": "https://sethna.lassp.cornell.edu/node/781"
+   },
+   {
+    "title": "bibsonomy.org",
+    "url": "https://www.bibsonomy.org/bibtex/2d7f948430df05147fd84e81ebe3ade97/peter.ralph"
+   },
+   {
+    "title": "uv.mx",
+    "url": "https://ebusca.uv.mx/Record/pubmed-2000971/Details"
+   },
+   {
+    "title": "Sloppy systems biology: tight predictions with loose parameters",
+    "url": "https://archive.aps.org/mar/2007/d35/13"
+   }
+  ],
+  "ok": true,
+  "excerpt": ""
+ },
+ {
+  "ts": "2026-11-18T21:32:58.897Z",
+  "tool": "WebSearch",
+  "q": "Kennedy O'Hagan 2001 \"Bayesian calibration of computer models\" Journal of the Royal Statistical Society Series B 63 425-464",
+  "prompt": null,
+  "links": [
+   {
+    "title": "Bayesian calibration of computer models",
+    "url": "https://www.academia.edu/19082282/Bayesian_calibration_of_computer_models"
+   },
+   {
+    "title": "RePEc:bla:jorssb:v:63:y:2001:i:3:p:425 464",
+    "url": "https://econpapers.repec.org/RePEc:bla:jorssb:v:63:y:2001:i:3:p:425-464"
+   },
+   {
+    "title": "University of Sheffield",
+    "url": "https://tonyohagan.co.uk/academic/abs/calib.html"
+   },
+   {
+    "title": "IDEAS home Printed from https://ideas.repec.org/a/bla/jorssb/v63y2001i3p425-464.html",
+    "url": "https://ideas.repec.org/a/bla/jorssb/v63y2001i3p425-464.html"
+   },
+   {
+    "title": "University of Sheffield",
+    "url": "https://mail.tonyohagan.co.uk/academic/abs/calib.html"
+   },
+   {
+    "title": "1467 9868.00294",
+    "url": "https://zendy.io/title/10.1111/1467-9868.00294"
+   },
+   {
+    "title": "kennedy ohagan bayesiancalibrationofcomputermodelswithdiscussion 2001",
+    "url": "https://bibbase.org/network/publication/kennedy-ohagan-bayesiancalibrationofcomputermodelswithdiscussion-2001"
+   },
+   {
+    "title": "www.asc.ohio-state.edu",
+    "url": "https://www.asc.ohio-state.edu/statistics/comp_exp/jour.club/kennedy01.pdf"
+   },
+   {
+    "title": "Bayesian calibration of computer models",
+    "url": "https://academicnewsletter.sufe.edu.cn/info/442306"
+   },
+   {
+    "title": "bayesian calibration of computer models",
+    "url": "https://www.neura.market/ai-and-ml-research-papers/bayesian-calibration-of-computer-models"
+   }
+  ],
+  "ok": true,
+  "excerpt": ""
+ },
+ {
+  "ts": "2026-11-18T21:32:59.598Z",
+  "tool": "WebSearch",
+  "q": "Kapteyn Pretorius Willcox 2021 \"probabilistic graphical model foundation for enabling predictive digital twins at scale\" Nature Computational Science",
+  "prompt": null,
+  "links": [
+   {
+    "title": "A probabilistic graphical model foundation for enabling predictive digital twins at scale",
+    "url": "https://ersearch2.cvtisr.sk/vufind/SummonRecord/FETCH-LOGICAL-c468t-bc8466d44ebf2a81fb5f90a5733c27c44a8d1bb7200a90ee2b1cc24543b137033/Description"
+   },
+   {
+    "title": "A probabilistic graphical model foundation for enabling predictive digital twins at scale",
+    "url": "https://ersearch2.cvtisr.sk/vufind/SummonRecord/FETCH-LOGICAL-c468t-bc8466d44ebf2a81fb5f90a5733c27c44a8d1bb7200a90ee2b1cc24543b137033"
+   },
+   {
+    "title": "aeroastro.mit.edu",
+    "url": "https://aeroastro.mit.edu/?p=4615"
+   },
+   {
+    "title": "Advanced Technique for Developing Digital Twins Makes Tech Universally Applicable",
+    "url": "https://ae.utexas.edu/?p=9180"
+   },
+   {
+    "title": "MORTECH Book of Abstracts",
+    "url": "https://re.public.polimi.it/retrieve/d8326c53-a712-4f41-a081-2afb2274d1ca/MORTECH_Book_of_Abstracts.pdf"
+   },
+   {
+    "title": "5 michael kapteyns",
+    "url": "https://www.bnl.gov/nysds21/files/talks/day3/5-michael-kapteyns.pdf"
+   },
+   {
+    "title": "enbis.org",
+    "url": "https://conferences.enbis.org/event/35/contributions/451/contribution.pdf"
+   },
+   {
+    "title": "Advanced Technique for Developing Digital Twins Makes Tech Universally Applicable",
+    "url": "https://news.utexas.edu/?p=138167"
+   },
+   {
+    "title": "arxiv.org",
+    "url": "https://arxiv.org/abs/2012.05841v3"
+   },
+   {
+    "title": "Login / Signup",
+    "url": "https://cs.reviewer.ly/app/publication/983c926f-2a02-4e83-9a76-6cba1a0ef9ca"
+   }
+  ],
+  "ok": true,
+  "excerpt": ""
+ },
+ {
+  "ts": "2026-11-18T21:33:38.658Z",
+  "tool": "WebSearch",
+  "q": "Gevers identification for control survey \"From the identification of models to the identification of control\" OR \"Identification for control: from the early achievements to the revival of experiment design\"",
+  "prompt": null,
+  "links": [
+   {
+    "title": "uclouvain.be",
+    "url": "https://perso.uclouvain.be/michel.gevers/PublisMig/P78.pdf"
+   },
+   {
+    "title": "perso.uclouvain.be",
+    "url": "https://perso.uclouvain.be/michel.gevers/PublisMig/C124.pdf"
+   },
+   {
+    "title": "uclouvain.be",
+    "url": "https://perso.uclouvain.be/michel.gevers/PublisMig/C128.pdf"
+   },
+   {
+    "title": "system identification without lennart ljung what would have 4ehymyd15o",
+    "url": "https://typeset.io/pdf/system-identification-without-lennart-ljung-what-would-have-4ehymyd15o.pdf"
+   },
+   {
+    "title": "Modelling Identification and Control",
+    "url": "https://www.academia.edu/103502676/Modelling_Identification_and_Control"
+   },
+   {
+    "title": "Identification for Control: From the Early Achievements to the Revival of Experiment Design",
+    "url": "https://researchr.org/publication/Gevers05/bibtex"
+   },
+   {
+    "title": "uclouvain.be",
+    "url": "https://perso.uclouvain.be/michel.gevers/PublisMig/C110.pdf"
+   },
+   {
+    "title": "perso.uclouvain.be",
+    "url": "https://perso.uclouvain.be/michel.gevers/PublisMig/jpcf.pdf"
+   },
+   {
+    "title": "Login / Signup",
+    "url": "https://cs.reviewer.ly/app/publication/68b5c158-373e-46f7-964f-8604da0b55d0"
+   },
+   {
+    "title": "Login / Signup",
+    "url": "https://cs.reviewer.ly/app/publication/94c31606-21df-461c-bc1f-f2fc043af7d3"
+   }
+  ],
+  "ok": true,
+  "excerpt": ""
+ }
+]

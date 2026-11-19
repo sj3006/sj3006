@@ -1,0 +1,307 @@
+# Two results from work package 1
+
+Both come out of writing the certificate as a hypothesis test rather than as a
+geometric convention. Both are checked in `verify.py`, which passes 14 of 14.
+
+## 1. The ten degree separation floor was an assumption about signal strength
+
+The conference paper states a floor of ten degrees and calls it a practical
+convention. It is not a free choice. Profiling out the unknown fault magnitude
+leaves, for each candidate cause `k`, a residual
+
+    R_k = || z_w ||^2 - <z_w, u_k>^2 = rho^2 sin^2(psi_k)
+
+distributed as chi-squared on `S - 1` degrees of freedom, where `rho = ||z_w||`
+is the whitened signal-to-noise ratio and `psi_k` is the angle between the
+observation and cause `k`'s signature direction. Not rejecting `k` at level
+`alpha` therefore means
+
+    sin psi_k <= sqrt( q_{1-alpha}(S-1) ) / rho
+
+so the admissible causes form a cone of half-angle `psi*` about the observation,
+and two causes at mutual angle `D` are both admissible unless `D > 2 psi*`.
+
+Inverting that at three sensors and 95 % confidence:
+
+| separation floor | implied `rho` | at eps = 1 %, a power deviation of |
+|---|---|---|
+| 10 degrees, instantaneous (dof 2) | 28.08 | 3.22 % |
+| 10 degrees, build context (dof 14) | 55.84 | 0.69 % |
+
+So the paper's floor is the statement "the whitened signal is about 28 standard
+deviations". That is a defensible assumption, and it is better stated than
+assumed. The same inversion gives, for each pair, the signal-to-noise ratio at
+which it would become resolvable:
+
+| pair | angle (deg) | `rho` required |
+|---|---|---|
+| power / gas | 0.0001 | never, the pair is degenerate |
+| layer / gas | 0.3233 | 868 |
+| power / layer | 0.3234 | 867 |
+| power / speed | 0.7045 | 398 |
+| speed / gas | 0.7046 | 398 |
+| speed / layer | 1.0280 | 273 |
+| speed / geometry | 3.6175 | 77.6 |
+| power / geometry | 4.3109 | 65.1 |
+| gas / geometry | 4.3110 | 65.1 |
+| layer / geometry | 4.6304 | 60.6 |
+
+Power against gas is reported as degenerate rather than as needing a very large
+ratio, because the two Jacobian columns are proportional element-wise to within
+4.3e-5: the 1.1e-4 degree angle is finite-difference residue on an algebraic
+identity, not a small real separation.
+
+## 2. The enlarged observation was whitened with the wrong matrix
+
+This one changes two numbers in the conference paper.
+
+Whitening exists so that the geometry means separability, which requires the
+noise to be isotropic after whitening. Dividing each row by its own standard
+deviation achieves that only when the observations are independent. For three
+sensors read at one instant they are by assumption, so **the instantaneous
+results are unaffected**, Table 1's per-segment columns included.
+
+The enlarged observation is different. Its entries are least-squares
+coefficients of each sensor's residual onto five build regressors, and
+
+    c_hat_s = (G'G)^-1 G' z_s    so   Cov(c_hat_s) = sigma_s^2 eps^2 (G'G)^-1
+
+which is not diagonal. In this scan plan turn density and support depth are
+correlated, giving a coefficient correlation of 0.577. The project already knew
+this: `observables.coefficient_sigmas` documents the 0.571 regressor
+correlation and computes the marginal standard errors correctly, to 1.9e-16.
+What went wrong is using those marginal errors as if the coefficients were
+independent. The correct whitening is the inverse Cholesky factor of
+
+    Cov = eps^2 ( diag(sigma^2)  kron  (G'G)^-1 )
+
+verified against per-segment noise put through the same least squares
+(agreement to 0.95 % at 60 000 draws, within Monte Carlo error).
+
+Consequences. The 95 % certificate covers the truth 93.8 % of the time under
+diagonal whitening and 95.0 % under the full covariance. The pairwise angles
+move by up to 8.8 degrees:
+
+| pair | paper (diagonal) | corrected (full) | delta |
+|---|---|---|---|
+| power / speed | 24.90 | 33.67 | +8.77 |
+| power / geometry | 25.42 | 30.02 | +4.60 |
+| power / gas | 29.34 | 30.06 | +0.72 |
+| gas / geometry | 31.39 | 32.41 | +1.02 |
+| speed / geometry | 31.95 | 25.55 | **-6.40** |
+| speed / gas | 35.87 | 36.58 | +0.71 |
+| power / layer | 36.26 | 34.78 | -1.48 |
+| layer / geometry | 40.54 | 46.55 | +6.01 |
+| layer / gas | 44.48 | 45.55 | +1.07 |
+| speed / layer | 46.16 | 48.98 | +2.82 |
+
+What this does to the conference paper, precisely:
+
+- Rank is 5 either way. The rank claim stands.
+- All ten pairs clear the ten degree floor either way. The conclusion stands.
+- The worst pair over a build changes from **24.90 degrees on power against
+  speed** to **25.55 degrees on speed against geometry**. The abstract, the
+  results and Table 1's final column carry the old figure.
+- The condition number over retained singular values moves from 49.8 to 52.7.
+- The claimed rise "from 0.00 to 24.90 degrees" becomes "from 0.00 to 25.55".
+
+The correction is small and in the paper's favour: the worst pair is further
+above the floor than claimed, not closer to it.
+
+## 3. The linearised certificate is valid only below about rho = 30
+
+A certificate built on the Jacobian assumes the response to a fault is a
+straight line through the nominal point. The exact response is not, and the
+departure is not noise: it is a fixed bias perpendicular to the fault's own
+signature direction, which enters the residual as its square and so eats the
+test's budget `q = 5.99`.
+
+Measured at eps = 1 %, the perpendicular bias for a power fault is 0.19 at
+rho = 28, 0.78 at rho = 56 and 1.72 at rho = 120. Coverage of the 95 %
+certificate, with observations generated from the exact model:
+
+| rho | linearised test | exact profile test |
+|---|---|---|
+| 28 | 0.946 to 0.952 | 0.949 to 0.952 |
+| 56 | 0.903 to 0.944 | 0.948 to 0.953 |
+| 120 | 0.684 to 0.849 | 0.947 to 0.957 |
+
+The failure is in the dangerous direction. Under-coverage means the test
+*excludes the true cause* more often than advertised, so a linearised
+certificate would licence an agent to rule out the actual fault.
+
+The fix is to profile the magnitude through the exact forward model rather than
+its tangent,
+
+    R_k(z) = min over f of || z_w - g_k(f) / (sigma eps) ||^2
+
+which is a profile likelihood with one nuisance parameter and so keeps the same
+chi-squared reference distribution. It restores nominal coverage at every
+signal-to-noise ratio tested, including 0.951 for a power fault at rho = 120
+where the linearised test gives 0.684. Cost is 49 forward evaluations per fault
+once, cached as monotone cubic interpolants, after which a case is a table
+lookup.
+
+Worth noting what does not change: the mean certificate size in the
+instantaneous regime is 2.7 to 3.9 causes under the exact test, against 2.7 to
+3.8 under the linearised one. The paper's central claim is not an artefact of
+the linearisation.
+
+## 4. The certificate's size is the result, and it is stark
+
+Work packages 2 and 3 turn the geometry into a per-case quantity. The exact
+profile test, 400 cases per fault and signal level, observations from the full
+forward model:
+
+| rho | instantaneous: names one cause | build context: names one cause |
+|---|---|---|
+| 14 | 0.028 | 0.950 |
+| 28 | 0.045 | 0.953 |
+| 56 | 0.068 | 0.940 |
+| 120 | 0.232 | 0.952 |
+
+Mean certificate size instantaneously runs 4.62 causes at rho = 14 down to 2.58
+at rho = 120, out of five. At the paper's own operating point, rho = 28, a
+monitoring agent reading three coaxial signals is entitled to name a unique
+cause in **4.5 % of builds**. With build context it is **95.3 %**, which is the
+test's own ceiling.
+
+Broken out by fault at rho = 56, the instantaneous unique-cause rate is 0.005
+for power, 0.013 for gas, 0.022 for layer, 0.045 for speed and 0.255 for
+geometry. Geometry is the only cause the suite can name, which is consistent
+with its being the only one with angles above 3.6 degrees to everything else.
+
+### The equivalence structure
+
+Thresholding the admissibility matrix `A[k,l] = P(l in C | truth = k)` at 0.5
+and taking connected components:
+
+- **instantaneous**: one class containing all five causes up to rho = 56. At
+  rho = 120 geometry separates, leaving `{power, speed, layer, gas}` as a single
+  clique, meaning every member is confusable with every other rather than merged
+  through a chain.
+- **build context**: five singletons at every signal level from rho = 14 up.
+
+The matrix is deliberately not symmetrised. It is not symmetric: a weak cause
+produces an observation near the origin, where every signature direction passes,
+so geometry admits the others more readily than they admit geometry. At rho = 28,
+`A[geometry, speed] = 0.839` while `A[speed, geometry] = 0.603`.
+
+### What build context is worth, priced in fault magnitude
+
+The resolvability inequality gives each pair the signal it needs. Instantaneously:
+
+| pair | rho needed | the magnitude that implies |
+|---|---|---|
+| layer / geometry | 60.6 | layer f = 0.19 |
+| power / geometry | 65.1 | power f = 0.074 |
+| speed / geometry | 77.6 | speed f = 0.26 |
+| speed / layer | 272.9 | speed f = 0.91 |
+| power / speed | 398.1 | **power f = 0.46** |
+| power / layer | 867.2 | power f = 0.99 |
+| layer / gas | 867.5 | layer f = 2.66 |
+| power / gas | never | degenerate |
+
+Telling a power fault from a speed fault at a single instant needs a 46 % power
+deviation. Telling it from a layer fault needs 99 %. Those are not faults, they
+are different processes, which is why the structural-against-noise-limited
+question is settled on the geometry rather than by simulating to magnitudes the
+forward model has no business being evaluated at.
+
+With build context every pair needs between rho = 11.7 and rho = 22.0, and
+**power against gas becomes resolvable at rho = 18.8, a 0.2 % power deviation**,
+having been unresolvable at any signal strength whatever. That is the single
+sharpest statement of what the build's own known structure buys.
+
+## 5. The power-and-gas degeneracy is a theorem, and probing cannot touch it
+
+The conference paper reports power and gas confounded for one suite at one
+operating point, and calls the 0.00 degrees an upper bound that a richer gas
+model would open. Both statements can be made much stronger.
+
+Everything the model knows reaches the sensors through four physical channels,
+so the Jacobian factors as
+
+    J = M C
+
+with `C` 4 by 5, how each fault moves each channel, and `M` 3 by 4, how each
+observable responds to each channel. Writing `C` out from the fault routes in
+`faults.py`, channels in log units except preheat in kelvin:
+
+|  | power | speed | layer | gas | geometry |
+|---|---|---|---|---|---|
+| ln(A P) | 1 | 0 | -0.044 | -1 | 0 |
+| ln(v) | 0 | 1 | 0 | 0 | 0 |
+| ln(k) | 0 | 0 | 0.5 | 0 | 0 |
+| preheat | 0 | 0 | 0 | 0 | 100 |
+
+Checked against the Jacobian computed directly from fault perturbations:
+`J = M C` to 6.8e-5 relative, which is the finite-difference error.
+
+A probe changes `M`. Nothing a probe does touches `C`. And reading the first
+row, a power fault raises absorbed power, a gas fault lowers it, and neither
+does anything else, so
+
+    C[:, power] = -C[:, gas]     exactly
+
+from which `(M C)[:, power] = -(M C)[:, gas]` for **every** `M`. The two
+columns are antiparallel in every instrument set, at every operating point, and
+in any stack of operating points. `rank(C) = 4` and its null space is
+one-dimensional:
+
+    power -0.7071,  speed 0,  layer 0,  gas -0.7071,  geometry 0
+
+An equal simultaneous power and gas fault moves no channel, so it moves no
+observable that could be built.
+
+### Probing the other nine pairs does not clear the floor either
+
+| observation set | rank | condition | sv4/sv1 | worst | 2nd worst |
+|---|---|---|---|---|---|
+| nominal, one instant | 3 | 2562 | n/a | 0.000 | 0.323 |
+| two operating points | 3 | 194 | 2.4e-7 | 0.000 | 5.954 |
+| three operating points | 3 | 234 | 6.6e-7 | 0.000 | 4.916 |
+| four operating points | 4 | 288822 | 3.5e-6 | 0.000 | 4.714 |
+| six operating points | 4 | 123582 | 8.1e-6 | 0.000 | 4.614 |
+| build context, no probing | 5 | 52.7 | 1.3e-1 | 25.550 | 30.020 |
+
+Two well-chosen points raise the second-worst pair from 0.32 to 5.95 degrees,
+and the best point over a grid search with one local refinement, 440 W and
+2.29 m/s against a nominal 285 W and 0.96 m/s, reaches 6.15 degrees. Still
+short of ten, and that probe means deliberately running a quarter of the build
+at half the nominal energy density, which produces off-specification material
+in order to learn something the build's own structure already contains.
+
+Four points reach nominal rank 4 with a condition number of 289000, which is
+rank in name only. More points make the angles slightly worse rather than
+better, so probe selection matters and probe count does not.
+
+The mechanism is in `M`. Its preheat column is of order 1e-3 where its
+absorbed-power column is of order 1, at every operating point tested, because a
+kelvin of preheat barely moves a pool running near 3000 K. The fourth channel is
+intrinsically weak and no operating point makes it otherwise. Build context, by
+contrast, has `sv4/sv1 = 0.13`, four orders of magnitude better.
+
+### Why build context escapes a theorem that probing cannot
+
+Worth being precise, because it looks like a contradiction. The factorisation
+`J = M C` assumes the fault magnitudes are the same at every epoch. Build
+context breaks that assumption rather than enriching `M`: a fault's severity
+varies across the build along its own spatial profile, so what is observed is
+`J[s,k] B[j,k]`, and `B[:, power]` is not proportional to `B[:, gas]` even
+though the channel columns are.
+
+So the escape route is differential modulation of the faults, not richer
+observation. **The only thing that separates a power fault from a gas fault is
+that the two vary differently across a build.** Not instruments, not operating
+points, not probe schedules. A probe could supply that modulation deliberately,
+by commanding a known power ripple, and that is the one probe design with a
+route past the ceiling. It is also just build context, paid for rather than free.
+
+## What is not affected
+
+The instantaneous Jacobian, its angles, the rank-4 channel bound, the derived
+noise set, the Kronecker collapse theorem, and the 1/sqrt(84) coefficient
+noise-reduction factor are all untouched. The marginal standard errors in
+`coefficient_sigmas` were right; only their use in place of a covariance was
+wrong.
