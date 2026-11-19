@@ -22,7 +22,7 @@ causes consistent with an observation, and determine how accurate the model
 must be for that test to remain valid. No experiments were performed for this
 work and no external dataset is required to run it.
 
-Package version: 1.0. Built 2026-11-19 from commit `ac33e62` of the
+Package version: 1.0. Built 2026-11-19 from commit `83396ae` of the
 source repository.
 
 ---
@@ -111,8 +111,10 @@ in `papers/`, as the manifest checksums show. Likewise
 `src/literature_census.py` and `src/provenance_check.py`.
 
 The language-model arms of the certificate paper (its Section 4.7) require
-access to commercial language-model services and are not part of this package;
-the deterministic arms and all other results are.
+access to a commercial language-model service and have not been run; the driver
+that runs them, `code/certificate/run_llm_arms.py`, is included, with a dry-run
+mode that needs no network. The deterministic arms and all other results are
+in the package.
 
 ## 6. Data
 
@@ -140,6 +142,8 @@ refers to them.
 | file | content |
 |---|---|
 | `RECORD.md` | the complete record of the work: what was done, found and created, and where it is |
+| `HANDBOOK.md` | how to finish the three papers and implement the work on a real machine |
+| `conversations/` | the record of the conversation in which most of the work was done |
 | `findings/` | the findings documents of the three papers |
 | `fidelity-labnotebook.md` | dated record of the fidelity work, including errors found and corrected |
 | `roadmaps/` | the plans of the certificate and fidelity papers |

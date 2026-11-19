@@ -216,6 +216,9 @@ before submission.
    `api.anthropic.com` can be requested in-session; if the paper should report
    several vendors, the keys and the cost belong on the authors' side and the
    harness will take them from the environment.
+   `run_llm_arms.py` runs the arms with a key from the environment, saves every
+   reply for rescoring, and has a dry-run mode; `../HANDBOOK.md`, Section 5.1,
+   gives the steps.
 2. **How many fault types the agent chooses among.** Five is the conference
    paper's set. Including a "no fault" option changes the test to a composite
    null and is worth doing, but it is a second test, not a sixth column.

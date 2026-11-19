@@ -18,7 +18,9 @@ Decisions that were taken by the assistant without the authors' input are
 recorded with their reasons in the documents named in Section 7.
 
 A self-contained package for sharing and replicating the work is in
-`replication/` (Section 8).
+`replication/` (Section 8). `HANDBOOK.md` explains how to finish the papers and
+implement the work without an assistant, and `conversations/` holds the full
+record of the conversation in which most of the work was done.
 
 ---
 
@@ -146,7 +148,13 @@ The numbered documents `00` to `10` are the conference paper's planning and
 working record; `explainers/` holds eleven first-principles explanations of the
 method; `docs/measured-inputs.md` lists every outside measurement;
 `docs/sources-consulted.md` lists the web searches made; `docs/commit-history.md`
-lists every commit. Each paper has its own roadmap and findings document, and
+lists every commit. `conversations/` is the record of the conversation from 10
+to 19 November, exported from the session transcript by
+`tools/export_conversation.py`: every request and reply verbatim, each action in
+one line, with internal reasoning, tool output and personal contact details
+left out. The conversation before 10 November survives only as the automatic
+summary at the start of `conversations/2026-11-10.md`; the work it covers is
+documented in the numbered files and the commit history. Each paper has its own roadmap and findings document, and
 the fidelity paper has a dated laboratory notebook.
 
 ## 5. Data from outside the project, and sources consulted
