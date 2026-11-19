@@ -210,6 +210,7 @@ Bonferroni correction.
 | SmolLM2-135M | 12² | 3.8k | 8.0k | 11.7k | 18.6k |
 | | 23² | 5.8k | 25.0k | 47.1k | 75.1k |
 | Qwen2.5-0.5B | 12² | 4.6k | 9.2k | 17.0k | 24.8k |
+| Qwen2.5-1.5B | 12² | 6.5k | 10.6k | 17.0k | 27.2k |
 
 **Table 2: fixed confidence (the search stops by itself).**
 LB = the lower bound of Theorem 2.
@@ -223,6 +224,7 @@ LB = the lower bound of Theorem 2.
 | SmolLM2 12² | 19.7k | 2.1k | 9.4 | 31.8k | 6.9k |
 | SmolLM2 23² | 52.1k | 3.5k | 14.8 | 129.7k | 24.4k |
 | Qwen2.5-0.5B 12² | 22.9k | 2.2k | 10.5 | 39.0k | 8.6k |
+| Qwen2.5-1.5B 12² | 24.4k | 2.2k | 11.0 | 51.5k | 10.3k |
 
 **Other results in the paper**
 
@@ -279,7 +281,7 @@ LB = the lower bound of Theorem 2.
 | Pointer | Status |
 |---|---|
 | 1. Near-optimal algorithm | Done. The search is within O(log n) and a multiple-testing factor of a matching-shape lower bound (Theorems 2-4). Measured gap 4.2-14.8x. Whether the log N part of the gap is necessary is stated as open. |
-| 2. ML-native application | Done. Sampling settings of language models, failure rates measured from real generations: SmolLM2-135M on 12² and 23² grids, Qwen2.5-0.5B on 12². Qwen2.5-1.5B on CPU is 98/144 settings measured (section 10). |
+| 2. ML-native application | Done. Sampling settings of three language models, failure rates measured from real generations: SmolLM2-135M on 12² and 23² grids, Qwen2.5-0.5B and Qwen2.5-1.5B on 12². Live runs (the certifier querying the model directly) agree with the surface runs. 7B models need a GPU (section 10). |
 | 3. Airtight proofs | Done to the level we can check ourselves. Appendix A has full proofs, no open "[check]" items; the growth condition (T) needed for termination is explicit and checked numerically. Recommended: one independent read by a statistician (section 10). |
 | 4. Real data and stronger baselines | Language model: real data. Manufacturing: no public data with repeated builds exists, so the AM problems are simulated; we test the monotonicity assumption on published data and show the gains survive calibration changes. Baselines: Learn-then-Test (fixed sequence), Bonferroni grid, GP level set (plain and with the ordering), BEAM-style active search, SafeOpt-style safe expansion. |
 | 5. Final paper | Written, compiled, within the page limit, anonymized, with supplement. What remains needs your input (section 10). |
@@ -334,15 +336,26 @@ Condensed; the dated detail is in [`ROADMAP.md`](ROADMAP.md).
     the checkpoints' bfloat16 precision.
   - Reviewer FAQ, submission metadata, the "between grid points" remark.
   - Started measuring Qwen2.5-1.5B on CPU.
-- **2026-11-15 to 2026-11-18.**
+- **2026-11-15 to 2026-11-19.**
   - The 1.5B measurement was interrupted three times. Twice the cloud
     session was idle and its machine was reclaimed; once a 2-hour limit
-    on background jobs stopped it. It is resumable and stands at 98/144.
+    on background jobs stopped it. It is resumable, was resumed each
+    time, and finished on 2026-11-19.
   - Added a helper that prints the table rows for any measured model
     (`scripts/lm_table_rows.py`).
   - This record.
   - A new experiment on correlated trials within a build plate
-    (`experiments/plate_effects.py`; section 10).
+    (`experiments/plate_effects.py`). Result: the paper's analysis
+    breaks under plate correlation; two valid fixes, now in Section 6
+    and Appendix B.
+  - Qwen2.5-1.5B finished. It is the third model in Tables 1-2:
+    - 88 of 144 settings safe;
+    - 1.6x fewer generations than no ordering at half the safe region,
+      3.0x at 70%;
+    - the search stops at 2.1x fewer generations than the per-setting
+      test.
+  - More live runs on SmolLM2 (seeds 1-4) and a script that sets them
+    next to surface runs (`experiments/lm_live_summary.py`).
 
 ---
 
@@ -509,9 +522,9 @@ results/
 | Paper item | Result files (in `results/`) |
 |---|---|
 | Table 1, synthetic and 316L rows; Figure 2 | `final/scaling_toy-good.csv`, `final/scaling_lpbf-good.csv`, `final/scaling_grid_baselines.csv` |
-| Table 1, LM rows | `lm/lm_cost_50.csv` (12²), `lm/lm_cost_50_23.csv` (23²), `lm/lm_cost_50_qwen05b.csv`; 70% versions `lm_cost_70*` |
+| Table 1, LM rows | `lm/lm_cost_50.csv` (12²), `lm/lm_cost_50_23.csv` (23²), `lm/lm_cost_50_qwen05b.csv`, `lm/lm_cost_50_qwen15b.csv`; 70% versions `lm_cost_70*` |
 | Table 2, synthetic; Figure 3 | `final/fixed_confidence*.csv`, `final/bounds.csv` |
-| Table 2, LM rows | `lm/lm_fixed_confidence.csv`, `_23`, `_qwen05b` |
+| Table 2, LM rows | `lm/lm_fixed_confidence.csv`, `_23`, `_qwen05b`, `_qwen15b` |
 | Figure 1 | `lm/surface_scores_23.npz`, `lm/lm_fixed_budget_23.csv` |
 | Validity (0-2.75%) | `final/validity.csv`, `final/validity_edge.csv` |
 | Area-vs-budget curves (24²) | `final/curves_*_24.csv` |
@@ -522,8 +535,8 @@ results/
 | LM failure-definition sensitivity | `lm/lm_sensitivity.csv` |
 | 316L sensitivity | `final/physics_sensitivity_24.csv` |
 | Published 316L melt-pool check | `final/am_monotone_check.csv` |
-| Live LM run | `lm/lm_live_seed0.json` |
-| Measured LM surfaces | `lm/surface_scores.npz` (SmolLM2 12²), `_23.npz` (23²), `_qwen05b.npz`, `_qwen15b.npz` (1.5B, partial) |
+| Live LM runs | `lm/lm_live_seed0.json` ... `seed4.json`, summary `lm/lm_live_summary.csv` |
+| Measured LM surfaces | `lm/surface_scores.npz` (SmolLM2 12²), `_23.npz` (23²), `_qwen05b.npz`, `_qwen15b.npz` |
 | Correlated trials on a plate (Section 6, Appendix B) | `final/plate_effects_{single,cost,grid}.csv` |
 
 Each `log_*.txt` next to a CSV is the console output of the run that made it.
@@ -644,23 +657,14 @@ Listed in [`paper/submission_metadata.md`](paper/submission_metadata.md)
 
 ### C. In progress or ready to run
 
-- **Qwen2.5-1.5B on CPU**:
-  - 98 of 144 settings measured (`results/lm/surface_scores_qwen15b.npz`);
-    46 left, about 2.3 hours on 3 CPU threads. Resume with:
-    ```bash
-    HF_HOME=<cache> python3 experiments/lm_surface.py --model Qwen/Qwen2.5-1.5B --tag qwen15b --threads 3
-    ```
-  - Then follow "Add a new language model" above. On any GPU, the
-    remaining settings take minutes.
 - **GPU tier A**: `bash scripts/gpu_runs.sh` on one 80 GB GPU. It adds 7B
   rows on both grids and live runs on a 7B model. Details in
   `COMPUTE_PLAN.md`.
-- **More live runs on SmolLM2** (seeds 1-4, about 40 minutes each on 4 CPU
-  cores):
+- **Live runs on a larger model.** For example Qwen2.5-0.5B on CPU:
   ```bash
-  HF_HOME=<cache> python3 experiments/lm_live.py --seed <s>
+  HF_HOME=<cache> python3 experiments/lm_live.py --model Qwen/Qwen2.5-0.5B --surface results/lm/surface_scores_qwen05b.npz --seed 0
   ```
-  These strengthen "the live run agrees with the surface".
+  This takes about 2x longer than SmolLM2. On a GPU it is part of tier A.
 
 ### D. Status of the newest items
 
@@ -777,5 +781,5 @@ If ICML does not work out:
 
 (Updated at the end of each working session.)
 
-- Qwen2.5-1.5B: 98/144 settings measured; resumed 2026-11-18.
+- Qwen2.5-1.5B: done 2026-11-19, in Tables 1-2 and the text.
 - Plate-correlation experiment: done 2026-11-18, in the paper.
