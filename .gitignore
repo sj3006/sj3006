@@ -6,5 +6,5 @@ Full_Dataset.xlsx
 __pycache__/
 paper_outputs_quick/
 
-# LAMMPS machining: working run directory (key outputs are copied to machining/results/)
-machining/run/
+# LAMMPS machining: scratch run directories
+machining/run*/

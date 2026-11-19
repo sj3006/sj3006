@@ -1,0 +1,323 @@
+LAMMPS (22 Jul 2025 - Update 4)
+OMP_NUM_THREADS environment is not set. Defaulting to 1 thread.
+  using 1 OpenMP thread(s) per MPI task
+# =====================================================================
+#  3D nano-machining of aluminium with a spherical diamond tool
+#
+#  Workpiece : Al single crystal (FCC), EAM potential
+#  Tool      : rigid sphere of diamond atoms (R = 1.2 nm)
+#  Process   : tool sinks 0.8 nm into the top surface, then moves
+#              along +X for 5 nm, ploughing material into a chip
+#  Boundary  : bottom layer and all four side layers are fixed;
+#              a thin layer just inside them is held at 300 K
+#              (heat sink); all other Al atoms move freely (NVE)
+#
+#  Run   :  mpirun -np 4 lmp -in machining.in
+#  Output:  machining.lammpstrj  (open in OVITO)
+# =====================================================================
+
+units           metal
+dimension       3
+boundary        f f f
+atom_style      atomic
+atom_modify     map array
+
+# ---------------- parameters -----------------------------------------
+variable  a       equal 4.05     # Al lattice constant (A)
+variable  L       equal 25*${a}  # workpiece length  X (~10.1 nm)
+variable  L       equal 25*4.05  
+variable  H       equal 8*${a}   # workpiece height  Y (~3.2 nm)
+variable  H       equal 8*4.05   
+variable  W       equal 12*${a}  # workpiece width   Z (~4.9 nm)
+variable  W       equal 12*4.05  
+variable  R       equal 12.0     # tool radius (A)
+variable  depth   equal 8.0      # penetration depth (A)
+variable  gap     equal 4.0      # initial gap above the surface (A)
+variable  v       equal 2.0      # tool speed (A/ps) = 200 m/s
+variable  travel  equal 50.0     # machining length along X (A)
+variable  b       equal 4.0      # thickness of fixed boundary layers (A)
+variable  t       equal 8.0      # fixed + heat-sink layer thickness (A)
+
+variable  xc      equal 20.0             # tool start position
+variable  yc      equal ${H}+${R}+${gap}
+variable  yc      equal 32.4+${R}+${gap}
+variable  yc      equal 32.4+12+${gap}
+variable  yc      equal 32.4+12+4
+variable  zc      equal ${W}/2
+variable  zc      equal 48.6/2
+
+# ---------------- simulation box -------------------------------------
+region          box block -10 $(v_L+10) -10 $(v_H+40) -15 $(v_W+15) units box
+region          box block -10 111.25 -10 $(v_H+40) -15 $(v_W+15) units box
+region          box block -10 111.25 -10 72.400000000000005684 -15 $(v_W+15) units box
+region          box block -10 111.25 -10 72.400000000000005684 -15 63.600000000000001421 units box
+create_box      2 box
+Created orthogonal box = (-10 -10 -15) to (111.25 72.4 63.6)
+  2 by 2 by 1 MPI processor grid
+
+# ---------------- workpiece: type 1 = Al -----------------------------
+lattice         fcc ${a}
+lattice         fcc 4.05
+Lattice spacing in x,y,z = 4.05 4.05 4.05
+region          work block 0 $(v_L-0.1) 0 $(v_H-0.1) 0 $(v_W-0.1) units box
+region          work block 0 101.15000000000000568 0 $(v_H-0.1) 0 $(v_W-0.1) units box
+region          work block 0 101.15000000000000568 0 32.299999999999997158 0 $(v_W-0.1) units box
+region          work block 0 101.15000000000000568 0 32.299999999999997158 0 48.5 units box
+create_atoms    1 region work
+Created 9600 atoms
+  using lattice units in orthogonal box = (-10 -10 -15) to (111.25 72.4 63.6)
+  create_atoms CPU = 0.001 seconds
+
+# ---------------- spherical tool: type 2 = C (diamond) ---------------
+lattice         diamond 3.567
+Lattice spacing in x,y,z = 3.567 3.567 3.567
+region          sphere sphere ${xc} ${yc} ${zc} ${R} units box
+region          sphere sphere 20 ${yc} ${zc} ${R} units box
+region          sphere sphere 20 48.4 ${zc} ${R} units box
+region          sphere sphere 20 48.4 24.3 ${R} units box
+region          sphere sphere 20 48.4 24.3 12 units box
+create_atoms    2 region sphere
+Created 1276 atoms
+  using lattice units in orthogonal box = (-10 -10 -15) to (111.25 72.4 63.6)
+  create_atoms CPU = 0.001 seconds
+
+mass            1 26.98
+mass            2 12.01
+
+# ---------------- interatomic potentials -----------------------------
+pair_style      hybrid eam/fs morse 5.0
+pair_coeff      * * eam/fs Al_mm.eam.fs Al NULL      # Al-Al
+Reading eam/fs potential file Al_mm.eam.fs with DATE: 2007-06-11
+pair_coeff      1 2 morse 0.28 2.78 2.20              # Al-C
+pair_coeff      2 2 none                              # tool is rigid
+neighbor        2.0 bin
+neigh_modify    every 1 delay 0 check yes exclude type 2 2
+
+# ---------------- groups ---------------------------------------------
+region          bottom block INF INF INF ${b} INF INF units box
+region          bottom block INF INF INF 4 INF INF units box
+region          xlo    block INF ${b} INF INF INF INF units box
+region          xlo    block INF 4 INF INF INF INF units box
+region          xhi    block $(v_L-v_b-0.5) INF INF INF INF INF units box
+region          xhi    block 96.75 INF INF INF INF INF units box
+region          zlo    block INF INF INF INF INF ${b} units box
+region          zlo    block INF INF INF INF INF 4 units box
+region          zhi    block INF INF INF INF $(v_W-v_b-0.5) INF units box
+region          zhi    block INF INF INF INF 44.100000000000001421 INF units box
+region          fixreg union 5 bottom xlo xhi zlo zhi
+region          bottom2 block INF INF INF ${t} INF INF units box
+region          bottom2 block INF INF INF 8 INF INF units box
+region          xlo2    block INF ${t} INF INF INF INF units box
+region          xlo2    block INF 8 INF INF INF INF units box
+region          xhi2    block $(v_L-v_t-0.5) INF INF INF INF INF units box
+region          xhi2    block 92.75 INF INF INF INF INF units box
+region          zlo2    block INF INF INF INF INF ${t} units box
+region          zlo2    block INF INF INF INF INF 8 units box
+region          zhi2    block INF INF INF INF $(v_W-v_t-0.5) INF units box
+region          zhi2    block INF INF INF INF 40.100000000000001421 INF units box
+region          sinkreg union 5 bottom2 xlo2 xhi2 zlo2 zhi2
+
+group           tool   type 2
+1276 atoms in group tool
+group           al     type 1
+9600 atoms in group al
+group           fixed  region fixreg
+3160 atoms in group fixed
+group           fixed  intersect fixed al
+3160 atoms in group fixed
+group           mobile subtract al fixed
+6440 atoms in group mobile
+group           sink   region sinkreg
+5568 atoms in group sink
+group           sink   subtract sink fixed tool
+2408 atoms in group sink
+group           free   subtract mobile sink
+4032 atoms in group free
+
+# ---------------- settings -------------------------------------------
+timestep        0.002                                 # 2 fs
+compute         pe all pe/atom
+compute         Tmob mobile temp
+compute         Tfree free temp
+compute         Tsink sink temp
+variable        Fx equal fcm(tool,x)*1.602            # force on tool (nN)
+variable        Fy equal fcm(tool,y)*1.602
+variable        Fz equal fcm(tool,z)*1.602
+
+fix             hold  fixed setforce 0.0 0.0 0.0      # fixed boundary
+velocity        fixed set 0.0 0.0 0.0
+velocity        tool  set 0.0 0.0 0.0
+
+thermo_style    custom step time c_Tfree c_Tsink v_Fx v_Fy v_Fz atoms
+thermo_modify   lost ignore
+thermo          500
+
+dump            d1 all custom 500 machining.lammpstrj id type element x y z c_pe
+dump_modify     d1 element Al C sort id
+
+# ---------------- 1) equilibrate at 300 K (1 ps) ---------------------
+velocity        mobile create 300.0 4928459 dist gaussian
+fix             eq mobile nvt temp 300.0 300.0 0.1
+run             500
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 8.5
+  ghost atom cutoff = 8.5
+  binsize = 4.25, bins = 29 20 19
+  3 neighbor lists, perpetual/occasional/extra = 3 0 0
+  (1) pair eam/fs, perpetual, skip from (3)
+      attributes: half, newton on
+      pair build: skip
+      stencil: none
+      bin: none
+  (2) pair morse, perpetual, skip from (3)
+      attributes: half, newton on
+      pair build: skip
+      stencil: none
+      bin: none
+  (3) neighbor class addition, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 5.19 | 6.837 | 8.67 Mbytes
+   Step          Time         c_Tfree        c_Tsink          v_Fx           v_Fy           v_Fz         Atoms   
+         0   0              303.4715       294.31091      0              0              0                  10876 
+       500   1              307.56357      302.7316       0              0              0                  10876 
+Loop time of 3.65692 on 4 procs for 500 steps with 10876 atoms
+
+Performance: 23.626 ns/day, 1.016 hours/ns, 136.727 timesteps/s, 1.487 Matom-step/s
+66.2% CPU use with 4 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 1.4627     | 2.4622     | 3.4799     |  63.7 | 67.33
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0.12494    | 1.0853     | 2.0468     |  90.5 | 29.68
+Output  | 0.0038952  | 0.0039708  | 0.0040349  |   0.1 |  0.11
+Modify  | 0.039166   | 0.089178   | 0.15961    |  17.4 |  2.44
+Other   |            | 0.01628    |            |       |  0.45
+
+Nlocal:           2719 ave        4800 max           0 min
+Histogram: 1 0 1 0 0 0 0 0 0 2
+Nghost:         1155.5 ave        1440 max         768 min
+Histogram: 1 0 0 1 0 0 0 0 0 2
+Neighs:              0 ave           0 max           0 min
+Histogram: 4 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 0
+Ave neighs/atom = 0
+Neighbor list builds = 0
+Dangerous builds = 0
+unfix           eq
+fix             md   mobile nve                       # all moving atoms
+fix             heat sink langevin 300.0 300.0 0.1 4928459   # heat sink layer
+fix_modify      heat temp Tsink
+
+# ---------------- 2) tool penetrates the surface ---------------------
+fix             down tool move linear 0.0 -${v} 0.0 units box
+fix             down tool move linear 0.0 -2 0.0 units box
+run             $(round((v_gap+v_depth)/v_v/dt))
+run             3000
+Per MPI rank memory allocation (min/avg/max) = 7.454 | 9.29 | 11.61 Mbytes
+   Step          Time         c_Tfree        c_Tsink          v_Fx           v_Fy           v_Fz         Atoms   
+       500   1              307.56357      302.7316       0              0              0                  10876 
+      1000   2              310.93675      310.39765      0.00032750326 -0.021596373    0.0010521921       10876 
+      1500   3              304.803        293.09873      2.1228723     -3.0924773     -1.4464641          10876 
+      2000   4              310.71353      297.2989       1.8620837     -6.3937327     -11.093082          10876 
+      2500   5              324.88645      298.51526      4.3632879      1.2292164     -0.71853534         10876 
+      3000   6              339.78698      301.03844      4.5787288      19.258329     -9.6130764          10876 
+      3500   7              348.8427       298.9243       6.2856036      46.957661      12.79426           10876 
+Loop time of 24.2249 on 4 procs for 3000 steps with 10876 atoms
+
+Performance: 21.400 ns/day, 1.122 hours/ns, 123.840 timesteps/s, 1.347 Matom-step/s
+67.5% CPU use with 4 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 10.132     | 16.2       | 22.366     | 150.2 | 66.87
+Neigh   | 0.0012256  | 0.33519    | 0.64293    |  47.6 |  1.38
+Comm    | 0.75475    | 6.8698     | 12.979     | 227.2 | 28.36
+Output  | 0.022427   | 0.022981   | 0.023887   |   0.4 |  0.09
+Modify  | 0.0044731  | 0.1903     | 0.35384    |  37.5 |  0.79
+Other   |            | 0.6068     |            |       |  2.51
+
+Nlocal:           2719 ave        5071 max           0 min
+Histogram: 1 0 1 0 0 0 0 0 0 2
+Nghost:         1351.5 ave        1657 max         800 min
+Histogram: 1 0 0 0 0 0 1 0 1 1
+Neighs:              0 ave           0 max           0 min
+Histogram: 4 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 0
+Ave neighs/atom = 0
+Neighbor list builds = 53
+Dangerous builds = 0
+unfix           down
+
+# ---------------- 3) tool machines along +X --------------------------
+fix             cut tool move linear ${v} 0.0 0.0 units box
+fix             cut tool move linear 2 0.0 0.0 units box
+run             $(round(v_travel/v_v/dt))
+run             12500
+Per MPI rank memory allocation (min/avg/max) = 7.47 | 9.499 | 11.63 Mbytes
+   Step          Time         c_Tfree        c_Tsink          v_Fx           v_Fy           v_Fz         Atoms   
+      3500   7              348.8427       298.9243       6.2856036      46.957661      12.79426           10876 
+      4000   8              365.33347      313.47675     -24.381377      1.0134638     -6.774703           10876 
+      4500   9              380.36588      302.04259     -24.928708      1.8357408      15.986822          10876 
+      5000   10             381.51404      300.8904      -34.633419      22.15753      -1.8764333          10876 
+      5500   11             385.525        307.77028     -28.071092      16.333091      16.128946          10876 
+      6000   12             378.30879      296.9149      -31.984905      19.360885      10.682041          10876 
+      6500   13             366.34053      303.49134     -20.788482     -1.8719759     -2.8079391          10876 
+      7000   14             371.22778      304.58264     -9.6672215      33.962387      24.98851           10876 
+      7500   15             374.62024      300.4346      -48.368719      26.903135      11.605259          10876 
+      8000   16             366.5214       314.49088     -43.663374      14.464567     -14.54389           10876 
+      8500   17             372.80537      305.81728     -24.795918      20.347227      26.659434          10876 
+      9000   18             379.53549      309.43087     -35.162076      10.88939       0.92696198         10876 
+      9500   19             387.53649      310.9598      -23.729264      25.058376      1.667219           10876 
+     10000   20             387.85942      310.17728     -32.037169      7.0099909      7.049975           10876 
+     10500   21             384.5909       310.32334     -46.340001      8.3657741      30.952309          10876 
+     11000   22             387.85554      299.34505     -39.98316       25.982643     -21.734909          10876 
+     11500   23             382.58636      302.12709     -46.684285      36.364003      13.326934          10876 
+     12000   24             388.51916      302.20235     -31.163053      13.337711     -7.0955902          10876 
+     12500   25             385.64628      301.28318     -35.063065      18.310491     -11.834964          10876 
+     13000   26             389.43126      298.16418     -41.983117      20.180118      18.966638          10876 
+     13500   27             394.06206      299.81437     -37.931852      12.593378      2.7959297          10876 
+     14000   28             399.30892      309.95556     -48.157153      20.372538      24.564447          10876 
+     14500   29             403.20043      305.08816     -11.002321      43.165176     -17.836335          10876 
+     15000   30             388.67638      307.16326     -24.630513      15.300335      25.716531          10876 
+     15500   31             403.30255      311.25318     -35.352529      51.510245      0.74312572         10876 
+     16000   32             413.70584      311.07517     -15.801347     -14.876764     -3.7268095          10876 
+Loop time of 103.1 on 4 procs for 12500 steps with 10876 atoms
+
+Performance: 20.951 ns/day, 1.146 hours/ns, 121.242 timesteps/s, 1.319 Matom-step/s
+67.5% CPU use with 4 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 45.262     | 68.985     | 92.951     | 276.6 | 66.91
+Neigh   | 0.64965    | 2.6932     | 4.7775     | 123.5 |  2.61
+Comm    | 3.406      | 29.112     | 55.019     | 457.3 | 28.24
+Output  | 0.087797   | 0.089783   | 0.092477   |   0.6 |  0.09
+Modify  | 0.14604    | 0.82434    | 1.5013     |  74.0 |  0.80
+Other   |            | 1.396      |            |       |  1.35
+
+Nlocal:           2719 ave        4846 max          20 min
+Histogram: 1 0 0 1 0 0 0 0 0 2
+Nghost:        1259.25 ave        1755 max         874 min
+Histogram: 1 1 0 0 0 0 1 0 0 1
+Neighs:              0 ave           0 max           0 min
+Histogram: 4 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 0
+Ave neighs/atom = 0
+Neighbor list builds = 399
+Dangerous builds = 0
+
+write_data      final.data
+System init for write_data ...
+Total wall time: 0:02:11

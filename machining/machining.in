@@ -1,0 +1,126 @@
+# =====================================================================
+#  3D nano-machining of aluminium with a spherical diamond tool
+#
+#  Workpiece : Al single crystal (FCC), EAM potential
+#  Tool      : rigid sphere of diamond atoms (R = 1.2 nm)
+#  Process   : tool sinks 0.8 nm into the top surface, then moves
+#              along +X for 5 nm, ploughing material into a chip
+#  Boundary  : bottom layer and all four side layers are fixed;
+#              a thin layer just inside them is held at 300 K
+#              (heat sink); all other Al atoms move freely (NVE)
+#
+#  Run   :  mpirun -np 4 lmp -in machining.in
+#  Output:  machining.lammpstrj  (open in OVITO)
+# =====================================================================
+
+units           metal
+dimension       3
+boundary        f f f
+atom_style      atomic
+atom_modify     map array
+
+# ---------------- parameters -----------------------------------------
+variable  a       equal 4.05     # Al lattice constant (A)
+variable  L       equal 25*${a}  # workpiece length  X (~10.1 nm)
+variable  H       equal 8*${a}   # workpiece height  Y (~3.2 nm)
+variable  W       equal 12*${a}  # workpiece width   Z (~4.9 nm)
+variable  R       equal 12.0     # tool radius (A)
+variable  depth   equal 8.0      # penetration depth (A)
+variable  gap     equal 4.0      # initial gap above the surface (A)
+variable  v       equal 2.0      # tool speed (A/ps) = 200 m/s
+variable  travel  equal 50.0     # machining length along X (A)
+variable  b       equal 4.0      # thickness of fixed boundary layers (A)
+variable  t       equal 8.0      # fixed + heat-sink layer thickness (A)
+
+variable  xc      equal 20.0             # tool start position
+variable  yc      equal ${H}+${R}+${gap}
+variable  zc      equal ${W}/2
+
+# ---------------- simulation box -------------------------------------
+region          box block -10 $(v_L+10) -10 $(v_H+40) -15 $(v_W+15) units box
+create_box      2 box
+
+# ---------------- workpiece: type 1 = Al -----------------------------
+lattice         fcc ${a}
+region          work block 0 $(v_L-0.1) 0 $(v_H-0.1) 0 $(v_W-0.1) units box
+create_atoms    1 region work
+
+# ---------------- spherical tool: type 2 = C (diamond) ---------------
+lattice         diamond 3.567
+region          sphere sphere ${xc} ${yc} ${zc} ${R} units box
+create_atoms    2 region sphere
+
+mass            1 26.98
+mass            2 12.01
+
+# ---------------- interatomic potentials -----------------------------
+pair_style      hybrid eam/fs morse 5.0
+pair_coeff      * * eam/fs Al_mm.eam.fs Al NULL      # Al-Al
+pair_coeff      1 2 morse 0.28 2.78 2.20              # Al-C
+pair_coeff      2 2 none                              # tool is rigid
+neighbor        2.0 bin
+neigh_modify    every 1 delay 0 check yes exclude type 2 2
+
+# ---------------- groups ---------------------------------------------
+region          bottom block INF INF INF ${b} INF INF units box
+region          xlo    block INF ${b} INF INF INF INF units box
+region          xhi    block $(v_L-v_b-0.5) INF INF INF INF INF units box
+region          zlo    block INF INF INF INF INF ${b} units box
+region          zhi    block INF INF INF INF $(v_W-v_b-0.5) INF units box
+region          fixreg union 5 bottom xlo xhi zlo zhi
+region          bottom2 block INF INF INF ${t} INF INF units box
+region          xlo2    block INF ${t} INF INF INF INF units box
+region          xhi2    block $(v_L-v_t-0.5) INF INF INF INF INF units box
+region          zlo2    block INF INF INF INF INF ${t} units box
+region          zhi2    block INF INF INF INF $(v_W-v_t-0.5) INF units box
+region          sinkreg union 5 bottom2 xlo2 xhi2 zlo2 zhi2
+
+group           tool   type 2
+group           al     type 1
+group           fixed  region fixreg
+group           fixed  intersect fixed al
+group           mobile subtract al fixed
+group           sink   region sinkreg
+group           sink   subtract sink fixed tool
+group           free   subtract mobile sink
+
+# ---------------- settings -------------------------------------------
+timestep        0.002                                 # 2 fs
+compute         pe all pe/atom
+compute         Tmob mobile temp
+compute         Tfree free temp
+compute         Tsink sink temp
+variable        Fx equal fcm(tool,x)*1.602            # force on tool (nN)
+variable        Fy equal fcm(tool,y)*1.602
+variable        Fz equal fcm(tool,z)*1.602
+
+fix             hold  fixed setforce 0.0 0.0 0.0      # fixed boundary
+velocity        fixed set 0.0 0.0 0.0
+velocity        tool  set 0.0 0.0 0.0
+
+thermo_style    custom step time c_Tfree c_Tsink v_Fx v_Fy v_Fz atoms
+thermo_modify   lost ignore
+thermo          500
+
+dump            d1 all custom 500 machining.lammpstrj id type element x y z c_pe
+dump_modify     d1 element Al C sort id
+
+# ---------------- 1) equilibrate at 300 K (1 ps) ---------------------
+velocity        mobile create 300.0 4928459 dist gaussian
+fix             eq mobile nvt temp 300.0 300.0 0.1
+run             500
+unfix           eq
+fix             md   mobile nve                       # all moving atoms
+fix             heat sink langevin 300.0 300.0 0.1 4928459   # heat sink layer
+fix_modify      heat temp Tsink
+
+# ---------------- 2) tool penetrates the surface ---------------------
+fix             down tool move linear 0.0 -${v} 0.0 units box
+run             $(round((v_gap+v_depth)/v_v/dt))
+unfix           down
+
+# ---------------- 3) tool machines along +X --------------------------
+fix             cut tool move linear ${v} 0.0 0.0 units box
+run             $(round(v_travel/v_v/dt))
+
+write_data      final.data

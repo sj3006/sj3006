@@ -1,126 +1,76 @@
-# Quick 3D nanometric cutting of aluminium: LAMMPS MD
+# 3D machining of aluminium with a spherical tool: LAMMPS + OVITO
 
-A small, fast 3D molecular dynamics model of a machining operation. A rigid diamond
-tool cuts a free-standing single-crystal aluminium block at constant speed and depth
-of cut. The tool is narrower than the block, so the result is truly 3D: a chip forms
-on the rake face, a groove is left behind, and side burrs appear where material
-flows sideways around the tool.
+A rigid spherical diamond tool sinks into the top surface of an aluminium workpiece,
+then moves along the X-axis. It ploughs out a groove and pushes the removed material
+up into a chip in front of it.
 
-The whole run takes **about 20–25 seconds on 4 CPU cores**.
+![machining](ovito/machining_steps.png)
 
-```
-            y (up)
-            |        chip
-            |       _/|    diamond tool (rigid, 2 nm wide in z)
-            |  ____/  |    ---> moves in -x at 200 m/s
-            | |  Al   |_/  <- 10 deg clearance face
-            | |          |  depth of cut 0.8 nm
-            | |__________|
-            | thermostat layer (300 K)
-            | fixed layer (bottom and left end)
-            +-----------------------> x
-           /
-          z (width: free surfaces on both sides)
-```
+## Deliverables
 
-## Parameters
+| File | What it is |
+|---|---|
+| `machining.in` | LAMMPS input file |
+| `Al_mm.eam.fs` | Al EAM potential used by the input (ships with LAMMPS) |
+| `machining.lammpstrj` | dump file: 33 frames, one every 1 ps (open in OVITO) |
+| `log.lammps` | LAMMPS log of the run (forces on the tool, temperature) |
+| `ovito/machining.gif` | OVITO animation of the whole run |
+| `ovito/machining_steps.png` | OVITO 3D views at 4 moments: start, penetration, mid-cut, end |
+| `ovito/machining_3d.png` | OVITO 3D view at the end, Al coloured by height |
+| `ovito/machining_slice.png` | OVITO cross-section through the tool path (crystal structure) |
+| `ovito_render.py` | script that produced the OVITO images |
+
+## Setup
 
 | Item | Value |
 |---|---|
-| Workpiece | Al, FCC, a = 4.05 Å, 6.5 × 3.2 × 3.2 nm (4,096 atoms) |
-| Orientation | x = [100], y = [010], z = [001]; cut on the (010) surface along [-100] |
-| Tool | diamond (a = 3.567 Å), rigid, 1,091 atoms, 2.0 nm wide |
-| Tool geometry | rake angle 0°, clearance angle 10°, sharp edge |
-| Cutting speed | 200 m/s (2 Å/ps) |
-| Depth of cut | 0.8 nm |
-| Cutting length | 2.0 nm (10 ps) |
-| Temperature | 300 K, Langevin thermostat on the boundary layer |
-| Timestep | 2 fs; 1 ps equilibration, then 10 ps of cutting (5,500 steps in total) |
-| Boundaries | non-periodic in all directions (free 3D block in a fixed box) |
-| Al–Al | EAM, Mendelev et al., Phil. Mag. 88, 1723 (2008) (`Al_mm.eam.fs`) |
-| Al–C | Morse: D₀ = 0.28 eV, α = 2.78 Å⁻¹, r₀ = 2.20 Å, cutoff 5 Å |
-| C–C | none (the tool is rigid) |
+| Workpiece | Al single crystal, 10.1 × 3.2 × 4.9 nm (X × Y × Z), 9,600 atoms, Y is up |
+| Tool | rigid sphere of diamond atoms, radius 1.2 nm, 1,276 atoms |
+| Tool path | starts 0.4 nm above the surface, moves down to 0.8 nm depth, then 5 nm along +X |
+| Tool speed | 200 m/s (2 Å/ps) for both stages |
+| Potentials | Al–Al: EAM (Mendelev 2008); Al–C: Morse (D₀ = 0.28 eV, α = 2.78 Å⁻¹, r₀ = 2.2 Å) |
+| Timestep | 2 fs; 1 ps equilibration at 300 K, 6 ps penetration, 25 ps machining |
 
-Atom groups: a 0.4 nm **fixed** layer at the bottom and left end holds the block in
-place. The next 0.8 nm is a **thermostat** layer that removes heat. All other Al
-atoms are **Newtonian** (plain NVE).
+**Boundary conditions:**
+- **Fixed:** a 0.4 nm layer at the bottom and on all four sides. Forces and
+  velocities there are zero, which prevents rigid-body motion.
+- **Heat sink:** the next 0.4 nm inside the fixed layers is held at 300 K. It soaks
+  up the heat from machining, as the surrounding bulk would in a real part.
+- **Free:** all other Al atoms move freely (NVE) in response to the tool.
 
-Every parameter is a variable at the top of `in.cutting`.
+## Results
 
-## Results of the committed run
+- **Material removal:** the tool leaves a groove about 0.8 nm deep, and the displaced
+  aluminium piles up ahead of the tool as a chip. It also forms small ridges along the groove.
+- **Forces during machining (mean):** about 32 nN resisting the tool along X, and about
+  19 nN pushing it up.
+- **Temperature:** the free region stays at about 390 K.
+- **Runtime:** 2 min 11 s on 4 cores.
 
-* Mean cutting force Fx ≈ 8.7 nN and thrust force Fy ≈ 3.0 nN, averaged after the
-  tool engages at about 0.6 nm of travel.
-* The Newtonian-zone temperature climbs from about 316 K to about 430 K by the end of the cut.
-* A chip piles up on the rake face, and side burrs form on both sides of the groove.
+## Viewing the dump in OVITO
 
-See `figures/forces.png` and `figures/snapshots.png`.
+1. **File → Load File** and choose `machining.lammpstrj`. All 33 frames load as an
+   animation; Al and C are named automatically.
+2. OVITO treats Z as up, but this simulation uses Y. To get a natural view, add
+   **Affine transformation** with the rotation matrix rows `1 0 0 / 0 0 -1 / 0 1 0`,
+   or simply rotate the camera.
+3. Optional modifiers:
+   - **Color coding** on `Position.Y` (height) shows the groove and the chip.
+   - **Common neighbor analysis** shows the crystal (green) and the disordered chip (white).
+   - **Slice** through the middle of the width shows the side view.
 
-## Files
+To re-create the images: `pip install ovito`, then `python ovito_render.py machining.lammpstrj`.
+On a headless Linux machine, also install `mesa-vulkan-drivers`.
 
-| Path | What it is |
-|---|---|
-| `in.cutting` | LAMMPS input script |
-| `Al_mm.eam.fs` | Al EAM potential (ships with LAMMPS) |
-| `postprocess.py` | force plot and quick 2D snapshots (matplotlib) |
-| `results/dump/cut.*.gz` | **trajectory for OVITO**: 21 frames, one every 0.5 ps (1 Å of tool travel) |
-| `results/final.data` | final configuration (LAMMPS data file, also opens in OVITO) |
-| `results/forces.dat` | step, time, tool travel, Fx, Fy, Fz (nN), Newtonian-zone T, every 0.05 ps |
-| `results/log.lammps` | full LAMMPS log |
-| `figures/` | force/temperature plot and snapshots |
-
-Dump columns: `id type element x y z c_pe`. Type 1 is Al and type 2 is C;
-the `element` column lets OVITO name the particle types. `c_pe` is per-atom
-potential energy in eV.
-
-## Viewing in OVITO
-
-1. **File → Load File** and pick `results/dump/cut.0.gz`. OVITO detects the
-   numbered sequence `cut.*.gz` on its own. If it doesn't, type `cut.*.gz` as the
-   file name. OVITO reads `.gz` directly; there's no need to unzip.
-2. Press play on the animation bar to watch the cut.
-3. Useful modifiers:
-   - **Common neighbor analysis** (adaptive): FCC shows green, HCP (stacking faults)
-     red, and disordered/surface atoms white. To keep the tool out of it, first add an
-     **Expression selection** with `ParticleType==1` (Al only), then tick
-     *Use only selected particles* in CNA.
-   - **Slice** with normal (0,0,1) through the middle of the width gives the classic side
-     view of chip formation.
-   - **Color coding** on `c_pe` (energy) or `Position.Y` (height) highlights the chip
-     and the burrs.
-   - **Dislocation analysis (DXA)** with input crystal FCC shows any dislocation lines.
-
-## Re-running it yourself
-
-Requirements: LAMMPS with the MANYBODY and COMPRESS packages. The PyPI wheel has both:
+## Running the simulation
 
 ```bash
-pip install lammps mpich matplotlib numpy
+pip install lammps mpich
 ```
 
 ```bash
-cd machining && mkdir -p run && cp in.cutting Al_mm.eam.fs run/ && cd run
+mpirun -np 4 lmp -in machining.in
 ```
 
-```bash
-mpirun -np 4 lmp -in in.cutting
-```
-
-```bash
-cd .. && python postprocess.py run
-```
-
-Output goes to `run/`, which is gitignored; the committed copy is in `results/`.
-On one core it takes roughly 35–40 s.
-
-## Caveats
-
-* The model is deliberately tiny so that it runs in seconds. The fixed and thermostat
-  layers are close to the cutting zone, and the numbers are noisy. Increase `nx/ny/nz`
-  and `cutlen` for a more realistic run; the cost grows with atom count × steps.
-* 200 m/s is much faster than real ultra-precision machining (about 1–10 m/s). MD
-  needs high speeds to cut nanometres in picoseconds.
-* The tool is rigid, so wear is not modelled.
-* The Al–C Morse parameters are illustrative values for a weakly adhesive
-  diamond/Al contact. Check them against the literature before quoting forces
-  quantitatively.
+Run it in a folder that contains `machining.in` and `Al_mm.eam.fs`. It writes
+`machining.lammpstrj`, `log.lammps` and `final.data`.
