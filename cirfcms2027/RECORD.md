@@ -214,6 +214,11 @@ its own. It is rebuilt from the working directories by
 `tools/build_replication.py`, so it does not drift from them. Its
 `README.md` is the starting point.
 
+The package was tested on 19 November 2026 from a fresh unpacked copy outside
+the repository: every check passed, and the certificate and fidelity results,
+regenerated from scratch, agreed with the shipped data. The details are in
+`replication/VERIFICATION.md`.
+
 ## 9. Open items
 
 * Fidelity paper: choice of journal; abstract to be shortened to the journal's

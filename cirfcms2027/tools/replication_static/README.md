@@ -39,6 +39,7 @@ source repository.
 | `environment/` | pinned package versions and the computing environment |
 | `scripts/` | verification and reproduction scripts |
 | `MANIFEST.tsv` | every file in the package with its size and SHA-256 checksum |
+| `VERIFICATION.md` | the record of testing this package from a fresh copy |
 | `LICENSE-NOTICE.md` | licensing status |
 | `CITATION.md` | how to cite the papers and the data |
 

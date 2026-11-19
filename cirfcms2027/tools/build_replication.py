@@ -172,7 +172,7 @@ def build_docs() -> None:
 
 
 def build_static() -> None:
-    for f in ("LICENSE-NOTICE.md", "CITATION.md"):
+    for f in ("LICENSE-NOTICE.md", "CITATION.md", "VERIFICATION.md"):
         copy(STATIC / f, OUT / f)
     copy_tree(STATIC / "environment", OUT / "environment")
     copy_tree(STATIC / "scripts", OUT / "scripts")
