@@ -10,7 +10,7 @@ It is written so that you can finish and submit the paper, answer
 reviewers, and pick the work up again later, with no AI assistant and no
 memory of the conversations that produced it.
 
-Last updated: 2026-11-18. The running log of dated changes is at the
+Last updated: 2026-11-19. The running log of dated changes is at the
 bottom of [`ROADMAP.md`](ROADMAP.md); this file is the overview.
 
 ---
@@ -266,15 +266,19 @@ LB = the lower bound of Theorem 2.
   certified by spreading in 75-92% of runs; an audit catches gross
   violations (96-100%) but rarely mild ones (4-9%). The paper says so.
 - **Is Assumption A true?**
-  - *LM:* no setting deviates from the monotone fit at the 1% level; 1 of
-    264 neighbouring pairs is reversed by more than 2 standard errors.
+  - *LM:* on all three models, no setting deviates from the monotone fit
+    at the 1% level; 0-1 of 264 neighbouring pairs is reversed by more
+    than 2 standard errors.
   - *316L:* in published melt-pool measurements from 11 single-track
     studies (MeltpoolNet), depth and width grow with power and fall with
     speed in every study; 5 of 942 neighbouring pairs reverse by more than
     2 standard errors.
-- **Live run:** the certifier queried SmolLM2 directly: 8.0k generations
-  certified 64 of 78 safe settings and no unsafe one, in line with the
-  surface-based runs.
+- **Live runs:** the certifier queried SmolLM2 directly in five runs.
+  Each used 8.0k generations and certified 59-65 of the 78 safe settings
+  (62.8 on average) and no unsafe one. Twenty runs on the measured surface
+  at the same budget certify 59-69 (64.3 on average). The benchmark's
+  shortcut (drawing outcomes from the measured surface) therefore matches
+  querying the model.
 
 ### The five pointers you set, and where each stands
 
@@ -783,3 +787,5 @@ If ICML does not work out:
 
 - Qwen2.5-1.5B: done 2026-11-19, in Tables 1-2 and the text.
 - Plate-correlation experiment: done 2026-11-18, in the paper.
+- Live runs: five (seeds 0-4), done 2026-11-19, in the paper.
+- Nothing is running. Everything is committed and pushed.

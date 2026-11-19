@@ -1,6 +1,9 @@
 kind,seed,budget,generations,certified,unsafe_certified,safe_reference
 live,0,8000,8016,64,0,78
 live,1,8000,8016,59,0,78
+live,2,8000,8016,65,0,78
+live,3,8000,8016,61,0,78
+live,4,8000,8016,65,0,78
 surface,0,8000,8016,65,0,78
 surface,1,8000,8016,64,0,78
 surface,2,8000,8016,68,0,78

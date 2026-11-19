@@ -325,3 +325,19 @@ These change the method, so they need your answer before Phase 2:
   6, Appendix B, Limitations, the Impact Statement and reviewer FAQ 2;
   the main text now ends near the top of page 8. lm_live.py gains
   --threads; a second live run (seed 1) is running.
+- 2026-11-19: Qwen2.5-1.5B finished (12 x 12, 160 generations per setting;
+  about 7 h on three CPU threads in four pieces). 88 of 144 settings safe;
+  no setting off the monotone fit at 1%, 0 of 264 pairs reversed beyond
+  2 SE. Half the safe region: ours 6.5k generations (pilot counted), no
+  ordering 10.6k (1.6x), full-grid FST 17.0k, Bonferroni 27.2k; at 70%:
+  7.7k / 23.4k / 47.7k / 63.1k (3.0x and 6.2x). Fixed confidence: search
+  24.4k (8 of 8 complete, none unsafe) vs 51.5k per-setting (2.1x), 11.0x
+  the ordered bound. GP: errs in every run at beta 2, 35-90% at 3; at 4
+  certifies at most 58% and errs in up to 20% (ours 82%). Added to Tables
+  1-2 and the text (abstract: "1.6-2.0x fewer on two larger models";
+  Limitations: three small models, 0.1B-1.5B). Five live runs on SmolLM2
+  (seeds 0-4, 8.0k generations each): 59-65 of 78 safe settings
+  certified (62.8 on average), none unsafe; 20 surface runs at the same
+  budget: 59-69 (64.3), none unsafe (experiments/lm_live_summary.py).
+  Paper text updated ("five live runs agree"). Main text ends about a
+  quarter down page 8.

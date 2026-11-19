@@ -419,10 +419,11 @@ differs from the monotone fit at the 1\% level (exact binomial test), and
 between equal rates; the larger models give no setting and 1 and 0 of 264
 pairs. 78 of the 144 settings are safe (Qwen2.5-0.5B: 86; 1.5B: 88), and 292 of
 the 529 on the finer grid (Figure~\ref{fig:lm}). Benchmark runs draw fresh outcomes from the fitted
-surface. As a check, one live run queried the model directly: with 8.0k
-real generations it certified 64 of the 78 safe settings and no unsafe
-one (judged against the measured surface), in line with the 65 certified
-on average by benchmark runs at the same budget.
+surface. As a check, five live runs queried the model directly: with 8.0k
+real generations each they certified 59--65 of the 78 safe settings (62.8
+on average) and no unsafe one (judged against the measured surface), in
+line with benchmark runs at the same budget (59--69, 64.3 on average, 20
+runs).
 \emph{Additive manufacturing.} A Rosenthal melt-pool model
 \citep{rosenthal1946} of 316L with lack-of-fusion \citep{tang2017lof},
 keyhole \citep{king2014keyhole} and balling criteria, and a synthetic

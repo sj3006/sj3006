@@ -48,8 +48,8 @@ settings of language models, where repetition and incoherence rates are
 measured from real generations, the method certifies half of the safe
 region with 2.1x fewer generations than testing without the ordering on a
 12x12 grid and 4.3x fewer on a 23x23 grid (3.1x and 8.1x fewer than
-full-grid Learn-then-Test), pilot study included, and 2.0x fewer on a
-second, larger model. Across this, additive manufacturing process windows
+full-grid Learn-then-Test), pilot study included, and 1.6-2.0x fewer on
+two larger models. Across this, additive manufacturing process windows
 and a drug-combination screen it needs 1.3-9x fewer trials than adaptive
 testing without the ordering and, on 48x48 grids, 19-26x fewer than a
 full grid with fixed-sequence testing, with no unsafe setting certified in

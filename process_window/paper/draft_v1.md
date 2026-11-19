@@ -207,7 +207,10 @@ multiple-testing factor ln(MN/alpha)/L of the ordered lower bound.
 - *Language model sampling.* SmolLM2-135M and, as larger models,
   Qwen2.5-0.5B and 1.5B (86 and 88 of 144 settings safe; no setting off the
   monotone fit at the 1% level, 1 and 0 of 264 pairs reversed by more than
-  2 SE); 12 temperatures (0.2-2.0) x 12
+  2 SE; five live runs in which the certifier queries SmolLM2 directly
+  certified 59-65 of 78 safe settings with 8.0k generations each, none
+  unsafe, in line with 59-69 for 20 surface runs at the same budget;
+  results/lm/lm_live_summary.csv); 12 temperatures (0.2-2.0) x 12
   top-p values (0.5-1.0); prompts from WikiText-2; degenerate = more than
   20% of 4-grams repeated, incoherent = mean token NLL above 3.5 nats;
   eps = 10% for both. Ground truth from 144 generations per setting

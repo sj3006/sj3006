@@ -98,11 +98,13 @@ settings). 7B models from three families are tier A in COMPUTE_PLAN.md
 only measuring the reference surface does.
 
 **10. Benchmark runs resample a fitted surface instead of querying the model.**
-The live run queries SmolLM2 directly: 8.0k generations certified 64 of
-78 safe settings and no unsafe one, in line with the 65 certified on
-average by surface runs at the same budget. More live runs (other seeds,
-other models) are cheap on CPU for the small models and part of tier A on
-a GPU.
+Five live runs query SmolLM2 directly (seeds 0-4). Each used 8.0k
+generations and certified 59-65 of the 78 safe settings (62.8 on average)
+and no unsafe setting. Twenty surface runs at the same budget certify
+59-69 (64.3 on average), also with no unsafe setting. Files:
+results/lm/lm_live_seed*.json, results/lm/lm_live_summary.csv
+(experiments/lm_live_summary.py). Live runs on the larger models are
+about 2-4x slower on CPU and part of tier A on a GPU.
 
 **11. Few runs per configuration (5-8).**
 Medians of costs that vary little between runs (the per-run costs are in

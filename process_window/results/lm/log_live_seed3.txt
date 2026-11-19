@@ -219,3 +219,23 @@ Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF
 {'generations': 7512, 'certified': 61, 'unsafe_vs_reference': 0, 'seconds': 2165.0}
 {'generations': 7536, 'certified': 61, 'unsafe_vs_reference': 0, 'seconds': 2174.3}
 {'generations': 7560, 'certified': 61, 'unsafe_vs_reference': 0, 'seconds': 2183.0}
+{'generations': 7584, 'certified': 61, 'unsafe_vs_reference': 0, 'seconds': 2192.0}
+{'generations': 7608, 'certified': 61, 'unsafe_vs_reference': 0, 'seconds': 2201.3}
+{'generations': 7632, 'certified': 61, 'unsafe_vs_reference': 0, 'seconds': 2210.6}
+{'generations': 7656, 'certified': 61, 'unsafe_vs_reference': 0, 'seconds': 2219.9}
+{'generations': 7680, 'certified': 61, 'unsafe_vs_reference': 0, 'seconds': 2229.2}
+{'generations': 7704, 'certified': 61, 'unsafe_vs_reference': 0, 'seconds': 2238.3}
+{'generations': 7728, 'certified': 61, 'unsafe_vs_reference': 0, 'seconds': 2247.1}
+{'generations': 7752, 'certified': 61, 'unsafe_vs_reference': 0, 'seconds': 2255.8}
+{'generations': 7776, 'certified': 61, 'unsafe_vs_reference': 0, 'seconds': 2264.6}
+{'generations': 7800, 'certified': 61, 'unsafe_vs_reference': 0, 'seconds': 2274.0}
+{'generations': 7824, 'certified': 61, 'unsafe_vs_reference': 0, 'seconds': 2283.0}
+{'generations': 7848, 'certified': 61, 'unsafe_vs_reference': 0, 'seconds': 2291.6}
+{'generations': 7872, 'certified': 61, 'unsafe_vs_reference': 0, 'seconds': 2300.7}
+{'generations': 7896, 'certified': 61, 'unsafe_vs_reference': 0, 'seconds': 2310.1}
+{'generations': 7920, 'certified': 61, 'unsafe_vs_reference': 0, 'seconds': 2319.1}
+{'generations': 7944, 'certified': 61, 'unsafe_vs_reference': 0, 'seconds': 2328.3}
+{'generations': 7968, 'certified': 61, 'unsafe_vs_reference': 0, 'seconds': 2337.2}
+{'generations': 7992, 'certified': 61, 'unsafe_vs_reference': 0, 'seconds': 2346.5}
+{'generations': 8016, 'certified': 61, 'unsafe_vs_reference': 0, 'seconds': 2356.1}
+{'budget': 8000, 'seed': 3, 'safe_reference': 78, 'certified': 61, 'certified_unsafe_vs_reference': 0, 'generations': 8016}
