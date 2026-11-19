@@ -85,3 +85,5 @@ Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF
 {'generations': 4296, 'certified': 29, 'unsafe_vs_reference': 0, 'seconds': 847.8}
 {'generations': 4320, 'certified': 29, 'unsafe_vs_reference': 0, 'seconds': 857.6}
 {'generations': 4344, 'certified': 29, 'unsafe_vs_reference': 0, 'seconds': 867.0}
+{'generations': 4368, 'certified': 29, 'unsafe_vs_reference': 0, 'seconds': 876.4}
+{'generations': 4392, 'certified': 29, 'unsafe_vs_reference': 0, 'seconds': 885.9}
