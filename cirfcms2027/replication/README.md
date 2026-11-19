@@ -22,7 +22,7 @@ causes consistent with an observation, and determine how accurate the model
 must be for that test to remain valid. No experiments were performed for this
 work and no external dataset is required to run it.
 
-Package version: 1.0. Built 2026-11-19 from commit `46779a8` of the
+Package version: 1.0. Built 2026-11-19 from commit `ac33e62` of the
 source repository.
 
 ---
