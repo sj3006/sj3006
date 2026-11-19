@@ -26,3 +26,4 @@ Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF
 {'generations': 2880, 'certified': 1, 'unsafe_vs_reference': 0, 'seconds': 144.2}
 {'generations': 2904, 'certified': 1, 'unsafe_vs_reference': 0, 'seconds': 152.2}
 {'generations': 2928, 'certified': 1, 'unsafe_vs_reference': 0, 'seconds': 158.3}
+{'generations': 2952, 'certified': 1, 'unsafe_vs_reference': 0, 'seconds': 164.7}
