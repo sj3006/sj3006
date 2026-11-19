@@ -205,6 +205,32 @@ def depth_groups(rows: list[dict], study: dict) -> list[dict]:
     return out
 
 
+def envelope(rows: list[dict]) -> dict:
+    """Worst directional error validation at precision s would let through.
+
+    Over the twins that differ from the truth in shared quantities only (the
+    diagnosis-only families have zero prediction error and are excluded, since
+    no precision excludes them). No linearisation; limited by how densely the
+    sample covers small prediction errors.
+    """
+    fams = ("validation-equivalent", "region-rejected", "structural",
+            "one parameter", "operating point")
+    R = [r for r in rows if r["family"] in fams]
+    b = budget()
+    curve = []
+    for s in (0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 8.0):
+        sub = [r for r in R if r["pred_rms"] <= s]
+        m = max(sub, key=lambda r: r["delta_max"])
+        curve.append({"s": s, "n": len(sub), "worst": m["delta_max"],
+                      "worst_name": m["name"], "worst_pred": m["pred_rms"],
+                      "n_over": sum(r["delta_max"] > b for r in sub)})
+    over = [r for r in R if r["delta_max"] > b]
+    first = min(over, key=lambda r: r["pred_rms"])
+    return {"curve": curve, "n_below_2pct": sum(r["pred_rms"] <= 2.0 for r in R),
+            "first_over_pred": first["pred_rms"], "first_over_delta": first["delta_max"],
+            "first_over_name": first["name"]}
+
+
 def theory_numbers() -> dict:
     out = {"lambda_star_S3": float(th.noncentrality_for_coverage(0.90, 3)),
            "budget": {str(r): float(th.delta_max(r, 3)) for r in (14, 28, 56, 120)},
@@ -244,6 +270,10 @@ def main() -> dict:
     tol = tolerances(rows)
     res = {"table": table, "tests": t, "controls": c, "spread": sp,
            "tolerances": tol, "depth_groups": depth_groups(rows, data),
+           "envelope": envelope(rows),
+           "n_twins": len(rows),
+           "truth_amb_mape": next(r["amb_mape"] for r in rows
+                                  if r["family"] == "couplings control"),
            "theory": theory_numbers(), "sloppy": _side("_sloppy.json"),
            "floor": _side("_floor.json"),
            "grid": ({k: v for k, v in _side("_grid.json").items() if k != "rows"}

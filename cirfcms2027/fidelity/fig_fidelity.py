@@ -42,7 +42,7 @@ NAMED = {"structural": "s", "prediction only": ">", "one parameter": "d",
 
 
 XMAX = 25.0          # rejected twins beyond this are counted, not drawn
-NUM_FLOOR = 0.15     # numerical floor of the direction on the study grid, deg
+NUM_FLOOR = 0.17     # numerical floor of the direction on the study grid, deg
 
 
 def draw(ax, rows, rho=28.0):

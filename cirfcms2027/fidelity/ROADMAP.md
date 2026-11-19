@@ -1,5 +1,11 @@
 # How accurate must a digital twin be for fault diagnosis?
 
+> Status 2026-11-19: first full draft complete. Results summarised in
+> `FINDINGS.md`. The plan below is the original one; where the work departed from
+> it (the off-ridge family was replaced by region-rejected draws; numerical
+> resolution, prediction-only and one-parameter families were added;
+> Proposition 6 was added) the notebook says why.
+
 Third paper in this repository, after the conference paper (`../overleaf/`) and
 the certificate paper (`../certificate/`). Simulation only. Started 2026-11-18
 without input from the authors, on the instruction to proceed on best judgement;
@@ -117,13 +123,13 @@ diagnostic axis with no prediction cost.
 
 | WP | content | module | status |
 |---|---|---|---|
-| 0 | plan, documentation, GitHub index | this file, `README.md`, `LABNOTEBOOK.md` | in progress |
-| 1 | theorems and their verification | `theory.py`, `verify.py` | |
-| 2 | parameterised twin | `twin.py` | |
-| 3 | twin family | `twins.py` | |
-| 4 | study and findings | `study.py`, `FINDINGS.md` | |
-| 5 | verified literature | `literature.md` | |
-| 6 | results pipeline, figures, draft, claim registry | `results.py`, `figures.py`, `paper/`, `claims.py` | |
+| 0 | plan, documentation, GitHub index | this file, `README.md`, `LABNOTEBOOK.md` | done |
+| 1 | theorems and their verification | `theory.py`, `verify.py` | done, six results, 16/16 |
+| 2 | parameterised twin | `twin.py` | done |
+| 3 | twin family | `twins.py` | done, 13 families |
+| 4 | study and findings | `study.py`, `FINDINGS.md`, `grid_convergence.py`, `floor_check.py` | done |
+| 5 | verified literature | `literature.md` | done; two entries to verify |
+| 6 | results pipeline, figures, draft, claim registry | `results.py`, `fig_*.py`, `fill_tables.py`, `paper/`, `claims.py` | first full draft; 71/71 claims |
 
 ## What this paper will not claim
 

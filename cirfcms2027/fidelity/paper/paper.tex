@@ -234,15 +234,15 @@ is sensitive to the first and third rows and, by construction, cannot detect an
 error in the second.}
 \label{tab:classes}
 \small
-\begin{tabular}{@{}lll@{}}
+\begin{tabular}{@{}lp{0.52\textwidth}l@{}}
 \toprule
 class & quantities & visible to validation \\
 \midrule
 prediction only & keyhole coefficient & yes \\
-diagnosis only & fault couplings, noise model, scattering channel, & no \\
- & \quad instrument-model resolution & \\
-shared & absorptivity, conductivity, heat capacity, & yes \\
- & \quad operating power and speed & \\
+diagnosis only & fault couplings, noise model, scattering channel,
+instrument-model resolution & no \\
+shared & absorptivity, conductivity, heat capacity, operating power and
+speed & yes \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -326,7 +326,7 @@ which decreases as $1/\rho$.
 \end{corollary}
 
 For three instruments, a nominal 95\,\% certificate and a target of 90\,\%,
-$\lambda^* = 0.624$, and the budget is $3.24^\circ$ at $\rho = 14$,
+$\lambda^* = 0.624$, and the budget is $3.23^\circ$ at $\rho = 14$,
 $1.62^\circ$ at $\rho = 28$, $0.81^\circ$ at $\rho = 56$ and $0.38^\circ$ at
 $\rho = 120$. At the signal strength that the ten-degree floor implies, a twin
 must reproduce every fault's direction to within $1.6^\circ$.
@@ -451,6 +451,18 @@ commanded step is as strong as the fault to be diagnosed, four repetitions
 suffice, at every signal strength from $\rho = 14$ to $\rho = 120$. A modelled
 direction has a fixed error whose cost grows with $\rho$; a measured direction
 has an error that shrinks with the same signal that makes it expensive.
+Fig.~\ref{fig:theory} shows the contrast.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.8\textwidth]{fig2_theory}
+\caption{Coverage of the nominal 95\,\% certificate for the true cause as the
+signal grows, three instruments. Grey: the twin's direction is wrong by a fixed
+angle (Theorem~\ref{thm:coverage}). Blue: the direction is measured from four
+commanded steps as strong as the fault (Proposition~\ref{prop:commanded}).
+Dotted: the 90\,\% target. Dashed: $\rho = 28$.}
+\label{fig:theory}
+\end{figure}
 
 %% ===========================================================================
 \section{Twin experiments}
@@ -593,7 +605,8 @@ certificate's coverage, median over twins, at one instant and with build
 context at matched fault severity. Verdicts: share of twins that change at
 least one pair's separability verdict at one instant.}
 \label{tab:results}
-\small
+\footnotesize
+\setlength{\tabcolsep}{3.5pt}
 \begin{tabular}{@{}lrrrrrrrr@{}}
 \toprule
  & & prediction & \multicolumn{2}{c}{direction (deg)} & & \multicolumn{2}{c}{coverage} & \\
@@ -698,7 +711,21 @@ A power offset and an absorptivity offset of the same relative size give the
 same twin, since the model depends on them only through their product, and the
 study reproduces this to the last digit.
 
-%%SLOPPY%%
+How precise would validation against healthy-build geometry have to be to
+exclude every twin that exceeds the budget? Among the twins that differ from the
+truth in shared quantities, none with a prediction error below 2.09\,\% exceeds
+the budget; the first that does has a prediction error of 2.09\,\% and a
+directional error of 2.54$^\circ$, and twins with prediction errors of
+2.56\,\% and 3.34\,\% have directional errors of 16.4$^\circ$ and 45.1$^\circ$.
+Validation coarser than about 2\,\% in root-mean-square relative terms therefore
+admits twins that are unusable for diagnosis. Whether 2\,\% suffices is not
+established, because only 21 of the sampled twins have prediction errors below
+it. The requirement is in any case an order of magnitude finer than the error of
+the calibrated model against the benchmark measurements, 12.4\,\%. A local
+linearised version of this analysis was attempted and is not reported: along
+the directions that the data constrain least, a small change in prediction
+requires a large change in the parameters, and the linear regime is too small to
+be resolved above the numerical floor of the instrument model.
 
 \subsection{Quantities that only diagnosis sees}
 \label{sec:diagnosis-only}
@@ -744,16 +771,16 @@ The photodiode and pyrometer readings are integrals of the surface temperature,
 capped at the boiling point, over a square grid. The cap makes the integrand
 non-smooth, and as a fault changes the readings, the edge of the capped region
 crosses grid nodes. On the $121\times121$ grid used by the companion papers,
-the truth's own fault directions lie up to %%G121%%$^\circ$ from their values on
+the truth's own fault directions lie up to 0.97$^\circ$ from their values on
 a $961\times961$ grid, and the pairwise angles that those papers report shift by
-up to %%G121PAIR%%$^\circ$ (Table~\ref{tab:grid}). No separability verdict
+up to 0.60$^\circ$ (Table~\ref{tab:grid}). No separability verdict
 changes, because every pair is far from the ten-degree floor.
 
 As a twin, the coarse grid is a pure diagnosis-only error: it changes no
 prediction, since width and depth are computed analytically, and it moves the
 directions by 0.97$^\circ$, 60\,\% of the instantaneous budget, and reduces
 build-context coverage to 3.1\,\%. On the $961\times961$ grid used here the
-directions agree with a $1921\times1921$ grid to within %%FLOOR%%$^\circ$ for
+directions agree with a $1921\times1921$ grid to within 0.17$^\circ$ for
 the truth and every twin checked, which sets the resolution of all the results
 above.
 
@@ -768,7 +795,10 @@ grid: angle from the $961\times961$ result, degrees.}
 grid & power & speed & layer & gas & geometry \\
 \midrule
 % rows:gridrows
-% grid table: run grid_convergence.py
+$121\times121$ & 0.89 & 0.73 & 0.97 & 0.89 & 0.37 \\
+$241\times241$ & 0.09 & 0.20 & 0.23 & 0.09 & 0.05 \\
+$481\times481$ & 0.07 & 0.10 & 0.05 & 0.07 & 0.03 \\
+$961\times961$ & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \\
 % end rows:gridrows
 \bottomrule
 \end{tabular}
@@ -844,7 +874,7 @@ sits at the upper limit of diffusivity that the bounds allow, and twins with
 higher diffusivity, which the data alone would not exclude, were not sampled.
 Including them could only enlarge the set of validation-equivalent twins.
 
-The instrument model resolves fault directions to about %%FLOOR%% degrees on the
+The instrument model resolves fault directions to about 0.17 degrees on the
 study grid. Directional errors below that are reported as unresolved rather
 than as small.
 
@@ -945,8 +975,9 @@ Equation~\eqref{eq:region} is the likelihood-ratio region of nonlinear least
 squares with the error variance estimated from the residuals. It is exact for a
 model linear in its parameters and approximate otherwise. Its use here is to
 define a population of twins that validation cannot distinguish, not to make a
-probability statement about the parameters, and the conclusions of
-Section~\ref{sec:results} do not depend on its confidence level: the
-directional disagreement is already present among twins far inside it.
+probability statement about the parameters. The conclusions of
+Section~\ref{sec:results} weaken as the region is tightened but do not
+disappear: among the accepted twins whose sum of squared residuals lies within
+25\,\% of the minimum, the median directional error is still 8.7$^\circ$.
 
 \end{document}
