@@ -56,7 +56,8 @@ papers at the top level) is a separate, earlier project. Nothing in
 | Readable Markdown version of the paper | [`paper/draft_v1.md`](paper/draft_v1.md) (kept in sync with main.tex) |
 | Code overview and reproduction table | [`README.md`](README.md) |
 | Dated log of everything done | [`ROADMAP.md`](ROADMAP.md) (bottom section "Log") |
-| What extra compute would buy, and how to run it | [`COMPUTE_PLAN.md`](COMPUTE_PLAN.md), [`scripts/gpu_runs.sh`](scripts/gpu_runs.sh) |
+| What extra compute would buy | [`COMPUTE_PLAN.md`](COMPUTE_PLAN.md) |
+| **Running the 7B models on a GPU** (rented, Kaggle or HPC): one upload-ready zip | [`gpu/gpu_bundle.zip`](gpu/gpu_bundle.zip), instructions [`gpu/RUN_ME.md`](gpu/RUN_ME.md) |
 | Answers to likely reviewer questions | [`paper/reviewer_faq.md`](paper/reviewer_faq.md) |
 | Submission form fields and checklist | [`paper/submission_metadata.md`](paper/submission_metadata.md) |
 | Study notes (betting, multiple testing, bounds, search) | [`notes/`](notes/) (nine notes, see section 7) |
@@ -499,8 +500,14 @@ experiments/        one script per table or figure (commands in README.md)
 tests/              63 unit tests (validity checks included); ~1 minute
 scripts/
   make_supplement.py  builds the anonymous archive dist/supplement.zip
-  gpu_runs.sh         all GPU language-model runs in one command
+  make_gpu_bundle.py  builds gpu/gpu_bundle.zip
+  gpu_runs.sh         old entry point; now calls gpu/run_gpu.py
   lm_table_rows.py    prints Tables 1-2 rows for any measured model
+gpu/                the GPU package (rented GPU, Kaggle, HPC)
+  gpu_bundle.zip      upload this one file to the GPU machine
+  run_gpu.py          the one script: downloads, tests, measures, packs
+  RUN_ME.md           instructions for the three platforms
+  kaggle_notebook.ipynb, rented_gpu.sh, slurm_job.sh, requirements-gpu.txt
 paper/
   latex/            main.tex, references.bib, figs/, ICML 2026 style files
   draft_v1.md       Markdown mirror of the paper
@@ -596,7 +603,8 @@ practical rules:
 
 ### Add a new language model to the paper
 
-1. Measure it (one line per grid in `scripts/gpu_runs.sh`, or on CPU):
+1. Measure it. On a GPU, use the package in `gpu/` (section 10 C). It
+   also runs the analyses of step 2. On CPU (small models only):
    ```bash
    HF_HOME=<cache> python3 experiments/lm_surface.py --model <hf-name> --tag <tag> --threads 4
    ```
@@ -661,9 +669,20 @@ Listed in [`paper/submission_metadata.md`](paper/submission_metadata.md)
 
 ### C. In progress or ready to run
 
-- **GPU tier A**: `bash scripts/gpu_runs.sh` on one 80 GB GPU. It adds 7B
-  rows on both grids and live runs on a 7B model. Details in
-  `COMPUTE_PLAN.md`.
+- **GPU tier A: three 7B models.** Upload `gpu/gpu_bundle.zip` to a GPU
+  machine and follow `gpu/RUN_ME.md`. The same script runs on:
+  - a rented GPU: `bash rented_gpu.sh`;
+  - Kaggle (free): import `kaggle_notebook.ipynb` and Save & Run All;
+  - an HPC cluster: `sbatch slurm_job.sh`, after `--download-only` on the
+    login node.
+
+  Expected time:
+  - about 3-6 h on one A100/H100;
+  - about 10-20 h on Kaggle's free 2 x T4.
+
+  Bring back `gpu_results.zip` and put its `results/lm/` files into
+  `results/lm/`. It adds 7B rows on both grids, live runs on 7B models and
+  the analyses. Details in `COMPUTE_PLAN.md`.
 - **Live runs on a larger model.** For example Qwen2.5-0.5B on CPU:
   ```bash
   HF_HOME=<cache> python3 experiments/lm_live.py --model Qwen/Qwen2.5-0.5B --surface results/lm/surface_scores_qwen05b.npz --seed 0
@@ -686,8 +705,9 @@ each working session.
 3. **Fix** the one reference detail (Waudby-Smith page range: search the
    journal site or Google Scholar for "Estimating means of bounded random
    variables by betting", JRSS B 2024).
-4. **Optional:** get GPU time and run tier A (`scripts/gpu_runs.sh`), then
-   add the rows ("Add a new language model", section 9). Without it, the
+4. **Optional:** run tier A with `gpu/gpu_bundle.zip` (rented GPU, Kaggle
+   or HPC; see `gpu/RUN_ME.md`), then add the rows ("Add a new language
+   model", section 9). Without it, the
    paper stands as is.
 5. **When the ICML 2027 style is out:** drop it in, rebuild, and make sure
    the main text is at most 8 pages. If it overflows, the easiest cuts are

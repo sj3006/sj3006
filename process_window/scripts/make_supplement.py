@@ -70,6 +70,8 @@ README_EDITS = [
     ("results/          CSVs, logs and figures written by the experiments\n",
      "results/          CSVs and measured surfaces the paper is built from\n"),
     ("notes/            study notes and earlier proof drafts\n", ""),
+    ("gpu/              GPU package for the larger language models (upload gpu/gpu_bundle.zip;\n"
+     "                  instructions in gpu/RUN_ME.md: rented GPU, Kaggle or HPC)\n", ""),
     ("\n## Status\n\nSee the log at the bottom of `ROADMAP.md`.\n", ""),
 ]
 
@@ -86,7 +88,9 @@ def build(out):
     os.makedirs(out)
     files = []
     files += sorted(os.path.relpath(p, ROOT) for p in glob.glob(os.path.join(ROOT, "pwcert", "*.py")))
-    files += sorted(os.path.relpath(p, ROOT) for p in glob.glob(os.path.join(ROOT, "tests", "*.py")))
+    files += sorted(os.path.relpath(p, ROOT) for p in glob.glob(os.path.join(ROOT, "pwcert", "data", "*.json")))
+    files += sorted(os.path.relpath(p, ROOT) for p in glob.glob(os.path.join(ROOT, "tests", "*.py"))
+                    if not p.endswith("test_run_gpu.py"))     # tests gpu/, which is not in the archive
     files += [os.path.join("experiments", f) for f in EXPERIMENTS]
     files += ["requirements.txt", "requirements-lm.txt"]
     for g in RESULT_GLOBS:

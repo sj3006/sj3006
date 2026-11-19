@@ -16,7 +16,8 @@ instead of being generated again (output: surface_scores_23.npz).
 --model NAME --tag TAG measures another model (output: surface_scores_TAG.npz,
 or surface_scores_TAG_23.npz with --n 23, which reuses surface_scores_TAG.npz);
 the NLL judge is then that model's own NLL. On a GPU add --device cuda
---dtype bfloat16 --batch 160 (one batch per setting).
+--dtype bfloat16 --batch 160 (one batch per setting), or use gpu/run_gpu.py,
+which chooses these for the machine.
 """
 
 import argparse
@@ -29,7 +30,8 @@ import numpy as np
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from pwcert.lm import MODEL, generate_and_score, load, wikitext_prompts  # noqa: E402
 
-OUT = os.path.join(os.path.dirname(__file__), "..", "results", "lm")
+# PWCERT_LM_RESULTS lets a GPU run write somewhere else (gpu/run_gpu.py uses it).
+OUT = os.environ.get("PWCERT_LM_RESULTS", os.path.join(os.path.dirname(__file__), "..", "results", "lm"))
 
 
 def grid(n):
@@ -47,8 +49,10 @@ def main():
     ap.add_argument("--model", default=MODEL)
     ap.add_argument("--tag", default=None, help="output suffix for a model other than the default")
     ap.add_argument("--threads", type=int, default=4, help="torch threads (leave cores for other jobs)")
-    ap.add_argument("--device", default="cpu", help="cpu or cuda")
+    ap.add_argument("--device", default="cpu", help="cpu, cuda (one GPU) or auto (split over all GPUs)")
     ap.add_argument("--dtype", default=None, help="e.g. bfloat16 (default: the checkpoint's precision)")
+    ap.add_argument("--score-batch", type=int, default=32, help="sequences per NLL pass (lower it if memory is short)")
+    ap.add_argument("--max-settings", type=int, default=0, help="stop after this many new settings (0: all)")
     args = ap.parse_args()
     os.makedirs(OUT, exist_ok=True)
     temps, tops = grid(args.n)
@@ -71,21 +75,25 @@ def main():
     tok, model = load(args.model, threads=args.threads, device=args.device, dtype=args.dtype)
     prompts = wikitext_prompts(400)
     t0 = time.time()
+    new = 0
     for i, T in enumerate(temps):
         for j, p in enumerate(tops):
             key = f"{i}_{j}"
             if key in done:
                 continue
+            if args.max_settings and new >= args.max_settings:
+                return
             rng = np.random.default_rng(1000 * i + j + (0 if args.n == 12 else 10 ** 6))
             reps, nlls = [], []
             for _ in range(int(np.ceil(args.per_setting / args.batch))):
                 batch = list(rng.choice(prompts, args.batch))
-                r, n = generate_and_score(tok, model, batch, T, p)
+                r, n = generate_and_score(tok, model, batch, T, p, score_batch=args.score_batch)
                 reps.append(r)
                 nlls.append(n)
             done[key] = np.stack([np.concatenate(reps)[: args.per_setting],
                                   np.concatenate(nlls)[: args.per_setting]])
             np.savez(path, **done, temps=temps, tops=tops)
+            new += 1
             print(f"[{len(done)}/{len(temps) * len(tops)}] T={T} top_p={p} "
                   f"rep4>0.2: {np.mean(done[key][0] > 0.2):.3f}  NLL>3.5: {np.mean(done[key][1] > 3.5):.3f}"
                   f"  ({time.time() - t0:.0f}s)", flush=True)

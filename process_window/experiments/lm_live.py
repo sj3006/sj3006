@@ -26,15 +26,16 @@ from pwcert.cone import ConeCertifier  # noqa: E402
 from pwcert.lm import generate_and_score, load, wikitext_prompts  # noqa: E402
 from pwcert.lm_scenario import NLL_THRESH, REP_THRESH, make_lm_scenario  # noqa: E402
 
-OUT = os.path.join(os.path.dirname(__file__), "..", "results", "lm")
+OUT = os.environ.get("PWCERT_LM_RESULTS", os.path.join(os.path.dirname(__file__), "..", "results", "lm"))
 
 
 class LiveCertifier(ConeCertifier):
     """ConeCertifier whose trials are real generations."""
 
-    def __init__(self, sc, tok, model, prompts, gen_batch=32, **kw):
+    def __init__(self, sc, tok, model, prompts, gen_batch=32, score_batch=32, **kw):
         super().__init__(sc, **kw)
         self.tok, self.model, self.prompts, self.gen_batch = tok, model, prompts, gen_batch
+        self.score_batch = score_batch
         self.temps, self.tops = sc.power, sc.speed
         self.shape2 = sc.truth[sc.modes[0]].shape
 
@@ -44,7 +45,8 @@ class LiveCertifier(ConeCertifier):
         for start in range(0, k, self.gen_batch):
             m = min(self.gen_batch, k - start)
             pr = [self.prompts[t] for t in self.rng.integers(len(self.prompts), size=m)]
-            rep, nll = generate_and_score(self.tok, self.model, pr, float(self.temps[i]), float(self.tops[j]))
+            rep, nll = generate_and_score(self.tok, self.model, pr, float(self.temps[i]), float(self.tops[j]),
+                                          score_batch=self.score_batch)
             ys += [np.array([float(r > REP_THRESH), float(v > NLL_THRESH)]) for r, v in zip(rep, nll)]
         return ys
 
@@ -76,6 +78,8 @@ def main():
     ap.add_argument("--device", default="cpu")
     ap.add_argument("--dtype", default=None)
     ap.add_argument("--threads", type=int, default=4, help="CPU threads for torch")
+    ap.add_argument("--gen-batch", type=int, default=32, help="generations per model call")
+    ap.add_argument("--score-batch", type=int, default=32, help="sequences per NLL pass")
     args = ap.parse_args()
     sc = make_lm_scenario(0.10, "pilot", **({"path": args.surface} if args.surface else {}))
     n = sc.truth["degenerate"].shape[0]
@@ -85,7 +89,7 @@ def main():
         tag = os.path.splitext(os.path.basename(args.surface))[0].replace("surface_scores", "").strip("_")
         tag = tag + "_" if tag else ""
     prompts = wikitext_prompts(400, seed=1)      # a fresh prompt pool
-    c = LiveCertifier(sc, tok, model, prompts, rule="cone", weights="ensemble", alloc="edge", target_q=0.7,
+    c = LiveCertifier(sc, tok, model, prompts, gen_batch=args.gen_batch, score_batch=args.score_batch, rule="cone", weights="ensemble", alloc="edge", target_q=0.7,
                       batch=2 * n, coupons0=sc.meta["pilot_coupons"], rng=np.random.default_rng(args.seed))
     t0 = time.time()
     W = sc.true_window()

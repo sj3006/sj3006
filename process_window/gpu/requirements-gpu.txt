@@ -1,0 +1,10 @@
+# For gpu/run_gpu.py. Kaggle and most GPU images already have torch;
+# `pip install -r requirements-gpu.txt` adds or upgrades the rest.
+torch>=2.3
+transformers>=4.47
+accelerate>=0.30
+huggingface_hub>=0.24
+safetensors>=0.4
+numpy>=1.26
+scipy>=1.11
+pandas>=2.0

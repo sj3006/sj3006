@@ -28,9 +28,11 @@ longer; it cannot hold the 14B model.
 
 Free routes, slower to arrange: a university cluster; an NSF ACCESS
 "Explore" allocation (free for US researchers, a few days to approve);
-Kaggle notebooks (about 30 free GPU-hours a week on 16 GB T4/P100 cards,
-enough for 1.5B-3B models; 7B would need a small change to split the
-model over two cards).
+Kaggle notebooks (about 30 free GPU-hours a week; with "GPU T4 x2" a 7B
+model is split over the two 16 GB cards automatically, in float16 because T4s
+have no bfloat16; tier A takes roughly 10-20 h there, so one to two weeks of
+free quota; Qwen models can overflow in float16, in which case the script
+skips them and says so).
 
 ## How the numbers were estimated
 
@@ -53,25 +55,33 @@ These are estimates, not measurements, with about a 2x margin.
 
 ## How to run it
 
-On any Linux machine with an NVIDIA GPU, CUDA and Python 3.10+:
+Everything is packed in one upload-ready file, **`gpu/gpu_bundle.zip`**. It
+holds the code, the exact prompts and one script, `run_gpu.py`, which runs
+unchanged on a rented GPU, on Kaggle and on an HPC cluster. Step-by-step
+instructions for each are in [`gpu/RUN_ME.md`](gpu/RUN_ME.md) (also inside
+the zip). In short:
 
-```
-git clone <this repository>; cd <repo>/process_window
-pip install -r requirements.txt -r requirements-lm.txt
-bash scripts/gpu_runs.sh             # tier A
-TIER=B bash scripts/gpu_runs.sh      # tier A + B (skips what is done)
-```
+| Where | How you start it |
+|---|---|
+| Rented GPU | `unzip gpu_bundle.zip && cd gpu_bundle && bash rented_gpu.sh` |
+| Kaggle (free, 2 x T4) | upload the zip as a dataset, import `kaggle_notebook.ipynb`, Save & Run All |
+| HPC (Slurm) | `python3 run_gpu.py --download-only ...` on the login node, then `sbatch slurm_job.sh` |
 
-Every step can be resumed, so a preempted or spot instance is fine: run the
-script again. The outputs (results/lm/surface_scores_<tag>*.npz and
-lm_live_<tag>_seed*.json, a few MB) are all that needs to come back; commit
-them or copy them over. The analysis then runs on any CPU (commands at the
-end of scripts/gpu_runs.sh), and I add the rows, the size trend and the
-live-run results to the paper.
+The script:
+- downloads the models itself;
+- picks the precision (bfloat16 where the GPU supports it, else float16)
+  and whether to split a model over several GPUs;
+- runs a 2-setting test first and prints a time estimate;
+- handles float16 overflow and out-of-memory errors;
+- saves after every setting and resumes in a later session;
+- stops in time before a session limit.
 
-If the GPU machine runs the Claude desktop app or Claude Code with Remote
-Control, it can also be attached to a session so the runs are driven from
-there directly.
+The one file that comes back is `gpu_results.zip`. Its `results/lm/` files
+go into this repository's `results/lm/`; the paper is then updated as in
+PROJECT_RECORD.md, section 9. Try `--dry-run` first: a few minutes with a
+135M model, which checks the whole pipeline.
+
+Rebuild the zip after changing the code: `python3 scripts/make_gpu_bundle.py`.
 
 ## What it changes in the paper
 

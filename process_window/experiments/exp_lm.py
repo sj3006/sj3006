@@ -38,7 +38,7 @@ from pwcert.gp_baseline import GPLevelSet  # noqa: E402
 from pwcert.lm_scenario import LM_DIRECTIONS, NLL_THRESH, PATH, REP_THRESH, load_scores, make_lm_scenario  # noqa: E402
 from pwcert.search import SearchCertifier  # noqa: E402
 
-OUT = os.path.join(os.path.dirname(__file__), "..", "results", "lm")
+OUT = os.environ.get("PWCERT_LM_RESULTS", os.path.join(os.path.dirname(__file__), "..", "results", "lm"))
 EPS, Q = 0.10, 0.5
 # Set from the command line: which measured surface, how sparse the pilot,
 # and a suffix for output files (empty for the 12 x 12 surface).

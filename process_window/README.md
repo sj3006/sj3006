@@ -56,6 +56,8 @@ pwcert/
 experiments/      one script per table or figure (below)
 results/          CSVs, logs and figures written by the experiments
 tests/            unit tests, including validity checks
+gpu/              GPU package for the larger language models (upload gpu/gpu_bundle.zip;
+                  instructions in gpu/RUN_ME.md: rented GPU, Kaggle or HPC)
 notes/            study notes and earlier proof drafts
 ```
 
