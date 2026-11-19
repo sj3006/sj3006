@@ -1,5 +1,10 @@
 # Project record
 
+> **Moved (2026-11-19).** This project now lives in its own private repository,
+> **[sj3006/safe-operating-regions](https://github.com/sj3006/safe-operating-regions)**,
+> with its full history. The copy in this folder is frozen as of that date;
+> continue the work there.
+
 **Certifying Safe Operating Regions under Monotone Failure Modes**
 (target: ICML 2027, main track)
 

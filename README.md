@@ -4,6 +4,10 @@ This repository holds two separate projects.
 
 ## 1. Certifying safe operating regions (ICML 2027 submission)
 
+**Moved (2026-11-19):** this project now lives in its own private repository,
+[sj3006/safe-operating-regions](https://github.com/sj3006/safe-operating-regions),
+with its full history. The folder below is a frozen copy.
+
 Folder: [`process_window/`](process_window/)
 
 A method for certifying which settings of a system (laser power and speed

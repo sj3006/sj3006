@@ -1,5 +1,10 @@
 # Certifying safe operating regions under monotone failure modes
 
+> **Moved (2026-11-19).** This project now lives in its own private repository,
+> **[sj3006/safe-operating-regions](https://github.com/sj3006/safe-operating-regions)**,
+> with its full history. The copy in this folder is frozen as of that date;
+> continue the work there.
+
 Code for the ICML 2027 submission. The paper itself is
 `paper/latex/main.tex` (compiled: `paper/latex/main.pdf`); the proofs in
 plain text are `paper/appendix_theory.md`.
