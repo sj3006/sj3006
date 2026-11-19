@@ -35,7 +35,8 @@ def ignorable(rel: str) -> bool:
     # outputs the programs write into code/ when run
     if rel.startswith("code/") and (p.name.startswith("_") and p.suffix == ".json"):
         return True
-    if rel in {"code/certificate/results.json", "code/repro/REPORT.md"}:
+    if rel in {"code/certificate/results.json", "code/repro/REPORT.md",
+               "code/certificate/llm_replies.json", "code/certificate/llm_results.json"}:
         return True
     if rel.startswith(("code/paper/", "code/figures/", "code/certificate/figures/",
                        "code/fidelity/paper/figures/")) and p.suffix in {".png", ".pdf"}:

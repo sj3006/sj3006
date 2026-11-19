@@ -11,6 +11,11 @@ Three linked papers live in this directory. All of it is on the branch
 
 ## Where to start
 
+- **`HANDBOOK.md`**: how to finish all three papers and take the work to a
+  real machine without any assistant: remaining work step by step, the rules
+  that keep numbers correct, experimental protocols, open decisions.
+- **`conversations/`**: the full written record of the conversation, every
+  request and reply verbatim, one file per day.
 - **`RECORD.md`**: the complete record of the work across all three papers,
   what was found, what was created and where it is kept.
 - **`replication/`** (and the same as one file, `cirfcms2027-replication.zip`):

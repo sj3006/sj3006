@@ -150,6 +150,8 @@ def build_generated_data() -> None:
 def build_docs() -> None:
     D = OUT / "docs"
     copy(ROOT / "RECORD.md", D / "RECORD.md")
+    copy(ROOT / "HANDBOOK.md", D / "HANDBOOK.md")
+    copy_tree(ROOT / "conversations", D / "conversations", {".md"})
     copy(ROOT / "INDEX.md", D / "INDEX-source-repository.md")
     copy(ROOT / "README.md", D / "findings" / "conference-README.md")
     copy(ROOT / "certificate" / "FINDINGS.md", D / "findings" / "certificate-FINDINGS.md")
