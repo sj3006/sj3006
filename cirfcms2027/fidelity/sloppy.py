@@ -1,4 +1,14 @@
-"""How precise must validation be? The local, worst-case answer.
+"""How precise must validation be? The local, worst-case answer. (NEGATIVE RESULT)
+
+Status: run on 2026-11-18 and NOT used in the paper. The linearisation is not
+reliable for this model: the direction derivatives change by a factor of up to
+4.5 between 10 % and 5 % steps, finite differences report a spurious change
+along the exact null direction, and the nonlinear check along the claimed worst
+direction disagrees with the linear prediction by factors of 3 to 75. Along a
+sloppy direction a small prediction change needs a large parameter move, so the
+linear regime is too small to sit above the instrument model's numerical floor.
+The paper uses the empirical envelope in `results.py` instead. Kept so the
+attempt and its failure are reproducible; see LABNOTEBOOK entry 6.
 
 Near the truth, a small change `t` in the log-parameters `(mu, k, cp, C)`
 changes the healthy-build predictions by `P t` (relative, 16 values: width and

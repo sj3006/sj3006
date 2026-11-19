@@ -216,6 +216,16 @@ def theory_numbers() -> dict:
     q = chi2.ppf(0.95, 2)
     out["noise_level_coverage"] = {f"{c:g}": float(chi2.cdf(q / c ** 2, 2))
                                    for c in (1 / 0.9, 1 / 0.75, 1 / 0.5, 1.1, 1.25, 1.5)}
+    # the commanded step that gives rho = 28, at the certificate paper's
+    # convention eps = 1 %, from the truth's Jacobian on the study grid
+    import study as st_mod
+    import twins as tw_mod
+    sc = st_mod.Scorer()
+    J = sc.J(tw_mod.REFERENCE)
+    sig = np.asarray(tw_mod.REFERENCE.sigmas, float)
+    norms = np.linalg.norm(J / sig[:, None], axis=0)
+    out["step_for_rho28_eps1pct"] = {f: float(28.0 * 0.01 / n)
+                                     for f, n in zip(FAULTS, norms)}
     return out
 
 

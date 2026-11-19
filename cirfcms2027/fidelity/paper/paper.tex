@@ -41,7 +41,32 @@ digital twin must be to attribute process faults in laser powder bed fusion}
                 city={Pilani}, country={India}}
 
 \begin{abstract}
-%%ABSTRACT%%
+A digital twin of a manufacturing process is normally validated by comparing
+its predictions with measurements from healthy production, and is then often
+used for a different task: to attribute an observed anomaly to a process fault.
+This paper asks how accurate a twin must be for the second task, using the
+certificate of a companion paper, a test that returns the set of fault causes
+consistent with an observation with exact coverage, and the calibrated thermal
+model of laser powder bed fusion on which it rests. The certificate depends on
+the twin only through the directions in which faults move the instrument
+readings. A directional error $\delta$ reduces its coverage by an exact amount,
+and the admissible error shrinks in inverse proportion to the signal strength:
+at the signal the conventional ten-degree separation floor implies, every
+direction must be right to within 1.6 degrees, and with build context to within
+a quarter of a degree. Twin experiments over 301 twins show that validation
+against melt-pool geometry does not secure this. The twins that the benchmark
+data accept as equally good disagree with the calibrated model about the fault
+directions by a median of 22.5 degrees and with one another by 30.1 degrees,
+and 99\,\% exceed the budget. Quantities that only diagnosis uses, such as the
+noise model, an omitted beam-scattering channel and the numerical resolution of
+the instrument model, change no prediction and still move the directions by
+amounts comparable to the budget; the coarse resolution used in the companion
+papers is one of them. Conversely, a prediction-only parameter changes predicted
+depths by 18 per cent at no diagnostic cost. The constructive result is that the
+directions can be measured rather than modelled: four commanded steps as strong
+as the fault keep the certificate within its coverage target at every signal
+strength, and at the companion paper's noise convention such a step is a 3.2 per
+cent change in laser power.
 \end{abstract}
 
 \begin{keyword}
@@ -117,7 +142,7 @@ so stronger signals need a more accurate twin; noise-model errors cost a fixed
 amount; build context carries the error unchanged but raises its price; and a
 direction measured from a few commanded steps meets the requirement at every
 signal strength (Section~\ref{sec:theory}).
-\item A twin experiment over %%NTWINS%% twins in ten families, which measures
+\item A twin experiment over 301 twins in thirteen families, which measures
 how far twins that validate equally well disagree about fault directions, and
 whether prediction accuracy indicates diagnostic accuracy
 (Sections~\ref{sec:experiments} and \ref{sec:results}).
@@ -508,7 +533,21 @@ $241\times241$.
 \toprule
 family & class & twins \\
 \midrule
-%%FAMILYROWS%%
+% rows:familyrows
+validation-equivalent & shared & 120 \\
+region-rejected & shared & 120 \\
+structural & shared, structure & 2 \\
+prediction only & prediction only & 4 \\
+one parameter & shared & 12 \\
+operating point & shared & 16 \\
+numerical resolution & diagnosis only & 2 \\
+couplings & diagnosis only & 8 \\
+couplings control & diagnosis only & 4 \\
+noise model & diagnosis only & 3 \\
+noise level & diagnosis only & 4 \\
+missing channel & diagnosis only & 3 \\
+spurious channel & diagnosis only & 3 \\
+% end rows:familyrows
 \bottomrule
 \end{tabular}
 \end{table}
@@ -540,19 +579,306 @@ whitened space, at one instant and with build context.
 \section{Results}
 \label{sec:results}
 
-%%RESULTS%%
+Table~\ref{tab:results} summarises every family, and Fig.~\ref{fig:fidelity}
+places every twin by its two scores.
+
+\begin{table}[t]
+\centering
+\caption{Scores by family, at $\rho = 28$, three instruments, on the converged
+instrument grid. Prediction error: median RMS relative difference from the
+truth on healthy builds. Direction: median and largest over twins of the
+largest directional error over the five faults. Over: share of twins above the
+budget of $1.62^\circ$. Coverage: smallest over faults of the nominal 95\,\%
+certificate's coverage, median over twins, at one instant and with build
+context at matched fault severity. Verdicts: share of twins that change at
+least one pair's separability verdict at one instant.}
+\label{tab:results}
+\small
+\begin{tabular}{@{}lrrrrrrrr@{}}
+\toprule
+ & & prediction & \multicolumn{2}{c}{direction (deg)} & & \multicolumn{2}{c}{coverage} & \\
+\cmidrule(lr){4-5}\cmidrule(lr){7-8}
+family & $n$ & error (\%) & median & largest & over & instant & build & verdicts \\
+\midrule
+% rows:tablerows
+validation-equivalent & 120 & 8.5 & 22.55 & 88.75 & 0.99 & 0.0 & 0.0 & 0.89 \\
+region-rejected & 120 & 13.9 & 71.51 & 89.90 & 1.00 & 0.0 & 0.0 & 0.99 \\
+structural & 2 & 17.8 & 66.54 & 70.36 & 1.00 & 0.0 & 0.0 & 1.00 \\
+prediction only & 4 & 12.7 & 0.00 & 0.00 & 0.00 & 95.0 & 95.0 & 0.00 \\
+one parameter & 12 & 1.1 & 0.25 & 1.32 & 0.00 & 94.9 & 89.1 & 0.00 \\
+operating point & 16 & 0.7 & 0.29 & 1.32 & 0.00 & 94.9 & 87.7 & 0.00 \\
+numerical resolution & 2 & 0.0 & 0.60 & 0.97 & 0.00 & 94.1 & 46.7 & 0.00 \\
+couplings & 8 & 0.0 & 0.06 & 0.37 & 0.00 & 95.0 & 94.7 & 0.00 \\
+couplings control & 4 & 0.0 & 0.00 & 0.00 & 0.00 & 95.0 & 95.0 & 0.00 \\
+noise model & 3 & 0.0 & 0.00 & 0.00 & 0.00 & 94.8 & -- & 0.33 \\
+noise level & 4 & 0.0 & 0.00 & 0.00 & 0.00 & 94.3 & -- & 0.00 \\
+missing channel & 3 & 0.0 & 1.55 & 2.27 & 0.33 & 90.4 & 0.0 & 0.00 \\
+spurious channel & 3 & 0.0 & 1.55 & 2.27 & 0.33 & 90.4 & 0.0 & 0.00 \\
+% end rows:tablerows
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{fig1_fidelity}
+\caption{Prediction error against directional error for every twin. Twins the
+benchmark data accept (blue) lie one to two orders of magnitude above the
+directional budget at $\rho = 28$ (dashed). Twins that differ from the truth
+only in a diagnosis-only quantity lie on the vertical axis; twins that differ
+only in the keyhole coefficient lie on the horizontal axis at zero directional
+error. The shaded band is below the numerical resolution of the instrument
+model.}
+\label{fig:fidelity}
+\end{figure}
+
+\subsection{Validation leaves the fault directions undetermined}
+\label{sec:ve}
+
+The 120 validation-equivalent twins differ from the truth in their healthy-build
+predictions by a median of 8.5\,\% and at most 11.7\,\%, which is less than the
+truth's own error against the measurements, 12.4\,\%. Their largest
+directional error has a median of 22.5$^\circ$, and 119 of the 120 exceed the
+budget. The median of their coverage at $\rho = 28$, for the worst fault, is
+zero to three decimal places, and 89\,\% of them report a different separability verdict for at
+least one pair of faults. The faults most affected are speed, layer and gas,
+with median errors of 13.4$^\circ$, 3.3$^\circ$ and 18.1$^\circ$; power has the
+same median error as gas, 18.1$^\circ$, because the two faults reach the model
+through the same quantity.
+
+This does not depend on designating the calibrated model as the truth. Taking
+every pair of accepted twins in turn, one as truth and the other as twin, the
+median largest directional error over the 7140 pairs is 30.1$^\circ$, and
+98\,\% of pairs exceed the budget. Whichever accepted model is closest to the
+process, the others that validation would pass equally well are wrong about the
+directions by more than the certificate tolerates.
+
+Validation is informative, but not sufficiently. The rejected twins have larger
+directional errors than the accepted ones (median 71.5$^\circ$; one-sided
+Mann--Whitney $p < 10^{-10}$), and among accepted twins the error shrinks with
+the quality of fit. The six accepted twins whose sum of squared residuals lies
+within 25\,\% of the minimum have a median error of 8.7$^\circ$, and five of
+them exceed the budget; the 28 within 50\,\% have a median of 11.2$^\circ$.
+Fig.~\ref{fig:region} shows the reason. The twin depends on its thermal
+parameters through two groups, and the data constrain one combination of the
+two while leaving a band along which the directional error grows steadily.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.85\textwidth]{fig3_region}
+\caption{The validation region in the plane of the two identifiable thermal
+groups. Small points: 2048 sampled parameter sets, accepted or rejected by the
+benchmark data. Large points: the accepted twins scored in the study, shaded by
+their largest directional error. The truth lies at the corner of the accepted
+band because the calibration's bounds cap the diffusivity at its value.}
+\label{fig:region}
+\end{figure}
+
+\subsection{Prediction error is a weak indicator of directional error}
+\label{sec:indicator}
+
+Within the accepted set, the rank correlation between a twin's prediction error
+and its directional error is 0.18 ($p = 0.046$); with its error against the
+measured dimensions, 0.32. Across accepted and rejected twins together the
+correlation is 0.36, carried mainly by the difference between the two groups.
+The named families make the dissociation exact. Scaling the keyhole coefficient
+by 0.5 or 1.5 changes the predicted depths by an RMS of 18.1\,\% and every fault
+direction by exactly zero. Every diagnosis-only quantity, in the other
+direction, changes the predictions by exactly zero
+(Section~\ref{sec:diagnosis-only}).
+
+\subsection{How accurate the twin must be}
+\label{sec:accuracy}
+
+Small errors in the shared quantities are tolerable at one instant. An error of
+up to 5\,\% in absorptivity, conductivity or heat capacity alone, or of up to
+10\,\% in the operating power or speed, produces at most 1.32$^\circ$ of
+directional error, inside the budget, and keeps coverage at or above 91.8\,\%.
+A power offset and an absorptivity offset of the same relative size give the
+same twin, since the model depends on them only through their product, and the
+study reproduces this to the last digit.
+
+%%SLOPPY%%
+
+\subsection{Quantities that only diagnosis sees}
+\label{sec:diagnosis-only}
+
+The coupling constants behave as Theorem~\ref{thm:magnitude} predicts.
+Changing the geometry preheat constant from 25\,K to 400\,K, a factor of
+sixteen, moves no direction by more than 0.001$^\circ$. The layer constants,
+which set the mixture of two channels in the layer signature, move it by at most
+0.37$^\circ$ over the ranges tried.
+
+The noise model changes no prediction and no Jacobian, and its effect on
+coverage is that of Proposition~\ref{prop:noise}. The alternative noise set in
+which the pyrometer is taken to be 35 times quieter than it is reduces coverage
+of the nominal 95\,\% certificate to 5.0\,\%. A set in which the camera noise is
+taken to be seven times larger than it is keeps coverage at 96.0\,\% but changes
+four of the ten separability verdicts, because whitening with the wrong noise
+rotates the directions the twin reports.
+
+Beam scattering by the vapour plume, present in the process and omitted from
+the twin, turns the gas signature by 0.44$^\circ$, 1.55$^\circ$ and
+2.27$^\circ$ at the three scattering strengths, and the largest of these exceeds
+the budget. The twin's predictions are unaffected, because scattering acts only
+when the gas fault is present. The reverse error, a twin that includes
+scattering the process lacks, gives the same angles.
+
+\subsection{Build context}
+\label{sec:build}
+
+At matched fault severity, build context raises the whitened signal by a factor
+of 9.3 to 11.5 and lowers the directional budget correspondingly, to between
+0.24$^\circ$ and 0.29$^\circ$ depending on the fault. Twins that are
+comfortably inside the instantaneous budget fail it. A 5\,\% power offset,
+1.32$^\circ$, leaves build-context coverage at 0.05\,\%; a 2\,\% absorptivity
+offset, 0.55$^\circ$, leaves 59.8\,\%; omitting scattering at the middle strength
+leaves none. The unique-attribution rate of 95.3\,\% that the certificate paper
+reports for build context is therefore a property of a twin whose directions
+are right to about a quarter of a degree.
+
+\subsection{The numerical resolution of the instrument model}
+\label{sec:grid}
+
+The photodiode and pyrometer readings are integrals of the surface temperature,
+capped at the boiling point, over a square grid. The cap makes the integrand
+non-smooth, and as a fault changes the readings, the edge of the capped region
+crosses grid nodes. On the $121\times121$ grid used by the companion papers,
+the truth's own fault directions lie up to %%G121%%$^\circ$ from their values on
+a $961\times961$ grid, and the pairwise angles that those papers report shift by
+up to %%G121PAIR%%$^\circ$ (Table~\ref{tab:grid}). No separability verdict
+changes, because every pair is far from the ten-degree floor.
+
+As a twin, the coarse grid is a pure diagnosis-only error: it changes no
+prediction, since width and depth are computed analytically, and it moves the
+directions by 0.97$^\circ$, 60\,\% of the instantaneous budget, and reduces
+build-context coverage to 3.1\,\%. On the $961\times961$ grid used here the
+directions agree with a $1921\times1921$ grid to within %%FLOOR%%$^\circ$ for
+the truth and every twin checked, which sets the resolution of all the results
+above.
+
+\begin{table}[t]
+\centering
+\caption{Convergence of the truth's fault directions with the instrument-model
+grid: angle from the $961\times961$ result, degrees.}
+\label{tab:grid}
+\small
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+grid & power & speed & layer & gas & geometry \\
+\midrule
+% rows:gridrows
+% grid table: run grid_convergence.py
+% end rows:gridrows
+\bottomrule
+\end{tabular}
+\end{table}
 
 %% ===========================================================================
 \section{Discussion}
 \label{sec:discussion}
 
-%%DISCUSSION%%
+\subsection{What validation for diagnosis should measure}
+
+The results separate two questions that the usual practice treats as one. A twin
+validated on healthy-build geometry has demonstrated that it reproduces two
+groups of thermal parameters along the directions the data constrain. It has
+not demonstrated that it reproduces fault directions, and
+Section~\ref{sec:results} shows that among the twins the same data accept, the
+directions differ by far more than the certificate tolerates.
+
+Theorem~\ref{thm:magnitude} indicates what should be measured instead. The
+certificate needs only the directions in which faults move the instrument
+readings. Proposition~\ref{prop:commanded} shows that those directions can be
+measured from a small number of deliberate steps on a healthy machine, and that
+the number does not grow with the signal strength. At the noise convention of
+the certificate paper, $\varepsilon = 1\,\%$, a signal of $\rho = 28$ is
+produced by a 3.2\,\% power step, a 9.4\,\% speed step or a
+preheat index of 0.43, so four such steps per fault are a routine
+test-build procedure rather than a research campaign.
+
+Not every fault can be commanded. Two of the five are covered by the structure
+of the fault model rather than by an experiment. Shielding-gas degradation
+enters the model as attenuation of the absorbed power, so in any twin without a
+scattering channel its direction is that of the power fault, and a power step
+measures both. Heat accumulation from part geometry enters as a local preheat
+rise, which a heated build plate can impose directly. Both equivalences are
+statements about the fault model, not about the machine, and the scattering
+results of Section~\ref{sec:diagnosis-only} show that the first fails as soon as
+beam scattering is present. Where a fault can be neither commanded nor reduced
+to one that can, the twin's direction must be used, and the Corollary's budget
+is then the requirement it must meet.
+
+\subsection{Consequences for the companion papers}
+
+Three findings bear on the two companion papers. First, both were identical-twin
+studies: the model that generated the observations was the model that
+interpreted them. The certificate's exact coverage holds under that condition,
+and this paper measures how quickly it is lost when the condition fails.
+Second, their instrument model on its default grid places the fault directions
+up to about one degree from their converged values. Every separability verdict
+in both papers is unaffected, because every pair lies far from the ten-degree
+floor, but the quoted angles carry an error of that size. Third, the
+calibration's conductivity and heat capacity are not separately identifiable
+from melt-pool geometry: the model is exactly invariant under a common scaling
+of absorptivity, conductivity and heat capacity, and the calibrated values lie
+on their bounds because the fit is degenerate along that line. Only absorbed
+power per unit conductivity and the diffusivity are determined, and the
+companion papers' description of the calibrated values should say so.
+
+\subsection{Limitations}
+
+The truth is a model. Every result here is a comparison between models, one of
+which is designated the truth, and it says how errors of a given kind propagate
+into diagnosis, not how large those errors are in the real process. The
+conclusion that validation leaves the directions undetermined does not depend on
+which model is designated the truth: it holds equally for the disagreement among
+the accepted twins themselves.
+
+Observations were generated from the truth's linearisation. This isolates the
+twin's error from the truth's curvature, which the certificate paper treats, but
+it means the two effects have not been studied together.
+
+The validation region depends on the calibration's bounds. The calibrated model
+sits at the upper limit of diffusivity that the bounds allow, and twins with
+higher diffusivity, which the data alone would not exclude, were not sampled.
+Including them could only enlarge the set of validation-equivalent twins.
+
+The instrument model resolves fault directions to about %%FLOOR%% degrees on the
+study grid. Directional errors below that are reported as unresolved rather
+than as small.
+
+One alloy, one machine configuration and one instrument suite were studied. The
+structural results of Sections~\ref{sec:classes} and \ref{sec:theory} do not
+depend on them; the numerical results do.
 
 %% ===========================================================================
 \section{Conclusions}
 \label{sec:conclusions}
 
-%%CONCLUSIONS%%
+A digital twin validated against healthy-build measurements has been shown to
+predict; it has not been shown to diagnose. For the certificate of the companion
+paper, diagnosis requires only the directions in which faults move the
+instrument readings, an error $\delta$ in a direction reduces coverage by an
+exact amount, and the admissible error shrinks as the signal grows: at the
+signal strength the ten-degree floor implies, every direction must be right to
+within 1.6 degrees.
+
+Validation against melt-pool geometry does not deliver that. The twins that the
+benchmark data accept disagree with the calibrated model by a median of
+22.5 degrees, and with each other by 30.1 degrees; 99\,\%
+of them exceed the budget, and their prediction error is a weak indicator of
+their directional error. Quantities that affect only diagnosis, such as the
+noise model, a missing physical channel or the numerical resolution of the
+instrument model, change no prediction at all and still move the directions by
+amounts comparable to the budget. Conversely, quantities that affect only
+prediction can carry large errors at no cost to diagnosis.
+
+The constructive conclusion is that a twin intended for diagnosis should be
+validated on directions, and that directions can be measured: four commanded
+steps of the same strength as the fault keep the certificate within its coverage
+target at every signal strength, for every fault that can be commanded or
+reduced to one that can.
 
 \section*{Reproducibility}
 All code is in the repository directory \texttt{cirfcms2027/fidelity}.
