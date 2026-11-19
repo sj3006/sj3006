@@ -208,6 +208,8 @@ def seconds_per_setting(logpath):
     """From the last two progress lines '[k/N] ... (XXs)' of a surface log."""
     import re
     times = []
+    if not os.path.exists(logpath):
+        return None
     with open(logpath) as f:
         for line in f:
             m = re.search(r"^\[\d+/\d+\].*\((\d+)s\)\s*$", line.strip())
@@ -327,7 +329,10 @@ def do_model(run, tag, hw):
                     date=time.strftime("%Y-%m-%d"))
         json.dump(meta, open(meta_path, "w"), indent=1)
     st["plan"] = p
-    sps = seconds_per_setting(os.path.join(run.logs, f"{tag}_surface12.log"))
+    sps = seconds_per_setting(os.path.join(run.logs, f"{tag}_surface12.log")) or meta.get("seconds_per_setting")
+    if sps and not meta.get("seconds_per_setting"):
+        meta["seconds_per_setting"] = sps                 # kept for the estimate in later sessions
+        json.dump(meta, open(meta_path, "w"), indent=1)
     if sps:
         left12 = 144 - n_settings(s12)
         left23 = 0 if "surface23" not in a.stages else 529 - max(n_settings(s23), 144)

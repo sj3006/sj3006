@@ -808,4 +808,11 @@ If ICML does not work out:
 - Qwen2.5-1.5B: done 2026-11-19, in Tables 1-2 and the text.
 - Plate-correlation experiment: done 2026-11-18, in the paper.
 - Live runs: five (seeds 0-4), done 2026-11-19, in the paper.
+- GPU package for the 7B models: `gpu/gpu_bundle.zip` (2026-11-19). Tested
+  on CPU with `--dry-run`, from the unpacked zip:
+  - every stage, packing, resuming from an earlier session's zip, and the
+    session time limit all work;
+  - the GPU-specific paths (splitting over two cards, the float16
+    overflow fallback, the out-of-memory retry) could not be run without
+    a GPU, but the choices behind them are unit-tested.
 - Nothing is running. Everything is committed and pushed.

@@ -341,3 +341,18 @@ These change the method, so they need your answer before Phase 2:
   budget: 59-69 (64.3), none unsafe (experiments/lm_live_summary.py).
   Paper text updated ("five live runs agree"). Main text ends about a
   quarter down page 8.
+- 2026-11-19 (later): GPU package for the 7B runs, one script for rented
+  GPUs, Kaggle and HPC clusters (gpu/run_gpu.py; upload-ready
+  gpu/gpu_bundle.zip, 92 kB; instructions gpu/RUN_ME.md; launchers
+  rented_gpu.sh, kaggle_notebook.ipynb, slurm_job.sh). It downloads each
+  model, picks bfloat16 or float16 and one card or a split over several,
+  tests 2 settings first (time estimate; float16 overflow -> float32 if it
+  fits, else skip; out of memory -> smaller batch), then measures both
+  grids, runs 2 live runs and the 12 x 12 analyses, resumes across
+  sessions and stops before a session limit, packing gpu_results.zip.
+  pwcert/lm.py: model split over GPUs, scoring kept on one card, NaN check,
+  precision argument named for the installed transformers version, prompt
+  pools shipped (pwcert/data/wikitext_prompts.json). CPU dry runs from the
+  unpacked zip found and fixed two bugs (the default model ignored --tag;
+  a resumed session crashed looking for an old log); all stages, resume
+  and the time limit now work. 69 tests pass.
