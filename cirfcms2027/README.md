@@ -1,3 +1,10 @@
+> **This repository holds three related papers.** This page describes the first,
+> the conference paper. For all three, start with [`INDEX.md`](INDEX.md); to
+> finish the papers or take the work to a real machine, read
+> [`HANDBOOK.md`](HANDBOOK.md); for the full record of the work, see
+> [`RECORD.md`](RECORD.md) and [`conversations/`](conversations/); to share or
+> replicate it, use [`replication/`](replication/).
+
 # Which process faults can be told apart?
 
 ### Diagnosability limits of in-situ monitoring in laser powder bed fusion
